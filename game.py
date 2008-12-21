@@ -19,7 +19,7 @@ class Game:
 		self.cur_level = Level(self.dimensions, 1)
 		self.cur_level.addCreature(self.player)
 		self.levels = [self.cur_level]
-		self.cur_level.refresh()
+		self.cur_level.draw()
 	
 	def play(self):
 		IO().drawInterface(self.turn_counter, self.cur_level.id)
@@ -36,14 +36,14 @@ class Game:
 		else:
 			self.cur_level = self.levels[self.levels.index(self.cur_level) + 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["us"])
-		self.cur_level.refresh()
+		self.cur_level.draw()
 
 	def ascend(self):
 		if self.levels.index(self.cur_level) > 0:
 			self.cur_level.removeCreature(self.player)
 			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["ds"])
-			self.cur_level.refresh()
+			self.cur_level.draw()
 		else:
 			self.endGame()
 			
