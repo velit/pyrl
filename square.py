@@ -1,3 +1,5 @@
+from io import IO
+
 class Square:
 	def __init__(self, tile, y, x):
 		self.loc = y, x
@@ -25,3 +27,6 @@ class Square:
 			return self.creature.ch.color
 		else:
 			return self.floor.ch.color
+
+	def draw(self):
+		IO().drawTile(self)

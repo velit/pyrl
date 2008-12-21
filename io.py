@@ -19,8 +19,8 @@ class IO:
 			self.setColors()
 			self.setFloors()
 	
-		def drawLevel(self, level):
-			for row in level.map:
+		def drawMap(self, map):
+			for row in map.map:
 				for square in row:
 					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, square.getChar(), square.getColor())
 
@@ -61,7 +61,7 @@ class IO:
 
 
 
-		def refreshTile(self, level, square):
+		def drawTile(self, square):
 			y,x=square.loc
 			self.w.addch(y+self.dy, x+self.dx, square.getChar(), square.getColor())
 

@@ -61,7 +61,7 @@ class Player(Creature):
 							IO().drawLine(game.cur_level.squares[self], game.cur_level.squares[cre])
 
 					elif c == 'f':
-						game.cur_level.refresh()
+						game.cur_level.draw()
 					else:
 						IO().printMsg("Unknown command: '"+c+"'")
 				else:
