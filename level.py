@@ -17,7 +17,7 @@ class Level:
 
 		self.map = Map(self.dimensions, self.squares)
 
-		for x in range(0):
+		for x in range(10):
 			self.addCreature(Monster())
 
 	def getSquare(self, y, x):

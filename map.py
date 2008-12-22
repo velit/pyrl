@@ -41,6 +41,8 @@ class Map:
 				self.attemptCorridor()
 			else:
 				self.attemptRoom()
+		self.addUpStairCase()
+		self.addDownStairCase()
 
 	def makeInitialRoom(self):
 		while True:
@@ -179,13 +181,27 @@ class Map:
 		self.digRect(fy, fx, IO().floors["f"], fhei, fwid)
 
 	def addUpStairCase(self):
-		square = self.getFreeTile()
+		while True:
+			square = self.getFreeTile()
+			y,x = square.loc
+			m = self.map
+			f = IO().floors["f"]
+			if m[y-1][x].floor == f and m[y+1][x].floor == f and m[y][x-1].floor == f and m[y][x+1].floor == f:
+				break
+
 		square.floor = IO().floors["us"]
 		self.squares["us"] = square
 		square.draw()
 
 	def addDownStairCase(self):
-		square = self.getFreeTile()
+		while True:
+			square = self.getFreeTile()
+			y,x = square.loc
+			m = self.map
+			f = IO().floors["f"]
+			if m[y-1][x].floor == f and m[y+1][x].floor == f and m[y][x-1].floor == f and m[y][x+1].floor == f:
+				break
+
 		square.floor = IO().floors["ds"]
 		self.squares["ds"] = square
 		square.draw()
