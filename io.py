@@ -59,8 +59,6 @@ class IO:
 					y += ystep
 					error += deltax
 
-
-
 		def drawTile(self, square):
 			y,x=square.loc
 			self.w.addch(y+self.dy, x+self.dx, square.getChar(), square.getColor())
