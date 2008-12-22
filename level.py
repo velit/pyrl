@@ -30,7 +30,7 @@ class Level:
 		return self.map.getRandomTile()
 
 	def draw(self):
-		IO().drawMap(self.map)
+		self.map.draw()
 
 	def addCreature(self, creature, square = None):
 		if square is None:
