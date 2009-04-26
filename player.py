@@ -7,7 +7,7 @@ from char import Char
 class Player(Creature):
 
 	def __init__(self):
-		self.name = "Bob"
+		Creature.__init__(self)
 		self.ch = Char('@', IO().colors["white"])
 
 	def move(self, direction, level):

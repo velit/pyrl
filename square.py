@@ -5,6 +5,7 @@ class Square:
 		self.loc = y, x
 		self.floor = tile
 		self.creature = None
+		self.flag = 0
 
 	#returns true if the square is passable by creatures
 	def passable(self):
@@ -14,6 +15,9 @@ class Square:
 			return self.floor.passable
 		else:
 			return False
+
+	def seeThrough(self):
+		return self.floor.see_through
 
 	#returns the visible character of the square
 	def getChar(self):

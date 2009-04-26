@@ -29,6 +29,16 @@ class Level:
 	def getRandomTile(self):
 		return self.map.getRandomTile()
 
+	def lightSquare(self, y, x):
+		self.getSquare(y,x).flag = IO().flag
+	
+	def isLit(self, y, x):
+		return self.getSquare(y,x).flag == IO().flag
+
+	def seeThrough(self, y, x):
+		rows, cols = self.dimensions
+		return y >= 0 and x >= 0 and y < rows and x < cols and self.getSquare(y,x).seeThrough()
+
 	def draw(self):
 		self.map.draw()
 
@@ -38,21 +48,21 @@ class Level:
 		self.creatures.append(creature)
 		square.creature = creature
 		self.squares[creature] = square
-		square.draw()
+		#square.draw()
 
 	def moveCreature(self, creature, square):
 		square.creature = creature
 		self.squares[creature].creature = None
-		self.squares[creature].draw()
+		#self.squares[creature].draw()
 		self.squares[creature] = square
-		square.draw()
+		#square.draw()
 
 	def removeCreature(self, creature):
 		square = self.squares[creature]
 		self.creatures.remove(creature)
 		self.squares[creature].creature = None
 		del self.squares[creature]
-		square.draw()
+		#square.draw()
 
 	def getClosestInSquare(self, creature, radius):
 		y, x = self.squares[creature].loc
