@@ -1,18 +1,21 @@
-import sys
-import curses
-import pickle
+try:
+	import sys
+	import curses
+	import pickle
 
-from game import Game
+	from io import IO
+	from game import Game
 
-def main(w):
-	if len(sys.argv) == 2:
-		game = pickle.load(open("pyrl.svg", "r"))
-		IO(game.ydelta, game.xdelta)
-		game.cur_level.draw()
-	else:
+	def main(w):
+		
 		game = Game(w)
 
-	while True:
-		game.play()
+		while True:
+			game.play()
 
-curses.wrapper(main)
+	curses.wrapper(main)
+finally:
+	curses.nocbreak()
+	curses.echo()
+	curses.initscr().keypad(0)
+	curses.endwin()

@@ -1,6 +1,16 @@
 import random
+from char import Char
+from io import IO
+
+mons = ['k', '@', 'g', 'j', 'c']
+color = [IO().colors["black"], IO().colors["light_green"], IO().colors["yellow"], IO().colors["blue"]] 
 
 class Creature:
+	def __init__(self):
+		self.name = "Bob"
+		self.ch = Char(random.choice(mons), random.choice(color))
+		self.sight = 6
+
 	def act(self, game):
 		#self.move(game.cur_level.squares[game.player].loc, game.cur_level)
 		y,x = game.cur_level.squares[self].loc

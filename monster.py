@@ -4,4 +4,4 @@ from char import Char
 
 class Monster(Creature):
 	def __init__(self):
-		self.ch = Char('k', IO().colors["light_green"])
+		Creature.__init__(self)

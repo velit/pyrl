@@ -7,6 +7,11 @@ class IO:
 	class __impl:
 		def __init__(self):
 			self.w = curses.initscr()
+			curses.start_color()
+			curses.noecho()
+			curses.cbreak()
+			self.w.keypad(1)
+
 			self.rows = self.w.getmaxyx()[0]
 			self.cols = self.w.getmaxyx()[1]
 			self.dy = 0
@@ -18,11 +23,13 @@ class IO:
 			self.skipAll = False
 			self.setColors()
 			self.setFloors()
+			self.flag = 0
 	
 		def drawMap(self, map):
 			for row in map.map:
 				for square in row:
-					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, square.getChar(), square.getColor())
+					if square.flag == self.flag:
+						self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, square.getChar(), square.getColor())
 
 		def drawInterface(self, counter, id):
 			self.addstr(-2, 0, "T: "+str(counter)+" ")
@@ -183,11 +190,11 @@ class IO:
 
 		def setFloors(self):
 			self.floors = {}
-			self.floors["f"] = Floor("Dungeon Floor", Char('.'), True)
-			self.floors["r"] = Floor("Dungeon Rock", Char('#'), False)
-			self.floors["w"] = Floor("Wall", Char('#', self.colors["black"]), False)
-			self.floors["ds"] = Floor("Down Staircase", Char('>'), True)
-			self.floors["us"] = Floor("Up Staircase", Char('<'), True)
+			self.floors["f"] = Floor("Dungeon floor", Char('.'), True, False, True)
+			self.floors["r"] = Floor("Dungeon rock", Char('#'), False, True, False)
+			self.floors["w"] = Floor("Wall", Char('#', self.colors["black"]), False, True, False)
+			self.floors["ds"] = Floor("Down staircase", Char('>'), True, True, True)
+			self.floors["us"] = Floor("Up staircase", Char('<'), True, True, True)
 
 	__instance = None
 	
