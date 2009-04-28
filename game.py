@@ -5,13 +5,13 @@ import pickle
 from level import Level
 from player import Player
 from io import IO
-from fov import calcFov
 
 class Game:
 	def __init__(self, w):
+		#TODO
 		self.ydelta = 2 #two lines of room left for the interface in the top and bottom
 		self.xdelta = 0
-		self.dimensions = 20, 80#w.getmaxyx()[0]-self.ydelta*2, w.getmaxyx()[1]-self.xdelta*2
+		self.dimensions = w.getmaxyx()[0]-self.ydelta*2, w.getmaxyx()[1]-self.xdelta*2
 		IO().dy = self.ydelta
 
 		self.turn_counter = 0
@@ -22,14 +22,13 @@ class Game:
 		self.levels = [self.cur_level]
 	
 	def play(self):
-		calcFov(self.player, self.cur_level)
-		self.cur_level.draw()
 		IO().drawInterface(self.turn_counter, self.cur_level.id)
 		for creature in self.cur_level.creatures:
 			creature.act(self)
 		self.turn_counter += 1
 
 	def descend(self):
+		IO().clearLos()
 		self.cur_level.removeCreature(self.player)
 		if len(self.levels) == self.levels.index(self.cur_level) + 1:
 			self.cur_level = Level(self.dimensions, len(self.levels)+1)
@@ -41,6 +40,7 @@ class Game:
 		self.cur_level.draw()
 
 	def ascend(self):
+		IO().clearLos()
 		if self.levels.index(self.cur_level) > 0:
 			self.cur_level.removeCreature(self.player)
 			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]

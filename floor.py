@@ -1,6 +1,7 @@
 from char import Char
 
-class Floor:
+class Tile:
+	"""Tile (floor) part of a square."""
 	def __init__(self, name = "Dungeon floor", ch = Char('.'), \
 			passable = True, destroyable = False, see_through = True ):
 		self.name = name

@@ -1,7 +1,7 @@
 import curses
 import textwrap
 from char import Char
-from floor import Floor
+from tile import Tile
 
 class IO:
 	class __impl:
@@ -22,14 +22,34 @@ class IO:
 			self.line2Size = 0
 			self.skipAll = False
 			self.setColors()
-			self.setFloors()
-			self.flag = 0
-	
+			self.setFloors() #TODO
+			self.visibility = []
+			self.reverse = False
+
 		def drawMap(self, map):
 			for row in map.map:
 				for square in row:
-					if square.flag == self.flag:
-						self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, square.getChar(), square.getColor())
+					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+							square.getSymbol(False), square.getColor(False))
+			
+		def drawLos(self):
+			if self.reverse:
+				for square in self.visibility:
+					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+							square.getSymbol(), square.getColor() | self.colors["reverse"])
+			else:
+				for square in self.visibility:
+					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+							square.getSymbol(), square.getColor())
+
+		def clearLos(self):
+			while True:
+				try:
+					square = self.visibility.pop()
+				except IndexError:
+					break
+				self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+						square.getSymbol(False), square.getColor(False))
 
 		def drawInterface(self, counter, id):
 			self.addstr(-2, 0, "T: "+str(counter)+" ")
@@ -188,13 +208,21 @@ class IO:
 			self.colors["light_purple"] = curses.color_pair(6) | curses.A_BOLD
 			self.colors["light_cyan"] = curses.color_pair(7) | curses.A_BOLD
 
+			self.colors["blink"] = curses.A_BLINK
+			self.colors["bold"] = curses.A_BOLD
+			self.colors["dim"] = curses.A_DIM
+			self.colors["reverse"] = curses.A_REVERSE
+			self.colors["standout"] = curses.A_STANDOUT
+			self.colors["underline"] = curses.A_UNDERLINE
+
 		def setFloors(self):
 			self.floors = {}
-			self.floors["f"] = Floor("Dungeon floor", Char('.'), True, False, True)
-			self.floors["r"] = Floor("Dungeon rock", Char('#'), False, True, False)
-			self.floors["w"] = Floor("Wall", Char('#', self.colors["black"]), False, True, False)
-			self.floors["ds"] = Floor("Down staircase", Char('>'), True, True, True)
-			self.floors["us"] = Floor("Up staircase", Char('<'), True, True, True)
+			self.floors["u"] = Tile("You have not seen this place yet", Char(' '), False, False, False)
+			self.floors["f"] = Tile("Dungeon floor", Char('.'), True, False, True)
+			self.floors["r"] = Tile("Dungeon rock", Char('#'), False, True, False)
+			self.floors["w"] = Tile("Wall", Char('#', self.colors["black"]), False, True, False)
+			self.floors["ds"] = Tile("Down staircase", Char('>'), True, True, True)
+			self.floors["us"] = Tile("Up staircase", Char('<'), True, True, True)
 
 	__instance = None
 	

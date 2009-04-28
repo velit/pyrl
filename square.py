@@ -3,34 +3,43 @@ from io import IO
 class Square:
 	def __init__(self, tile, y, x):
 		self.loc = y, x
-		self.floor = tile
+		self.tile = tile
 		self.creature = None
-		self.flag = 0
+		self.memory_tile = IO().floors["u"]
 
 	#returns true if the square is passable by creatures
 	def passable(self):
 		if self.creature is not None:
 			return False
-		elif self.floor is not None:
-			return self.floor.passable
+		elif self.tile is not None:
+			return self.tile.passable
 		else:
 			return False
 
 	def seeThrough(self):
-		return self.floor.see_through
+		return self.tile.see_through
 
-	#returns the visible character of the square
-	def getChar(self):
-		if self.creature is not None:
+	def visit(self):
+		self.memory_tile = self.tile
+		IO().visibility.append(self)
+
+	def getChar(self, memory=True):
+		if memory and self.creature is not None:
+			return (self.creature.ch.symbol, self.creature.ch.color)
+		else:
+			return (self.memory_tile.ch.symbol, self.creature.ch.color)
+
+	def getSymbol(self, memory=True):
+		if memory and self.creature is not None:
 			return self.creature.ch.symbol
 		else:
-			return self.floor.ch.symbol
+			return self.memory_tile.ch.symbol
 
-	def getColor(self):
-		if self.creature is not None:
+	def getColor(self, memory=True):
+		if memory and self.creature is not None:
 			return self.creature.ch.color
 		else:
-			return self.floor.ch.color
+			return self.memory_tile.ch.color
 
 	def draw(self):
 		IO().drawTile(self)
