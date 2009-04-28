@@ -31,7 +31,7 @@ def _cast_light(level, cy, cx, row, start, end, radius, xx, xy, yx, yy):
 			else:
 				# Our light beam is touching this square; light it:
 				if dx*dx + dy*dy < radius_squared:
-					level.lightSquare(Y, X)
+					level.visitSquare(Y, X)
 				if blocked:
 					# we're scanning a row of blocked squares:
 					if not level.seeThrough(Y, X):
@@ -50,10 +50,13 @@ def _cast_light(level, cy, cx, row, start, end, radius, xx, xy, yx, yy):
 		if blocked:
 			break
 
-def calcFov(creature, level):
+def doFov(creature, level):
 	"Calculate lit squares from the given location and radius"
-	IO().flag += 1
+	IO().clearLos()
 	y,x = level.squares[creature].loc
 	radius = creature.sight
+	if radius != 0:
+		level.visitSquare(y,x)
 	for oct in range(8):
 		_cast_light(level, y, x, 1, 1.0, 0.0, radius, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
+	IO().drawLos()

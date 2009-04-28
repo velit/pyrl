@@ -3,6 +3,7 @@ import curses
 from creature import Creature
 from io import IO
 from char import Char
+from fov import doFov
 
 class Player(Creature):
 
@@ -36,6 +37,7 @@ class Player(Creature):
 
 	def act(self, game):
 		while True:
+			doFov(self, game.cur_level)
 			IO().moveCursor(game.cur_level.squares[self])
 			c = IO().getch()
 			if 0 <= c < 256:
@@ -59,24 +61,32 @@ class Player(Creature):
 						cre = game.cur_level.getClosestCreature(self)
 						if cre:
 							IO().drawLine(game.cur_level.squares[self], game.cur_level.squares[cre])
-
 					elif c == 'f':
 						game.cur_level.draw()
+					elif c == 'H':
+						IO().reverse = not IO().reverse
 					else:
 						IO().printMsg("Unknown command: '"+c+"'")
 				else:
 					if c == '>':
-						if game.cur_level.squares[self].floor == IO().floors["ds"]:
+						if True:#game.cur_level.squares[self].tile == IO().floors["ds"]:
 							game.descend()
 							break
 						else:
 							IO().printMsg("You don't see a staircase going down.")
 					elif c == '<':
-						if game.cur_level.squares[self].floor == IO().floors["us"]:
+						if True:#game.cur_level.squares[self].tile == IO().floors["us"]:
 							game.ascend()
 							break
 						else:
 							IO().printMsg("You don't see a staircase going up.")
+					elif c == '+':
+						self.sight += 1
+						break
+					elif c == '-':
+						if self.sight > 0:
+							self.sight -= 1
+						break
 					else:
 						IO().printMsg("Unknown command: '"+c+"'")
 			else:

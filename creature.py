@@ -9,7 +9,7 @@ class Creature:
 	def __init__(self):
 		self.name = "Bob"
 		self.ch = Char(random.choice(mons), random.choice(color))
-		self.sight = 6
+		self.sight = 8
 
 	def act(self, game):
 		#self.move(game.cur_level.squares[game.player].loc, game.cur_level)

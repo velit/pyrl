@@ -15,14 +15,9 @@ class Map:
 		self.map = [[Square(r,j,i) for i in range(x)] for j in range(y)]
 
 		self.generateMap()
-		#self.addUpStairCase()
-		#self.addDownStairCase()
 
 	def getSquare(self, y, x):
 		return self.map[y][x]
-
-	def draw(self):
-		IO().drawMap(self)
 
 	def getFreeTile(self):
 		#TODO Write a new one that doesn't loop indefinitely if the map is full
@@ -71,15 +66,15 @@ class Map:
 		y,x = square.loc
 		if y in (0, len(self.map)-1) or x in (0, len(self.map[y])-1):
 			return False, ""
-		if self.getSquare(y-1,x).floor == w and self.getSquare(y+1,x).floor == w:
-			if self.getSquare(y,x-1).floor == f and self.getSquare(y,x+1).floor == r:
+		if self.getSquare(y-1,x).tile == w and self.getSquare(y+1,x).tile == w:
+			if self.getSquare(y,x-1).tile == f and self.getSquare(y,x+1).tile == r:
 				return True, "right"
-			elif self.getSquare(y,x-1).floor == r and self.getSquare(y,x+1).floor == f:
+			elif self.getSquare(y,x-1).tile == r and self.getSquare(y,x+1).tile == f:
 				return True, "left"
-		elif self.getSquare(y,x-1).floor == w and self.getSquare(y,x+1).floor == w:
-			if self.getSquare(y-1,x).floor == f and self.getSquare(y+1,x).floor == r:
+		elif self.getSquare(y,x-1).tile == w and self.getSquare(y,x+1).tile == w:
+			if self.getSquare(y-1,x).tile == f and self.getSquare(y+1,x).tile == r:
 				return True, "down"
-			elif self.getSquare(y-1,x).floor == r and self.getSquare(y+1,x).floor == f:
+			elif self.getSquare(y-1,x).tile == r and self.getSquare(y+1,x).tile == f:
 				return True, "up"
 		return False, ""
 
@@ -89,7 +84,7 @@ class Map:
 			return False
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
-				if self.map[y][x].floor != IO().floors["r"] and self.map[y][x].floor != IO().floors["w"]:
+				if self.map[y][x].tile != IO().floors["r"] and self.map[y][x].tile != IO().floors["w"]:
 					return False
 		return True	
 
@@ -114,7 +109,7 @@ class Map:
 
 		if self.rectDiggable(y, x, height, width):
 			self.makeRoom(y, x, height, width)
-			self.map[y0][x0].floor = IO().floors["f"]
+			self.map[y0][x0].tile = IO().floors["f"]
 
 	def makeRoom(self, y0, x0, height, width):
 		w = IO().floors["w"]
@@ -122,20 +117,20 @@ class Map:
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
 				if y in (y0, y0+height-1) or x in (x0, x0+width-1):
-					self.map[y][x].floor = w
+					self.map[y][x].tile = w
 				else:
-					self.map[y][x].floor = f
+					self.map[y][x].tile = f
 
-	def digRect(self, y0, x0, floor, height=1, width=1):
+	def digRect(self, y0, x0, tile, height=1, width=1):
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
-				self.map[y][x].floor = floor
+				self.map[y][x].tile = tile
 
 	def turnRockToWall(self):
 		for row in self.map:
 			for col in row:
-				if col.floor == IO().floors["r"]:
-					col.floor = IO().floors["w"]
+				if col.tile == IO().floors["r"]:
+					col.tile = IO().floors["w"]
 
 	def attemptCorridor(self):
 		square, dir = self.getWallSquare()
@@ -186,12 +181,11 @@ class Map:
 			y,x = square.loc
 			m = self.map
 			f = IO().floors["f"]
-			if m[y-1][x].floor == f and m[y+1][x].floor == f and m[y][x-1].floor == f and m[y][x+1].floor == f:
+			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
 				break
 
-		square.floor = IO().floors["us"]
+		square.tile = IO().floors["us"]
 		self.squares["us"] = square
-		square.draw()
 
 	def addDownStairCase(self):
 		while True:
@@ -199,9 +193,8 @@ class Map:
 			y,x = square.loc
 			m = self.map
 			f = IO().floors["f"]
-			if m[y-1][x].floor == f and m[y+1][x].floor == f and m[y][x-1].floor == f and m[y][x+1].floor == f:
+			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
 				break
 
-		square.floor = IO().floors["ds"]
+		square.tile = IO().floors["ds"]
 		self.squares["ds"] = square
-		square.draw()
