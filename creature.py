@@ -3,13 +3,19 @@ from char import Char
 from io import IO
 
 mons = ['k', '@', 'g', 'j', 'c']
+name1 = ["kobold", "bandit", "goblin", "jelly", "centipede"]
 color = [IO().colors["black"], IO().colors["light_green"], IO().colors["yellow"], IO().colors["blue"]] 
+name2 = ["black", "green", "yellow", "blue"]
+name3 = ["him", "him", "him", "it", "it"]
 
 class Creature:
 	def __init__(self):
-		self.name = "Bob"
-		self.ch = Char(random.choice(mons), random.choice(color))
+		i1, i2 = random.randrange(len(mons)), random.randrange(len(color))
+		self.name = name2[i2]+" "+name1[i1]
+		self.ch = Char(mons[i1], color[i2])
+		self.n = name3[i1]
 		self.sight = 8
+		self.hp = 50
 
 	def act(self, game):
 		#self.move(game.cur_level.squares[game.player].loc, game.cur_level)

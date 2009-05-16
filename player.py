@@ -40,8 +40,12 @@ class Player(Creature):
 		return False
 
 	def hit(self, creature, level):
-		IO().printMsg("Poof.")
-		level.removeCreature(creature)
+		creature.hp -= 25
+		if creature.hp > 0:
+			IO().printMsg("You hit the "+creature.name+" and wound "+creature.n+".")
+		else:
+			IO().printMsg("You hit the "+creature.name+" and kill "+creature.n+".")
+			level.removeCreature(creature)
 
 	def act(self, game):
 		while True:
