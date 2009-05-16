@@ -1,11 +1,12 @@
 from io import IO
+from tile import tiles
 
 class Square:
 	def __init__(self, tile, y, x):
 		self.loc = y, x
 		self.tile = tile
 		self.creature = None
-		self.memory_tile = IO().floors["u"]
+		self.memory_tile = tiles["u"]
 
 	#returns true if the square is passable by creatures
 	def passable(self):
