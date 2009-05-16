@@ -1,4 +1,5 @@
 from char import Char
+from io import IO
 
 class Tile:
 	"Tile (floor) part of a square."
@@ -9,3 +10,12 @@ class Tile:
 		self.passable = passable
 		self.destroyable = destroyable
 		self.see_through = see_through
+
+tiles = {
+		"u": Tile("You have not seen this place yet", Char(' '), False, False, False),
+		"f": Tile("Dungeon floor", Char('.'), True, False, True),
+		"r": Tile("Dungeon rock", Char('#'), False, True, False),
+		"w": Tile("Wall", Char('#', IO().colors["black"]), False, True, False),
+		"ds": Tile("Down staircase", Char('>'), True, True, True),
+		"us": Tile("Up staircase", Char('<'), True, True, True),
+		}

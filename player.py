@@ -4,6 +4,7 @@ from creature import Creature
 from io import IO
 from char import Char
 from fov import doFov
+from tile import tiles
 
 class Player(Creature):
 
@@ -33,7 +34,14 @@ class Player(Creature):
 		if target_square.passable():
 			level.moveCreature(self, target_square)
 			return True
+		elif target_square.creature is not None:
+			self.hit(target_square.creature, level)
+			return True
 		return False
+
+	def hit(self, creature, level):
+		IO().printMsg("Poof.")
+		level.removeCreature(creature)
 
 	def act(self, game):
 		while True:
@@ -69,13 +77,13 @@ class Player(Creature):
 						IO().printMsg("Unknown command: '"+c+"'")
 				else:
 					if c == '>':
-						if True:#game.cur_level.squares[self].tile == IO().floors["ds"]:
+						if True:#game.cur_level.squares[self].tile == tiles["ds"]:
 							game.descend()
 							break
 						else:
 							IO().printMsg("You don't see a staircase going down.")
 					elif c == '<':
-						if True:#game.cur_level.squares[self].tile == IO().floors["us"]:
+						if True:#game.cur_level.squares[self].tile == tiles["us"]:
 							game.ascend()
 							break
 						else:

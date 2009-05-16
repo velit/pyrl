@@ -2,12 +2,13 @@ import random
 
 from square import Square
 from io import IO
+from tile import tiles
 
 class Map:
 	def __init__(self, dimensions, squares):
-		f = IO().floors["f"]
-		w = IO().floors["w"]
-		r = IO().floors["r"]
+		f = tiles["f"]
+		w = tiles["w"]
+		r = tiles["r"]
 
 		self.squares = squares
 
@@ -60,9 +61,9 @@ class Map:
 				return tile, dir[1]
 
 	def isWall(self, square):
-		w = IO().floors["w"]
-		f = IO().floors["f"]
-		r = IO().floors["r"]
+		w = tiles["w"]
+		f = tiles["f"]
+		r = tiles["r"]
 		y,x = square.loc
 		if y in (0, len(self.map)-1) or x in (0, len(self.map[y])-1):
 			return False, ""
@@ -84,7 +85,7 @@ class Map:
 			return False
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
-				if self.map[y][x].tile != IO().floors["r"] and self.map[y][x].tile != IO().floors["w"]:
+				if self.map[y][x].tile != tiles["r"] and self.map[y][x].tile != tiles["w"]:
 					return False
 		return True	
 
@@ -109,11 +110,11 @@ class Map:
 
 		if self.rectDiggable(y, x, height, width):
 			self.makeRoom(y, x, height, width)
-			self.map[y0][x0].tile = IO().floors["f"]
+			self.map[y0][x0].tile = tiles["f"]
 
 	def makeRoom(self, y0, x0, height, width):
-		w = IO().floors["w"]
-		f = IO().floors["f"]
+		w = tiles["w"]
+		f = tiles["f"]
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
 				if y in (y0, y0+height-1) or x in (x0, x0+width-1):
@@ -129,8 +130,8 @@ class Map:
 	def turnRockToWall(self):
 		for row in self.map:
 			for col in row:
-				if col.tile == IO().floors["r"]:
-					col.tile = IO().floors["w"]
+				if col.tile == tiles["r"]:
+					col.tile = tiles["w"]
 
 	def attemptCorridor(self):
 		square, dir = self.getWallSquare()
@@ -172,19 +173,19 @@ class Map:
 				fx = x0
 				wx = fx+1
 
-		self.digRect(wy, wx, IO().floors["w"], whei, wwid)
-		self.digRect(fy, fx, IO().floors["f"], fhei, fwid)
+		self.digRect(wy, wx, tiles["w"], whei, wwid)
+		self.digRect(fy, fx, tiles["f"], fhei, fwid)
 
 	def addUpStairCase(self):
 		while True:
 			square = self.getFreeTile()
 			y,x = square.loc
 			m = self.map
-			f = IO().floors["f"]
+			f = tiles["f"]
 			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
 				break
 
-		square.tile = IO().floors["us"]
+		square.tile = tiles["us"]
 		self.squares["us"] = square
 
 	def addDownStairCase(self):
@@ -192,9 +193,9 @@ class Map:
 			square = self.getFreeTile()
 			y,x = square.loc
 			m = self.map
-			f = IO().floors["f"]
+			f = tiles["f"]
 			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
 				break
 
-		square.tile = IO().floors["ds"]
+		square.tile = tiles["ds"]
 		self.squares["ds"] = square

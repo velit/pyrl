@@ -39,3 +39,6 @@ class Creature:
 
 		if target_square.passable():
 			level.moveCreature(self, target_square)
+
+	def die(self):
+		pass

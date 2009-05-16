@@ -1,7 +1,7 @@
 import curses
 import textwrap
 from char import Char
-from tile import Tile
+#from tile import Tile
 
 class IO:
 	class __impl:
@@ -22,7 +22,7 @@ class IO:
 			self.line2Size = 0
 			self.skipAll = False
 			self.setColors()
-			self.setFloors() #TODO
+#			self.setFloors() #TODO
 			self.visibility = []
 			self.reverse = False
 
@@ -215,14 +215,14 @@ class IO:
 			self.colors["standout"] = curses.A_STANDOUT
 			self.colors["underline"] = curses.A_UNDERLINE
 
-		def setFloors(self):
-			self.floors = {}
-			self.floors["u"] = Tile("You have not seen this place yet", Char(' '), False, False, False)
-			self.floors["f"] = Tile("Dungeon floor", Char('.'), True, False, True)
-			self.floors["r"] = Tile("Dungeon rock", Char('#'), False, True, False)
-			self.floors["w"] = Tile("Wall", Char('#', self.colors["black"]), False, True, False)
-			self.floors["ds"] = Tile("Down staircase", Char('>'), True, True, True)
-			self.floors["us"] = Tile("Up staircase", Char('<'), True, True, True)
+#		def setFloors(self):
+#			self.floors = {}
+#			self.floors["u"] = Tile("You have not seen this place yet", Char(' '), False, False, False)
+#			self.floors["f"] = Tile("Dungeon floor", Char('.'), True, False, True)
+#			self.floors["r"] = Tile("Dungeon rock", Char('#'), False, True, False)
+#			self.floors["w"] = Tile("Wall", Char('#', self.colors["black"]), False, True, False)
+#			self.floors["ds"] = Tile("Down staircase", Char('>'), True, True, True)
+#			self.floors["us"] = Tile("Up staircase", Char('<'), True, True, True)
 
 	__instance = None
 	

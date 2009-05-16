@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #try:
 import sys
 import curses
