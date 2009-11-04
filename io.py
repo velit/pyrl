@@ -1,7 +1,5 @@
 import curses
 import textwrap
-from char import Char
-#from tile import Tile
 
 class IO:
 	class __impl:
@@ -22,7 +20,6 @@ class IO:
 			self.line2Size = 0
 			self.skipAll = False
 			self.setColors()
-#			self.setFloors() #TODO
 			self.visibility = []
 			self.reverse = False
 
@@ -57,7 +54,11 @@ class IO:
 
 		def drawLine(self, startSquare, targetSquare, char=None):
 			if char is None:
-				char = Char('*', self.colors["yellow"])
+				symbol = '*'
+				color = self.colors["yellow"]
+			else:
+				symbol = char.symbol
+				color = char.color
 			x0, y0 = startSquare.loc
 			x1, y1 = targetSquare.loc
 			steep = abs(y1 - y0) > abs(x1 - x0)
@@ -147,14 +148,10 @@ class IO:
 
 		def clearMsgs(self):
 			if self.line1Size:
-				self.w.move(0,0)
-				for x in range(self.line1Size):
-					self.w.addch(' ')
+				self.w.hline(0,0,' ',self.line1Size)
 				self.line1Size = 0
 			if self.line2Size:
-				self.w.move(1,0)
-				for x in range(self.line2Size):
-					self.w.addch(' ')
+				self.w.hline(1,0,' ',self.line2Size)
 				self.line2Size = 0
 
 			self.bufferLine = 0
@@ -214,15 +211,6 @@ class IO:
 			self.colors["reverse"] = curses.A_REVERSE
 			self.colors["standout"] = curses.A_STANDOUT
 			self.colors["underline"] = curses.A_UNDERLINE
-
-#		def setFloors(self):
-#			self.floors = {}
-#			self.floors["u"] = Tile("You have not seen this place yet", Char(' '), False, False, False)
-#			self.floors["f"] = Tile("Dungeon floor", Char('.'), True, False, True)
-#			self.floors["r"] = Tile("Dungeon rock", Char('#'), False, True, False)
-#			self.floors["w"] = Tile("Wall", Char('#', self.colors["black"]), False, True, False)
-#			self.floors["ds"] = Tile("Down staircase", Char('>'), True, True, True)
-#			self.floors["us"] = Tile("Up staircase", Char('<'), True, True, True)
 
 	__instance = None
 	

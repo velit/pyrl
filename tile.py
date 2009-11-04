@@ -2,7 +2,7 @@ from char import Char
 from io import IO
 
 class Tile:
-	"Tile (floor) part of a square."
+	"""The actual floor of a square."""
 	def __init__(self, name = "Unknown", ch = Char(' '), \
 			passable = False, destroyable = False, see_through = False ):
 		self.name = name
