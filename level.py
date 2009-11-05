@@ -8,14 +8,14 @@ from map import Map
 from io import IO
 
 class Level:
-	def __init__(self, dimensions, id):
+	def __init__(self, id):
 		self.id = id
-		self.dimensions = dimensions
+		self.rows, self.cols = IO().level_dimensions
 		
 		self.creatures = []
 		self.squares = {}
 
-		self.map = Map(self.dimensions, self.squares)
+		self.map = Map(self.rows, self.cols, self.squares)
 
 		for x in range(10):
 			self.addCreature(Monster())
@@ -33,8 +33,7 @@ class Level:
 		self.getSquare(y,x).visit()
 	
 	def seeThrough(self, y, x):
-		rows, cols = self.dimensions
-		return y >= 0 and x >= 0 and y < rows and x < cols and self.getSquare(y,x).seeThrough()
+		return y >= 0 and x >= 0 and y < self.rows and x < self.cols and self.getSquare(y,x).seeThrough()
 
 	def draw(self):
 		IO().drawMap(self.map)
@@ -58,7 +57,7 @@ class Level:
 		del self.squares[creature]
 
 	def getClosestInSquare(self, creature, radius):
-		y, x = self.squares[creature].loc
+		y, x = self.squares[creature].y, self.squares[creature].x
 		for i in range(radius*2):
 			c = self.getSquare(y-radius, x-radius+i).creature
 			if c: return c
@@ -72,8 +71,8 @@ class Level:
 			return False
 
 	def getClosestCreatureFromArea(self, creature):
-		y,x=self.squares[creature].loc
-		radius = min(self.dimensions[0]-y, y, self.dimensions[1]-x, x)
+		y,x=self.squares[creature].y, self.squares[creature].x
+		radius = min(self.rows-y, y, self.cols-x, x)
 		for i in range(1, radius):
 			c = self.getClosestInSquare(creature, i)
 			if c:
@@ -81,8 +80,19 @@ class Level:
 		else:
 			return False
 
-	def getClosestCreature(self, targetCreature):
-		squaredDistance = 0
-		for x in self.creatures:
-			if squaredDistance == 0:
-				pass
+	def getClosestCreature(self, target_creature):
+		tcreature_square = self.squares[target_creature]
+		ty, tx = tcreature_square.y, tcreature_square.x
+		best, cre = None, None
+		for creature in self.creatures:
+			creature_square = self.squares[creature]
+			y, x = creature_square.y, creature_square.x
+			a = (ty-y) ** 2 + (tx-x) ** 2
+			if a > 0:
+				if best is None:
+					best = a
+					cre = creature
+				elif a < best:
+					best = a
+					cre = creature
+		return cre

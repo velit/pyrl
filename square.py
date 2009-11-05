@@ -3,7 +3,8 @@ from tile import tiles
 
 class Square:
 	def __init__(self, tile, y, x):
-		self.loc = y, x
+		self.y = y
+		self.x = x
 		self.tile = tile
 		self.creature = None
 		self.memory_tile = tiles["u"]
@@ -28,7 +29,7 @@ class Square:
 		if memory and self.creature is not None:
 			return (self.creature.ch.symbol, self.creature.ch.color)
 		else:
-			return (self.memory_tile.ch.symbol, self.creature.ch.color)
+			return (self.memory_tile.ch.symbol, self.memory_tile.ch.color)
 
 	def getSymbol(self, memory=True):
 		if memory and self.creature is not None:

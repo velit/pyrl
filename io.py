@@ -10,9 +10,25 @@ class IO:
 			curses.cbreak()
 			self.w.keypad(1)
 
-			self.rows = self.w.getmaxyx()[0]
-			self.cols = self.w.getmaxyx()[1]
-			self.dy = 0
+			self.rows, self.cols = self.w.getmaxyx()
+			self.msg_display_size = 2 #number of lines for the message display on the top of the screen
+			self.status_size = 2 #number of lines for the status bar display at the bottom of the screen
+			self.level_size = self.rows - self.msg_display_size - self.status_size #level size in lines
+			self.level_dimensions = self.level_size, self.cols
+
+			#message window
+			self.m_w = curses.newwin(self.msg_display_size, 0, 0, 0)
+			self.m_w.keypad(1)
+			
+			#status window
+			self.s_w = curses.newwin(self.status_size, 0, self.rows - self.status_size, 0)
+			self.s_w.keypad(1)
+			
+			#level window
+			self.l_w = curses.newwin(self.level_size, 0, self.msg_display_size, 0)
+			self.l_w.keypad(1)
+			
+			self.dy = 4
 			self.dx = 0
 			self.msgqueue = ""
 			self.bufferLine = 0
@@ -23,20 +39,31 @@ class IO:
 			self.visibility = []
 			self.reverse = False
 
+		def refreshWindows(self):
+			self.m_w.refresh()
+			self.s_w.refresh()
+			self.l_w.refresh()
+
 		def drawMap(self, map):
+			#try:
+			self.l_w.move(0,0)
 			for row in map.map:
 				for square in row:
-					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
-							square.getSymbol(False), square.getColor(False))
+					if square.y == self.level_dimensions[0]-1 and square.x == self.level_dimensions[1]-1:
+						break
+					self.l_w.addch(square.getSymbol(False), square.getColor(False))
+			self.l_w.refresh()
+			#except:
+			#	pass
 			
 		def drawLos(self):
 			if self.reverse:
 				for square in self.visibility:
-					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+					self.l_w.addch(square.y, square.x, \
 							square.getSymbol(), square.getColor() | self.colors["reverse"])
 			else:
 				for square in self.visibility:
-					self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+					self.l_w.addch(square.y, square.x, \
 							square.getSymbol(), square.getColor())
 
 		def clearLos(self):
@@ -45,12 +72,12 @@ class IO:
 					square = self.visibility.pop()
 				except IndexError:
 					break
-				self.w.addch(square.loc[0]+self.dy, square.loc[1]+self.dx, \
+				self.l_w.addch(square.y, square.x, \
 						square.getSymbol(False), square.getColor(False))
 
 		def drawInterface(self, counter, id):
-			self.addstr(-2, 0, "T: "+str(counter)+" ")
-			self.addstr(-2, len(str(counter)+"T:  "), "ID: "+str(id)+" ")
+			self.s_w.addstr(0, 0, "T: "+str(counter)+" ")
+			self.s_w.addstr(0, len(str(counter)+"T:  "), "ID: "+str(id)+" ")
 
 		def drawLine(self, startSquare, targetSquare, char=None):
 			if char is None:
@@ -59,8 +86,8 @@ class IO:
 			else:
 				symbol = char.symbol
 				color = char.color
-			x0, y0 = startSquare.loc
-			x1, y1 = targetSquare.loc
+			x0, y0 = startSquare.y, startSquare.x
+			x1, y1 = targetSquare.y, targetSquare.x
 			steep = abs(y1 - y0) > abs(x1 - x0)
 			if steep:
 				x0, y0 = y0, x0
@@ -79,31 +106,32 @@ class IO:
 				ystep = -1
 			for x in range(x0, x1):
 				if steep:
-					self.addch(y+self.dy, x+self.dx, char.symbol, char.color)
+					self.l_w.addch(y, x, symbol, color)
 				else:
-					self.addch(x+self.dy, y+self.dx, char.symbol, char.color)
+					self.l_w.addch(x, y, symbol, color)
 				error -= deltay
 				if error < 0:
 					y += ystep
 					error += deltax
+			self.l_w.getch()
 
 		def drawTile(self, square):
-			y,x=square.loc
-			self.w.addch(y+self.dy, x+self.dx, square.getChar(), square.getColor())
+			self.l_w.addch(square.y, square.x, square.getChar(), square.getColor())
 
 		def moveCursor(self, square):
-			y,x=square.loc
-			self.w.move(y+self.dy, x+self.dx)
+			self.l_w.move(square.y, square.x)
 
 		def getch(self):
-			c = self.w.getch()
+			self.refreshWindows()
+			c = self.l_w.getch()
 			self.flushMsgArea()
 			return c
 
 		def getCharacters(self, list):
 			c = None
+			self.refreshWindows()
 			while c not in list:
-				c = self.w.getch()
+				c = self.l_w.getch()
 			self.flushMsgArea()
 			return c
 
@@ -111,23 +139,23 @@ class IO:
 			more = " (more)"
 			if self.bufferLine == 0:
 				if self.line1Size + len(str) + len(" ") < self.cols:
-					self.w.addstr(0, self.line1Size, str, color)
+					self.m_w.addstr(0, self.line1Size, str, color)
 					self.line1Size += len(str)+len(" ")
 				elif str.find(' ') == -1 or not (self.line1Size + str.find(' ') + len(" ") < self.cols):
 					self.bufferLine = 1
 					self.printMsg(str)
 				else:
 					a = textwrap.wrap(str, self.cols-self.line1Size-len(" "))
-					self.w.addstr(0, self.line1Size, a[0], color)
+					self.m_w.addstr(0, self.line1Size, a[0], color)
 					self.line1Size += len(a[0]) + len(" ")
 					self.bufferLine = 1
 					self.printMsg(str.replace(a[0]+" ", "", 1))
 			elif self.bufferLine == 1:
 				if self.line2Size + len(str) + len(more) + len(" ") < self.cols:
-					self.w.addstr(1, self.line2Size, str, color)
+					self.m_w.addstr(1, self.line2Size, str, color)
 					self.line2Size += len(str)+len(" ")
 				elif str.find(' ') == -1 or not (self.line2Size + str.find(' ') + len(" ") < self.cols):
-					self.w.addstr(1, self.line2Size, more, color)
+					self.m_w.addstr(1, self.line2Size, more, color)
 					self.line2Size += len(more+" ")
 					if not self.skipAll:
 						c = self.getCharacters([32,10])
@@ -137,7 +165,7 @@ class IO:
 					self.printMsg(str)
 				else:
 					a = textwrap.wrap(str, self.cols-self.line2Size-len(more+" "))
-					self.w.addstr(1, self.line2Size, a[0]+more, color)
+					self.m_w.addstr(1, self.line2Size, a[0]+more, color)
 					self.line2Size += len(a[0]) + len(more+" ")
 					if not self.skipAll:
 						c = self.getCharacters([32,10])
@@ -148,10 +176,10 @@ class IO:
 
 		def clearMsgs(self):
 			if self.line1Size:
-				self.w.hline(0,0,' ',self.line1Size)
+				self.m_w.hline(0,0,' ',self.line1Size)
 				self.line1Size = 0
 			if self.line2Size:
-				self.w.hline(1,0,' ',self.line2Size)
+				self.m_w.hline(1,0,' ',self.line2Size)
 				self.line2Size = 0
 
 			self.bufferLine = 0
@@ -168,20 +196,6 @@ class IO:
 				self.skipAll = False
 			self.clearMsgs()
 
-		def addstr(self, row, col, str, color=curses.A_NORMAL):
-			if row < 0:
-				row += self.rows
-			if col < 0:
-				col += self.cols
-			self.w.addstr(row, col, str, color)
-
-		def addch(self, row, col, ch, color=curses.A_NORMAL):
-			if row < 0:
-				row += self.rows
-			if col < 0:
-				col += self.cols
-			self.w.addch(row, col, ch, color)
-			
 		def setColors(self):
 			for x in range(7):
 				curses.init_pair(x+1, x, 0)

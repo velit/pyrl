@@ -4,15 +4,16 @@ from square import Square
 from io import IO
 from tile import tiles
 
+f = tiles["f"]
+w = tiles["w"]
+r = tiles["r"]
+
 class Map:
-	def __init__(self, dimensions, squares):
-		f = tiles["f"]
-		w = tiles["w"]
-		r = tiles["r"]
+	"""This object holds the data of a Level object, and methods for manipulating the data."""
+	def __init__(self, y, x, squares):
 
 		self.squares = squares
 
-		y,x = dimensions
 		self.map = [[Square(r,j,i) for i in range(x)] for j in range(y)]
 
 		self.generateMap()
@@ -61,10 +62,7 @@ class Map:
 				return tile, dir[1]
 
 	def isWall(self, square):
-		w = tiles["w"]
-		f = tiles["f"]
-		r = tiles["r"]
-		y,x = square.loc
+		y,x = square.y, square.x
 		if y in (0, len(self.map)-1) or x in (0, len(self.map[y])-1):
 			return False, ""
 		if self.getSquare(y-1,x).tile == w and self.getSquare(y+1,x).tile == w:
@@ -91,7 +89,7 @@ class Map:
 
 	def attemptRoom(self):
 		square, dir = self.getWallSquare()
-		y0,x0 = square.loc
+		y0,x0 = square.y, square.x
 		height, width = random.randrange(5,11), random.randrange(7,14)
 		ypos, xpos = random.choice(range(height-2)), random.choice(range(width-2))
 
@@ -113,8 +111,6 @@ class Map:
 			self.map[y0][x0].tile = tiles["f"]
 
 	def makeRoom(self, y0, x0, height, width):
-		w = tiles["w"]
-		f = tiles["f"]
 		for y in range(y0, y0+height):
 			for x in range(x0, x0+width):
 				if y in (y0, y0+height-1) or x in (x0, x0+width-1):
@@ -135,7 +131,7 @@ class Map:
 
 	def attemptCorridor(self):
 		square, dir = self.getWallSquare()
-		y,x = square.loc
+		y,x = square.y, square.x
 		len = random.randrange(7,20)
 		if dir == "up" and self.rectDiggable(y-len, x-1, len, 3) or \
 				dir == "down" and self.rectDiggable(y+1, x-1, len, 3) or \
@@ -145,7 +141,7 @@ class Map:
 			return True
 
 	def makeCorridor(self, square, dir, len):
-		y0,x0 = square.loc
+		y0,x0 = square.y, square.x
 
 		if dir in ("up", "down"):
 			fhei = whei = len
@@ -179,7 +175,7 @@ class Map:
 	def addUpStairCase(self):
 		while True:
 			square = self.getFreeTile()
-			y,x = square.loc
+			y,x = square.y, square.x
 			m = self.map
 			f = tiles["f"]
 			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
@@ -191,7 +187,7 @@ class Map:
 	def addDownStairCase(self):
 		while True:
 			square = self.getFreeTile()
-			y,x = square.loc
+			y,x = square.y, square.x
 			m = self.map
 			f = tiles["f"]
 			if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:

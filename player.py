@@ -14,7 +14,7 @@ class Player(Creature):
 
 	def move(self, direction, level):
 		d = direction
-		y,x = level.squares[self].loc
+		y,x = level.squares[self].y, level.squares[self].x
 		ny = y
 		nx = x
 
@@ -68,7 +68,7 @@ class Player(Creature):
 						IO().drawLine(game.cur_level.squares[self], \
 								game.cur_level.squares["ds"])
 					elif c == 'b':
-						IO().printMsg(str(game.dimensions[0])+" "+str(game.dimensions[1]))
+						IO().printMsg(str(IO().level_dimensions[0]) +" "+str(IO().w.getmaxyx()[0]))
 					elif c == 'l':
 						cre = game.cur_level.getClosestCreature(self)
 						if cre:
