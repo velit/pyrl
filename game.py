@@ -8,16 +8,11 @@ from io import IO
 
 class Game:
 	def __init__(self, w):
-		#TODO
-		self.ydelta = 2 #two lines of room left for the interface in the top and bottom
-		self.xdelta = 0
-		self.dimensions = w.getmaxyx()[0]-self.ydelta*2, w.getmaxyx()[1]-self.xdelta*2
-		IO().dy = self.ydelta
-
+		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
 		self.turn_counter = 0
 
 		self.player = Player()
-		self.cur_level = Level(self.dimensions, 1)
+		self.cur_level = Level(1)
 		self.cur_level.addCreature(self.player)
 		self.levels = [self.cur_level]
 	
@@ -31,7 +26,7 @@ class Game:
 		IO().clearLos()
 		self.cur_level.removeCreature(self.player)
 		if len(self.levels) == self.levels.index(self.cur_level) + 1:
-			self.cur_level = Level(self.dimensions, len(self.levels)+1)
+			self.cur_level = Level(len(self.levels)+1)
 			self.cur_level.addCreature(self.player, self.cur_level.squares["us"])
 			self.levels.append(self.cur_level)
 		else:
@@ -40,8 +35,8 @@ class Game:
 		self.cur_level.draw()
 
 	def ascend(self):
-		IO().clearLos()
 		if self.levels.index(self.cur_level) > 0:
+			IO().clearLos()
 			self.cur_level.removeCreature(self.player)
 			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["ds"])

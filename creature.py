@@ -4,9 +4,9 @@ from io import IO
 
 mons = ['k', '@', 'g', 'j', 'c']
 name1 = ["kobold", "bandit", "goblin", "jelly", "centipede"]
-color = [IO().colors["black"], IO().colors["light_green"], IO().colors["yellow"], IO().colors["blue"]] 
 name2 = ["black", "green", "yellow", "blue"]
 name3 = ["him", "him", "him", "it", "it"]
+color = [IO().colors["black"], IO().colors["light_green"], IO().colors["yellow"], IO().colors["blue"]] 
 
 class Creature:
 	def __init__(self):
@@ -18,15 +18,14 @@ class Creature:
 		self.hp = 50
 
 	def act(self, game):
-		#self.move(game.cur_level.squares[game.player].loc, game.cur_level)
-		y,x = game.cur_level.squares[self].loc
+		y,x = game.cur_level.squares[self].y, game.cur_level.squares[self].x
 		loc = y + random.randrange(3)-1, x + random.randrange(3)-1
 		self.move(loc, game.cur_level)
 
 	def move(self, loc, level):
-		dy, dx = loc
-		sy, sx = level.squares[self].loc #self loc
-		ny, nx = None, None #newy
+		dy, dx = loc #destination
+		sy, sx = level.squares[self].y, level.squares[self].x #self
+		ny, nx = None, None #square to move to
 		if dy-sy > 0:
 			ny = sy+1
 		elif dy-sy < 0:

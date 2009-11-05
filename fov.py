@@ -53,7 +53,7 @@ def _cast_light(level, cy, cx, row, start, end, radius, xx, xy, yx, yy):
 def doFov(creature, level):
 	"Calculate lit squares from the given location and radius"
 	IO().clearLos()
-	y,x = level.squares[creature].loc
+	y,x = level.squares[creature].y, level.squares[creature].x
 	radius = creature.sight
 	if radius != 0:
 		level.visitSquare(y,x)
