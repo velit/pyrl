@@ -36,7 +36,7 @@ class Level:
 		return y >= 0 and x >= 0 and y < self.rows and x < self.cols and self.getSquare(y,x).seeThrough()
 
 	def draw(self):
-		IO().drawMap(self.map)
+		IO().drawMap(self.map.map)
 
 	def addCreature(self, creature, square = None):
 		if square is None:

@@ -1,5 +1,6 @@
 import curses
-import textwrap
+import _curses
+from message import MessageBar
 
 class IO:
 	class __impl:
@@ -27,34 +28,28 @@ class IO:
 			#level window
 			self.l_w = curses.newwin(self.level_size, 0, self.msg_display_size, 0)
 			self.l_w.keypad(1)
+
+			self.message_bar = MessageBar(self.m_w)
 			
-			self.dy = 4
-			self.dx = 0
-			self.msgqueue = ""
-			self.bufferLine = 0
-			self.line1Size = 0
-			self.line2Size = 0
-			self.skipAll = False
 			self.setColors()
 			self.visibility = []
 			self.reverse = False
 
 		def refreshWindows(self):
-			self.m_w.refresh()
-			self.s_w.refresh()
-			self.l_w.refresh()
+			self.message_bar.printQueue()
+			self.m_w.noutrefresh()
+			self.s_w.noutrefresh()
+			self.l_w.noutrefresh()
+			curses.doupdate()
 
 		def drawMap(self, map):
-			#try:
 			self.l_w.move(0,0)
-			for row in map.map:
-				for square in row:
-					if square.y == self.level_dimensions[0]-1 and square.x == self.level_dimensions[1]-1:
-						break
-					self.l_w.addch(square.getSymbol(False), square.getColor(False))
-			self.l_w.refresh()
-			#except:
-			#	pass
+			try:
+				for row in map:
+					for square in row:
+						self.l_w.addch(square.getSymbol(False), square.getColor(False))
+			except curses.error:
+				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
 			
 		def drawLos(self):
 			if self.reverse:
@@ -116,15 +111,17 @@ class IO:
 			self.l_w.getch()
 
 		def drawTile(self, square):
-			self.l_w.addch(square.y, square.x, square.getChar(), square.getColor())
+			try:
+				self.l_w.addch(square.y, square.x, square.getChar(), square.getColor())
+			except curses.error:
+				pass
 
-		def moveCursor(self, square):
-			self.l_w.move(square.y, square.x)
-
-		def getch(self):
+		def getch(self, y=None, x=None):
+			if y is not None and x is not None:
+				self.l_w.move(y, x)	
 			self.refreshWindows()
 			c = self.l_w.getch()
-			self.flushMsgArea()
+			self.clearMsgArea()
 			return c
 
 		def getCharacters(self, list):
@@ -132,69 +129,14 @@ class IO:
 			self.refreshWindows()
 			while c not in list:
 				c = self.l_w.getch()
-			self.flushMsgArea()
+			self.clearMsgArea()
 			return c
 
-		def printMsg(self, str, color=curses.A_NORMAL):
-			more = " (more)"
-			if self.bufferLine == 0:
-				if self.line1Size + len(str) + len(" ") < self.cols:
-					self.m_w.addstr(0, self.line1Size, str, color)
-					self.line1Size += len(str)+len(" ")
-				elif str.find(' ') == -1 or not (self.line1Size + str.find(' ') + len(" ") < self.cols):
-					self.bufferLine = 1
-					self.printMsg(str)
-				else:
-					a = textwrap.wrap(str, self.cols-self.line1Size-len(" "))
-					self.m_w.addstr(0, self.line1Size, a[0], color)
-					self.line1Size += len(a[0]) + len(" ")
-					self.bufferLine = 1
-					self.printMsg(str.replace(a[0]+" ", "", 1))
-			elif self.bufferLine == 1:
-				if self.line2Size + len(str) + len(more) + len(" ") < self.cols:
-					self.m_w.addstr(1, self.line2Size, str, color)
-					self.line2Size += len(str)+len(" ")
-				elif str.find(' ') == -1 or not (self.line2Size + str.find(' ') + len(" ") < self.cols):
-					self.m_w.addstr(1, self.line2Size, more, color)
-					self.line2Size += len(more+" ")
-					if not self.skipAll:
-						c = self.getCharacters([32,10])
-						if c == 10:
-							self.skipAll = True
-					self.clearMsgs()
-					self.printMsg(str)
-				else:
-					a = textwrap.wrap(str, self.cols-self.line2Size-len(more+" "))
-					self.m_w.addstr(1, self.line2Size, a[0]+more, color)
-					self.line2Size += len(a[0]) + len(more+" ")
-					if not self.skipAll:
-						c = self.getCharacters([32,10])
-						if c == 10:
-							self.skipAll = True
-					self.clearMsgs()
-					self.printMsg(str.replace(a[0]+" ", "", 1))
-
-		def clearMsgs(self):
-			if self.line1Size:
-				self.m_w.hline(0,0,' ',self.line1Size)
-				self.line1Size = 0
-			if self.line2Size:
-				self.m_w.hline(1,0,' ',self.line2Size)
-				self.line2Size = 0
-
-			self.bufferLine = 0
-
 		def queueMsg(self, str):
-			self.msgqueue += str+" "
+			self.message_bar.queueMsg(str)
 		
-		def printQueue(self):
-			self.printMsg(self.msgqueue)
-			self.msgqueue = ""
-
-		def flushMsgArea(self):
-			if self.skipAll:
-				self.skipAll = False
-			self.clearMsgs()
+		def clearMsgArea(self):
+			self.message_bar.clearMsgArea()
 
 		def setColors(self):
 			for x in range(7):
