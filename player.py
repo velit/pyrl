@@ -11,6 +11,7 @@ class Player(Creature):
 	def __init__(self):
 		Creature.__init__(self)
 		self.ch = Char('@', IO().colors["white"])
+		self.int = 1
 
 	def move(self, direction, level):
 		d = direction
@@ -42,23 +43,22 @@ class Player(Creature):
 	def hit(self, creature, level):
 		creature.hp -= 25
 		if creature.hp > 0:
-			IO().printMsg("You hit the "+creature.name+" and wound "+creature.n+".")
+			IO().queueMsg("You hit the "+creature.name+" and wound "+creature.n+".")
 		else:
-			IO().printMsg("You hit the "+creature.name+" and kill "+creature.n+".")
+			IO().queueMsg("You hit the "+creature.name+" and kill "+creature.n+".")
 			level.removeCreature(creature)
 
 	def act(self, game):
 		while True:
 			doFov(self, game.cur_level)
-			IO().moveCursor(game.cur_level.squares[self])
-			c = IO().getch()
+			c = IO().getch(game.cur_level.squares[self].y, game.cur_level.squares[self].x)
 			if 0 <= c < 256:
 				c = chr(c)
 				if c.isdigit():
 					if self.move(int(c), game.cur_level):
 						break
 					else:
-						IO().printMsg("You can't move there.")
+						IO().queueMsg("You can't move there.")
 				elif c.isalpha():
 					if c == 'Q':
 						game.endGame()
@@ -68,30 +68,33 @@ class Player(Creature):
 						IO().drawLine(game.cur_level.squares[self], \
 								game.cur_level.squares["ds"])
 					elif c == 'b':
-						IO().printMsg(str(IO().level_dimensions[0]) +" "+str(IO().w.getmaxyx()[0]))
+						IO().queueMsg(str(IO().level_dimensions[0]) +" "+str(IO().w.getmaxyx()[0]))
 					elif c == 'l':
 						cre = game.cur_level.getClosestCreature(self)
 						if cre:
 							IO().drawLine(game.cur_level.squares[self], game.cur_level.squares[cre])
 					elif c == 'f':
 						game.cur_level.draw()
+					elif c == 'n':
+						IO().queueMsg("abbaba "*self.int)
+						self.int *= 2
 					elif c == 'H':
 						IO().reverse = not IO().reverse
 					else:
-						IO().printMsg("Unknown command: '"+c+"'")
+						IO().queueMsg("Unknown command: '"+c+"'")
 				else:
 					if c == '>':
 						if True:#game.cur_level.squares[self].tile == tiles["ds"]:
 							game.descend()
 							break
 						else:
-							IO().printMsg("You don't see a staircase going down.")
+							IO().queueMsg("You don't see a staircase going down.")
 					elif c == '<':
 						if True:#game.cur_level.squares[self].tile == tiles["us"]:
 							game.ascend()
 							break
 						else:
-							IO().printMsg("You don't see a staircase going up.")
+							IO().queueMsg("You don't see a staircase going up.")
 					elif c == '+':
 						self.sight += 1
 						break
@@ -100,12 +103,12 @@ class Player(Creature):
 							self.sight -= 1
 						break
 					else:
-						IO().printMsg("Unknown command: '"+c+"'")
+						IO().queueMsg("Unknown command: '"+c+"'")
 			else:
 				if c in (curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_UP, curses.KEY_DOWN):
 					if self.move(c, game.cur_level):
 						break
 					else:
-						IO().printMsg("You can't move there.")
+						IO().queueMsg("You can't move there.")
 				else:
-					IO().printMsg("Unknown command: '"+str(c)+"'")
+					IO().queueMsg("Unknown command: '"+str(c)+"'")

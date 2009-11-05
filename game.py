@@ -47,7 +47,7 @@ class Game:
 	def endGame(self, dontAsk=False):
 		if dontAsk:
 			sys.exit(0)
-		IO().printMsg("Do you wish to end the game? [y/N]:")
+		IO().queueMsg("Do you wish to end the game? [y/N]:")
 		c = IO().getCharacters([10,78,110,121])
 		if c == 121:
 			sys.exit(0)
@@ -56,8 +56,8 @@ class Game:
 		if dontAsk:
 			pickle.dump(self, open("pyrl.svg", "w"))
 			self.endGame(True)
-		IO().printMsg("Do you wish to save the game? [Y/n]:")
-		c = IO().getCharacters([10,78,110,121])
+		IO().queueMsg("Do you wish to save the game? [Y/n]:")
+		c = IO().getCharacters((10,78,110,121))
 		if c in (121, 10):
 			pickle.dump(self, open("pyrl.svg", "w"))
 			self.endGame(True)
