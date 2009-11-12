@@ -13,9 +13,9 @@ class Level:
 		self.rows, self.cols = IO().level_dimensions
 		
 		self.creatures = []
-		self.squares = {}
 
-		self.map = Map(self.rows, self.cols, self.squares)
+		self.map = Map(self.rows, self.cols)
+		self.squares = self.map.squares
 
 		for x in range(10):
 			self.addCreature(Monster())

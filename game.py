@@ -7,7 +7,7 @@ from player import Player
 from io import IO
 
 class Game:
-	def __init__(self, w):
+	def __init__(self):
 		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
 		self.turn_counter = 0
 

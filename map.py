@@ -1,7 +1,6 @@
 import random
 
 from square import Square
-from io import IO
 from tile import tiles
 
 f = tiles["f"]
@@ -10,13 +9,14 @@ r = tiles["r"]
 
 class Map:
 	"""This object holds the data of a Level object, and methods for manipulating the data."""
-	def __init__(self, y, x, squares):
+	def __init__(self, y, x, generate=True):
 
-		self.squares = squares
+		self.squares = {}
 
 		self.map = [[Square(r,j,i) for i in range(x)] for j in range(y)]
 
-		self.generateMap()
+		if generate:
+			self.generateMap()
 
 	def getSquare(self, y, x):
 		return self.map[y][x]

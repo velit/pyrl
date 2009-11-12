@@ -6,10 +6,6 @@ class IO:
 	class __impl:
 		def __init__(self):
 			self.w = curses.initscr()
-			curses.start_color()
-			curses.noecho()
-			curses.cbreak()
-			self.w.keypad(1)
 
 			self.rows, self.cols = self.w.getmaxyx()
 			self.msg_display_size = 2 #number of lines for the message display on the top of the screen
@@ -47,7 +43,8 @@ class IO:
 			try:
 				for row in map:
 					for square in row:
-						self.l_w.addch(square.getSymbol(False), square.getColor(False))
+						square.draw()
+						#self.l_w.addch(square.getSymbol(False), square.getColor(False))
 			except curses.error:
 				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
 			
@@ -112,7 +109,7 @@ class IO:
 
 		def drawTile(self, square):
 			try:
-				self.l_w.addch(square.y, square.x, square.getChar(), square.getColor())
+				self.l_w.addch(square.y, square.x, square.getChar(False), square.getColor(False))
 			except curses.error:
 				pass
 
