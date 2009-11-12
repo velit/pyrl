@@ -10,7 +10,7 @@ class MessageBar:
 		self.cur_line = 0
 		self.more_str=more_str
 		self.wrapper = TextWrapper(width=(self.width - 1)) #accommodate for printing the newline character
-		self.last_line_wrapper = TextWrapper(width=(self.width - len(self.more_str) - 1)) #accommodate for the more string printed if the messages continue on the next page, also newline
+		self.last_line_wrapper = TextWrapper(width=(self.width - len(self.more_str) - 1)) #accommodate for the more_str if the messages continue on the next page
 
 	def queueMsg(self, str):
 		self.msgqueue += str+" "

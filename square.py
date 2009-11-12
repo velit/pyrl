@@ -1,5 +1,5 @@
-from io import IO
 from tile import tiles
+from io import IO
 
 class Square:
 	def __init__(self, tile, y, x):

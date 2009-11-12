@@ -1,10 +1,10 @@
 import curses
 
 from creature import Creature
-from io import IO
 from char import Char
 from fov import doFov
 from tile import tiles
+from io import IO
 
 class Player(Creature):
 
