@@ -43,7 +43,7 @@ class IO:
 			try:
 				for row in map:
 					for square in row:
-						self.l_w.addch(square.getMemoryChar().symbol, square.getMemoryChar().color)
+						self.l_w.addch(square.y, square.x, square.getMemoryChar().symbol, square.getMemoryChar().color)
 
 			except curses.error:
 				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
@@ -53,10 +53,13 @@ class IO:
 			try:
 				for row in map:
 					for square in row:
-						self.l_w.addch(square.getVisibleChar().symbol, square.getVisibleChar().color)
+						self.l_w.addch(square.y, square.x, square.getVisibleChar().symbol, square.getVisibleChar().color)
 
 			except curses.error:
 				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
+
+		def drawChar(self, y, x, char):
+			self.l_w.addch(y, x, char.symbol, char.color)
 
 		def drawLos(self):
 			if self.reverse:
