@@ -32,7 +32,7 @@ class Game:
 		else:
 			self.cur_level = self.levels[self.levels.index(self.cur_level) + 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["us"])
-		self.cur_level.draw()
+		self.cur_level.drawMemory()
 
 	def ascend(self):
 		if self.levels.index(self.cur_level) > 0:
@@ -40,7 +40,7 @@ class Game:
 			self.cur_level.removeCreature(self.player)
 			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["ds"])
-			self.cur_level.draw()
+			self.cur_level.drawMemory()
 		else:
 			self.endGame()
 			

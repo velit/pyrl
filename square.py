@@ -11,9 +11,9 @@ class Square:
 
 	#returns true if the square is passable by creatures
 	def passable(self):
-		if self.creature is not None:
+		if self.creature:
 			return False
-		elif self.tile is not None:
+		elif self.tile:
 			return self.tile.passable
 		else:
 			return False
@@ -25,23 +25,11 @@ class Square:
 		self.memory_tile = self.tile
 		IO().visibility.append(self)
 
-	def getChar(self, memory=True):
-		if memory and self.creature is not None:
-			return (self.creature.ch.symbol, self.creature.ch.color)
+	def getVisibleChar(self):
+		if self.creature:
+			return self.creature.ch
 		else:
-			return (self.memory_tile.ch.symbol, self.memory_tile.ch.color)
+			return self.tile.ch
 
-	def getSymbol(self, memory=True):
-		if memory and self.creature is not None:
-			return self.creature.ch.symbol
-		else:
-			return self.memory_tile.ch.symbol
-
-	def getColor(self, memory=True):
-		if memory and self.creature is not None:
-			return self.creature.ch.color
-		else:
-			return self.memory_tile.ch.color
-
-	def draw(self):
-		IO().drawTile(self)
+	def getMemoryChar(self):
+		return self.memory_tile.ch

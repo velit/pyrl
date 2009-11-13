@@ -38,25 +38,35 @@ class IO:
 			self.l_w.noutrefresh()
 			curses.doupdate()
 
+		def drawMemoryMap(self, map):
+			self.l_w.move(0,0)
+			try:
+				for row in map:
+					for square in row:
+						self.l_w.addch(square.getMemoryChar().symbol, square.getMemoryChar().color)
+
+			except curses.error:
+				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
+
 		def drawMap(self, map):
 			self.l_w.move(0,0)
 			try:
 				for row in map:
 					for square in row:
-						square.draw()
-						#self.l_w.addch(square.getSymbol(False), square.getColor(False))
+						self.l_w.addch(square.getVisibleChar().symbol, square.getVisibleChar().color)
+
 			except curses.error:
 				pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
-			
+
 		def drawLos(self):
 			if self.reverse:
 				for square in self.visibility:
 					self.l_w.addch(square.y, square.x, \
-							square.getSymbol(), square.getColor() | self.colors["reverse"])
+							square.getVisibleChar().symbol, square.getVisibleChar().color | self.colors["reverse"])
 			else:
 				for square in self.visibility:
 					self.l_w.addch(square.y, square.x, \
-							square.getSymbol(), square.getColor())
+							square.getVisibleChar().symbol, square.getVisibleChar().color)
 
 		def clearLos(self):
 			while True:
@@ -65,11 +75,33 @@ class IO:
 				except IndexError:
 					break
 				self.l_w.addch(square.y, square.x, \
-						square.getSymbol(False), square.getColor(False))
+						square.getMemoryChar().symbol, square.getMemoryChar().color)
 
 		def drawInterface(self, counter, id):
 			self.s_w.addstr(0, 0, "T: "+str(counter)+" ")
 			self.s_w.addstr(0, len(str(counter)+"T:  "), "ID: "+str(id)+" ")
+
+		def getch(self, y=None, x=None):
+			if y is not None and x is not None:
+				self.l_w.move(y, x)	
+			self.refreshWindows()
+			c = self.l_w.getch()
+			self.clearMsgArea()
+			return c
+
+		def getCharacters(self, list):
+			c = None
+			self.refreshWindows()
+			while c not in list:
+				c = self.l_w.getch()
+			self.clearMsgArea()
+			return c
+
+		def queueMsg(self, str):
+			self.message_bar.queueMsg(str)
+		
+		def clearMsgArea(self):
+			self.message_bar.clearMsgArea()
 
 		def drawLine(self, startSquare, targetSquare, char=None):
 			if char is None:
@@ -106,34 +138,6 @@ class IO:
 					y += ystep
 					error += deltax
 			self.l_w.getch()
-
-		def drawTile(self, square):
-			try:
-				self.l_w.addch(square.y, square.x, square.getChar(False), square.getColor(False))
-			except curses.error:
-				pass
-
-		def getch(self, y=None, x=None):
-			if y is not None and x is not None:
-				self.l_w.move(y, x)	
-			self.refreshWindows()
-			c = self.l_w.getch()
-			self.clearMsgArea()
-			return c
-
-		def getCharacters(self, list):
-			c = None
-			self.refreshWindows()
-			while c not in list:
-				c = self.l_w.getch()
-			self.clearMsgArea()
-			return c
-
-		def queueMsg(self, str):
-			self.message_bar.queueMsg(str)
-		
-		def clearMsgArea(self):
-			self.message_bar.clearMsgArea()
 
 		def setColors(self):
 			for x in range(7):
