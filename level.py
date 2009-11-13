@@ -37,6 +37,9 @@ class Level:
 
 	def draw(self):
 		IO().drawMap(self.map.map)
+	
+	def drawMemory(self):
+		IO().drawMemoryMap(self.map.map)
 
 	def addCreature(self, creature, square = None):
 		if square is None:
