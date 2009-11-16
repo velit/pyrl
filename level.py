@@ -5,12 +5,12 @@ from player import Player
 from monster import Monster
 from square import Square
 from map import Map
-from io import IO
+from io import io
 
 class Level:
 	def __init__(self, id):
 		self.id = id
-		self.rows, self.cols = IO().level_dimensions
+		self.rows, self.cols = io.level_dimensions
 		
 		self.creatures = []
 
@@ -36,10 +36,10 @@ class Level:
 		return y >= 0 and x >= 0 and y < self.rows and x < self.cols and self.getSquare(y,x).seeThrough()
 
 	def draw(self):
-		IO().drawMap(self.map.map)
+		io.drawMap(self.map.map)
 	
 	def drawMemory(self):
-		IO().drawMemoryMap(self.map.map)
+		io.drawMemoryMap(self.map.map)
 
 	def addCreature(self, creature, square = None):
 		if square is None:

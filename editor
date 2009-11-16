@@ -1,1 +1,9 @@
-#!/usr/bin/python editor.py
+#!/usr/bin/python
+from curses import wrapper
+
+def main(w):
+	from io import io
+	from editor import Editor
+	Editor().ui()
+
+wrapper(main)

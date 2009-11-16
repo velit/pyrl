@@ -1,5 +1,5 @@
 import curses
-from io import IO
+from io import io
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1,  0,  0, -1, -1,  0,  0,  1],
@@ -52,11 +52,11 @@ def _cast_light(level, cy, cx, row, start, end, radius, xx, xy, yx, yy):
 
 def doFov(creature, level):
 	"Calculate lit squares from the given location and radius"
-	IO().clearLos()
+	io.clearLos()
 	y,x = level.squares[creature].y, level.squares[creature].x
 	radius = creature.sight
 	if radius != 0:
 		level.visitSquare(y,x)
 	for oct in range(8):
 		_cast_light(level, y, x, 1, 1.0, 0.0, radius, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
-	IO().drawLos()
+	io.drawLos()
