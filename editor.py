@@ -33,6 +33,9 @@ def main(w):
 			a = l.getSquare(c.y, c.x)
 			a.tile = t
 			IO().drawChar(c.y, c.x, a.getVisibleChar())
+		elif ch == ord('f'):
+			t = tiles["f"]
+		elif ch == <F2><F2>
 
 
 curses.wrapper(main)
