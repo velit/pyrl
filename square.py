@@ -1,5 +1,5 @@
 from tile import tiles
-from io import IO
+from io import io
 
 class Square:
 	def __init__(self, tile, y, x):
@@ -23,7 +23,7 @@ class Square:
 
 	def visit(self):
 		self.memory_tile = self.tile
-		IO().visibility.append(self)
+		io.visibility.append(self)
 
 	def getVisibleChar(self):
 		if self.creature:

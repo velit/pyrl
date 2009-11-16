@@ -1,10 +1,10 @@
 import curses
 import sys
-import pickle
+import cPickle
 
 from level import Level
 from player import Player
-from io import IO
+from io import io
 
 class Game:
 	def __init__(self):
@@ -17,13 +17,13 @@ class Game:
 		self.levels = [self.cur_level]
 	
 	def play(self):
-		IO().drawInterface(self.turn_counter, self.cur_level.id)
+		io.drawInterface(self.turn_counter, self.cur_level.id)
 		for creature in self.cur_level.creatures:
 			creature.act(self)
 		self.turn_counter += 1
 
 	def descend(self):
-		IO().clearLos()
+		io.clearLos()
 		self.cur_level.removeCreature(self.player)
 		if len(self.levels) == self.levels.index(self.cur_level) + 1:
 			self.cur_level = Level(len(self.levels)+1)
@@ -36,7 +36,7 @@ class Game:
 
 	def ascend(self):
 		if self.levels.index(self.cur_level) > 0:
-			IO().clearLos()
+			io.clearLos()
 			self.cur_level.removeCreature(self.player)
 			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]
 			self.cur_level.addCreature(self.player, self.cur_level.squares["ds"])
@@ -44,21 +44,26 @@ class Game:
 		else:
 			self.endGame()
 			
-	def endGame(self, dontAsk=False):
-		if dontAsk:
+	def endGame(self, ask=True):
+		if not ask:
 			sys.exit(0)
-		IO().queueMsg("Do you wish to end the game? [y/N]:")
-		c = IO().getCharacters([10,78,110,121])
-		if c == 121:
+		io.queueMsg("Do you wish to end the game? [y/N]:")
+		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		if c in map(ord, ('y', 'Y')):
 			sys.exit(0)
+	
+	def _save(self):
+		f = open("pyrl.svg", "w")
+		cPickle.dump(self, f, "w")
+		f.close()
 
-	def saveGame(self, dontAsk=False):
-		if dontAsk:
-			pickle.dump(self, open("pyrl.svg", "w"))
+	def saveGame(self, ask=True):
+		if not ask:
+			self._save()
 			self.endGame(True)
-		IO().queueMsg("Do you wish to save the game? [Y/n]:")
-		c = IO().getCharacters((10,78,110,121))
-		if c in (121, 10):
-			pickle.dump(self, open("pyrl.svg", "w"))
+		io.queueMsg("Do you wish to save the game? [Y/n]:")
+		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		if c in map(ord, ('y', 'Y')):
+			self._save()
 			self.endGame(True)
 

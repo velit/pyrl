@@ -1,18 +1,18 @@
 import random
 from char import Char
-from io import IO
+from io import io
 
 mons = ['k', '@', 'g', 'j', 'c']
 name1 = ["kobold", "bandit", "goblin", "jelly", "centipede"]
 name2 = ["black", "green", "yellow", "blue"]
 name3 = ["him", "him", "him", "it", "it"]
-color = [IO().colors["black"], IO().colors["light_green"], IO().colors["yellow"], IO().colors["blue"]] 
+color = ["black", "light_green", "yellow", "blue"]
 
 class Creature:
 	def __init__(self):
 		i1, i2 = random.randrange(len(mons)), random.randrange(len(color))
 		self.name = name2[i2]+" "+name1[i1]
-		self.ch = Char(mons[i1], color[i2])
+		self.ch = Char(mons[i1], io.color[color[i2]])
 		self.n = name3[i1]
 		self.sight = 8
 		self.hp = 50
