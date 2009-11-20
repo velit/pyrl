@@ -3,8 +3,10 @@ import curses
 
 class MessageBar:
 	"""Handles the messaging bar system."""
-	def __init__(self, window, more_str=" (more)"):
+	def __init__(self, window, io, more_str=" (more)"):
 		self.w = window
+		self.w.keypad(1)
+		self.io = io
 		self.lines, self.width = self.w.getmaxyx()
 		self.msgqueue = ""
 		self.cur_line = 0
@@ -12,13 +14,26 @@ class MessageBar:
 		self.wrapper = TextWrapper(width=(self.width - 1)) #accommodate for printing the newline character
 		self.last_line_wrapper = TextWrapper(width=(self.width - len(self.more_str) - 1)) #accommodate for the more_str if the messages continue on the next page
 
+	def update(self):
+		self.printQueue()
+		self.w.noutrefresh()
+
 	def queueMsg(self, str):
 		self.msgqueue += str+" "
 
 	def clearMsgArea(self): #TODO perhaps only clear messages that are actually on screen, also implement a log history
-		for y in range(self.lines):
-			self.w.hline(y, 0, ' ', self.width)
+		self.w.erase()
 		self.cur_line = 0
+	
+	def getStr(self, str):
+		self.clearMsgArea()
+		self.w.addstr(0,0,str)
+		curses.echo()
+		a = self.w.getstr()
+		self.w.addstr(a)
+		self.w.getch()
+		curses.noecho()
+		return a
 
 	def printQueue(self):
 		str = self.msgqueue
@@ -42,7 +57,7 @@ class MessageBar:
 					a = self.last_line_wrapper.wrap(str)
 					self.w.addstr(self.cur_line, 0, a[0]+self.more_str)
 					if not skip_all:
-						c = self._getCharacters((ord('\n'), ord(' ')))
+						c = self.getCharacters((ord('\n'), ord(' ')))
 						if c == ord('\n'):
 							skip_all = True
 					str = " ".join(a[1:])
@@ -50,7 +65,7 @@ class MessageBar:
 					self.clearMsgArea()
 		self.msgqueue = ""
 
-	def _getCharacters(self, list):
+	def getCharacters(self, list):
 		c = None
 		while c not in list:
 			c = self.w.getch()

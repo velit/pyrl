@@ -23,7 +23,7 @@ class Square:
 
 	def visit(self):
 		self.memory_tile = self.tile
-		io.visibility.append(self)
+		io.l.visibility.append(self)
 
 	def getVisibleChar(self):
 		if self.creature:

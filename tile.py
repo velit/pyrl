@@ -1,5 +1,5 @@
 from char import Char
-from io import io
+from colors import color
 
 class Tile:
 	"""The actual floor of a square."""
@@ -15,7 +15,7 @@ tiles = {
 		"u": Tile("You have not seen this place yet", Char(' '), False, False, False),
 		"f": Tile("Dungeon floor", Char('.'), True, False, True),
 		"r": Tile("Dungeon rock", Char('#'), False, True, False),
-		"w": Tile("Wall", Char('#', io.color["black"]), False, True, False),
+		"w": Tile("Wall", Char('#', color["black"]), False, True, False),
 		"ds": Tile("Down staircase", Char('>'), True, True, True),
 		"us": Tile("Up staircase", Char('<'), True, True, True),
 		}
