@@ -1,9 +1,10 @@
 import curses
 
 def main(w):
-	from io import io
-	from game import Game
+	import io
+	io.io = io.IO(w, 2, 2)
 	
+	from game import Game
 	game = Game()
 
 	while True:

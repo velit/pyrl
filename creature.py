@@ -1,18 +1,18 @@
 import random
 from char import Char
-from io import io
+from colors import color
 
 mons = ['k', '@', 'g', 'j', 'c']
 name1 = ["kobold", "bandit", "goblin", "jelly", "centipede"]
 name2 = ["black", "green", "yellow", "blue"]
 name3 = ["him", "him", "him", "it", "it"]
-color = ["black", "light_green", "yellow", "blue"]
+color_ = [color["black"], color["light_green"], color["yellow"], color["blue"]]
 
 class Creature:
 	def __init__(self):
-		i1, i2 = random.randrange(len(mons)), random.randrange(len(color))
+		i1, i2 = random.randrange(len(mons)), random.randrange(len(color_))
 		self.name = name2[i2]+" "+name1[i1]
-		self.ch = Char(mons[i1], io.color[color[i2]])
+		self.ch = Char(mons[i1], color_[i2])
 		self.n = name3[i1]
 		self.sight = 8
 		self.hp = 50
@@ -44,6 +44,12 @@ class Creature:
 
 		if target_square.passable():
 			level.moveCreature(self, target_square)
+
+	def loseHP(self, amount):
+#		self.hp -= amount
+#		if self.hp <= 0:
+#			self.die
+		pass
 
 	def die(self):
 		pass

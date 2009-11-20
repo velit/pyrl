@@ -11,19 +11,17 @@ class Game:
 		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
 		self.turn_counter = 0
 
-		self.player = Player()
+		self.player = Player(self)
 		self.cur_level = Level(1)
 		self.cur_level.addCreature(self.player)
 		self.levels = [self.cur_level]
 	
 	def play(self):
-		io.drawInterface(self.turn_counter, self.cur_level.id)
 		for creature in self.cur_level.creatures:
 			creature.act(self)
 		self.turn_counter += 1
 
 	def descend(self):
-		io.clearLos()
 		self.cur_level.removeCreature(self.player)
 		if len(self.levels) == self.levels.index(self.cur_level) + 1:
 			self.cur_level = Level(len(self.levels)+1)

@@ -10,7 +10,7 @@ from io import io
 class Level:
 	def __init__(self, id):
 		self.id = id
-		self.rows, self.cols = io.level_dimensions
+		self.rows, self.cols = io.level_rows, io.level_cols
 		
 		self.creatures = []
 
