@@ -18,7 +18,7 @@ class Level:
 		self.squares = self.map.squares
 
 		for x in range(10):
-			self.addCreature(Monster())
+			self.addCreature(Monster(self))
 
 	def getSquare(self, y, x):
 		return self.map.getSquare(y,x)

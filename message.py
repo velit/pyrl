@@ -30,8 +30,6 @@ class MessageBar:
 		self.w.addstr(0,0,str)
 		curses.echo()
 		a = self.w.getstr()
-		self.w.addstr(a)
-		self.w.getch()
 		curses.noecho()
 		return a
 

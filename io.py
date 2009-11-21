@@ -4,6 +4,7 @@ from colors import color
 from message import MessageBar
 from status import StatusBar
 from level_window import LevelWindow
+from char import Char
 
 class IO:
 	def __init__(self, window, msg_bar_size=2, status_bar_size=2):
@@ -33,7 +34,12 @@ class IO:
 		self.l.drawLine(self, startSquare, targetSquare, char=None)
 
 	def getStr(self, str):
-		return self.m.getStr(str)
+		self.clear()
+		self.w.addstr(0,0,str)
+		curses.echo()
+		a = self.w.getstr()
+		curses.noecho()
+		return a
 
 	def queueMsg(self, str):
 		self.m.queueMsg(str)
@@ -66,25 +72,60 @@ class IO:
 		self.clearMsgArea()
 		return c
 
-	def getSelection(self, options):
+	def getSelection(self, option_names, decisions, option_values=None, hilite_values=True):
+		n = option_names
+		v = option_values
 		curses.curs_set(0)
 		self.clear()
-		selection = 0
 		self.w.move(0,0)
-		for option in options:
-			self.w.addstr(option[0]+"\n")
+
+		#printing options
+		for i in range(len(n)):
+			self.w.move(i, 0)
+			self.w.addstr(n[i])
+			if v is not None and i < len(v):
+				self.w.addstr(" ")
+				if isinstance(v[i], Char):
+					self.w.addstr(v[i].symbol, v[i].color)
+				else:
+					self.w.addstr(v[i])
+		#ui
+		i = 0
 		while True:
-			self.w.addstr(selection, 0, options[selection][0], color["reverse"])
-			c = self.w.getch()
-			self.w.addstr(selection, 0, options[selection][0])
+			if v is not None and i < len(v) and hilite_values:
+				y = i
+				x = len(n[i] + " ")
+				if isinstance(v[i], Char):
+					self.w.addstr(y, x, v[i].symbol, v[i].color | color["reverse"])
+					c = self.w.getch()
+					self.w.addstr(y, x, v[i].symbol, v[i].color)
+				else:
+					self.w.addstr(y, x, v[i], color["reverse"])
+					c = self.w.getch()
+					self.w.addstr(y, x, v[i])
+			else:
+				y = i
+				x = 0
+				self.w.addstr(y, x, n[i], color["reverse"])
+				c = self.w.getch()
+				self.w.addstr(y, x, n[i])
+
 			if c == curses.KEY_DOWN:
-				selection += 1
-				if selection >= len(options):
-					selection -= len(options)
+				i += 1
+				if i >= len(n):
+					i -= len(n)
+				if decisions[i] is None:
+					i+= 1
+					if i >= len(n):
+						i -= len(n)
 			elif c == curses.KEY_UP:
-				selection -= 1
-				if selection < 0:
-					selection += len(options)
+				i -= 1
+				if i < 0:
+					i += len(n)
+				if decisions[i] is None:
+					i -= 1
+					if i < 0:
+						i += len(n)
 			elif c == ord('\n'):
 				curses.curs_set(1)
-				return options[selection][1]()
+				return decisions[i]
