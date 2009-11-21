@@ -3,7 +3,7 @@ from curses import wrapper
 
 def main(w):
 	import io
-	io.io = io.IO(w, 2, 2, True)
+	io.io = io.IO(w, 2, 2)
 	from editor import Editor
 	Editor().ui()
 

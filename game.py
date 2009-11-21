@@ -11,34 +11,33 @@ class Game:
 		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
 		self.turn_counter = 0
 
-		self.player = Player(self)
-		self.cur_level = Level(1)
-		self.cur_level.addCreature(self.player)
-		self.levels = [self.cur_level]
+		self.l = [Level(1)]
+		self.p = Player(self.l[0], self)
+		self.p.l.addCreature(self.p)
 	
 	def play(self):
-		for creature in self.cur_level.creatures:
-			creature.act(self)
+		for creature in self.p.l.creatures:
+			creature.act()
 		self.turn_counter += 1
 
 	def descend(self):
-		self.cur_level.removeCreature(self.player)
-		if len(self.levels) == self.levels.index(self.cur_level) + 1:
-			self.cur_level = Level(len(self.levels)+1)
-			self.cur_level.addCreature(self.player, self.cur_level.squares["us"])
-			self.levels.append(self.cur_level)
+		self.p.l.removeCreature(self.p)
+		if len(self.l) == self.l.index(self.p.l) + 1:
+			self.p.l = Level(len(self.l)+1)
+			self.p.l.addCreature(self.p, self.p.l.squares["us"])
+			self.l.append(self.p.l)
 		else:
-			self.cur_level = self.levels[self.levels.index(self.cur_level) + 1]
-			self.cur_level.addCreature(self.player, self.cur_level.squares["us"])
-		self.cur_level.drawMemory()
+			self.p.l = self.l[self.l.index(self.p.l) + 1]
+			self.p.l.addCreature(self.p, self.p.l.squares["us"])
+		self.p.l.drawMemory()
 
 	def ascend(self):
-		if self.levels.index(self.cur_level) > 0:
+		if self.l.index(self.p.l) > 0:
 			io.clearLos()
-			self.cur_level.removeCreature(self.player)
-			self.cur_level = self.levels[self.levels.index(self.cur_level) - 1]
-			self.cur_level.addCreature(self.player, self.cur_level.squares["ds"])
-			self.cur_level.drawMemory()
+			self.p.l.removeCreature(self.p)
+			self.p.l = self.l[self.l.index(self.p.l) - 1]
+			self.p.l.addCreature(self.p, self.p.l.squares["ds"])
+			self.p.l.drawMemory()
 		else:
 			self.endGame()
 			

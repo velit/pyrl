@@ -10,14 +10,20 @@ from colors import color
 SW = 1; S = 2; SE = 3; W = 4; STOP = 5; E = 6; NW = 7; N = 8; NE = 9
 
 class Player(Creature):
-
-	def __init__(self, game):
-		Creature.__init__(self)
+	def __init__(self, level, game):
+		Creature.__init__(self, level)
 		self.game = game
+		self.name = "tappi"
+		self.n = "god"
 		self.ch = Char('@', color["white"])
 
+		self.register_status_texts()
+		self.def_actions()
+
+	def register_status_texts(self):
 		io.s.register("hp", "HP: ", lambda: self.hp)
 
+	def def_actions(self):
 		a = {}
 		n = {}
 
@@ -37,14 +43,14 @@ class Player(Creature):
 		a[ord('8')] = lambda: self.move(N)
 		a[ord('9')] = lambda: self.move(NE)
 
-		n[ord('Q')] = game.endGame
-		n[ord('S')] = game.saveGame
+		n[ord('Q')] = self.game.endGame
+		n[ord('S')] = self.game.saveGame
 
 		self.actions = a
 		self.non_actions = n
 
 	def move(self, d):
-		y,x = self.game.cur_level.squares[self].y, self.game.cur_level.squares[self].x
+		y,x = self.l.squares[self].y, self.l.squares[self].x
 		ny = y
 		nx = x
 
@@ -59,10 +65,10 @@ class Player(Creature):
 		if d == STOP:
 			return True
 		
-		target_square = self.game.cur_level.getSquare(ny,nx)
+		target_square = self.l.getSquare(ny,nx)
 
 		if target_square.passable():
-			self.game.cur_level.moveCreature(self, target_square)
+			self.l.moveCreature(self, target_square)
 			return True
 		elif target_square.creature is not None:
 			self.hit(target_square.creature)
@@ -74,8 +80,8 @@ class Player(Creature):
 		if creature.hp > 0:
 			io.queueMsg("You hit the "+creature.name+" and wound "+creature.n+".")
 		else:
+			creature.die()
 			io.queueMsg("You hit the "+creature.name+" and kill "+creature.n+".")
-			self.game.cur_level.removeCreature(creature)
 
 	def descend(self):
 		self.game.descend()
@@ -83,11 +89,11 @@ class Player(Creature):
 	def ascend(self):
 		self.game.ascend()
 
-	def act(self, game):
+	def act(self):
 		self.hp -= 1
 		while True:
-			doFov(self, self.game.cur_level)
-			c = io.getch(self.game.cur_level.squares[self].y, self.game.cur_level.squares[self].x)
+			doFov(self, self.l)
+			c = io.getch(self.l.squares[self].y, self.l.squares[self].x)
 			if c in self.actions:
 				io.clearLos()
 				self.actions[c]()
