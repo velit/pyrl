@@ -148,21 +148,7 @@ class Editor:
 				c = io.w.getch()
 			if c == ord("y") or c == ord("Y"):
 				self.save()
-				io.w.getch()
 		sys.exit(0)
-
-#
-#		str = ""
-#		str += handle + "\n"
-#		str += name + "\n"
-#		str += col + "\n"
-#		str += ch + "\n"
-#		str += passable + "\n"
-#		str += destroyable + "\n"
-#		str += see_through + "\n"
-#
-#		io.w.addstr(str)
-#		io.w.getch()
 
 #	from map import Map
 #	from tile import tiles
