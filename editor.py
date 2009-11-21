@@ -28,7 +28,10 @@ class Data:
 
 class Editor:
 	def __init__(self):
-		self.load()
+		try:
+			self.load()
+		except IOError:
+			self.data = Data()
 		self.modified = False
 
 	def save(self):
@@ -117,7 +120,7 @@ class Editor:
 				ch = io.getStr("Tile char: ")
 				while len(ch) != 1:
 					ch = io.getStr("Tile char must be exactly one char: ")
-				col = io.getStr("Tile color: ")
+				col = io.getStr("Tile color: [white/normal/black red/green/yellow/blue/purple/cyan/light_*]: ")
 				while col not in color:
 					col = io.getStr("Color must be a pre-existing color: ")
 				tile.ch = Char(ch, color[col])
@@ -137,6 +140,7 @@ class Editor:
 	def new_tile(self):
 		handle = io.getStr("Tile handle: ")
 		self.data.tiles[handle] = Tile()
+		self.modified = True
 		return True
 
 	def exit(self):
