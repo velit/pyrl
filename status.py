@@ -1,10 +1,10 @@
 import curses
+from window import Window
 
-class StatusBar:
+class StatusBar(Window):
 	"""Handles the status bar system."""
 	def __init__(self, window, io):
-		self.w = window
-		self.w.keypad(1)
+		Window.__init__(self, window)
 		self.io = io
 		self.lines, self.width = self.w.getmaxyx()
 		self.elements = {}
@@ -13,7 +13,10 @@ class StatusBar:
 		self.elements[handle] = (string, value)
 
 	def update(self):
-		self.w.move(0,0)
+		self.clear()
+		self.printElements()
+		Window.update(self)
+
+	def printElements(self):
 		for handle, (name, value) in self.elements.iteritems():
-			self.w.addstr(name + str(value())+" ")
-		self.w.noutrefresh()
+			self.w.addstr(name + str(value()) + " ")

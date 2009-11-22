@@ -1,6 +1,6 @@
 import curses
 import sys
-import cPickle
+import pickle
 
 from level import Level
 from player import Player
@@ -33,7 +33,6 @@ class Game:
 
 	def ascend(self):
 		if self.l.index(self.p.l) > 0:
-			io.clearLos()
 			self.p.l.removeCreature(self.p)
 			self.p.l = self.l[self.l.index(self.p.l) - 1]
 			self.p.l.addCreature(self.p, self.p.l.squares["ds"])
@@ -51,7 +50,7 @@ class Game:
 	
 	def _save(self):
 		f = open("pyrl.svg", "w")
-		cPickle.dump(self, f, "w")
+		pickle.dump(self, f)
 		f.close()
 
 	def saveGame(self, ask=True):
