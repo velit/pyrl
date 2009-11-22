@@ -25,7 +25,6 @@ class Player(Creature):
 
 	def def_actions(self):
 		a = {}
-		n = {}
 
 		a[ord('>')] = self.descend
 		a[ord('<')] = self.ascend
@@ -43,11 +42,10 @@ class Player(Creature):
 		a[ord('8')] = lambda: self.move(N)
 		a[ord('9')] = lambda: self.move(NE)
 
-		n[ord('Q')] = self.game.endGame
-		n[ord('S')] = self.game.saveGame
+		a[ord('Q')] = self.game.endGame
+		a[ord('S')] = self.game.saveGame
 
 		self.actions = a
-		self.non_actions = n
 
 	def move(self, d):
 		y,x = self.l.squares[self].y, self.l.squares[self].x
@@ -85,21 +83,20 @@ class Player(Creature):
 
 	def descend(self):
 		self.game.descend()
+		return True
 
 	def ascend(self):
 		self.game.ascend()
+		return True
 
 	def act(self):
 		self.hp -= 1
+		self.updateLos()
 		while True:
-			doFov(self, self.l)
 			c = io.getch(self.l.squares[self].y, self.l.squares[self].x)
 			if c in self.actions:
-				io.clearLos()
-				self.actions[c]()
-				break
-			elif c in self.non_actions:
-				self.non_actions[c]()
+				if self.actions[c]():
+					break
 			else:
 				if 0 <= c < 256:
 					c = chr(c)

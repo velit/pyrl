@@ -1,16 +1,12 @@
 import curses
+from window import Window
+from colors import color
 
-class LevelWindow:
+class LevelWindow(Window):
 	"""Handles the level display"""
 	def __init__(self, window, io):
-		self.w = window
-		self.w.keypad(1)
+		Window.__init__(self, window)
 		self.io = io
-		self.reverse = False
-		self.visibility = []
-
-	def update(self):
-		self.w.noutrefresh()
 
 	def drawMap(self, map):
 		self.w.move(0,0)
@@ -32,24 +28,24 @@ class LevelWindow:
 		except curses.error:
 			pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
 
-	def drawLos(self):
-		if self.reverse:
-			for square in self.visibility:
-				self.w.addch(square.y, square.x, \
-						square.getVisibleChar().symbol, square.getVisibleChar().color | color["reverse"])
-		else:
-			for square in self.visibility:
-				self.w.addch(square.y, square.x, \
-						square.getVisibleChar().symbol, square.getVisibleChar().color)
+	def drawChar(self, y, x, ch):
+		self.w.addch(y,x, ch.symbol, ch.color)
 
-	def clearLos(self):
+	def drawLos(self, visibility, l, reverse=False):
+		if reverse:
+			for y,x in visibility:
+				self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color | color["reverse"])
+		else:
+			for y,x in visibility:
+				self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color)
+
+	def clearLos(self, visibility, l):
 		while True:
 			try:
-				square = self.visibility.pop()
+				y, x = visibility.pop()
 			except IndexError:
 				break
-			self.w.addch(square.y, square.x, \
-					square.getMemoryChar().symbol, square.getMemoryChar().color)
+			self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, l.getSquare(y,x).getMemoryChar().color)
 
 	def drawLine(self, startSquare, targetSquare, char=None):
 		if char is None:
