@@ -31,4 +31,4 @@ class Square(object):
 			return self.tile.ch
 
 	def getMemoryChar(self):
-		return self.memory_tile.ch
+		return self.memory_tile.memory_ch

@@ -5,6 +5,8 @@ for x in range(7):
 
 color = {}
 
+color["brown"] = curses.color_pair(4) | curses.A_DIM
+
 color["grey"] = curses.color_pair(0)
 color["normal"] = curses.color_pair(0)
 color["black_on_black"] = curses.color_pair(1)
