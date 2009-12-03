@@ -19,17 +19,17 @@ def load(name="data"):
 	f.close()
 	return a
 
-class Cursor:
+class Cursor(object):
 	def __init__(self, y, x):
 		self.y = y
 		self.x = x
 
-class Data:
+class Data(object):
 	def __init__(self):
 		self.tiles = {}
 		self.levels = {}
 
-class Editor:
+class Editor(object):
 	def __init__(self):
 		try:
 			self.load()
@@ -92,31 +92,32 @@ class Editor:
 		return True
 
 	def new_tile(self):
-		handle = io.a.getstr("Tile handle: ")
+		handle = io.a.getstr("Tile handle")
 		self.data.tiles[handle] = Tile()
 		self.modified = True
 		return True
 
 	def pick_tile(self):
 		while True:
+			tiles = self.data.tiles
 			n = []
-			d = []
 			v = []
-			for key, value in self.data.tiles.iteritems():
+			d = []
+			for key, value in tiles.iteritems():
 				n.append(key)
-				d.append(value)
 				v.append(value.ch)
+				d.append(value)
 			n.append("----")
 			d.append(None)
 			n.append("Back")
-			d.append(1)
+			d.append(0)
 			n.append("Exit")
-			d.append(2)
+			d.append(1)
 
 			a = io.a.getSelection(n, d, v, False)
-			if a == 1:
+			if a == 0:
 				break
-			elif a == 2:
+			elif a == 1:
 				self.exit()
 			elif not self.edit_tile(a):
 				break
@@ -132,39 +133,37 @@ class Editor:
 			if s in (1,2,3,4,5):
 				self.modified = True
 			if s == 1:
-				tile.name = io.a.getstr("Name: ")
+				tile.name = io.a.getstr("Name")
 			elif s == 2:
-				passable = io.a.getstr("Passable [1/0]: ")
-				if passable == "1":
-					tile.passable = True
-				elif passable == "0":
-					tile.passable = False
+				tile.passable = io.a.getbool("Passable")
 			elif s == 3:
-				destroyable = io.a.getstr("Destroyable [1/0]: ")
-				if destroyable == "1":
-					tile.destroyable = True
-				elif destroyable == "0":
-					tile.destroyable = False
+				tile.destroyable = io.a.getbool("Destroyable")
 			elif s == 4:
-				see_through = io.a.getstr("See through [1/0]: ")
-				if see_through == "1":
-					tile.see_through = True
-				elif see_through == "0":
-					tile.see_through = False
+				tile.see_through = io.a.getbool("See through")
 			elif s == 5:
-				ch = io.a.getstr("Tile char: ")
-				while len(ch) != 1:
-					ch = io.a.getstr("Tile char must be exactly one char: ")
-				col = io.a.getstr("Tile color: [white/normal/black, red/green/yellow/blue/purple/cyan/, light_red/light_*]: ")
-				while col not in color:
-					col = io.a.getstr("Color must be a pre-existing color: ")
-				tile.ch = Char(ch, color[col])
+				tile.ch = Char(io.a.getchar("Tile char"), io.a.getcolor("Tile color"))
 			elif s == 6:
 				return True
 			elif s == 7:
 				return False
 			elif s == 8:
 				self.exit()
+
+	def edit_tile_alt(self, tile):
+		while True:
+			n = []
+			v = []
+			d = []
+			a = vars(tile)
+			for key, value in a.iteritems():
+				n.append(key)
+				if isinstance(value, Char):
+					v.append(value)
+				else:
+					v.append(str(value))
+				d.append(value)
+
+			s = io.a.getSelection(n, d, v)
 
 	def level_editor(self):
 		n = ("Make a new level", "Edit levels", "-----------", "Back", "Exit")
@@ -174,7 +173,7 @@ class Editor:
 		return True
 
 	def new_level(self):
-		handle = io.a.getstr("Level handle: ")
+		handle = io.a.getstr("Level handle")
 		self.data.levels[handle] = Map(20, 80, False)
 		self.modified = True
 		return True

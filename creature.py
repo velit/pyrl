@@ -8,7 +8,7 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 		[0,  1,  1,  0,  0, -1, -1,  0],
 		[1,  0,  0,  1, -1,  0,  0, -1]]
 
-class Creature:
+class Creature(object):
 	"""This is an abstract class representing a creature"""
 	def __init__(self, level):
 		self.sight = 8

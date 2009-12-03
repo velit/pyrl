@@ -1,7 +1,7 @@
 from char import Char
 from colors import color
 
-class Tile:
+class Tile(object):
 	"""The actual floor of a square."""
 	def __init__(self, name = "Unknown", ch = Char(' '), \
 			passable = False, destroyable = False, see_through = False ):

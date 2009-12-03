@@ -7,7 +7,7 @@ from square import Square
 from map import Map
 from io import io
 
-class Level:
+class Level(object):
 	def __init__(self, id):
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols

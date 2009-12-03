@@ -6,7 +6,7 @@ from level import Level
 from player import Player
 from io import io
 
-class Game:
+class Game(object):
 	def __init__(self):
 		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
 		self.turn_counter = 0

@@ -1,7 +1,7 @@
 from tile import tiles
 from io import io
 
-class Square:
+class Square(object):
 	def __init__(self, tile, y, x):
 		self.y = y
 		self.x = x
