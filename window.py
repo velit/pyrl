@@ -2,7 +2,7 @@ import curses
 from char import Char
 from colors import color
 
-class Window:
+class Window(object):
 	def __init__(self, window):
 		self.w = window
 		self.w.keypad(1)
@@ -26,14 +26,48 @@ class Window:
 			c = self.w.getch()
 		return c
 
-	def getstr(self, str=None):
+	def clear_and_print(self, str=None):
 		self.clear()
 		if str is not None:
 			self.w.addstr(str)
+
+	def _getstr(self, print_str=None):
+		self.clear_and_print(print_str)
 		curses.echo()
-		a = self.w.getstr()
+		str = self.w.getstr()
 		curses.noecho()
-		return a
+		return str
+
+	def getstr(self, str=None):
+		return self._getstr(str + " [str]: ")
+
+	def getint(self, print_str=None):
+		while True:
+			input = self._getstr(print_str + " [int]: ")
+			try:
+				return int(input)
+			except ValueError:
+				pass
+
+	def getbool(self, print_str=None):
+		while True:
+			input = self._getstr(print_str + " [1/0]: ")
+			if input == "1":
+				return True
+			elif input == "0":
+				return False
+
+	def getchar(self, print_str=None):
+		while True:
+			input = self._getstr(print_str + " [char]: ")
+			if len(input) == 1:
+				return input
+
+	def getcolor(self, print_str=None):
+		while True:
+			input = self._getstr(print_str + " [white/normal/black, red/green/yellow/blue/purple/cyan/, light_red/light_*]: ")
+			if input in color:
+				return color[input]
 
 	def move(self, y, x):
 		self.w.move(y, x)
@@ -44,6 +78,9 @@ class Window:
 
 	def addstr(self, str):
 		self.w.addstr(str)
+
+	def _getch(self):
+		return self.w.getch()
 
 	def getSelection(self, option_names, decisions, option_values=None, hilite_values=True):
 		n = option_names

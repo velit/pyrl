@@ -7,7 +7,7 @@ f = tiles["f"]
 w = tiles["w"]
 r = tiles["r"]
 
-class Map:
+class Map(object):
 	"""This object holds the data of a Level object, and methods for manipulating the data."""
 	def __init__(self, y, x, generate=True):
 

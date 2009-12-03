@@ -1,5 +1,6 @@
 import curses
 import _curses
+
 from colors import color
 from message import MessageBar
 from status import StatusBar
@@ -7,7 +8,7 @@ from level_window import LevelWindow
 from window import Window
 from char import Char
 
-class IO:
+class IO(object):
 	def __init__(self, window, msg_bar_size=2, status_bar_size=2):
 		self.w = window
 		self.w.keypad(1)
