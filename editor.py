@@ -4,7 +4,6 @@ import sys
 from io import io
 from colors import color
 from tile import Tile
-from tile import tiles
 from char import Char
 from map import Map
 
@@ -40,14 +39,16 @@ class Editor(object):
 	def save(self):
 		self.modified = False
 		f = open("data", "w")
-		cPickle.dump(self.data, f)
+		cPickle.dump(self.data.tiles, f)
 		f.close()
 
 		return True
 
 	def load(self):
 		f = open("data", "r")
-		self.data = cPickle.load(f)
+		self.data = Data()
+		self.data.tiles = cPickle.load(f)
+		f.close()
 		#try:
 		#	self.data.levels
 		#except AttributeError:
@@ -70,7 +71,7 @@ class Editor(object):
 			io.a.clear()
 			io.a.addstr("The data has been modified; save before exit? [y/N] ")
 			c = io.a.getch()
-			while c not in map(ord, ('y', 'Y', 'n', 'N')):
+			while c not in map(ord, ('y', 'Y', 'n', 'N', '\n')):
 				c = io.a.getch()
 			if c == ord("y") or c == ord("Y"):
 				self.save()
@@ -105,26 +106,71 @@ class Editor(object):
 			d = []
 			for key, value in tiles.iteritems():
 				n.append(key)
-				v.append(value.ch)
+				v.append(value.visible_ch)
 				d.append(value)
 			n.append("----")
 			d.append(None)
 			n.append("Back")
-			d.append(0)
-			n.append("Exit")
 			d.append(1)
+			n.append("Exit")
+			d.append(2)
 
-			a = io.a.getSelection(n, d, v, False)
-			if a == 0:
+			s = io.a.getSelection(n, d, v, False)
+			if s == 1:
 				break
-			elif a == 1:
+			elif s == 2:
 				self.exit()
-			elif not self.edit_tile(a):
+			elif not self.edit_tile(s):
 				break
 
 		return True
 
 	def edit_tile(self, tile):
+		i = 0
+		while True:
+			n = []
+			v = []
+			d = []
+			a = sorted(vars(tile))
+			for key in a:
+				value = getattr(tile, key)
+				n.append(key)
+				if isinstance(value, Char):
+					v.append(value)
+				else:
+					v.append(str(value))
+				d.append((key, value))
+
+			n.append("")
+			d.append(None)
+			n.append("Edit more")
+			d.append(1)
+			n.append("Back")
+			d.append(2)
+			n.append("Exit")
+			d.append(3)
+			s = io.a.getSelection(n, d, v, i)
+			if s == 1:
+				return True
+			elif s == 2:
+				return False
+			elif s == 3:
+				self.exit()
+			else:
+				i = a.index(s[0])
+				self.modified = True
+				if isinstance(s[1], bool):
+					setattr(tile, s[0], io.a.getbool(s[0]))
+				elif isinstance(s[1], str):
+					setattr(tile, s[0], io.a.getstr(s[0]))
+				elif isinstance(s[1], int):
+					setattr(tile, s[0], io.a.getint(s[0]))
+				elif isinstance(s[1], Char):
+					setattr(tile, s[0], Char(io.a.getchar(s[0]), io.a.getcolor(s[0])))
+				else:
+					self.exit()
+
+	def edit_tile_alt(self, tile):
 		n = ("Name:       ", "Passable:   ", "Destroyable:", "See through:", "Tile char:  ", "------------", "Edit more", "Back", "Exit")
 		d = (1, 2, 3, 4, 5, None, 6, 7, 8)
 		while True:
@@ -148,22 +194,6 @@ class Editor(object):
 				return False
 			elif s == 8:
 				self.exit()
-
-	def edit_tile_alt(self, tile):
-		while True:
-			n = []
-			v = []
-			d = []
-			a = vars(tile)
-			for key, value in a.iteritems():
-				n.append(key)
-				if isinstance(value, Char):
-					v.append(value)
-				else:
-					v.append(str(value))
-				d.append(value)
-
-			s = io.a.getSelection(n, d, v)
 
 	def level_editor(self):
 		n = ("Make a new level", "Edit levels", "-----------", "Back", "Exit")
