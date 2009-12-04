@@ -44,6 +44,8 @@ class Window(object):
 	def getint(self, print_str=None):
 		while True:
 			input = self._getstr(print_str + " [int]: ")
+			if input == "":
+				return 0
 			try:
 				return int(input)
 			except ValueError:
@@ -52,21 +54,25 @@ class Window(object):
 	def getbool(self, print_str=None):
 		while True:
 			input = self._getstr(print_str + " [1/0]: ")
-			if input == "1":
-				return True
-			elif input == "0":
+			if input == "" or input == "0":
 				return False
+			elif input == "1":
+				return True
 
 	def getchar(self, print_str=None):
 		while True:
 			input = self._getstr(print_str + " [char]: ")
-			if len(input) == 1:
+			if input == "":
+				return " "
+			elif len(input) == 1:
 				return input
 
 	def getcolor(self, print_str=None):
 		while True:
 			input = self._getstr(print_str + " [white/normal/black, red/green/yellow/blue/purple/cyan/, light_red/light_*]: ")
-			if input in color:
+			if input == "":
+				return color["normal"]
+			elif input in color:
 				return color[input]
 
 	def move(self, y, x):
@@ -82,30 +88,44 @@ class Window(object):
 	def _getch(self):
 		return self.w.getch()
 
-	def getSelection(self, option_names, decisions, option_values=None, hilite_values=True):
+	def getSelection(self, option_names, decisions, option_values=None, start_selection=0, hilite_values=True):
 		n = option_names
 		v = option_values
 		curses.curs_set(0)
 		self.clear()
+		
+		indent = 0
+		for i in range(len(n)):
+			if v and i < len(v) and len(n[i]) > indent:
+				indent = len(n[i])
+
+		if indent: indent += 1
 
 		#printing options
-		for i in range(len(n)):
-			self.w.move(i, 0)
-			self.w.addstr(n[i])
-			if v is not None and i < len(v):
-				self.w.addstr(" ")
-				if isinstance(v[i], Char):
-					self.w.addstr(v[i].symbol, v[i].color)
-				else:
-					self.w.addstr(v[i])
+		for y, name in enumerate(n):
+			if isinstance(name, Char):
+				self.w.addstr(y, 0, name.symbol, name.color)
+			else:
+				self.w.addstr(y, 0, name)
+
+		if v is not None:
+			for y, name in enumerate(v):
+				if name is not None:
+					if isinstance(name, Char):
+						self.w.addstr(y, indent, name.symbol, name.color)
+					else:
+						self.w.addstr(y, indent, name)
+
 		#ui
-		i = 0
+		i = start_selection
 		while decisions[i] is None:
 			i += 1
+			if i >= len(n):
+				i = 0
 		while True:
 			if v is not None and i < len(v) and hilite_values:
 				y = i
-				x = len(n[i] + " ")
+				x = indent
 				if isinstance(v[i], Char):
 					self.w.addstr(y, x, v[i].symbol, v[i].color | color["reverse"])
 					c = self.w.getch()

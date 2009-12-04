@@ -7,7 +7,11 @@ from tile import tiles
 from io import io
 from colors import color
 
-SW = 1; S = 2; SE = 3; W = 4; STOP = 5; E = 6; NW = 7; N = 8; NE = 9
+UP = map(ord, ('7', '8', '9')); UP.append(curses.KEY_UP)
+DOWN = map(ord, ('1', '2', '3')); DOWN.append(curses.KEY_DOWN)
+LEFT = map(ord, ('1', '4', '7')); LEFT.append(curses.KEY_LEFT)
+RIGHT = map(ord, ('3', '6', '9')); RIGHT.append(curses.KEY_RIGHT)
+STOP = (ord('5'), ord('.'))
 
 class Player(Creature):
 	def __init__(self, level, game):
@@ -28,22 +32,22 @@ class Player(Creature):
 
 		a[ord('>')] = self.descend
 		a[ord('<')] = self.ascend
-		a[curses.KEY_DOWN] = lambda: self.move(S)
-		a[curses.KEY_LEFT] = lambda: self.move(W)
-		a[curses.KEY_RIGHT] = lambda: self.move(E)
-		a[curses.KEY_UP] = lambda: self.move(N)
-		a[ord('1')] = lambda: self.move(SW)
-		a[ord('2')] = lambda: self.move(S)
-		a[ord('3')] = lambda: self.move(SE)
-		a[ord('4')] = lambda: self.move(W)
-		a[ord('5')] = lambda: self.move(STOP)
-		a[ord('6')] = lambda: self.move(E)
-		a[ord('7')] = lambda: self.move(NW)
-		a[ord('8')] = lambda: self.move(N)
-		a[ord('9')] = lambda: self.move(NE)
+		a[curses.KEY_DOWN] = self.move
+		a[curses.KEY_LEFT] = self.move
+		a[curses.KEY_RIGHT] = self.move
+		a[curses.KEY_UP] = self.move
+		a[ord('1')] = self.move
+		a[ord('2')] = self.move
+		a[ord('3')] = self.move
+		a[ord('4')] = self.move
+		a[ord('5')] = self.move
+		a[ord('6')] = self.move
+		a[ord('7')] = self.move
+		a[ord('8')] = self.move
+		a[ord('9')] = self.move
 
-		a[ord('Q')] = self.game.endGame
-		a[ord('S')] = self.game.saveGame
+		a[ord('Q')] = self.endgame
+		a[ord('S')] = self.savegame
 
 		self.actions = a
 
@@ -52,13 +56,13 @@ class Player(Creature):
 		ny = y
 		nx = x
 
-		if d in (NW,N,NE):
+		if d in UP:
 			ny -= 1
-		if d in (SW,S,SE):
+		if d in DOWN:
 			ny += 1 
-		if d in (NW,W,SW):
+		if d in LEFT:
 			nx -= 1
-		if d in (NE,E,SE):
+		if d in RIGHT:
 			nx += 1
 		if d == STOP:
 			return True
@@ -71,7 +75,9 @@ class Player(Creature):
 		elif target_square.creature is not None:
 			self.hit(target_square.creature)
 			return True
-		return False
+		else:
+			io.queueMsg("You can't move there.")
+			return False
 
 	def hit(self, creature):
 		creature.hp -= 25
@@ -81,13 +87,19 @@ class Player(Creature):
 			creature.die()
 			io.queueMsg("You hit the "+creature.name+" and kill "+creature.n+".")
 
-	def descend(self):
+	def descend(self, char):
 		self.game.descend()
 		return True
 
-	def ascend(self):
+	def ascend(self, char):
 		self.game.ascend()
 		return True
+
+	def endgame(self, char):
+		self.game.endGame()
+
+	def savegame(self, char):
+		self.game.saveGame()
 
 	def act(self):
 		self.hp -= 1
@@ -95,10 +107,10 @@ class Player(Creature):
 		while True:
 			c = io.getch(self.l.squares[self].y, self.l.squares[self].x)
 			if c in self.actions:
-				if self.actions[c]():
+				if self.actions[c](c):
 					break
 			else:
-				if 0 <= c < 256:
+				if 0 < c < 256:
 					c = chr(c)
 					io.queueMsg("Undefined command: '"+c+"'")
 				else:
