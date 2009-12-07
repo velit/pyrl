@@ -42,6 +42,9 @@ class IO(object):
 	def queueMsg(self, str):
 		self.m.queueMsg(str)
 	
+	def msg(self, string):
+		self.m.queueMsg(str(string))
+	
 	def refresh(self):
 		self.m.update()
 		self.s.update()

@@ -7,11 +7,11 @@ from tile import tiles
 from io import io
 from colors import color
 
-UP = map(ord, ('7', '8', '9')); UP.append(curses.KEY_UP)
-DOWN = map(ord, ('1', '2', '3')); DOWN.append(curses.KEY_DOWN)
-LEFT = map(ord, ('1', '4', '7')); LEFT.append(curses.KEY_LEFT)
-RIGHT = map(ord, ('3', '6', '9')); RIGHT.append(curses.KEY_RIGHT)
-STOP = (ord('5'), ord('.'))
+SW = 1; S = 2; SE = 3; W = 4; STOP = 5; E = 6; NW = 7; N = 8; NE = 9
+UP = (NW, N, NE)
+DOWN = (SW, S, SE)
+LEFT = (SW, W, NW)
+RIGHT = (SE, E, NE)
 
 class Player(Creature):
 	def __init__(self, level, game):
@@ -30,26 +30,33 @@ class Player(Creature):
 	def def_actions(self):
 		a = {}
 
-		a[ord('>')] = self.descend
-		a[ord('<')] = self.ascend
-		a[curses.KEY_DOWN] = self.move
-		a[curses.KEY_LEFT] = self.move
-		a[curses.KEY_RIGHT] = self.move
-		a[curses.KEY_UP] = self.move
-		a[ord('1')] = self.move
-		a[ord('2')] = self.move
-		a[ord('3')] = self.move
-		a[ord('4')] = self.move
-		a[ord('5')] = self.move
-		a[ord('6')] = self.move
-		a[ord('7')] = self.move
-		a[ord('8')] = self.move
-		a[ord('9')] = self.move
+		a[ord('>')] = "descend",
+		a[ord('<')] = "ascend",
+		a[ord('1')] = "move", SW
+		a[ord('2')] = "move", S
+		a[ord('3')] = "move", SE
+		a[ord('4')] = "move", W
+		a[ord('5')] = "move", STOP
+		a[ord('6')] = "move", E
+		a[ord('7')] = "move", NW
+		a[ord('8')] = "move", N
+		a[ord('9')] = "move", NE
+		a[curses.KEY_UP] = "move", N
+		a[curses.KEY_DOWN] = "move", S
+		a[curses.KEY_LEFT] = "move", W
+		a[curses.KEY_RIGHT] = "move", E
 
-		a[ord('Q')] = self.endgame
-		a[ord('S')] = self.savegame
+		a[ord('Q')] = "endgame",
+		a[ord('S')] = "savegame",
+		a[ord('L')] = "loadgame",
 
 		self.actions = a
+
+	def exec_act(self, act):
+		if len(act) == 1:
+			return getattr(self, act[0])()
+		elif len(act) == 2:
+			return getattr(self, act[0])(act[1])
 
 	def move(self, d):
 		y,x = self.l.squares[self].y, self.l.squares[self].x
@@ -87,19 +94,22 @@ class Player(Creature):
 			creature.die()
 			io.queueMsg("You hit the "+creature.name+" and kill "+creature.n+".")
 
-	def descend(self, char):
+	def descend(self):
 		self.game.descend()
 		return True
 
-	def ascend(self, char):
+	def ascend(self):
 		self.game.ascend()
 		return True
 
-	def endgame(self, char):
-		self.game.endGame()
+	def endgame(self):
+		self.game.endgame()
 
-	def savegame(self, char):
-		self.game.saveGame()
+	def savegame(self):
+		self.game.savegame()
+
+	def loadgame(self):
+		self.game.loadgame()
 
 	def act(self):
 		self.hp -= 1
@@ -107,7 +117,7 @@ class Player(Creature):
 		while True:
 			c = io.getch(self.l.squares[self].y, self.l.squares[self].x)
 			if c in self.actions:
-				if self.actions[c](c):
+				if self.exec_act(self.actions[c]):
 					break
 			else:
 				if 0 < c < 256:

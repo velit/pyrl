@@ -1,22 +1,13 @@
 import curses
 import cPickle
 import sys
+import shutil
+from os import path
 from io import io
 from colors import color
-from tile import Tile
+from tile import Tile, tiles
 from char import Char
 from map import Map
-
-def save(data, name="data"):
-	f = open(name, "w")
-	cPickle.dump(data, f)
-	f.close()
-
-def load(name="data"):
-	f = open(name, "r")
-	a = cPickle.load(f)
-	f.close()
-	return a
 
 class Cursor(object):
 	def __init__(self, y, x):
@@ -33,28 +24,31 @@ class Editor(object):
 		try:
 			self.load()
 		except IOError:
-			self.data = Data()
+			pass
 		self.modified = False
 
 	def save(self):
 		self.modified = False
-		f = open("data", "w")
-		cPickle.dump(self.data.tiles, f)
-		f.close()
+		t = open(path.join("editor_data", "tiles"), "w")
+		cPickle.dump(self.data.tiles, t)
+		t.close()
+
+		l = open(path.join("editor_data", "levels"), "w")
+		cPickle.dump(self.data.levels, l)
+		l.close()
 
 		return True
 
 	def load(self):
-		f = open("data", "r")
 		self.data = Data()
+
+		f = open(path.join("editor_data", "tiles"), "r")
 		self.data.tiles = cPickle.load(f)
 		f.close()
-		#try:
-		#	self.data.levels
-		#except AttributeError:
-		#	data = Data()
-		#	data.tiles = self.data.tiles
-		#	self.data = data
+
+		f = open(path.join("editor_data", "levels"), "r")
+		self.data.levels = cPickle.load(f)
+		f.close()
 
 		self.modified = False
 
@@ -77,9 +71,21 @@ class Editor(object):
 				self.save()
 		sys.exit(0)
 
+	def export(self):
+		io.a.addstr("Are you sure? [y/N] ")
+		c = io.a.getch()
+		if c == ord('y'):
+			t = path.join("editor_data", "tiles")
+			l = path.join("editor_data", "levels")
+			d = path.join("data")
+			shutil.copy(t, d)
+			shutil.copy (l, d)
+
+		return True
+
 	def ui(self):
-		n = ("Tile editor", "Level editor", "Save data", "Load data", "Exit")
-		d = (self.tile_editor, self.level_editor, self.save, self.load, self.exit)
+		n = ("Tile editor", "Level editor", "Save data", "Load data", "Export data", "Exit")
+		d = (self.tile_editor, self.level_editor, self.save, self.load, self.export, self.exit)
 		while io.a.getSelection(n, d)():
 			pass
 

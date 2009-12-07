@@ -13,11 +13,11 @@ class Tile(object):
 		self.destroyable = destroyable
 		self.see_through = see_through
 
-#tiles = {
-#		"u": Tile("You have not seen this place yet", Char(' '), Char(' '), False, False, False),
-#		"f": Tile("Dungeon floor", Char('.'), Char('.'), True, False, True),
-#		"r": Tile("Dungeon rock", Char('#'), Char('#'), False, True, False),
-#		"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]), False, True, False),
-#		"ds": Tile("Down staircase", Char('>'), Char('>'), True, True, True),
-#		"us": Tile("Up staircase", Char('<'), Char('<'), True, True, True),
-#		}
+tiles = {
+		"u": Tile("You have not seen this place yet", Char(' '), Char(' '), False, False, False),
+		"f": Tile("Dungeon floor", Char('.'), Char('.'), True, False, True),
+		"r": Tile("Dungeon rock", Char('#'), Char('#'), False, True, False),
+		"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]), False, True, False),
+		"ds": Tile("Down staircase", Char('>'), Char('>'), True, True, True),
+		"us": Tile("Up staircase", Char('<'), Char('<'), True, True, True),
+		}
