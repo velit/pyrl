@@ -2,12 +2,13 @@
 
 from curses import wrapper
 from cPickle import load
+from os import path
 
 def main(w):
 	import io
 	import tile
 
-	f = open("data", "r")
+	f = open(path.join("data", "tiles"), "r")
 	io.io = io.IO(w)
 	tile.tiles = load(f)
 	f.close()
