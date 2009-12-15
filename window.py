@@ -75,6 +75,9 @@ class Window(object):
 			elif input in color:
 				return color[input]
 
+	def getmaxyx(self):
+		return self.w.getmaxyx()
+
 	def move(self, y, x):
 		self.w.move(y, x)
 
