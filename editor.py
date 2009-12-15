@@ -240,24 +240,50 @@ class Editor(object):
 
 	def edit_level(self, l):
 		io.drawMap(l.map)
-
 		t = tiles["f"]
 		c = Cursor(0,0)
+		my, mx = l.dimensions
+		moves = map(ord, ('1', '2', '3', '4', '5', '6', '7', '8', '9'))
+		moves.append(curses.KEY_UP)
+		moves.append(curses.KEY_DOWN)
+		moves.append(curses.KEY_LEFT)
+		moves.append(curses.KEY_RIGHT)
 		while True:
 			ch = io.getch(c.y, c.x)
-			if ch == curses.KEY_LEFT:
-				c.x -= 1
-			elif ch == curses.KEY_RIGHT:
-				c.x += 1
-			elif ch == curses.KEY_UP:
-				c.y -= 1
-			elif ch == curses.KEY_DOWN:
-				c.y += 1
+			if ch in moves:
+				if ch in (ord('1'), ord('2'), ord('3'), curses.KEY_DOWN):
+					c.y += 1
+				if ch in (ord('1'), ord('4'), ord('7'), curses.KEY_LEFT):
+					c.x -= 1
+				if ch in (ord('9'), ord('8'), ord('7'), curses.KEY_UP):
+					c.y -= 1
+				if ch in (ord('9'), ord('6'), ord('3'), curses.KEY_RIGHT):
+					c.x += 1
+				if c.y < 0:
+					c.y += my
+				if c.x < 0:
+					c.x += mx
+				if c.y >= my:
+					c.y -= my
+				if c.x >= mx:
+					c.x -= mx
 			elif ch == ord('Q'):
-				sys.exit(0)
+				self.exit()
+			elif ch == ord('S'):
+				self.save()
+			elif ch == ord('B'):
+				return True
 			elif ch == ord('\n'):
 				a = l.getSquare(c.y, c.x)
 				a.tile = t
 				io.l.drawChar(c.y, c.x, a.getVisibleChar())
-			elif ch == ord('f'):
+			elif ch == ord('1'):
 				t = tiles["f"]
+			elif ch == ord('2'):
+				t = tiles["w"]
+			elif ch == ord('3'):
+				t = tiles["us"]
+			elif ch == ord('4'):
+				t = tiles["ds"]
+			elif ch == ord('5'):
+				t = tiles["r"]

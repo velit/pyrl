@@ -10,6 +10,7 @@ r = tiles["r"]
 class Map(object):
 	"""This object holds the data of a Level object, and methods for manipulating the data."""
 	def __init__(self, y, x, generate=True):
+		self.dimensions = y, x
 
 		self.squares = {}
 
