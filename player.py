@@ -2,7 +2,6 @@ import curses
 
 from creature import Creature
 from char import Char
-from fov import doFov
 from tile import tiles
 from io import io
 from colors import color
@@ -14,12 +13,13 @@ LEFT = (SW, W, NW)
 RIGHT = (SE, E, NE)
 
 class Player(Creature):
-	def __init__(self, level, game):
-		Creature.__init__(self, level)
-		self.game = game
+	def __init__(self, game, level):
+		super(Player, self).__init__(game, level)
 		self.name = "tappi"
 		self.n = "god"
 		self.ch = Char('@', color["white"])
+		self.hp = 50
+		self.dmg = 5
 
 		self.register_status_texts()
 		self.def_actions()
@@ -50,6 +50,9 @@ class Player(Creature):
 		a[ord('S')] = "savegame",
 		a[ord('L')] = "loadgame",
 
+		a[ord('+')] = "change_sight_range", 1
+		a[ord('-')] = "change_sight_range", -1
+
 		self.actions = a
 
 	def exec_act(self, act):
@@ -59,7 +62,7 @@ class Player(Creature):
 			return getattr(self, act[0])(act[1])
 
 	def move(self, d):
-		y,x = self.l.squares[self].y, self.l.squares[self].x
+		y,x = self.square.y, self.square.x
 		ny = y
 		nx = x
 
@@ -86,36 +89,40 @@ class Player(Creature):
 			io.queueMsg("You can't move there.")
 			return False
 
+	def change_sight_range(self, amount):
+		self.sight += amount
+		return True
+
 	def hit(self, creature):
-		creature.hp -= 25
-		if creature.hp > 0:
-			io.queueMsg("You hit the "+creature.name+" and wound "+creature.n+".")
-		else:
-			creature.die()
-			io.queueMsg("You hit the "+creature.name+" and kill "+creature.n+".")
+		io.msg("You hit the "+creature.name+" for "+str(self.dmg)+" damage.")
+		creature.loseHP(self.dmg)
 
 	def descend(self):
-		self.game.descend()
+		self.g.descend()
 		return True
 
 	def ascend(self):
-		self.game.ascend()
+		self.g.ascend()
 		return True
 
+	def die(self):
+		io.msg("You die... [more]")
+		io.getCharacters((ord(' '), ord('\n')))
+		self.g.endgame(False)
+
 	def endgame(self):
-		self.game.endgame()
+		self.g.endgame()
 
 	def savegame(self):
-		self.game.savegame()
+		self.g.savegame()
 
 	def loadgame(self):
-		self.game.loadgame()
+		self.g.loadgame()
 
 	def act(self):
-		self.hp -= 1
 		self.updateLos()
 		while True:
-			c = io.getch(self.l.squares[self].y, self.l.squares[self].x)
+			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
 				if self.exec_act(self.actions[c]):
 					break

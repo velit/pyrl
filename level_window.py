@@ -10,23 +10,21 @@ class LevelWindow(Window):
 
 	def drawMap(self, map):
 		self.w.move(0,0)
-		try:
-			for row in map:
-				for square in row:
+		for row in map:
+			for square in row:
+				try:
 					self.w.addch(square.y, square.x, square.getVisibleChar().symbol, square.getVisibleChar().color)
-
-		except curses.error:
-			pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
+				except curses.error:
+					pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
 
 	def drawMemoryMap(self, map):
 		self.w.move(0,0)
-		try:
-			for row in map:
-				for square in row:
+		for row in map:
+			for square in row:
+				try:
 					self.w.addch(square.y, square.x, square.getMemoryChar().symbol, square.getMemoryChar().color)
-
-		except curses.error:
-			pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
+				except curses.error:
+					pass
 
 	def drawChar(self, y, x, ch):
 		self.w.addch(y,x, ch.symbol, ch.color)
@@ -34,10 +32,16 @@ class LevelWindow(Window):
 	def drawLos(self, visibility, l, reverse=False):
 		if reverse:
 			for y,x in visibility:
-				self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color | color["reverse"])
+				try:
+					self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color | color["reverse"])
+				except curses.error:
+					pass
 		else:
 			for y,x in visibility:
-				self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color)
+				try:
+					self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color)
+				except curses.error:
+					pass
 
 	def clearLos(self, visibility, l):
 		while True:
@@ -45,7 +49,10 @@ class LevelWindow(Window):
 				y, x = visibility.pop()
 			except IndexError:
 				break
-			self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, l.getSquare(y,x).getMemoryChar().color)
+			try:
+				self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, l.getSquare(y,x).getMemoryChar().color)
+			except curses.error:
+				pass
 
 	def drawLine(self, startSquare, targetSquare, char=None):
 		if char is None:

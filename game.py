@@ -15,8 +15,8 @@ class Game(object):
 
 		self.turn_counter = 0
 
-		self.l = [Level(1)]
-		self.p = Player(self.l[0], self)
+		self.l = [Level(self, 1)]
+		self.p = Player(self, self.l[0])
 		self.p.l.addCreature(self.p)
 		self.redraw()
 	
@@ -28,7 +28,7 @@ class Game(object):
 	def descend(self):
 		self.p.l.removeCreature(self.p)
 		if len(self.l) == self.l.index(self.p.l) + 1:
-			self.p.l = Level(len(self.l)+1)
+			self.p.l = Level(self, len(self.l)+1)
 			self.p.l.addCreature(self.p, self.p.l.squares["us"])
 			self.l.append(self.p.l)
 		else:

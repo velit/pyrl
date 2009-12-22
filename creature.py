@@ -10,47 +10,75 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 
 class Creature(object):
 	"""This is an abstract class representing a creature"""
-	def __init__(self, level):
-		self.sight = 8
-		self.hp = 50
+	def __init__(self, game, level):
+		self.sight = 6
+		self.hp = 10
+		self.dmg = 2
+		self.g = game
 		self.l = level
+		self.square = None
 		self.visibility = []
 
 	def act(self):
-		y,x = self.l.squares[self].y, self.l.squares[self].x
-		loc = y + randrange(3)-1, x + randrange(3)-1
-		self.move(loc)
+		self.move(self.square.y + randrange(3) - 1, self.square.x + randrange(3) - 1)
 
-	def move(self, loc):
-		dy, dx = loc #destination
-		sy, sx = self.l.squares[self].y, self.l.squares[self].x #self
-		ny, nx = None, None #square to move to
-		if dy-sy > 0:
-			ny = sy+1
-		elif dy-sy < 0:
-			ny = sy-1
-		else:
-			ny = sy
+	def getloc(self):
+		return self.square.y, self.square.x
 
-		if dx-sx > 0:
-			nx = sx+1
-		elif dx-sx < 0:
-			nx = sx-1
-		else:
-			nx = sx
+	def move(self, dy, dx):
+		sy, sx = self.square.y, self.square.x #self
+		ty, tx = sy, sx #square to move to
+		if dy > sy:
+			ty += 1
+		if dy < sy:
+			ty -= 1
 
-		target_square = self.l.getSquare(ny,nx)
+		if dx > sx:
+			tx += 1
+		elif dx < sx:
+			tx -= 1
+
+		target_square = self.l.getSquare(ty,tx)
 
 		if target_square.passable():
 			self.l.moveCreature(self, target_square)
+		elif target_square.creature is self.g.p:
+			self.hit(target_square.creature)
 
 	def loseHP(self, amount):
 		self.hp -= amount
 		if self.hp <= 0:
-			self.die
+			self.die()
 
 	def die(self):
+		io.msg("The "+self.name+" dies.")
 		self.l.removeCreature(self)
+
+	def hit(self, creature):
+		if creature is self.g.p:
+			io.msg("The "+self.name+" hits the you for "+str(self.dmg)+" damage.")
+		else:
+			io.msg("The "+self.name+" hits the "+creature.name+" for "+str(self.dmg)+" damage.")
+		creature.loseHP(self.dmg)
+
+	def visitSquare(self, y, x):
+		self.l.visitSquare(y,x)
+		self.visibility.append((y,x))
+
+	def has_los(self, target):
+		sy, sx = self.getloc()
+		py, px = target.getloc()
+		if (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight - 1) ** 2:
+			return self.l.check_los(self.square, target.square)
+
+	def updateLos(self):
+		io.clearLos(self.visibility, self.l)
+		y,x = self.square.y, self.square.x
+		if self.sight > 0:
+			self.visitSquare(y,x)
+		for oct in range(8):
+			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
+		io.drawLos(self.visibility, self.l)
 
 	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org Copyright 2001 
 	# http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
@@ -95,15 +123,3 @@ class Creature(object):
 			if blocked:
 				break
 
-	def visitSquare(self, y, x):
-		self.l.visitSquare(y,x)
-		self.visibility.append((y,x))
-
-	def updateLos(self):
-		io.clearLos(self.visibility, self.l)
-		y,x = self.l.squares[self].y, self.l.squares[self].x
-		if self.sight != 0:
-			self.visitSquare(y,x)
-		for oct in range(8):
-			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
-		io.drawLos(self.visibility, self.l)
