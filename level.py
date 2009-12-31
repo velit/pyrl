@@ -10,7 +10,7 @@ from io import io
 from rdg import generateLevel
 
 class Level(object):
-	def __init__(self, game, id, generate=True):
+	def __init__(self, game, id, generate=False):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -51,7 +51,7 @@ class Level(object):
 		return y >= 0 and x >= 0 and y < self.rows and x < self.cols and self.getSquare(y,x).seeThrough()
 
 	def draw(self):
-		io.drawMap(self.map.map)
+		io.drawMap(self.map)
 	
 	def drawMemory(self):
 		io.drawMemoryMap(self.map)
