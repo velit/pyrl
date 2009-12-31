@@ -1,5 +1,6 @@
 import curses
 from random import randrange
+from random import choice
 from io import io
 
 # Multipliers for transforming coordinates to other octants:
@@ -11,39 +12,106 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 class Creature(object):
 	"""This is an abstract class representing a creature"""
 	def __init__(self, game, level):
-		self.sight = 6
+		self.sight = 200
 		self.hp = 10
-		self.dmg = 2
+		self.dmg = 1
 		self.g = game
 		self.l = level
 		self.square = None
 		self.visibility = []
-
-	def act(self):
-		self.move(self.square.y + randrange(3) - 1, self.square.x + randrange(3) - 1)
+		self.hostile = False
 
 	def getloc(self):
 		return self.square.y, self.square.x
 
-	def move(self, dy, dx):
-		sy, sx = self.square.y, self.square.x #self
-		ty, tx = sy, sx #square to move to
-		if dy > sy:
-			ty += 1
-		if dy < sy:
-			ty -= 1
+	def act(self):
+		self.move_random()
 
-		if dx > sx:
-			tx += 1
-		elif dx < sx:
-			tx -= 1
+	def move_random(self):
+		self.rcs(self.square.y + randrange(3) - 1, self.square.x + randrange(3) - 1)
 
-		target_square = self.l.getSquare(ty,tx)
+	def act_towards(self, y, x, c=(-1,1)):
+		# Self
+		sy = self.square.y
+		sx = self.square.x
 
-		if target_square.passable():
-			self.l.moveCreature(self, target_square)
-		elif target_square.creature is self.g.p:
-			self.hit(target_square.creature)
+		# Difference
+		dy = y - sy
+		dx = x - sx
+
+		# Modifier
+		my, mx = 0, 0
+		
+		if dy > 0:
+			my = 1
+		elif dy < 0:
+			my = -1
+		if dx > 0:
+			mx = 1
+		elif dx < 0:
+			mx = -1
+
+		if self.rcs(sy + my, sx + mx):
+			r = choice(c)
+			if my == 0:
+				if self.rcs(sy + r, sx + mx):
+					if self.rcs(sy - r, sx + mx):
+						if self.rcs(sy + r, sx):
+							if self.rcs(sy - r, sx):
+								if self.rcs(sy + r, sx - mx):
+									if self.rcs(sy - r, sx - mx):
+										self.rcs(sy, sx - mx)
+			elif mx == 0:
+				if self.rcs(sy + my, sx + r):
+					if self.rcs(sy + my, sx - r):
+						if self.rcs(sy, sx + r):
+							if self.rcs(sy, sx - r):
+								if self.rcs(sy - my, sx + r):
+									if self.rcs(sy - my, sx - r):
+										self.rcs(sy - my, sx - mx)
+			elif abs(dy) > abs(dx):
+				if self.rcs(sy + my, sx):
+					if self.rcs(sy, sx + mx):
+						if self.rcs(sy + my, sx - mx):
+							if self.rcs(sy - my, sx + mx):
+								if self.rcs(sy, sx - mx):
+									if self.rcs(sy - my, sx):
+										self.rcs(sy - my, sx - mx)
+			elif abs(dy < abs(dx)):
+				if self.rcs(sy, sx + mx):
+					if self.rcs(sy + my, sx):
+						if self.rcs(sy - my, sx + mx):
+							if self.rcs(sy + my, sx - mx):
+								if self.rcs(sy - my, sx):
+									if self.rcs(sy, sx - mx):
+										self.rcs(sy - my, sx - mx)
+			elif r == 1:
+				if self.rcs(sy + my, sx):
+					if self.rcs(sy, sx + mx):
+						if self.rcs(sy + my, sx - mx):
+							if self.rcs(sy - my, sx + mx):
+								if self.rcs(sy, sx - mx):
+									if self.rcs(sy - my, sx):
+										self.rcs(sy - my, sx - mx)
+			elif r == -1:
+				if self.rcs(sy, sx + mx):
+					if self.rcs(sy + my, sx):
+						if self.rcs(sy - my, sx + mx):
+							if self.rcs(sy + my, sx - mx):
+								if self.rcs(sy - my, sx):
+									if self.rcs(sy, sx - mx):
+										self.rcs(sy - my, sx - mx)
+
+	# Right click square (rts games)
+	def rcs(self, y, x, hostile=True):
+		s = self.l.getSquare(y,x)
+		if s.passable():
+			self.l.moveCreature(self, s)
+		elif s.creature is self.g.p:
+			self.hit(s.creature)
+		else:
+			return True
+		return False
 
 	def loseHP(self, amount):
 		self.hp -= amount
@@ -56,20 +124,22 @@ class Creature(object):
 
 	def hit(self, creature):
 		if creature is self.g.p:
-			io.msg("The "+self.name+" hits the you for "+str(self.dmg)+" damage.")
+			io.msg("The "+self.name+" hits the you.")
 		else:
-			io.msg("The "+self.name+" hits the "+creature.name+" for "+str(self.dmg)+" damage.")
+			io.msg("The "+self.name+" hits the "+creature.name+".")
 		creature.loseHP(self.dmg)
 
 	def visitSquare(self, y, x):
 		self.l.visitSquare(y,x)
 		self.visibility.append((y,x))
 
-	def has_los(self, target):
+	def has_range(self, target):
 		sy, sx = self.getloc()
 		py, px = target.getloc()
-		if (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight - 1) ** 2:
-			return self.l.check_los(self.square, target.square)
+		return (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight - 1) ** 2
+
+	def has_los(self, target):
+		return self.has_range(target) and self.l.check_los(self.square, target.square)
 
 	def updateLos(self):
 		io.clearLos(self.visibility, self.l)

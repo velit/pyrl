@@ -120,7 +120,8 @@ class Player(Creature):
 		self.g.loadgame()
 
 	def act(self):
-		self.updateLos()
+		self.l.draw()
+		#self.updateLos()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
