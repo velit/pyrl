@@ -18,6 +18,10 @@ class Square(object):
 		else:
 			return False
 
+	def tile_passable(self):
+		if self.tile:
+			return self.tile.passable
+
 	def seeThrough(self):
 		return self.tile.see_through
 

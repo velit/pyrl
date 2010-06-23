@@ -49,6 +49,7 @@ class Player(Creature):
 		a[ord('Q')] = "endgame",
 		a[ord('S')] = "savegame",
 		a[ord('L')] = "loadgame",
+		a[ord('p')] = "path",
 
 		a[ord('+')] = "change_sight_range", 1
 		a[ord('-')] = "change_sight_range", -1
@@ -133,3 +134,7 @@ class Player(Creature):
 					io.queueMsg("Undefined command: '"+c+"'")
 				else:
 					io.queueMsg("Undefined command key: "+str(c))
+
+	def path(self):
+		self.l.path(self.l.squares["us"], self.l.squares["ds"])
+		return True
