@@ -13,7 +13,7 @@ def init(level):
 def generateLevel(level):
 	init(level)
 	makeInitialRoom(level)
-	for x in range(200):
+	for x in range(2000):
 		if random.random() < 0.50:
 			attemptCorridor(level)
 		else:

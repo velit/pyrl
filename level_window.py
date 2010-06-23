@@ -54,6 +54,12 @@ class LevelWindow(Window):
 			except curses.error:
 				pass
 
+	def drawStar(self, square, col):
+		self.w.addch(square.y, square.x, "*", col)
+
+	def drawBlock(self, square, col):
+		self.w.addch(square.y, square.x, " ", col | color["reverse"])
+
 	def drawLine(self, startSquare, targetSquare, char=None):
 		if char is None:
 			symbol = '*'

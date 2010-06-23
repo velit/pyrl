@@ -51,6 +51,16 @@ class IO(object):
 		self.l.update()
 		curses.doupdate()
 
+	def drawStar(self, square, col=None):
+		if col is None:
+			col = color["green"]
+		self.l.drawStar(square, col)
+	
+	def drawBlock(self, square, col=None):
+		if col is None:
+			col = color["blue"]
+		self.l.drawBlock(square, col)
+
 	def getch(self, y=None, x=None):
 		self.refresh()
 		if y is not None and x is not None:

@@ -1,16 +1,17 @@
 import random
 import curses
-
+import heapq
 
 from player import Player
 from monster import Monster
 from square import Square
 from tile import tiles
 from io import io
+from colors import color
 from rdg import generateLevel
 
 class Level(object):
-	def __init__(self, game, id, generate=False):
+	def __init__(self, game, id, generate=True):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -30,7 +31,10 @@ class Level(object):
 				self.map[y][-1].tile = tiles["w"]
 
 		for x in range(10):
-			self.addCreature(Monster(self.g, self))
+			pass#self.addCreature(Monster(self.g, self))
+
+		for x in self.neighbor_nodes(19,0):
+			pass
 
 	def getSquare(self, y, x):
 		return self.map[y][x]
@@ -145,3 +149,75 @@ class Level(object):
 				error += deltax
 		else:
 			return True
+
+	def neighbor_nodes(self, y, x):
+		for j in range(y-1, y+2):
+			for i in range(x-1, x+2):
+				if not (y == j and x == i) \
+						and 0 <= j < self.rows and 0 <= i < self.cols and self.getSquare(j, i).tile_passable():
+					yield self.getSquare(j, i)
+
+	def dist(self, a, b):
+		y = abs(a.x - b.x)
+		x = abs(a.y - b.y)
+		diagonal = min(y,x)
+		straight = y+x
+		return 1415*diagonal + 1000 * (straight - 2*diagonal)
+
+	def h(self, cur, start, goal):
+		#return max(abs(a.y - b.y), abs(a.x - b.x))
+		y = abs(cur.y - goal.y)
+		x = abs(cur.x - goal.x)
+		dx1 = cur.y - goal.y
+		dy1 = cur.x - goal.x
+		dx2 = start.y - goal.y
+		dy2 = start.x - goal.x
+		cross = abs(dy1*dx2 - dy2*dx1)
+		diagonal = min(y,x)
+		straight = y+x
+		return (1415*diagonal + 1000 * (straight - 2*diagonal)) + cross
+
+	# A* search algorithm
+	def path(self, start, goal):
+		if start == goal:
+			return goal
+		g = {}
+		h = {}
+		came_from = {}
+		closedset = set()
+		openprio = [(0, start)]
+		openmember = set()
+		openmember.add(start)
+
+		g[start] = 0
+		h[start] = self.h(start, start, goal)
+
+		while openprio[0][1] != goal:
+			# Best selected node
+			s = heapq.heappop(openprio)[1]
+			if s in closedset:
+				continue
+			if s != start: io.drawBlock(s)
+			#io.msg(str((g[s]+h[s], g[s], h[s])))
+			#io.getch()
+			openmember.remove(s)
+			closedset.add(s)
+
+			for n in self.neighbor_nodes(s.y, s.x):
+				if n in closedset or n in openmember \
+						and not g[s] + self.dist(n, s) < g[n]:
+					continue
+
+				came_from[n] = s
+				g[n] = g[s] + self.dist(n, s)
+				h[n] = self.h(n, start, goal)
+				heapq.heappush(openprio, (g[n] + h[n], n))
+				if n != goal: io.drawBlock(n, color["green"])
+				openmember.add(n)
+
+		cur = goal
+		while came_from[cur] != start:
+			cur = came_from[cur]
+			io.drawStar(cur)
+		io.getch()
+		return cur
