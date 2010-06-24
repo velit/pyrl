@@ -121,8 +121,8 @@ class Player(Creature):
 		self.g.loadgame()
 
 	def act(self):
-		self.l.draw()
-		#self.updateLos()
+		#self.l.draw()
+		self.updateLos()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
@@ -136,5 +136,5 @@ class Player(Creature):
 					io.queueMsg("Undefined command key: "+str(c))
 
 	def path(self):
-		self.l.path(self.l.squares["us"], self.l.squares["ds"])
+		io.draw_path(self.l.path(self.square, self.l.squares["ds"]))
 		return True

@@ -17,8 +17,10 @@ class IO(object):
 		self.level_cols = self.cols
 
 		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0), self)
-		self.s = StatusBar(self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0), self)
-		self.l = LevelWindow(self.w.derwin(self.level_rows, 0, msg_bar_size, 0), self)
+		self.s = StatusBar(self.w.derwin(status_bar_size, 0,
+							self.rows - status_bar_size, 0), self)
+		self.l = LevelWindow(self.w.derwin(self.level_rows, 0,
+											msg_bar_size, 0), self)
 		self.a = Window(self.w)
 
 	def drawMemoryMap(self, map):
@@ -71,3 +73,10 @@ class IO(object):
 	def getCharacters(self, list):
 		self.refresh()
 		return self.l.getCharacters(list)
+
+	def draw_path(self, iterator):
+		curses.curs_set(0)
+		for x in iterator:
+			self.drawStar(x)
+		self.getch()
+		curses.curs_set(1)
