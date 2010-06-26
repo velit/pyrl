@@ -108,7 +108,7 @@ class Creature(object):
 		if s.passable():
 			self.l.moveCreature(self, s)
 		elif s.creature is self.g.p:
-			self.hit(s.creature)
+			pass#self.hit(s.creature)
 		else:
 			return True
 		return False

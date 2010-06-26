@@ -41,6 +41,7 @@ class Player(Creature):
 		a[ord('7')] = "move", NW
 		a[ord('8')] = "move", N
 		a[ord('9')] = "move", NE
+		a[ord('.')] = "move", STOP
 		a[curses.KEY_UP] = "move", N
 		a[curses.KEY_DOWN] = "move", S
 		a[curses.KEY_LEFT] = "move", W
@@ -121,8 +122,8 @@ class Player(Creature):
 		self.g.loadgame()
 
 	def act(self):
-		#self.l.draw()
-		self.updateLos()
+		self.l.draw()
+		#self.updateLos()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
