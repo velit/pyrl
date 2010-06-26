@@ -11,7 +11,7 @@ from rdg import generateLevel
 from path import path
 
 class Level(object):
-	def __init__(self, game, id, generate=True):
+	def __init__(self, game, id, generate=False):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -31,11 +31,8 @@ class Level(object):
 				self.map[y][0].tile = tiles["w"]
 				self.map[y][-1].tile = tiles["w"]
 
-		for x in range(10):
+		for x in range(100):
 			self.addCreature(Monster(self.g, self))
-
-		for x in self.neighbor_nodes(19,0):
-			pass
 
 	def getSquare(self, y, x):
 		return self.map[y][x]
@@ -152,12 +149,12 @@ class Level(object):
 		else:
 			return True
 
-	def neighbor_nodes(self, y, x):
+	def neighbor_nodes(self, y, x, debug=None):
 		for j in range(y-1, y+2):
 			for i in range(x-1, x+2):
 				if not (y == j and x == i) \
 						and 0 <= j < self.rows and 0 <= i < self.cols \
-						and self.getSquare(j, i).tile_passable():
+						and debug or self.getSquare(j, i).tile_passable():
 					yield self.getSquare(j, i)
 
 	def path(self, start, goal):

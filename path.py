@@ -1,4 +1,6 @@
 from heapq import heappush, heappop
+from io import io
+from colors import color
 
 def path(start, goal, level):
 	"""A* search algorithm. Parameters are squares."""
