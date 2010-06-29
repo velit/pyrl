@@ -1,6 +1,6 @@
-import random
+from random import randrange as rr, random as rand, choice
 
-from square import Square
+from square import Square as S
 from tile import tiles
 
 w = tiles["w"]
@@ -8,13 +8,14 @@ r = tiles["r"]
 f = tiles["f"]
 
 def init(level):
-	level.map = [[Square(r,j,i) for i in range(level.cols)] for j in range(level.rows)]
+	y, x = level.rows, level.cols
+	level.map = [S(r, i / x, i % x) for i in range(y * x)]
 
 def generateLevel(level):
 	init(level)
 	makeInitialRoom(level)
 	for x in range(2000):
-		if random.random() < 0.50:
+		if rand() < 0.50:
 			attemptCorridor(level)
 		else:
 			attemptRoom(level)
@@ -23,12 +24,11 @@ def generateLevel(level):
 
 def makeInitialRoom(level):
 	while True:
-		height, width = random.randrange(5,11), random.randrange(7,14)
+		height, width = rr(5, 11), rr(7, 14)
 		if height*width <= 8*8:
 			break
 	while True: 
-		y, x = random.randrange(1,len(level.map)-height-1), \
-				random.randrange(1,len(level.map[0])-width-1)
+		y, x = rr(1, level.rows-height-1), rr(1, level.cols-width-1)
 		if rectDiggable(level, y, x, height, width):
 			break
 	
@@ -42,36 +42,38 @@ def getWallSquare(level):
 			return tile, dir[1]
 
 def isWall(level, square):
-	y,x = square.y, square.x
-	if y in (0, len(level.map)-1) or x in (0, len(level.map[y])-1):
+	y, x = square.y, square.x
+	g = level.getSquare
+	if y in (0, level.rows-1) or x in (0, level.cols-1):
 		return False, ""
-	if level.getSquare(y-1,x).tile == w and level.getSquare(y+1,x).tile == w:
-		if level.getSquare(y,x-1).tile == f and level.getSquare(y,x+1).tile == r:
+	if g(y-1, x).tile == w and g(y+1, x).tile == w:
+		if g(y, x-1).tile == f and g(y, x+1).tile == r:
 			return True, "right"
-		elif level.getSquare(y,x-1).tile == r and level.getSquare(y,x+1).tile == f:
+		elif g(y, x-1).tile == r and g(y, x+1).tile == f:
 			return True, "left"
-	elif level.getSquare(y,x-1).tile == w and level.getSquare(y,x+1).tile == w:
-		if level.getSquare(y-1,x).tile == f and level.getSquare(y+1,x).tile == r:
+	elif g(y, x-1).tile == w and g(y, x+1).tile == w:
+		if g(y-1, x).tile == f and g(y+1, x).tile == r:
 			return True, "down"
-		elif level.getSquare(y-1,x).tile == r and level.getSquare(y+1,x).tile == f:
+		elif g(y-1, x).tile == r and g(y+1, x).tile == f:
 			return True, "up"
 	return False, ""
 
 def rectDiggable(level, y0, x0, height, width):
-	if y0 < 0 or x0 < 0 or y0+height >= len(level.map) \
-			or x0+width >= len(level.map[y0]):
+	if y0 < 0 or x0 < 0 or y0+height >= level.rows \
+			or x0+width >= level.cols:
 		return False
 	for y in range(y0, y0+height):
 		for x in range(x0, x0+width):
-			if level.map[y][x].tile != r and level.map[y][x].tile != w:
+			if level.getSquare(y, x).tile != r and \
+					level.getSquare(y, x).tile != w:
 				return False
 	return True	
 
 def attemptRoom(level):
 	square, dir = getWallSquare(level)
-	y0,x0 = square.y, square.x
-	height, width = random.randrange(5,11), random.randrange(7,14)
-	ypos, xpos = random.choice(range(height-2)), random.choice(range(width-2))
+	y0, x0 = square.y, square.x
+	height, width = rr(5, 11), rr(7, 14)
+	ypos, xpos = choice(range(height-2)), choice(range(width-2))
 
 	if dir == "left":
 		y = y0 - 1 - ypos
@@ -88,31 +90,30 @@ def attemptRoom(level):
 
 	if rectDiggable(level, y, x, height, width):
 		makeRoom(level, y, x, height, width)
-		level.map[y0][x0].tile = f
+		level.getSquare(y0, x0).tile = f
 
 def makeRoom(level, y0, x0, height, width):
 	for y in range(y0, y0+height):
 		for x in range(x0, x0+width):
 			if y in (y0, y0+height-1) or x in (x0, x0+width-1):
-				level.map[y][x].tile = w
+				level.getSquare(y, x).tile = w
 			else:
-				level.map[y][x].tile = f
+				level.getSquare(y, x).tile = f
 
 def digRect(level, y0, x0, tile, height=1, width=1):
 	for y in range(y0, y0+height):
 		for x in range(x0, x0+width):
-			level.map[y][x].tile = tile
+			level.getSquare(y, x).tile = tile
 
 def turnRockToWall(level):
-	for row in level.map:
-		for col in row:
-			if col.tile == r:
-				col.tile = w
+	for square in level.map:
+			if square.tile == r:
+				square.tile = w
 
 def attemptCorridor(level):
 	square, dir = getWallSquare(level)
-	y,x = square.y, square.x
-	len = random.randrange(7,20)
+	y, x = square.y, square.x
+	len = rr(7, 20)
 	if dir == "up" and rectDiggable(level, y-len, x-1, len, 3) or \
 			dir == "down" and rectDiggable(level, y+1, x-1, len, 3) or \
 			dir == "left" and rectDiggable(level, y-1, x-len, 3, len) or \
@@ -121,7 +122,7 @@ def attemptCorridor(level):
 		return True
 
 def makeCorridor(level, square, dir, len):
-	y0,x0 = square.y, square.x
+	y0, x0 = square.y, square.x
 
 	if dir in ("up", "down"):
 		fhei = whei = len
@@ -155,9 +156,10 @@ def makeCorridor(level, square, dir, len):
 def addUpStairCase(level):
 	while True:
 		square = level.getFreeTile()
-		y,x = square.y, square.x
-		m = level.map
-		if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
+		y, x = square.y, square.x
+		g = level.getSquare
+		if g(y-1, x).tile == f and g(y+1, x).tile == f \
+				and g(y, x-1).tile == f and g(y, x+1).tile == f:
 			break
 
 	square.tile = tiles["us"]
@@ -166,9 +168,10 @@ def addUpStairCase(level):
 def addDownStairCase(level):
 	while True:
 		square = level.getFreeTile()
-		y,x = square.y, square.x
-		m = level.map
-		if m[y-1][x].tile == f and m[y+1][x].tile == f and m[y][x-1].tile == f and m[y][x+1].tile == f:
+		y, x = square.y, square.x
+		g = level.getSquare
+		if g(y-1, x).tile == f and g(y+1, x).tile == f and \
+				g(y, x-1).tile == f and g(y, x+1).tile == f:
 			break
 
 	square.tile = tiles["ds"]

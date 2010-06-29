@@ -7,7 +7,7 @@ from io import io
 from colors import color
 from tile import Tile, tiles
 from char import Char
-from map import Map
+from level import Level
 
 class Cursor(object):
 	def __init__(self, y, x):
@@ -46,9 +46,9 @@ class Editor(object):
 		self.data.tiles = cPickle.load(f)
 		f.close()
 
-		f = open(path.join("editor_data", "levels"), "r")
-		self.data.levels = cPickle.load(f)
-		f.close()
+		#f = open(path.join("editor_data", "levels"), "r")
+		#self.data.levels = cPickle.load(f)
+		#f.close()
 
 		self.modified = False
 

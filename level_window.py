@@ -10,21 +10,24 @@ class LevelWindow(Window):
 
 	def drawMap(self, map):
 		self.w.move(0,0)
-		for row in map:
-			for square in row:
-				try:
-					self.w.addch(square.y, square.x, square.getVisibleChar().symbol, square.getVisibleChar().color)
-				except curses.error:
-					pass #writing to the last cell of a window raises an exception because the automatic cursor move to the next cell is illegal, this works
+		for s in map:
+			try:
+				self.w.addch(s.y, s.x, s.getVisibleChar().symbol,
+								s.getVisibleChar().color)
+			except curses.error:
+				pass
+			# Writing to the last cell of a window raises an exception because
+			# the automatic cursor move to the next cell is illegal, this is
+			# the only way to the last cell with the current curses wrapper
 
 	def drawMemoryMap(self, map):
 		self.w.move(0,0)
-		for row in map:
-			for square in row:
-				try:
-					self.w.addch(square.y, square.x, square.getMemoryChar().symbol, square.getMemoryChar().color)
-				except curses.error:
-					pass
+		for s in map:
+			try:
+				self.w.addch(s.y, s.x, s.getMemoryChar().symbol,
+								s.getMemoryChar().color)
+			except curses.error:
+				pass
 
 	def drawChar(self, y, x, ch):
 		self.w.addch(y,x, ch.symbol, ch.color)
@@ -33,13 +36,16 @@ class LevelWindow(Window):
 		if reverse:
 			for y,x in visibility:
 				try:
-					self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color | color["reverse"])
+					self.w.addch(y,x,l.getSquare(y,x).getVisibleChar().symbol,\
+							l.getSquare(y,x).getVisibleChar().color \
+							| color["reverse"])
 				except curses.error:
 					pass
 		else:
 			for y,x in visibility:
 				try:
-					self.w.addch(y, x, l.getSquare(y,x).getVisibleChar().symbol, l.getSquare(y,x).getVisibleChar().color)
+					self.w.addch(y,x,l.getSquare(y,x).getVisibleChar().symbol,\
+							l.getSquare(y,x).getVisibleChar().color)
 				except curses.error:
 					pass
 
@@ -50,7 +56,8 @@ class LevelWindow(Window):
 			except IndexError:
 				break
 			try:
-				self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, l.getSquare(y,x).getMemoryChar().color)
+				self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, \
+								l.getSquare(y,x).getMemoryChar().color)
 			except curses.error:
 				pass
 

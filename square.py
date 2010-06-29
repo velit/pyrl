@@ -1,13 +1,26 @@
 from tile import tiles
 from io import io
 
+opti = True
+
 class Square(object):
+	"""A cell that is a part of a level."""
+
+	if opti: __slots__ = ("x", "y", "tile", "creature", "memory_tile")
+
 	def __init__(self, tile, y, x):
 		self.y = y
 		self.x = x
 		self.tile = tile
 		self.creature = None
 		self.memory_tile = tiles["u"]
+
+	if opti:
+		def __getstate__(self):
+			return self.y, self.x, self.tile, self.creature, self.memory_tile
+	if opti:
+		def __setstate__(self, state):
+			self.y, self.x, self.tile, self.creature, self.memory_tile = state
 
 	#returns true if the square is passable by creatures
 	def passable(self):
