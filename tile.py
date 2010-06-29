@@ -4,20 +4,34 @@ from cPickle import load
 
 class Tile(object):
 	"""The actual floor of a square."""
-	def __init__(self, name = "Unknown", visible_ch = Char(' '), memory_ch = Char(' '),
+
+	#__slots__ = ("name", "visible_ch", "memory_ch", "passable", \
+			#		"destroyable", "see_through")
+
+	def __init__(self, name = "Unknown", visible = Char(' '), mem = Char(' '),
 			passable = False, destroyable = False, see_through = False ):
 		self.name = name
-		self.visible_ch = visible_ch
-		self.memory_ch = memory_ch
+		self.visible_ch = visible
+		self.memory_ch = mem
 		self.passable = passable
 		self.destroyable = destroyable
 		self.see_through = see_through
 
+	#def __getstate__(self):
+	#	return self.name, self.visible_ch, self.memory_ch, self.passable, \
+			#			self.destroyable, self.see_through
+
+	#def __setstate__(self, state):
+	#	self.name, self.visible_ch, self.memory_ch, self.passable, \
+			#			self.destroyable, self.see_through = state
+
 tiles = {
-		"u": Tile("You have not seen this place yet", Char(' '), Char(' '), False, False, False),
+		"u": Tile("You have not seen this place yet",
+					Char(' '), Char(' '), False, False, False),
 		"f": Tile("Dungeon floor", Char('.'), Char('.'), True, False, True),
 		"r": Tile("Dungeon rock", Char('#'), Char('#'), False, True, False),
-		"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]), False, True, False),
+		"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]),
+					False, True, False),
 		"ds": Tile("Down staircase", Char('>'), Char('>'), True, True, True),
 		"us": Tile("Up staircase", Char('<'), Char('<'), True, True, True),
 		}

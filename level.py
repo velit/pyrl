@@ -11,7 +11,7 @@ from rdg import generateLevel
 from path import path
 
 class Level(object):
-	def __init__(self, game, id, generate=False):
+	def __init__(self, game, id, generate=True):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -22,20 +22,21 @@ class Level(object):
 		if generate:
 			generateLevel(self)
 		else:
-			self.map = [[Square(tiles["f"],j,i) for i in range(self.cols)] \
-													for j in range(self.rows)]
+			self.map = [Square(tiles["f"], j / self.cols, x % self.cols)
+						for x in range(self.rows * self.cols)]
+
 			for x in range(self.cols):
-				self.map[0][x].tile = tiles["w"]
-				self.map[-1][x].tile = tiles["w"]
+				self.getSquare(0, x).tile = tiles["w"]
+				self.getSquare(self.rows, x).tile = tiles["w"]
 			for y in range(self.rows):
-				self.map[y][0].tile = tiles["w"]
-				self.map[y][-1].tile = tiles["w"]
+				self.getSquare(y, 0).tile = tiles["w"]
+				self.getSquare(y, self.cols).tile = tiles["w"]
 
 		for x in range(100):
 			self.addCreature(Monster(self.g, self))
 
 	def getSquare(self, y, x):
-		return self.map[y][x]
+		return self.map[y*self.cols + x]
 
 	def getFreeTile(self):
 		while True:
@@ -44,7 +45,7 @@ class Level(object):
 				return tile
 
 	def getRandomTile(self):
-		return random.choice(random.choice(self.map))
+		return random.choice(self.map)
 
 	def visitSquare(self, y, x):
 		self.getSquare(y,x).visit()

@@ -1,5 +1,4 @@
 import curses
-import sys
 import cPickle
 
 from os import path
@@ -10,7 +9,7 @@ from io import io
 
 class Game(object):
 	def __init__(self, main):
-		"""The game object for Tapani Kiiskisen's game pyrl made with curses."""
+		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 		self.main = main
 
 		self.turn_counter = 0
@@ -47,16 +46,15 @@ class Game(object):
 			
 	def endgame(self, ask=True):
 		if not ask:
-			sys.exit(0)
+			exit()
 		io.queueMsg("Do you wish to end the game? [y/N]:")
 		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
 		if c in map(ord, ('y', 'Y')):
-			sys.exit(0)
+			exit()
 	
 	def _save(self):
-		f = open(path.join("data", "pyrl.svg"), "w")
-		cPickle.dump(self, f)
-		f.close()
+		with open(path.join("data", "pyrl.svg"), "w") as f:
+			cPickle.dump(self.p.l.map, f)
 
 	def savegame(self, ask=True):
 		if not ask:
