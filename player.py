@@ -137,5 +137,6 @@ class Player(Creature):
 					io.queueMsg("Undefined command key: "+str(c))
 
 	def path(self):
-		io.draw_path(self.l.path(self.square, self.l.squares["ds"]))
+		#io.draw_path(self.l.path(self.square, self.l.squares["ds"]))
+		io.msg(str(curses.A_NORMAL))
 		return True

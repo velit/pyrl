@@ -1,7 +1,9 @@
+import debug
+
 from tile import tiles
 from io import io
 
-opti = True
+opti = debug.optimization
 
 class Square(object):
 	"""A cell that is a part of a level."""
