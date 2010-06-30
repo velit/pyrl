@@ -1,15 +1,12 @@
 from char import Char
 from colors import color
 from cPickle import load
+from curses import A_NORMAL
 
 class Tile(object):
 	"""The actual floor of a square."""
 
-	#__slots__ = ("name", "visible_ch", "memory_ch", "passable", \
-			#		"destroyable", "see_through")
-
-	def __init__(self, name = "Unknown", visible = Char(' '), mem = Char(' '),
-			passable = False, destroyable = False, see_through = False ):
+	def __init__(self, name, visible, mem, passable, destroyable, see_through):
 		self.name = name
 		self.visible_ch = visible
 		self.memory_ch = mem
@@ -17,21 +14,14 @@ class Tile(object):
 		self.destroyable = destroyable
 		self.see_through = see_through
 
-	#def __getstate__(self):
-	#	return self.name, self.visible_ch, self.memory_ch, self.passable, \
-			#			self.destroyable, self.see_through
-
-	#def __setstate__(self, state):
-	#	self.name, self.visible_ch, self.memory_ch, self.passable, \
-			#			self.destroyable, self.see_through = state
-
-tiles = {
-		"u": Tile("You have not seen this place yet",
-					Char(' '), Char(' '), False, False, False),
-		"f": Tile("Dungeon floor", Char('.'), Char('.'), True, False, True),
-		"r": Tile("Dungeon rock", Char('#'), Char('#'), False, True, False),
-		"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]),
-					False, True, False),
-		"ds": Tile("Down staircase", Char('>'), Char('>'), True, True, True),
-		"us": Tile("Up staircase", Char('<'), Char('<'), True, True, True),
-		}
+#tiles = {
+#	"u": Tile("You have not seen this place yet",
+#				Char(' '), Char(' '), False, False, False),
+#	"f": Tile("Dungeon floor", Char('.'), Char('.'), True, False, True),
+#	"r": Tile("Dungeon rock", Char('#', color["black"]),
+#				Char('#', color["black"]), False, True, False),
+#	"w": Tile("Wall", Char('#', color["brown"]), Char('#', color["black"]),
+#				False, True, False),
+#	"ds": Tile("Down staircase", Char('>'), Char('>'), True, True, True),
+#	"us": Tile("Up staircase", Char('<'), Char('<'), True, True, True),
+#}
