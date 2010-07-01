@@ -8,66 +8,66 @@ class LevelWindow(Window):
 		Window.__init__(self, window)
 		self.io = io
 
-	def drawMap(self, level):
+	def drawmap(self, level):
 		self.w.move(0,0)
 		for s in level.map:
 			try:
-				self.w.addch(s.y, s.x, s.getVisibleChar().symbol,
-								s.getVisibleChar().color)
+				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
+								s.get_visible_char().color)
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
 			# the automatic cursor move to the next cell is illegal, this is
 			# the only way to the last cell with the current curses wrapper
 
-	def drawMemoryMap(self, level):
+	def drawmemory(self, level):
 		self.w.move(0,0)
 		for s in level.map:
 			try:
-				self.w.addch(s.y, s.x, s.getMemoryChar().symbol,
-								s.getMemoryChar().color)
+				self.w.addch(s.y, s.x, s.get_memory_char().symbol,
+								s.get_memory_char().color)
 			except curses.error:
 				pass
 
-	def drawChar(self, y, x, ch):
+	def drawchar(self, y, x, ch):
 		self.w.addch(y,x, ch.symbol, ch.color)
 
-	def drawLos(self, visibility, l, reverse=False):
+	def drawlos(self, visibility, l, reverse=False):
 		if reverse:
 			for y,x in visibility:
 				try:
-					self.w.addch(y,x,l.getSquare(y,x).getVisibleChar().symbol,\
-							l.getSquare(y,x).getVisibleChar().color \
+					self.w.addch(y,x,l.getsquare(y,x).get_visible_char().symbol,\
+							l.getsquare(y,x).get_visible_char().color \
 							| color["reverse"])
 				except curses.error:
 					pass
 		else:
 			for y,x in visibility:
 				try:
-					self.w.addch(y,x,l.getSquare(y,x).getVisibleChar().symbol,\
-							l.getSquare(y,x).getVisibleChar().color)
+					self.w.addch(y,x,l.getsquare(y,x).get_visible_char().symbol,\
+							l.getsquare(y,x).get_visible_char().color)
 				except curses.error:
 					pass
 
-	def clearLos(self, visibility, l):
+	def clearlos(self, visibility, l):
 		while True:
 			try:
 				y, x = visibility.pop()
 			except IndexError:
 				break
 			try:
-				self.w.addch(y, x, l.getSquare(y,x).getMemoryChar().symbol, \
-								l.getSquare(y,x).getMemoryChar().color)
+				self.w.addch(y, x, l.getsquare(y,x).get_memory_char().symbol, \
+								l.getsquare(y,x).get_memory_char().color)
 			except curses.error:
 				pass
 
-	def drawStar(self, square, col):
+	def drawstar(self, square, col):
 		self.w.addch(square.y, square.x, "*", col)
 
-	def drawBlock(self, square, col):
+	def drawblock(self, square, col):
 		self.w.addch(square.y, square.x, " ", col | color["reverse"])
 
-	def drawLine(self, startSquare, targetSquare, char=None):
+	def drawline(self, startSquare, targetsquare, char=None):
 		if char is None:
 			symbol = '*'
 			color = color["yellow"]
@@ -75,7 +75,7 @@ class LevelWindow(Window):
 			symbol = char.symbol
 			color = char.color
 		x0, y0 = startSquare.y, startSquare.x
-		x1, y1 = targetSquare.y, targetSquare.x
+		x1, y1 = targetsquare.y, targetsquare.x
 		steep = abs(y1 - y0) > abs(x1 - x0)
 		if steep:
 			x0, y0 = y0, x0

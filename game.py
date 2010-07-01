@@ -16,7 +16,7 @@ class Game(object):
 
 		self.l = [Level(self, 1)]
 		self.p = Player(self, self.l[0])
-		self.p.l.addCreature(self.p)
+		self.p.l.addcreature(self.p)
 		self.redraw()
 	
 	def play(self):
@@ -25,21 +25,21 @@ class Game(object):
 		self.turn_counter += 1
 
 	def descend(self):
-		self.p.l.removeCreature(self.p)
+		self.p.l.removecreature(self.p)
 		if len(self.l) == self.l.index(self.p.l) + 1:
 			self.p.l = Level(self, len(self.l)+1)
-			self.p.l.addCreature(self.p, self.p.l.squares["us"])
+			self.p.l.addcreature(self.p, self.p.l.squares["us"])
 			self.l.append(self.p.l)
 		else:
 			self.p.l = self.l[self.l.index(self.p.l) + 1]
-			self.p.l.addCreature(self.p, self.p.l.squares["us"])
+			self.p.l.addcreature(self.p, self.p.l.squares["us"])
 		self.redraw()
 
 	def ascend(self):
 		if self.l.index(self.p.l) > 0:
-			self.p.l.removeCreature(self.p)
+			self.p.l.removecreature(self.p)
 			self.p.l = self.l[self.l.index(self.p.l) - 1]
-			self.p.l.addCreature(self.p, self.p.l.squares["ds"])
+			self.p.l.addcreature(self.p, self.p.l.squares["ds"])
 			self.redraw()
 		else:
 			self.endgame()
@@ -47,8 +47,8 @@ class Game(object):
 	def endgame(self, ask=True):
 		if not ask:
 			exit()
-		io.queueMsg("Do you wish to end the game? [y/N]:")
-		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		io.msg("Do you wish to end the game? [y/N]:")
+		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
 		if c in map(ord, ('y', 'Y')):
 			exit()
 	
@@ -60,8 +60,8 @@ class Game(object):
 		if not ask:
 			self._save()
 			self.endgame(True)
-		io.queueMsg("Do you wish to save the game? [Y/n]:")
-		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		io.msg("Do you wish to save the game? [Y/n]:")
+		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
 		if c in map(ord, ('y', 'Y', '\n', ' ')):
 			self._save()
 			self.endgame(True)
@@ -70,9 +70,9 @@ class Game(object):
 		if not ask:
 			self.main.load()
 		io.msg("Do you wish to load the game? [y/N]:")
-		c = io.getCharacters(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
 		if c in map(ord, ('y', 'Y')):
 			self.main.load()
 
 	def redraw(self):
-		self.p.l.drawMemory()
+		self.p.l.drawmemory()

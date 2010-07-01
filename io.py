@@ -23,29 +23,26 @@ class IO(object):
 											msg_bar_size, 0), self)
 		self.a = Window(self.w)
 
-	def drawMap(self, level):
-		self.l.drawMap(level)
+	def drawmap(self, level):
+		self.l.drawmap(level)
 
-	def drawMemoryMap(self, level):
-		self.l.drawMemoryMap(level)
+	def drawmemory(self, level):
+		self.l.drawmemory(level)
 
-	def drawLos(self, visibility, level):
-		self.l.drawLos(visibility, level)
+	def drawlos(self, visibility, level):
+		self.l.drawlos(visibility, level)
 
-	def clearLos(self, visibility, level):
-		self.l.clearLos(visibility, level)
+	def clearlos(self, visibility, level):
+		self.l.clearlos(visibility, level)
 
-	def drawLine(self, startSquare, targetSquare, char=None):
-		self.l.drawLine(self, startSquare, targetSquare, char=None)
+	def drawline(self, startSquare, targetsquare, char=None):
+		self.l.drawline(self, startSquare, targetsquare, char=None)
 
 	def getstr(self, str):
 		self.m.getstr(str)
 
-	def queueMsg(self, str):
-		self.m.queueMsg(str)
-	
 	def msg(self, string):
-		self.m.queueMsg(str(string))
+		self.m.queue_msg(str(string))
 	
 	def refresh(self):
 		self.m.update()
@@ -53,15 +50,15 @@ class IO(object):
 		self.l.update()
 		curses.doupdate()
 
-	def drawStar(self, square, color_=None):
+	def drawstar(self, square, color_=None):
 		if color_ is None:
 			color_ = color["green"]
-		self.l.drawStar(square, color_)
+		self.l.drawstar(square, color_)
 	
-	def drawBlock(self, square, color_=None):
+	def drawblock(self, square, color_=None):
 		if color_ is None:
 			color_ = color["blue"]
-		self.l.drawBlock(square, color_)
+		self.l.drawblock(square, color_)
 
 	def getch(self, y=None, x=None):
 		self.refresh()
@@ -70,13 +67,13 @@ class IO(object):
 		else:
 			return self.l.getch()
 
-	def getCharacters(self, list):
+	def getchars(self, list):
 		self.refresh()
-		return self.l.getCharacters(list)
+		return self.l.getchars(list)
 
-	def draw_path(self, iterator):
+	def drawpath(self, iterator):
 		curses.curs_set(0)
 		for x in iterator:
-			self.drawStar(x)
+			self.drawstar(x)
 		self.getch()
 		curses.curs_set(1)

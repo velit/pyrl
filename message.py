@@ -19,14 +19,14 @@ class MessageBar(Window):
 													len(self.more_str) - 1))
 
 	def update(self):
-		self.printQueue()
+		self.print_queue()
 		#Window.update(self)
 		self.w.noutrefresh()
 
-	def queueMsg(self, str):
+	def queue_msg(self, str):
 		self.msgqueue += str+" "
 
-	def printQueue(self):
+	def print_queue(self):
 		self.clear()
 		str = self.msgqueue
 		cur_line = 0
@@ -49,7 +49,7 @@ class MessageBar(Window):
 					a = self.last_line_wrapper.wrap(str)
 					self.w.addstr(cur_line, 0, a[0]+self.more_str)
 					if not skip_all:
-						c = self.getCharacters((ord('\n'), ord(' ')))
+						c = self.getchars((ord('\n'), ord(' ')))
 						if c == ord('\n'):
 							skip_all = True
 					str = " ".join(a[1:])

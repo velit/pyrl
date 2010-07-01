@@ -37,17 +37,17 @@ class Square(object):
 		if self.tile:
 			return self.tile.passable
 
-	def seeThrough(self):
+	def see_through(self):
 		return self.tile.see_through
 
 	def visit(self):
 		self.memory_tile = self.tile
 
-	def getVisibleChar(self):
+	def get_visible_char(self):
 		if self.creature:
 			return self.creature.ch
 		else:
 			return self.tile.visible_ch
 
-	def getMemoryChar(self):
+	def get_memory_char(self):
 		return self.memory_tile.memory_ch

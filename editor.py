@@ -90,14 +90,14 @@ class Editor(object):
 				"Export data", "Exit")
 		d = (self.tile_editor, self.level_editor, self.save, self.load,
 				self.export, self.exit)
-		while io.a.getSelection(n, d)():
+		while io.a.get_selection(n, d)():
 			pass
 
 
 	def tile_editor(self):
 		n = ("Make a new tile", "Edit tiles", "----------",  "Back", "Exit")
 		d = (self.new_tile, self.pick_tile, None, self.back, self.exit)
-		while io.a.getSelection(n, d)():
+		while io.a.get_selection(n, d)():
 			pass
 
 		return True
@@ -125,7 +125,7 @@ class Editor(object):
 			n.append("Exit")
 			d.append(2)
 
-			s = io.a.getSelection(n, d, v, False)
+			s = io.a.get_selection(n, d, v, False)
 			if s == 1:
 				break
 			elif s == 2:
@@ -159,7 +159,7 @@ class Editor(object):
 			d.append(2)
 			n.append("Exit")
 			d.append(3)
-			s = io.a.getSelection(n, d, v, i)
+			s = io.a.get_selection(n, d, v, i)
 			if s == 1:
 				return True
 			elif s == 2:
@@ -188,7 +188,7 @@ class Editor(object):
 		while True:
 			v = (tile.name, str(tile.passable), str(tile.destroyable),
 					str(tile.see_through), tile.ch)
-			s = io.a.getSelection(n, d, v)
+			s = io.a.get_selection(n, d, v)
 			if s in (1,2,3,4,5):
 				self.modified = True
 			if s == 1:
@@ -212,7 +212,7 @@ class Editor(object):
 	def level_editor(self):
 		n = ("Make a new level", "Edit levels", "-----------", "Back", "Exit")
 		d = (self.new_level, self.pick_level, None, self.back, self.exit)
-		while io.a.getSelection(n,d)():
+		while io.a.get_selection(n,d)():
 			pass
 		return True
 
@@ -236,7 +236,7 @@ class Editor(object):
 			n.append("Exit")
 			d.append(2)
 
-			a = io.a.getSelection(n, d)
+			a = io.a.get_selection(n, d)
 			if a == 1:
 				break
 			elif a == 2:
@@ -247,7 +247,7 @@ class Editor(object):
 		return True
 
 	def edit_level(self, l):
-		io.drawMap(l)
+		io.drawmap(l)
 		t = tiles["f"]
 		c = Cursor(0,0)
 		my, mx = l.rows, l.cols
@@ -282,9 +282,9 @@ class Editor(object):
 			elif ch == ord('B'):
 				return True
 			elif ch == ord('\n'):
-				a = level.getSquare(c.y, c.x)
+				a = level.getsquare(c.y, c.x)
 				a.tile = t
-				io.l.drawChar(c.y, c.x, a.getVisibleChar())
+				io.l.drawchar(c.y, c.x, a.get_visible_char())
 			elif ch == ord('1'):
 				t = tiles["f"]
 			elif ch == ord('2'):

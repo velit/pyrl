@@ -82,14 +82,14 @@ class Player(Creature):
 			return True
 		
 		if self.l.legal_yx(ny, nx):
-			target_square = self.l.getSquare(ny,nx)
-			if target_square.passable():
-				self.l.moveCreature(self, target_square)
+			targetsquare = self.l.getsquare(ny,nx)
+			if targetsquare.passable():
+				self.l.movecreature(self, targetsquare)
 				return True
-			elif target_square.creature is not None:
-				self.hit(target_square.creature)
+			elif targetsquare.creature is not None:
+				self.hit(targetsquare.creature)
 				return True
-		io.queueMsg("You can't move there.")
+		io.msg("You can't move there.")
 		return False
 
 	def change_sight_range(self, amount):
@@ -98,7 +98,7 @@ class Player(Creature):
 
 	def hit(self, creature):
 		io.msg("You hit the "+creature.name+" for "+str(self.dmg)+" damage.")
-		creature.loseHP(self.dmg)
+		creature.lose_hp(self.dmg)
 
 	def descend(self):
 		self.g.descend()
@@ -110,7 +110,7 @@ class Player(Creature):
 
 	def die(self):
 		io.msg("You die... [more]")
-		io.getCharacters((ord(' '), ord('\n')))
+		io.getchars((ord(' '), ord('\n')))
 		self.g.endgame(False)
 
 	def endgame(self):
@@ -123,8 +123,8 @@ class Player(Creature):
 		self.g.loadgame()
 
 	def act(self):
-		#self.l.draw()
-		self.updateLos()
+		#self.l.drawmap()
+		self.update_los()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
@@ -133,11 +133,11 @@ class Player(Creature):
 			else:
 				if 0 < c < 256:
 					c = chr(c)
-					io.queueMsg("Undefined command: '"+c+"'")
+					io.msg("Undefined command: '"+c+"'")
 				else:
-					io.queueMsg("Undefined command key: "+str(c))
+					io.msg("Undefined command key: "+str(c))
 
 	def path(self):
-		#io.draw_path(self.l.path(self.square, self.l.squares["ds"]))
+		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))
 		io.msg(str(curses.A_NORMAL))
 		return True
