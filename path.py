@@ -26,7 +26,7 @@ def _path(start, goal, level, debug=None):
 		s = heappop(openprio)[1]
 		if s in closedset:
 			continue
-		if debug and s != start: io.drawBlock(s)
+		if debug and s != start: io.drawblock(s)
 		if debug == 2: io.msg(str((g[s]+h[s], g[s], h[s])))
 		if debug == 2: io.getch()
 		openmember.remove(s)
@@ -41,7 +41,7 @@ def _path(start, goal, level, debug=None):
 			g[n] = g[s] + _dist(n, s)
 			h[n] = _h(n, start, goal)
 			heappush(openprio, (g[n] + h[n], n))
-			if debug and  n != goal: io.drawBlock(n, color["green"])
+			if debug and  n != goal: io.drawblock(n, color["green"])
 			openmember.add(n)
 
 	return came_from

@@ -104,33 +104,33 @@ class Creature(object):
 
 	# Right click square (rts games)
 	def rcs(self, y, x, hostile=True):
-		s = self.l.getSquare(y,x)
+		s = self.l.getsquare(y,x)
 		if s.passable():
-			self.l.moveCreature(self, s)
+			self.l.movecreature(self, s)
 		elif s.creature is self.g.p:
 			pass#self.hit(s.creature)
 		else:
 			return True
 		return False
 
-	def loseHP(self, amount):
+	def lose_hp(self, amount):
 		self.hp -= amount
 		if self.hp <= 0:
 			self.die()
 
 	def die(self):
 		io.msg("The "+self.name+" dies.")
-		self.l.removeCreature(self)
+		self.l.removecreature(self)
 
 	def hit(self, creature):
 		if creature is self.g.p:
 			io.msg("The "+self.name+" hits the you.")
 		else:
 			io.msg("The "+self.name+" hits the "+creature.name+".")
-		creature.loseHP(self.dmg)
+		creature.lose_hp(self.dmg)
 
-	def visitSquare(self, y, x):
-		if self.l.visitSquare(y,x):
+	def visit_square(self, y, x):
+		if self.l.visit_square(y,x):
 			self.visibility.append((y,x))
 
 	def has_range(self, target):
@@ -142,15 +142,15 @@ class Creature(object):
 		return self.has_range(target) and \
 				self.l.check_los(self.square, target.square)
 
-	def updateLos(self):
-		io.clearLos(self.visibility, self.l)
+	def update_los(self):
+		io.clearlos(self.visibility, self.l)
 		y,x = self.square.y, self.square.x
 		if self.sight > 0:
-			self.visitSquare(y,x)
+			self.visit_square(y,x)
 		for oct in range(8):
 			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight,
 					mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
-		io.drawLos(self.visibility, self.l)
+		io.drawlos(self.visibility, self.l)
 
 	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
 	# Copyright 2001 
@@ -178,17 +178,17 @@ class Creature(object):
 				else:
 					# Our light beam is touching this square; light it:
 					if dx*dx + dy*dy < radius_squared:
-						self.visitSquare(Y, X)
+						self.visit_square(Y, X)
 					if blocked:
 						# we're scanning a row of blocked squares:
-						if not level.seeThrough(Y, X):
+						if not level.see_through(Y, X):
 							new_start = r_slope
 							continue
 						else:
 							blocked = False
 							start = new_start
 					else:
-						if not level.seeThrough(Y, X) and j < r:
+						if not level.see_through(Y, X) and j < r:
 							# This is a blocking square, start a child scan:
 							blocked = True
 							self._cast_light(level, cy, cx, j+1, start,

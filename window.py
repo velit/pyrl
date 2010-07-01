@@ -20,7 +20,7 @@ class Window(object):
 		else:
 			return self.w.getch(y, x)
 
-	def getCharacters(self, cont):
+	def getchars(self, cont):
 		c = self.w.getch()
 		while c not in cont:
 			c = self.w.getch()
@@ -92,7 +92,7 @@ class Window(object):
 	def _getch(self):
 		return self.w.getch()
 
-	def getSelection(self, option_names, decisions, option_values=None,
+	def get_selection(self, option_names, decisions, option_values=None,
 							start_selection=0, hilite_values=True):
 		n = option_names
 		v = option_values

@@ -14,9 +14,9 @@ class StatusBar(Window):
 
 	def update(self):
 		self.clear()
-		self.printElements()
+		self.print_elements()
 		Window.update(self)
 
-	def printElements(self):
+	def print_elements(self):
 		for handle, (name, value) in self.elements.iteritems():
 			self.w.addstr(name + str(value()) + " ")
