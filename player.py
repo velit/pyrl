@@ -12,7 +12,9 @@ DOWN = (SW, S, SE)
 LEFT = (SW, W, NW)
 RIGHT = (SE, E, NE)
 
+
 class Player(Creature):
+	"""da player object"""
 	def __init__(self, game, level):
 		super(Player, self).__init__(game, level)
 		self.name = "tappi"
@@ -122,8 +124,8 @@ class Player(Creature):
 		self.g.loadgame()
 
 	def act(self):
-		self.l.draw()
-		#self.updateLos()
+		#self.l.draw()
+		self.updateLos()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:

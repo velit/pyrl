@@ -10,8 +10,13 @@ class MessageBar(Window):
 		self.lines, self.width = self.w.getmaxyx()
 		self.msgqueue = ""
 		self.more_str=more_str
-		self.wrapper = TextWrapper(width=(self.width - 1)) #accommodate for printing the newline character
-		self.last_line_wrapper = TextWrapper(width=(self.width - len(self.more_str) - 1)) #accommodate for the more_str if the messages continue on the next page
+
+		#accommodate for printing the newline character
+		self.wrapper = TextWrapper(width=(self.width - 1))
+
+		#accommodate for the more_str if the messages continue on the next page
+		self.last_line_wrapper = TextWrapper(width=(self.width - 
+													len(self.more_str) - 1))
 
 	def update(self):
 		self.printQueue()

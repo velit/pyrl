@@ -36,11 +36,11 @@ nmap ]e :PEoB
 omap ]e :PEoB
 nmap ]t :PBoB
 omap ]t :PBoB
-map ]<Down> :call PythonNextLine(1)
-map ]<Up> :call PythonNextLine(-1)
-map ]d :call PythonSelectObject("function")
-map ]c :call PythonSelectObject("class")
 map ]v ]tV]e
+map ]c :call PythonSelectObject("class")
+map ]d :call PythonSelectObject("function")
+map ]<Up> :call PythonNextLine(-1)
+map ]<Down> :call PythonNextLine(1)
 nmap gx <Plug>NetrwBrowseX
 nnoremap <silent> <Plug>NetrwBrowseX :call netrw#NetrwBrowseX(expand("<cWORD>"),0)
 map <F12> 10gt
@@ -96,7 +96,7 @@ endif
 set shortmess=aoO
 badd +105 level.py
 badd +1 -TaskList_1-
-badd +82 io.py
+badd +1 io.py
 badd +103 window.py
 badd +1 message.py
 badd +1 player.py
@@ -104,7 +104,7 @@ badd +1 creature.py
 badd +1 monster.py
 badd +1 path.py
 badd +78 game.py
-badd +45 square.py
+badd +1 square.py
 badd +21 tile.py
 badd +4 char.py
 badd +51 editor.py
@@ -125,11 +125,11 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 83 + 84) / 168)
-exe '2resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 2resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 83 + 84) / 169)
+exe '2resize ' . ((&lines * 53 + 54) / 108)
+exe 'vert 2resize ' . ((&columns * 85 + 84) / 169)
 exe '3resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 3resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 3resize ' . ((&columns * 85 + 84) / 169)
 argglobal
 map <buffer> E :w:!/usr/bin/env python % 
 map <buffer> F :call ToggleFold()
@@ -231,12 +231,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 125 - ((20 * winheight(0) + 52) / 105)
+let s:l = 105 - ((104 * winheight(0) + 53) / 106)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-125
-normal! 02l
+105
+normal! 0
 wincmd w
 argglobal
 edit creature.py
@@ -340,7 +340,7 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 26) / 52)
+let s:l = 1 - ((0 * winheight(0) + 26) / 53)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -449,18 +449,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 6 - ((5 * winheight(0) + 26) / 52)
+let s:l = 6 - ((0 * winheight(0) + 26) / 52)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 6
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 83 + 84) / 168)
-exe '2resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 2resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 83 + 84) / 169)
+exe '2resize ' . ((&lines * 53 + 54) / 108)
+exe 'vert 2resize ' . ((&columns * 85 + 84) / 169)
 exe '3resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 3resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 3resize ' . ((&columns * 85 + 84) / 169)
 tabedit level.py
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -471,8 +471,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
 argglobal
 map <buffer> E :w:!/usr/bin/env python % 
 map <buffer> F :call ToggleFold()
@@ -690,8 +690,8 @@ normal! zt
 78
 normal! 02l
 wincmd w
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
 tabedit square.py
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -706,11 +706,11 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
 exe '2resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
 exe '3resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 3resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 3resize ' . ((&columns * 83 + 84) / 169)
 argglobal
 map <buffer> E :w:!/usr/bin/env python % 
 map <buffer> F :call ToggleFold()
@@ -1037,11 +1037,11 @@ normal! zt
 8
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
 exe '2resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
 exe '3resize ' . ((&lines * 52 + 54) / 108)
-exe 'vert 3resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 3resize ' . ((&columns * 83 + 84) / 169)
 tabedit io.py
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -1052,8 +1052,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
 argglobal
 map <buffer> E :w:!/usr/bin/env python % 
 map <buffer> F :call ToggleFold()
@@ -1155,12 +1155,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 19 - ((18 * winheight(0) + 52) / 105)
+let s:l = 4 - ((3 * winheight(0) + 52) / 105)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-19
-normal! 064l
+4
+normal! 0
 wincmd w
 argglobal
 edit level_window.py
@@ -1271,9 +1271,9 @@ normal! zt
 104
 normal! 02l
 wincmd w
-exe 'vert 1resize ' . ((&columns * 84 + 84) / 168)
-exe 'vert 2resize ' . ((&columns * 83 + 84) / 168)
-tabnext 1
+exe 'vert 1resize ' . ((&columns * 85 + 84) / 169)
+exe 'vert 2resize ' . ((&columns * 83 + 84) / 169)
+tabnext 4
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
 endif
