@@ -47,8 +47,7 @@ class Game(object):
 	def endgame(self, ask=True):
 		if not ask:
 			exit()
-		io.msg("Do you wish to end the game? [y/N]:")
-		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		c = io.getch_from_list(str="Do you wish to end the game? [y/N]:")
 		if c in map(ord, ('y', 'Y')):
 			exit()
 	
@@ -60,8 +59,7 @@ class Game(object):
 		if not ask:
 			self._save()
 			self.endgame(True)
-		io.msg("Do you wish to save the game? [Y/n]:")
-		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		c = io.getch_from_list(str="Do you wish to save the game? [Y/n]:")
 		if c in map(ord, ('y', 'Y', '\n', ' ')):
 			self._save()
 			self.endgame(True)
@@ -69,8 +67,7 @@ class Game(object):
 	def loadgame(self, ask=True):
 		if not ask:
 			self.main.load()
-		io.msg("Do you wish to load the game? [y/N]:")
-		c = io.getchars(map(ord, ('y', 'Y', 'n', 'N', '\n', ' ')))
+		c = io.getch_from_list(str="Do you wish to load the game? [y/N]:")
 		if c in map(ord, ('y', 'Y')):
 			self.main.load()
 

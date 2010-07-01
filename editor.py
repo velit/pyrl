@@ -29,31 +29,27 @@ class Editor(object):
 			pass
 		self.modified = False
 
-	def save(self):
+	def save(self, scope=0):
+
+		with open(path.join("editor_data", "tiles"), "w") as t:
+			pickle.dump(self.data.tiles, t)
+
+		with open(path.join("editor_data", "levels"), "w") as l:
+			pickle.dump(self.data.levels, l)
+
 		self.modified = False
-		t = open(path.join("editor_data", "tiles"), "w")
-		pickle.dump(self.data.tiles, t)
-		t.close()
-
-		l = open(path.join("editor_data", "levels"), "w")
-		pickle.dump(self.data.levels, l)
-		l.close()
-
 		return True
 
 	def load(self):
 		self.data = Data()
 
-		f = open(path.join("editor_data", "tiles"), "r")
-		self.data.tiles = pickle.load(f)
-		f.close()
+		with open(path.join("editor_data", "tiles"), "r") as f:
+			self.data.tiles = pickle.load(f)
 
-		f = open(path.join("editor_data", "levels"), "r")
-		self.data.levels = pickle.load(f)
-		f.close()
+		with open(path.join("editor_data", "levels"), "r") as f:
+			self.data.levels = pickle.load(f)
 
 		self.modified = False
-
 		return True
 
 	def back(self):
@@ -64,19 +60,16 @@ class Editor(object):
 
 	def exit(self):
 		if self.modified:
-			io.a.clear()
-			io.a.addstr("The data has been modified; save before exit? [y/N] ")
-			c = io.a.getch()
-			while c not in map(ord, ('y', 'Y', 'n', 'N', '\n')):
-				c = io.a.getch()
-			if c == ord("y") or c == ord("Y"):
+			c = io.a.getch_from_list(str="The data has been modified;"
+						" save before exit? [y/N] ")
+			if c in (ord("y"), ord("Y")):
 				self.save()
 		exit()
 
 	def export(self):
-		io.a.addstr("Are you sure? [y/N] ")
-		c = io.a.getch()
-		if c == ord('y'):
+		c = io.a.getch_from_list(str="Are you sure you want to export"
+						" all data to pyrl? [y/N] ")
+		if c in (ord('y'), ord('Y')):
 			t = path.join("editor_data", "tiles")
 			l = path.join("editor_data", "levels")
 			d = path.join("data")
@@ -87,7 +80,7 @@ class Editor(object):
 
 	def ui(self):
 		n = ("Tile editor", "Level editor", "Save data", "Load data",
-				"Export data", "Exit")
+					"Export data", "Exit")
 		d = (self.tile_editor, self.level_editor, self.save, self.load,
 				self.export, self.exit)
 		while io.a.get_selection(n, d)():
@@ -95,8 +88,10 @@ class Editor(object):
 
 
 	def tile_editor(self):
-		n = ("Make a new tile", "Edit tiles", "----------",  "Back", "Exit")
-		d = (self.new_tile, self.pick_tile, None, self.back, self.exit)
+		n = ("Make a new tile", "Edit tiles", "Delete tiles", "----------",
+					"Back", "Exit")
+		d = (self.new_tile, self.pick_tile, self.delete_tile, None,
+					self.back, self.exit)
 		while io.a.get_selection(n, d)():
 			pass
 
@@ -104,17 +99,21 @@ class Editor(object):
 
 	def new_tile(self):
 		handle = io.a.getstr("Tile handle")
-		self.data.tiles[handle] = Tile()
+		self.data.tiles[handle] = Tile("name", '@', '@', False, False, False )
 		self.modified = True
 		return True
 
-	def pick_tile(self):
+	def delete_tile(self):
+		i = 0
 		while True:
 			tiles = self.data.tiles
 			n = []
 			v = []
 			d = []
-			for key, value in tiles.iteritems():
+			n.append("Pick a tile to delete")
+			d.append(None)
+			v.append(None)
+			for key, value in sorted(tiles.iteritems()):
 				n.append(key)
 				v.append(value.visible_ch)
 				d.append(value)
@@ -125,13 +124,50 @@ class Editor(object):
 			n.append("Exit")
 			d.append(2)
 
-			s = io.a.get_selection(n, d, v, False)
+			s = io.a.get_selection(n, d, v, i)
 			if s == 1:
 				break
 			elif s == 2:
 				self.exit()
-			elif not self.edit_tile(s):
+			else:
+				i = d.index(s)
+				c = io.a.getch_from_list(str="Are you sure you want to delete"
+							" the tile? [y/N]: ")
+				if c in (ord('Y'), ord('y')):
+					del tiles[n[d.index(s)]]
+					self.modified = True
+
+		return True
+
+	def pick_tile(self):
+		i = 0
+		while True:
+			tiles = self.data.tiles
+			n = []
+			v = []
+			d = []
+			n.append("Pick a tile to edit")
+			d.append(None)
+			v.append(None)
+			for key, value in sorted(tiles.iteritems()):
+				n.append(key)
+				v.append(value.visible_ch)
+				d.append(value)
+			n.append("----")
+			d.append(None)
+			n.append("Back")
+			d.append(1)
+			n.append("Exit")
+			d.append(2)
+
+			s = io.a.get_selection(n, d, v, i)
+			if s == 1:
 				break
+			elif s == 2:
+				self.exit()
+			else:
+				i = d.index(s)
+				self.edit_tile(s)
 
 		return True
 
@@ -153,17 +189,13 @@ class Editor(object):
 
 			n.append("")
 			d.append(None)
-			n.append("Edit more")
-			d.append(1)
 			n.append("Back")
 			d.append(2)
 			n.append("Exit")
 			d.append(3)
 			s = io.a.get_selection(n, d, v, i)
-			if s == 1:
-				return True
-			elif s == 2:
-				return False
+			if s == 2:
+				return
 			elif s == 3:
 				self.exit()
 			else:
