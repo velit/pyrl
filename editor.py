@@ -1,7 +1,9 @@
 import curses
-import cPickle
-import sys
+import pickle as pickle
 import shutil
+
+import level
+
 from os import path
 from io import io
 from colors import color
@@ -30,11 +32,11 @@ class Editor(object):
 	def save(self):
 		self.modified = False
 		t = open(path.join("editor_data", "tiles"), "w")
-		cPickle.dump(self.data.tiles, t)
+		pickle.dump(self.data.tiles, t)
 		t.close()
 
 		l = open(path.join("editor_data", "levels"), "w")
-		cPickle.dump(self.data.levels, l)
+		pickle.dump(self.data.levels, l)
 		l.close()
 
 		return True
@@ -43,12 +45,12 @@ class Editor(object):
 		self.data = Data()
 
 		f = open(path.join("editor_data", "tiles"), "r")
-		self.data.tiles = cPickle.load(f)
+		self.data.tiles = pickle.load(f)
 		f.close()
 
-		#f = open(path.join("editor_data", "levels"), "r")
-		#self.data.levels = cPickle.load(f)
-		#f.close()
+		f = open(path.join("editor_data", "levels"), "r")
+		self.data.levels = pickle.load(f)
+		f.close()
 
 		self.modified = False
 
@@ -69,7 +71,7 @@ class Editor(object):
 				c = io.a.getch()
 			if c == ord("y") or c == ord("Y"):
 				self.save()
-		sys.exit(0)
+		exit()
 
 	def export(self):
 		io.a.addstr("Are you sure? [y/N] ")
@@ -79,7 +81,7 @@ class Editor(object):
 			l = path.join("editor_data", "levels")
 			d = path.join("data")
 			shutil.copy(t, d)
-			shutil.copy (l, d)
+			shutil.copy(l, d)
 
 		return True
 
@@ -216,7 +218,7 @@ class Editor(object):
 
 	def new_level(self):
 		handle = io.a.getstr("Level handle")
-		self.data.levels[handle] = Map(20, 80, False)
+		self.data.levels[handle] = Level()
 		self.modified = True
 		return True
 
@@ -245,10 +247,10 @@ class Editor(object):
 		return True
 
 	def edit_level(self, l):
-		io.drawMap(l.map)
+		io.drawMap(l)
 		t = tiles["f"]
 		c = Cursor(0,0)
-		my, mx = l.dimensions
+		my, mx = l.rows, l.cols
 		moves = map(ord, ('1', '2', '3', '4', '5', '6', '7', '8', '9'))
 		moves.append(curses.KEY_UP)
 		moves.append(curses.KEY_DOWN)
@@ -280,7 +282,7 @@ class Editor(object):
 			elif ch == ord('B'):
 				return True
 			elif ch == ord('\n'):
-				a = l.getSquare(c.y, c.x)
+				a = level.getSquare(c.y, c.x)
 				a.tile = t
 				io.l.drawChar(c.y, c.x, a.getVisibleChar())
 			elif ch == ord('1'):

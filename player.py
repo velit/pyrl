@@ -81,17 +81,16 @@ class Player(Creature):
 		if d == STOP:
 			return True
 		
-		target_square = self.l.getSquare(ny,nx)
-
-		if target_square.passable():
-			self.l.moveCreature(self, target_square)
-			return True
-		elif target_square.creature is not None:
-			self.hit(target_square.creature)
-			return True
-		else:
-			io.queueMsg("You can't move there.")
-			return False
+		if self.l.legal_yx(ny, nx):
+			target_square = self.l.getSquare(ny,nx)
+			if target_square.passable():
+				self.l.moveCreature(self, target_square)
+				return True
+			elif target_square.creature is not None:
+				self.hit(target_square.creature)
+				return True
+		io.queueMsg("You can't move there.")
+		return False
 
 	def change_sight_range(self, amount):
 		self.sight += amount

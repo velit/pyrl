@@ -23,11 +23,11 @@ class IO(object):
 											msg_bar_size, 0), self)
 		self.a = Window(self.w)
 
-	def drawMemoryMap(self, map):
-		self.l.drawMemoryMap(map)
+	def drawMap(self, level):
+		self.l.drawMap(level)
 
-	def drawMap(self, map):
-		self.l.drawMap(map)
+	def drawMemoryMap(self, level):
+		self.l.drawMemoryMap(level)
 
 	def drawLos(self, visibility, level):
 		self.l.drawLos(visibility, level)
@@ -53,15 +53,15 @@ class IO(object):
 		self.l.update()
 		curses.doupdate()
 
-	def drawStar(self, square, col=None):
-		if col is None:
-			col = color["green"]
-		self.l.drawStar(square, col)
+	def drawStar(self, square, color_=None):
+		if color_ is None:
+			color_ = color["green"]
+		self.l.drawStar(square, color_)
 	
-	def drawBlock(self, square, col=None):
-		if col is None:
-			col = color["blue"]
-		self.l.drawBlock(square, col)
+	def drawBlock(self, square, color_=None):
+		if color_ is None:
+			color_ = color["blue"]
+		self.l.drawBlock(square, color_)
 
 	def getch(self, y=None, x=None):
 		self.refresh()
