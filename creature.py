@@ -130,8 +130,8 @@ class Creature(object):
 		creature.loseHP(self.dmg)
 
 	def visitSquare(self, y, x):
-		self.l.visitSquare(y,x)
-		self.visibility.append((y,x))
+		if self.l.visitSquare(y,x):
+			self.visibility.append((y,x))
 
 	def has_range(self, target):
 		sy, sx = self.getloc()

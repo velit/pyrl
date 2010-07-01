@@ -8,9 +8,9 @@ class LevelWindow(Window):
 		Window.__init__(self, window)
 		self.io = io
 
-	def drawMap(self, map):
+	def drawMap(self, level):
 		self.w.move(0,0)
-		for s in map:
+		for s in level.map:
 			try:
 				self.w.addch(s.y, s.x, s.getVisibleChar().symbol,
 								s.getVisibleChar().color)
@@ -20,9 +20,9 @@ class LevelWindow(Window):
 			# the automatic cursor move to the next cell is illegal, this is
 			# the only way to the last cell with the current curses wrapper
 
-	def drawMemoryMap(self, map):
+	def drawMemoryMap(self, level):
 		self.w.move(0,0)
-		for s in map:
+		for s in level.map:
 			try:
 				self.w.addch(s.y, s.x, s.getMemoryChar().symbol,
 								s.getMemoryChar().color)

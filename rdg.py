@@ -7,12 +7,12 @@ w = tiles["w"]
 r = tiles["r"]
 f = tiles["f"]
 
-def init(level):
-	y, x = level.rows, level.cols
-	level.map = [S(r, i / x, i % x) for i in range(y * x)]
+def init_map(rows, cols, tile=r):
+	y, x = rows, cols
+	return [S(tile, i / x, i % x) for i in range(y * x)]
 
 def generateLevel(level):
-	init(level)
+	level.map = init_map(level.rows, level.cols)
 	makeInitialRoom(level)
 	for x in range(2000):
 		if rand() < 0.50:

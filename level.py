@@ -1,17 +1,18 @@
 import random
 import curses
 
+import path
+
 from player import Player
 from monster import Monster
 from square import Square
 from tile import tiles
 from io import io
 from colors import color
-from rdg import generateLevel
-from path import path
+from rdg import generateLevel, init_map
 
 class Level(object):
-	def __init__(self, game, id, generate=True):
+	def __init__(self, game=None, id=None, generate=False):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -19,21 +20,12 @@ class Level(object):
 		self.creatures = []
 		self.squares = {}
 
-		if generate:
+		if game and generate:
 			generateLevel(self)
+			for x in range(100):
+				self.addCreature(Monster(self.g, self))
 		else:
-			self.map = [Square(tiles["f"], j / self.cols, x % self.cols)
-						for x in range(self.rows * self.cols)]
-
-			for x in range(self.cols):
-				self.getSquare(0, x).tile = tiles["w"]
-				self.getSquare(self.rows, x).tile = tiles["w"]
-			for y in range(self.rows):
-				self.getSquare(y, 0).tile = tiles["w"]
-				self.getSquare(y, self.cols).tile = tiles["w"]
-
-		for x in range(100):
-			self.addCreature(Monster(self.g, self))
+			self.map = init_map(self.rows, self.cols, tiles["f"])
 
 	def getSquare(self, y, x):
 		return self.map[y*self.cols + x]
@@ -48,17 +40,22 @@ class Level(object):
 		return random.choice(self.map)
 
 	def visitSquare(self, y, x):
-		self.getSquare(y,x).visit()
-	
+		if self.legal_yx(y, x):
+			self.getSquare(y,x).visit()
+			return True
+		return False
+
 	def seeThrough(self, y, x):
-		return 0 <= y < self.rows and 0 <= x < self.cols \
-				and self.getSquare(y,x).seeThrough()
+		return self.legal_yx(y, x) and self.getSquare(y, x).seeThrough()
+
+	def legal_yx(self, y, x):
+		return 0 <= y < self.rows and 0 <= x < self.cols
 
 	def draw(self):
-		io.drawMap(self.map)
+		io.drawMap(self)
 	
 	def drawMemory(self):
-		io.drawMemoryMap(self.map)
+		io.drawMemoryMap(self)
 
 	def addCreature(self, creature, square = None):
 		if square is None:
@@ -67,7 +64,7 @@ class Level(object):
 		square.creature = creature
 		creature.square = square
 
-	def moveCreature(self, creature, square):
+	def moveCreature(self, creature=None, square=None, y=None, x=None):
 		square.creature = creature
 		creature.square.creature = None
 		creature.square = square
@@ -150,74 +147,12 @@ class Level(object):
 		else:
 			return True
 
-	def neighbor_nodes(self, y, x, debug=None):
+	def neighbor_nodes(self, y, x):
 		for j in range(y-1, y+2):
 			for i in range(x-1, x+2):
-				if not (y == j and x == i) \
-						and 0 <= j < self.rows and 0 <= i < self.cols \
-						and debug or self.getSquare(j, i).tile_passable():
+				if not ((y == j and x == i) and self.legal_yx(y, x) and
+						self.getSquare(j, i).tile_passable()):
 					yield self.getSquare(j, i)
 
 	def path(self, start, goal):
-		return path(start, goal, self)
-
-	#def dist(self, a, b):
-	#	y = abs(a.x - b.x)
-	#	x = abs(a.y - b.y)
-	#	diagonal = min(y,x)
-	#	straight = y+x
-	#	return 1415*diagonal + 1000 * (straight - 2*diagonal)
-
-	#def h(self, cur, start, goal):
-	#	y = abs(cur.y - goal.y)
-	#	x = abs(cur.x - goal.x)
-	#	dx1 = cur.y - goal.y
-	#	dy1 = cur.x - goal.x
-	#	dx2 = start.y - goal.y
-	#	dy2 = start.x - goal.x
-	#	cross = abs(dy1*dx2 - dy2*dx1)
-	#	diagonal = min(y,x)
-	#	straight = y+x
-	#	return (1415*diagonal + 1000 * (straight - 2*diagonal)) + cross/10.0
-
-	#def path(self, start, goal):
-	#	if start == goal:
-	#		return goal
-	#	g = {}
-	#	h = {}
-	#	came_from = {}
-	#	closedset = set()
-	#	openprio = [(0, start)]
-	#	openmember = set()
-	#	openmember.add(start)
-
-	#	g[start] = 0
-	#	h[start] = self.h(start, start, goal)
-
-	#	while openprio[0][1] != goal:
-	#		# Best selected node
-	#		s = heapq.heappop(openprio)[1]
-	#		if s in closedset:
-	#			continue
-	#		if s != start: io.drawBlock(s)
-	#		openmember.remove(s)
-	#		closedset.add(s)
-
-	#		for n in self.neighbor_nodes(s.y, s.x):
-	#			if n in closedset or n in openmember \
-			#					and not g[s] + self.dist(n, s) < g[n]:
-	#				continue
-
-	#			came_from[n] = s
-	#			g[n] = g[s] + self.dist(n, s)
-	#			h[n] = self.h(n, start, goal)
-	#			heapq.heappush(openprio, (g[n] + h[n], n))
-	#			if n != goal: io.drawBlock(n, color["green"])
-	#			openmember.add(n)
-
-	#	cur = goal
-	#	while came_from[cur] != start:
-	#		cur = came_from[cur]
-	#		io.drawStar(cur)
-	#	io.getch()
-	#	return cur
+		return path.path(start, goal, self)
