@@ -42,7 +42,7 @@ class IO(object):
 		self.m.getstr(str)
 
 	def msg(self, string):
-		self.m.queue_msg(str(string))
+		self.m.queue_msg(string)
 	
 	def refresh(self):
 		self.m.update()
@@ -67,9 +67,12 @@ class IO(object):
 		else:
 			return self.l.getch()
 
-	def getchars(self, list):
+	def getch_from_list(self, list=map(ord, ('Y', 'y', 'N', 'n', '\n', ' ')),
+					str=None):
+		if str:
+			self.msg(str)
 		self.refresh()
-		return self.l.getchars(list)
+		return self.l.getch_from_list()
 
 	def drawpath(self, iterator):
 		curses.curs_set(0)

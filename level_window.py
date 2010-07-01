@@ -13,7 +13,7 @@ class LevelWindow(Window):
 		for s in level.map:
 			try:
 				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
-								s.get_visible_char().color)
+							s.get_visible_char().color)
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
@@ -25,7 +25,7 @@ class LevelWindow(Window):
 		for s in level.map:
 			try:
 				self.w.addch(s.y, s.x, s.get_memory_char().symbol,
-								s.get_memory_char().color)
+							s.get_memory_char().color)
 			except curses.error:
 				pass
 
@@ -36,15 +36,17 @@ class LevelWindow(Window):
 		if reverse:
 			for y,x in visibility:
 				try:
-					self.w.addch(y,x,l.getsquare(y,x).get_visible_char().symbol,\
-							l.getsquare(y,x).get_visible_char().color \
+					self.w.addch(y, x,
+							l.getsquare(y,x).get_visible_char().symbol,
+							l.getsquare(y,x).get_visible_char().color
 							| color["reverse"])
 				except curses.error:
 					pass
 		else:
 			for y,x in visibility:
 				try:
-					self.w.addch(y,x,l.getsquare(y,x).get_visible_char().symbol,\
+					self.w.addch(y, x,
+							l.getsquare(y,x).get_visible_char().symbol,
 							l.getsquare(y,x).get_visible_char().color)
 				except curses.error:
 					pass
@@ -56,8 +58,8 @@ class LevelWindow(Window):
 			except IndexError:
 				break
 			try:
-				self.w.addch(y, x, l.getsquare(y,x).get_memory_char().symbol, \
-								l.getsquare(y,x).get_memory_char().color)
+				self.w.addch(y, x, l.getsquare(y,x).get_memory_char().symbol,
+							l.getsquare(y,x).get_memory_char().color)
 			except curses.error:
 				pass
 

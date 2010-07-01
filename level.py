@@ -1,14 +1,9 @@
 import random
-import curses
-
 import path
 
-from player import Player
 from monster import Monster
-from square import Square
 from tile import tiles
 from io import io
-from colors import color
 from rdg import generateLevel, init_map
 
 class Level(object):
@@ -41,7 +36,7 @@ class Level(object):
 
 	def visit_square(self, y, x):
 		if self.legal_yx(y, x):
-			self.getsquare(y,x).visit()
+			self.getsquare(y, x).visit()
 			return True
 		return False
 
@@ -145,10 +140,10 @@ class Level(object):
 			ystep = -1
 		for x in range(x0, x1):
 			if steep:
-				if not self.getsquare(y,x).see_through():
+				if not self.getsquare(y, x).see_through():
 					return False
 			else:
-				if not self.getsquare(x,y).see_through():
+				if not self.getsquare(x, y).see_through():
 					return False
 			error -= deltay
 			if error < 0:

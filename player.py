@@ -110,7 +110,7 @@ class Player(Creature):
 
 	def die(self):
 		io.msg("You die... [more]")
-		io.getchars((ord(' '), ord('\n')))
+		io.getch_from_list((ord(' '), ord('\n')))
 		self.g.endgame(False)
 
 	def endgame(self):
