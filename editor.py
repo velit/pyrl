@@ -84,8 +84,10 @@ class Editor(object):
 		return True
 
 	def ui(self):
-		n = ("Tile editor", "Level editor", "Save data", "Load data", "Export data", "Exit")
-		d = (self.tile_editor, self.level_editor, self.save, self.load, self.export, self.exit)
+		n = ("Tile editor", "Level editor", "Save data", "Load data",
+				"Export data", "Exit")
+		d = (self.tile_editor, self.level_editor, self.save, self.load,
+				self.export, self.exit)
 		while io.a.getSelection(n, d)():
 			pass
 
@@ -172,15 +174,18 @@ class Editor(object):
 				elif isinstance(s[1], int):
 					setattr(tile, s[0], io.a.getint(s[0]))
 				elif isinstance(s[1], Char):
-					setattr(tile, s[0], Char(io.a.getchar(s[0]), io.a.getcolor(s[0])))
+					setattr(tile, s[0], Char(io.a.getchar(s[0]),
+						io.a.getcolor(s[0])))
 				else:
 					self.exit()
 
 	def edit_tile_alt(self, tile):
-		n = ("Name:       ", "Passable:   ", "Destroyable:", "See through:", "Tile char:  ", "------------", "Edit more", "Back", "Exit")
+		n = ("Name:       ", "Passable:   ", "Destroyable:", "See through:",
+				"Tile char:  ", "------------", "Edit more", "Back", "Exit")
 		d = (1, 2, 3, 4, 5, None, 6, 7, 8)
 		while True:
-			v = (tile.name, str(tile.passable), str(tile.destroyable), str(tile.see_through), tile.ch)
+			v = (tile.name, str(tile.passable), str(tile.destroyable),
+					str(tile.see_through), tile.ch)
 			s = io.a.getSelection(n, d, v)
 			if s in (1,2,3,4,5):
 				self.modified = True
@@ -193,7 +198,8 @@ class Editor(object):
 			elif s == 4:
 				tile.see_through = io.a.getbool("See through")
 			elif s == 5:
-				tile.ch = Char(io.a.getchar("Tile char"), io.a.getcolor("Tile color"))
+				tile.ch = Char(io.a.getchar("Tile char"),
+						io.a.getcolor("Tile color"))
 			elif s == 6:
 				return True
 			elif s == 7:

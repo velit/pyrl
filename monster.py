@@ -3,8 +3,10 @@ from creature import Creature
 from random import choice
 from colors import color
 
-mons = (('k', "kobold", "him"), ('@', "bandit", "him"), ('g', "goblin", "him"), ('j', "jelly", "it"), ('c', "centipede", "it"))
-col = (("black", color["black"]), ("green", color["light_green"]), ("yellow", color["yellow"]), ("blue", color["blue"]))
+mons = (('k', "kobold", "him"), ('@', "bandit", "him"), ('g', "goblin", "him"),
+		('j', "jelly", "it"), ('c', "centipede", "it"))
+col = (("black", color["black"]), ("green", color["light_green"]),
+		("yellow", color["yellow"]), ("blue", color["blue"]))
 
 class Monster(Creature):
 	def __init__(self, game, level):

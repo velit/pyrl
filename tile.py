@@ -1,8 +1,3 @@
-from char import Char
-from colors import color
-from cPickle import load
-from curses import A_NORMAL
-
 class Tile(object):
 	"""The actual floor of a square."""
 

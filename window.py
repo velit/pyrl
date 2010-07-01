@@ -69,7 +69,8 @@ class Window(object):
 
 	def getcolor(self, print_str=None):
 		while True:
-			input = self._getstr(print_str + " [white/normal/black, red/green/yellow/blue/purple/cyan/, light_red/light_*]: ")
+			input = self._getstr(print_str + "[white/normal/black/red/green/"
+										"yellow/blue/purple/cyan/light_*]: ")
 			if input == "":
 				return color["normal"]
 			elif input in color:
@@ -91,7 +92,8 @@ class Window(object):
 	def _getch(self):
 		return self.w.getch()
 
-	def getSelection(self, option_names, decisions, option_values=None, start_selection=0, hilite_values=True):
+	def getSelection(self, option_names, decisions, option_values=None,
+							start_selection=0, hilite_values=True):
 		n = option_names
 		v = option_values
 		curses.curs_set(0)
@@ -130,7 +132,8 @@ class Window(object):
 				y = i
 				x = indent
 				if isinstance(v[i], Char):
-					self.w.addstr(y, x, v[i].symbol, v[i].color | color["reverse"])
+					self.w.addstr(y, x, v[i].symbol, v[i].color |
+															color["reverse"])
 					c = self.w.getch()
 					self.w.addstr(y, x, v[i].symbol, v[i].color)
 				else:
