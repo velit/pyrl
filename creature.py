@@ -12,23 +12,22 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 class Creature(object):
 	"""This is an abstract class representing a creature"""
 	def __init__(self, game, level):
-		self.sight = 200
+		self.sight = 50
 		self.hp = 10
 		self.dmg = 1
 		self.g = game
 		self.l = level
 		self.square = None
-		self.visibility = []
+		self.visibility = set()
+		self.visi_mod = set()
 		self.hostile = False
+		self.reverse = False
 
 	def getloc(self):
 		return self.square.y, self.square.x
 
 	def act(self):
 		self.move_random()
-
-	def move_random(self):
-		self.rcs(self.square.y + rr(3) - 1, self.square.x + rr(3) - 1)
 
 	def act_towards(self, y, x, c=(-1,1)):
 		# Self
@@ -104,14 +103,23 @@ class Creature(object):
 
 	# Right click square (rts games)
 	def rcs(self, y, x, hostile=True):
-		s = self.l.getsquare(y,x)
-		if s.passable():
-			self.l.movecreature(self, s)
-		elif s.creature is self.g.p:
-			pass#self.hit(s.creature)
-		else:
-			return True
+		if self.l.legal_yx(y, x):
+			s = self.l.getsquare(y, x)
+			if s.passable():
+				self.l.movecreature(self, s)
+			elif s.creature is self.g.p:
+				pass#self.hit(s.creature)
+			else:
+				return True
 		return False
+
+	def move_random(self):
+		for i in range(5):
+			y = self.square.y + rr(3) - 1
+			x = self.square.x + rr(3) - 1
+			if self.l.legal_yx(y, x):
+				self.rcs(self.square.y + rr(3) - 1, self.square.x + rr(3) - 1)
+				return
 
 	def lose_hp(self, amount):
 		self.hp -= amount
@@ -129,28 +137,30 @@ class Creature(object):
 			io.msg("The "+self.name+" hits the "+creature.name+".")
 		creature.lose_hp(self.dmg)
 
-	def visit_square(self, y, x):
-		if self.l.visit_square(y,x):
-			self.visibility.append((y,x))
-
-	def has_range(self, target):
+	def has_range(self, square):
 		sy, sx = self.getloc()
-		py, px = target.getloc()
-		return (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight - 1) ** 2
+		py, px = square.y, square.x
+		return (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight) ** 2
 
-	def has_los(self, target):
-		return self.has_range(target) and \
-				self.l.check_los(self.square, target.square)
+	def has_los(self, square):
+		return self.has_range(square) and \
+				self.l.check_los(self.square, square)
 
-	def update_los(self):
-		io.clearlos(self.visibility, self.l)
-		y,x = self.square.y, self.square.x
+	def update_los(self, debug=True):
+		old = self.visibility
+		self.visibility = set()
+		self.cast_light()
+		io.clearlos(old - self.visibility, self.l)
+		io.drawlos(self.visibility -(old -self.visi_mod), self.l, self.reverse)
+		self.visi_mod.clear()
+
+	def cast_light(self):
+		y, x = self.square.y, self.square.x
 		if self.sight > 0:
-			self.visit_square(y,x)
+			self.l.visit_square(y,x)
 		for oct in range(8):
 			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight,
 					mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
-		io.drawlos(self.visibility, self.l)
 
 	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
 	# Copyright 2001 
@@ -177,8 +187,8 @@ class Creature(object):
 					break
 				else:
 					# Our light beam is touching this square; light it:
-					if dx*dx + dy*dy < radius_squared:
-						self.visit_square(Y, X)
+					if dx*dx + dy*dy <= radius_squared:
+						self.l.visit_square(Y, X)
 					if blocked:
 						# we're scanning a row of blocked squares:
 						if not level.see_through(Y, X):

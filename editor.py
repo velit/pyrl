@@ -2,8 +2,6 @@ import curses
 import pickle as pickle
 import shutil
 
-import level
-
 from os import path
 from io import io
 from colors import color
@@ -314,16 +312,16 @@ class Editor(object):
 			elif ch == ord('B'):
 				return True
 			elif ch == ord('\n'):
-				a = level.getsquare(c.y, c.x)
+				a = l.getsquare(c.y, c.x)
 				a.tile = t
 				io.l.drawchar(c.y, c.x, a.get_visible_char())
-			elif ch == ord('1'):
+			elif ch == ord('f'):
 				t = tiles["f"]
-			elif ch == ord('2'):
+			elif ch == ord('w'):
 				t = tiles["w"]
-			elif ch == ord('3'):
+			elif ch == ord('<'):
 				t = tiles["us"]
-			elif ch == ord('4'):
+			elif ch == ord('>'):
 				t = tiles["ds"]
-			elif ch == ord('5'):
+			elif ch == ord('r'):
 				t = tiles["r"]

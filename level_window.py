@@ -34,48 +34,51 @@ class LevelWindow(Window):
 
 	def drawlos(self, visibility, l, reverse=False):
 		if reverse:
-			for y,x in visibility:
+			for s in visibility:
 				try:
-					self.w.addch(y, x,
-							l.getsquare(y,x).get_visible_char().symbol,
-							l.getsquare(y,x).get_visible_char().color
+					self.w.addch(s.y, s.x,
+							s.get_visible_char().symbol,
+							s.get_visible_char().color
 							| color["reverse"])
 				except curses.error:
 					pass
 		else:
-			for y,x in visibility:
+			for s in visibility:
 				try:
-					self.w.addch(y, x,
-							l.getsquare(y,x).get_visible_char().symbol,
-							l.getsquare(y,x).get_visible_char().color)
+					self.w.addch(s.y, s.x,
+							s.get_visible_char().symbol,
+							s.get_visible_char().color)
 				except curses.error:
 					pass
 
-	def clearlos(self, visibility, l):
-		while True:
+	def clearlos(self, old_visibility, l):
+		for s in old_visibility:
 			try:
-				y, x = visibility.pop()
-			except IndexError:
-				break
-			try:
-				self.w.addch(y, x, l.getsquare(y,x).get_memory_char().symbol,
-							l.getsquare(y,x).get_memory_char().color)
+				self.w.addch(s.y, s.x,
+							l.getsquare(s.y, s.x).get_memory_char().symbol,
+							l.getsquare(s.y, s.x).get_memory_char().color)
 			except curses.error:
 				pass
 
 	def drawstar(self, square, col):
-		self.w.addch(square.y, square.x, "*", col)
+		try:
+			self.w.addch(square.y, square.x, "*", col)
+		except curses.error:
+			pass
 
 	def drawblock(self, square, col):
-		self.w.addch(square.y, square.x, " ", col | color["reverse"])
+		try:
+			self.w.addch(square.y, square.x, " ", col | color["reverse"])
+		except curses.error:
+			pass
 
 	def drawline(self, startSquare, targetsquare, char=None):
 		if char is None:
 			symbol = '*'
-			color = color["yellow"]
+			color_ = color["yellow"]
 		else:
 			symbol = char.symbol
-			color = char.color
+			color_ = char.color
 		x0, y0 = startSquare.y, startSquare.x
 		x1, y1 = targetsquare.y, targetsquare.x
 		steep = abs(y1 - y0) > abs(x1 - x0)
@@ -96,11 +99,10 @@ class LevelWindow(Window):
 			ystep = -1
 		for x in range(x0, x1):
 			if steep:
-				self.w.addch(y, x, symbol, color)
+				self.w.addch(y, x, symbol, color_)
 			else:
-				self.w.addch(x, y, symbol, color)
+				self.w.addch(x, y, symbol, color_)
 			error -= deltay
 			if error < 0:
 				y += ystep
 				error += deltax
-		self.w.getch()

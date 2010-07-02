@@ -36,9 +36,9 @@ class Level(object):
 
 	def visit_square(self, y, x):
 		if self.legal_yx(y, x):
-			self.getsquare(y, x).visit()
-			return True
-		return False
+			s = self.getsquare(y, x)
+			s.visit()
+			self.g.p.visibility.add(s)
 
 	def see_through(self, y, x):
 		return self.legal_yx(y, x) and self.getsquare(y, x).see_through()
@@ -59,7 +59,9 @@ class Level(object):
 		square.creature = creature
 		creature.square = square
 
-	def movecreature(self, creature=None, square=None, y=None, x=None):
+	def movecreature(self, creature, square):
+		self.g.p.visi_mod.add(square)
+		self.g.p.visi_mod.add(creature.square)
 		square.creature = creature
 		creature.square.creature = None
 		creature.square = square
