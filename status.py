@@ -7,10 +7,10 @@ class StatusBar(Window):
 		Window.__init__(self, window)
 		self.io = io
 		self.lines, self.width = self.w.getmaxyx()
-		self.elements = {}
+		self.elements = []
 
-	def register(self, handle, string, value ):
-		self.elements[handle] = (string, value)
+	def register(self, string, value):
+		self.elements.append((string, value))
 
 	def update(self):
 		self.clear()
@@ -18,5 +18,5 @@ class StatusBar(Window):
 		Window.update(self)
 
 	def print_elements(self):
-		for handle, (name, value) in self.elements.iteritems():
+		for name, value in self.elements:
 			self.w.addstr(name + str(value()) + " ")

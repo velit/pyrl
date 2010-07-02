@@ -27,7 +27,8 @@ class Player(Creature):
 		self.def_actions()
 
 	def register_status_texts(self):
-		io.s.register("hp", "HP: ", lambda: self.hp)
+		io.s.register("HP: ", lambda: self.hp)
+		io.s.register("sight: ", lambda: self.sight)
 
 	def def_actions(self):
 		a = {}
@@ -53,6 +54,9 @@ class Player(Creature):
 		a[ord('S')] = "savegame",
 		a[ord('L')] = "loadgame",
 		a[ord('p')] = "path",
+		a[ord('\x12')] = "redraw",
+
+		a[ord('H')] = "los_highlight",
 
 		a[ord('+')] = "change_sight_range", 1
 		a[ord('-')] = "change_sight_range", -1
@@ -139,5 +143,31 @@ class Player(Creature):
 
 	def path(self):
 		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))
-		io.msg(str(curses.A_NORMAL))
-		return True
+		#io.msg(str(curses.A_NORMAL))
+		#io.msg(io.rows)
+		#io.msg(io.cols)
+		#i = 0
+		#for x in range(self.l.cols):
+		#	i +=io.l.drawline(self.l.getsquare(25, 40), self.l.getsquare(0, x))
+		#for y in range(self.l.rows):
+		#	i +=io.l.drawline(self.l.getsquare(25, 40),
+		#			self.l.getsquare(y, self.l.cols-1))
+		#io.msg(i)
+		#io.msg(len(self.visibility-self.old_visibility))
+		#io.l.drawline(self.l.getsquare(25, 40), self.l.getsquare(44, 19))
+		#io.l.drawline(self.l.getsquare(44, 19), self.l.getsquare(25, 40))
+		#io.msg(sorted((x.y, x.x) for x in self.visibility if self.has_los(x)))
+		#io.msg(all(self.has_los(x) for x in self.visibility))
+		#for x in self.l.map:
+		#	if not self.has_los(x): io.drawstar(x)
+		#io.getch()
+		pass
+	
+	def los_highlight(self):
+		self.reverse = not self.reverse
+		self.redraw()
+
+	def redraw(self):
+		self.visibility.clear()
+		self.g.redraw()
+		self.update_los()

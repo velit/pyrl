@@ -29,8 +29,8 @@ class IO(object):
 	def drawmemory(self, level):
 		self.l.drawmemory(level)
 
-	def drawlos(self, visibility, level):
-		self.l.drawlos(visibility, level)
+	def drawlos(self, visibility, level, reverse=False):
+		self.l.drawlos(visibility, level, reverse)
 
 	def clearlos(self, visibility, level):
 		self.l.clearlos(visibility, level)
@@ -42,7 +42,7 @@ class IO(object):
 		self.m.getstr(str)
 
 	def msg(self, string):
-		self.m.queue_msg(string)
+		self.m.queue_msg(str(string))
 	
 	def refresh(self):
 		self.m.update()

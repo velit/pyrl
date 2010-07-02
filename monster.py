@@ -19,7 +19,7 @@ class Monster(Creature):
 
 	def act(self):
 		#if self.has_los(self.g.p):
-		if self.has_range(self.g.p):
+		if self.has_range(self.g.p.square):
 			self.act_towards(self.g.p.square.y, self.g.p.square.x)
 		else:
 			self.move_random()

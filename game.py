@@ -53,7 +53,7 @@ class Game(object):
 	
 	def _save(self):
 		with open(path.join("data", "pyrl.svg"), "w") as f:
-			cPickle.dump(self.p.l.map, f)
+			cPickle.dump(self, f)
 
 	def savegame(self, ask=True):
 		if not ask:
