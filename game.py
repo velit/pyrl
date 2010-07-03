@@ -6,6 +6,7 @@ from os import path
 from level import Level
 from player import Player
 from io import io
+from constants import YES, NO, DEFAULT
 
 class Game(object):
 	def __init__(self, main):
@@ -48,7 +49,7 @@ class Game(object):
 		if not ask:
 			exit()
 		c = io.getch_from_list(str="Do you wish to end the game? [y/N]:")
-		if c in map(ord, ('y', 'Y')):
+		if c in YES:
 			exit()
 	
 	def _save(self):
@@ -60,7 +61,7 @@ class Game(object):
 			self._save()
 			self.endgame(True)
 		c = io.getch_from_list(str="Do you wish to save the game? [Y/n]:")
-		if c in map(ord, ('y', 'Y', '\n', ' ')):
+		if c in YES | DEFAULT:
 			self._save()
 			self.endgame(True)
 
@@ -68,7 +69,7 @@ class Game(object):
 		if not ask:
 			self.main.load()
 		c = io.getch_from_list(str="Do you wish to load the game? [y/N]:")
-		if c in map(ord, ('y', 'Y')):
+		if c in YES:
 			self.main.load()
 
 	def redraw(self):

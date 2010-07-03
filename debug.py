@@ -1,2 +1,0 @@
-optimization = False
-debug = False
