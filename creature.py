@@ -146,7 +146,7 @@ class Creature(object):
 		return self.has_range(square) and \
 				self.l.check_los(self.square, square)
 
-	def update_los(self, debug=True):
+	def update_los(self):
 		old = self.visibility
 		self.visibility = set()
 		self.cast_light()

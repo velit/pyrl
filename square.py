@@ -1,14 +1,12 @@
-import debug
-
 from tile import tiles
 from io import io
+from constants import OPTIMIZATION
 
-opti = debug.optimization
 
 class Square(object):
 	"""A cell that is a part of a level."""
 
-	if opti: __slots__ = ("x", "y", "tile", "creature", "memory_tile")
+	if OPTIMIZATION: __slots__ = ("x", "y", "tile", "creature", "memory_tile")
 
 	def __init__(self, tile, y, x):
 		self.y = y
@@ -17,10 +15,10 @@ class Square(object):
 		self.creature = None
 		self.memory_tile = tiles["u"]
 
-	if opti:
+	if OPTIMIZATION:
 		def __getstate__(self):
 			return self.y, self.x, self.tile, self.creature, self.memory_tile
-	if opti:
+	if OPTIMIZATION:
 		def __setstate__(self, state):
 			self.y, self.x, self.tile, self.creature, self.memory_tile = state
 

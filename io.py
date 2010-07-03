@@ -7,6 +7,7 @@ from status import StatusBar
 from level_window import LevelWindow
 from window import Window
 from char import Char
+from constants import YES, NO, DEFAULT
 
 class IO(object):
 	def __init__(self, window, msg_bar_size=2, status_bar_size=2):
@@ -67,8 +68,7 @@ class IO(object):
 		else:
 			return self.l.getch()
 
-	def getch_from_list(self, list=map(ord, ('Y', 'y', 'N', 'n', '\n', ' ')),
-					str=None):
+	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
 		if str:
 			self.msg(str)
 		self.refresh()

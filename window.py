@@ -1,6 +1,7 @@
 import curses
 from char import Char
 from colors import color
+from constants import YES, NO, DEFAULT
 
 class Window(object):
 	def __init__(self, window):
@@ -22,8 +23,7 @@ class Window(object):
 		else:
 			return self.w.getch(y, x)
 
-	def getch_from_list(self, list=map(ord, ('Y', 'y', 'N', 'n', '\n')),
-					str=None):
+	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
 		if str:
 			self.clear_and_print(str)
 		c = self.w.getch()
@@ -112,7 +112,7 @@ class Window(object):
 				self.w.addstr(i, x, v[i])
 
 	def get_selection(self, option_names, decisions, option_values=None,
-							start_selection=0):
+					keys=(), i=0):
 		n = option_names
 		v = option_values
 		curses.curs_set(0)
@@ -121,10 +121,10 @@ class Window(object):
 		# go through names which have values on the same line and match the
 		# indent level to the longest name
 		indent = 0
-		for i in range(len(n)):
+		for row_i in range(len(n)):
 			try:
-				if v[i] and len(n[i]) > indent:
-					indent = len(n[i])
+				if v[row_i] and len(n[row_i]) > indent:
+					indent = len(n[row_i])
 			except:
 				pass
 
@@ -148,7 +148,6 @@ class Window(object):
 						self.w.addstr(y, indent, name)
 
 		#ui
-		i = start_selection
 		while decisions[i] is None:
 			i += 1
 			if i >= len(n):
@@ -160,7 +159,9 @@ class Window(object):
 			self._print_selection_values(i, indent, n, v, False)
 			self.w.addstr(i, 0, n[i])
 
-			if c == curses.KEY_DOWN:
+			if c in keys:
+				return keys[c]
+			elif c == curses.KEY_DOWN:
 				i += 1
 				if i >= len(n):
 					i -= len(n)
@@ -176,6 +177,6 @@ class Window(object):
 					i -= 1
 					if i < 0:
 						i += len(n)
-			elif c == ord('\n'):
+			elif c == ord('\n') or c == ord('>'):
 				curses.curs_set(1)
 				return decisions[i]
