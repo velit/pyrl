@@ -26,6 +26,7 @@ color["light_blue"] = curses.color_pair(5) | curses.A_BOLD
 color["light_purple"] = curses.color_pair(6) | curses.A_BOLD
 color["light_cyan"] = curses.color_pair(7) | curses.A_BOLD
 
+color["normal"] = curses.A_NORMAL
 color["blink"] = curses.A_BLINK
 color["bold"] = curses.A_BOLD
 color["dim"] = curses.A_DIM
