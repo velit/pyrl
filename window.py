@@ -111,72 +111,82 @@ class Window(object):
 			else:
 				self.w.addstr(i, x, v[i])
 
-	def get_selection(self, option_names, decisions, option_values=None,
-					keys=(), i=0):
-		n = option_names
-		v = option_values
-		curses.curs_set(0)
-		self.clear()
-		
-		# go through names which have values on the same line and match the
-		# indent level to the longest name
+	def _get_indentation_level(self, rows):
 		indent = 0
-		for row_i in range(len(n)):
-			try:
-				if v[row_i] and len(n[row_i]) > indent:
-					indent = len(n[row_i])
-			except:
-				pass
-
-		# if we had values and thus an indent, add one space so the options
-		# wont be glued together
-		if indent: indent += 1
-
-		# print all the names and their values if there are any
-		for y, name in enumerate(n):
-			if isinstance(name, Char):
-				self.w.addstr(y, 0, name.symbol, name.color)
-			else:
-				self.w.addstr(y, 0, name)
-
-		if v is not None:
-			for y, name in enumerate(v):
-				if name is not None:
-					if isinstance(name, Char):
-						self.w.addstr(y, indent, name.symbol, name.color)
+		# if lines in rows has second words, find out indentation level
+		ii = isinstance
+		if any(not ii(l, str) for l in rows):
+			for l in rows:
+				if not ii(l, str):
+					if ii(l[0], Char):
+						indent = max(indent, 1)
 					else:
-						self.w.addstr(y, indent, name)
+						indent = max(indent, len(l[0]))
+			indent += 1 #leave room between words
+		return indent
 
-		#ui
-		while decisions[i] is None:
-			i += 1
+	def _print_selection_word(self, y, x, word, reverse=False):
+		r = color["reverse"] if reverse else color["normal"]
+		if isinstance(word, Char):
+			self.w.addstr(y, x, word.symbol, word.color | r)
+		else:
+			self.w.addstr(y, x, str(word), r)
+
+	def _print_selection_line(self, y, line, indent, reverse=False):
+		if not isinstance(line, str):
+			l = len(line[0])
+			self._print_selection_word(y, 0, line[0], reverse)
+			self._print_selection_word(y, l, " "*(indent-l), reverse)
+			self._print_selection_word(y, indent, line[1], reverse)
+		else:
+			self._print_selection_word(y, 0, line, reverse)
+
+	def _print_selection(self, rows, indent):
+		for y, line in enumerate(rows):
+			self._print_selection_line(y, line, indent)
+
+	def _print_select_getch(self, y, line, indent):
+		self._print_selection_line(y, line, indent, True)
+		c = self.w.getch()
+		self._print_selection_line(y, line, indent, False)
+		return c
+
+	def _roll_i(self, i, n, d, a=0):
+		i += a
+		if i >= len(n):
+			i = 0
+		elif i < 0:
+			i = len(n)-1
+
+		s = a if a else 1
+		while d[i] is None:
+			i += s
 			if i >= len(n):
 				i = 0
-		while True:
-			self.w.addstr(i, 0, n[i], color["reverse"])
-			self._print_selection_values(i, indent, n, v)
-			c = self.w.getch()
-			self._print_selection_values(i, indent, n, v, False)
-			self.w.addstr(i, 0, n[i])
+			elif i < 0:
+				i = len(n)-1
+		return i
 
+	def get_selection(self, print_lines, decisions, keys=(), i=0):
+		curses.curs_set(0)
+		self.clear()
+
+		n = print_lines
+		d = decisions
+		indent = self._get_indentation_level(n)
+
+		self._print_selection(n, indent)
+
+		#ui
+		i = self._roll_i(i, n, d)
+		while True:
+			c = self._print_select_getch(i, n[i], indent)
 			if c in keys:
 				return keys[c]
-			elif c == curses.KEY_DOWN:
-				i += 1
-				if i >= len(n):
-					i -= len(n)
-				while decisions[i] is None:
-					i+= 1
-					if i >= len(n):
-						i -= len(n)
-			elif c == curses.KEY_UP:
-				i -= 1
-				if i < 0:
-					i += len(n)
-				while decisions[i] is None:
-					i -= 1
-					if i < 0:
-						i += len(n)
+			elif c in (curses.KEY_DOWN, ord('j')):
+				i = self._roll_i(i, n, d, 1)
+			elif c in (curses.KEY_UP, ord('k')):
+				i = self._roll_i(i, n, d, -1)
 			elif c == ord('\n') or c == ord('>'):
 				curses.curs_set(1)
 				return decisions[i]

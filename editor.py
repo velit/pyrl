@@ -70,9 +70,6 @@ class Editor(object):
 		return True
 
 	def back(self):
-		return False
-
-	def true(self):
 		return True
 
 	def exit(self):
@@ -101,9 +98,11 @@ class Editor(object):
 		d = (self.tile_editor, self.level_editor, self.save, self.load,
 				self.export, self.exit)
 		k = {ord('Q'): self.exit}
-		while io.a.get_selection(n, d, keys=k)():
-			pass
-
+		i = 0
+		while True:
+			s = io.a.get_selection(n, d, k, i)
+			i = d.index(s)
+			s()
 
 	def tile_editor(self):
 		n = ("Make a new tile", "Edit tiles", "Delete tiles", "",
@@ -111,16 +110,17 @@ class Editor(object):
 		d = (self.new_tile, self.pick_tile, self.delete_tile, None,
 					self.back, self.exit)
 		k = {ord('<'): self.back, ord('Q'): self.exit}
-		while io.a.get_selection(n, d, keys=k)():
-			pass
-
-		return True
+		i = 0
+		while True:
+			s = io.a.get_selection(n, d, k, i)
+			i = d.index(s)
+			if s():
+				return
 
 	def new_tile(self):
 		handle = io.a.getstr("Tile handle")
 		self.data.tiles[handle] = Tile("name", '@', '@', False, False, False )
 		self.modified = True
-		return True
 
 	def level_editor(self):
 		n = ("Make a new level", "Edit levels", "Delete levels",
@@ -128,56 +128,52 @@ class Editor(object):
 		d = (self.new_level, self.pick_level, self.delete_level,
 					None, self.back, self.exit)
 		k = {ord('<'): self.back, ord('Q'): self.exit}
-		while io.a.get_selection(n, d, keys=k)():
-			pass
-		return True
+		i = 0
+		while True:
+			s = io.a.get_selection(n, d, k, i)
+			i = d.index(s)
+			if s():
+				return
 
 	def new_level(self):
 		handle = io.a.getstr("Level handle")
 		self.data.levels[handle] = Level()
 		self.modified = True
-		return True
 
 	def pick_tile(self):
 		i = 0
 		while True:
 			n = ["Pick a tile to edit", ""]
-			v = [None, None]
 			d = [None, None]
 			k = {}
 			for key, value in sorted(self.data.tiles.iteritems()):
-				n.append(key)
-				v.append(value.visible_ch)
+				n.append((key, value.visible_ch))
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, v, k, i)
+			s = io.a.get_selection(n, d, k, i)
 			if s == 1:
-				break
+				return
 			elif s == 2:
 				self.exit()
 			else:
 				i = d.index(s)
 				self.edit_tile(s)
 
-		return True
-
 	def delete_tile(self):
 		i = 0
 		while True:
 			n = ["Pick a tile to delete", ""]
-			v = [None, None]
 			d = [None, None]
 			k = {}
 			for key, value in sorted(self.data.tiles.iteritems()):
-				n.append(key)
-				v.append(value.visible_ch)
+				n.append((key, value.visible_ch))
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, v, k, i)
+			s = io.a.get_selection(n, d, k, i)
 			if s == 1:
-				break
+				return
 			elif s == 2:
 				self.exit()
 			else:
@@ -185,10 +181,8 @@ class Editor(object):
 				c = io.a.getch_from_list(str="Are you sure you wish to delete"
 							" this tile? [y/N]: ")
 				if c in YES:
-					del self.data.tiles[n[d.index(s)]]
+					del self.data.tiles[n[d.index(s)][0]]
 					self.modified = True
-
-		return True
 
 	def edit_tile(self, tile):
 		i = 0
@@ -200,16 +194,12 @@ class Editor(object):
 			a = sorted(vars(tile))
 			for key in a:
 				value = getattr(tile, key)
-				n.append(key)
-				if isinstance(value, Char):
-					v.append(value)
-				else:
-					v.append(str(value))
+				n.append((key, value))
 				d.append((key, value))
 
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, v, k, i)
+			s = io.a.get_selection(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
@@ -231,24 +221,25 @@ class Editor(object):
 							s[0])
 
 	def pick_level(self):
+		i = 0
 		while True:
 			n = ["Pick a level to edit", ""]
 			d = [None, None]
 			k = {}
-			for key, value in self.data.levels.iteritems():
+			a = sorted(self.data.levels.iteritems())
+			for key, value in a:
 				n.append(key)
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, none, k, i)
+			s = io.a.get_selection(n, d, k, i)
 			if s == 1:
-				break
+				return
 			elif s == 2:
 				self.exit()
-			elif not self.edit_level(s):
-				break
-
-		return True
+			else:
+				i = d.index(s)
+				self.edit_level(s)
 
 	def delete_level(self):
 		i = 0
@@ -261,9 +252,9 @@ class Editor(object):
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, None, k, i)
+			s = io.a.get_selection(n, d, k, i)
 			if s == 1:
-				break
+				return
 			elif s == 2:
 				self.exit()
 			else:
@@ -273,8 +264,6 @@ class Editor(object):
 				if c in YES:
 					del self.data.levels[n[d.index(s)]]
 					self.modified = True
-
-		return True
 
 	def edit_level(self, l):
 		io.drawmap(l)
@@ -309,8 +298,8 @@ class Editor(object):
 				self.exit()
 			elif ch == ord('S'):
 				self.save()
-			elif ch == ord('<'):
-				return True
+			elif ch == ord('B'):
+				return
 			elif ch == ord('\n'):
 				a = l.getsquare(c.y, c.x)
 				a.tile = t
