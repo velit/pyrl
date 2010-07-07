@@ -93,15 +93,15 @@ class Editor(object):
 		return True
 
 	def ui(self):
-		n = ("Tile editor", "Level editor", "Save data", "Load data",
+		l = ("Tile editor", "Level editor", "Save data", "Load data",
 					"Export data", "Exit [Q]")
-		d = (self.tile_editor, self.level_editor, self.save, self.load,
+		r = (self.tile_editor, self.level_editor, self.save, self.load,
 				self.export, self.exit)
 		k = {ord('Q'): self.exit}
 		i = 0
 		while True:
-			s = io.a.get_selection(n, d, k, i)
-			i = d.index(s)
+			s = io.a.draw_menu(l, r, k, i)
+			i = r.index(s)
 			s()
 
 	def tile_editor(self):
@@ -112,7 +112,7 @@ class Editor(object):
 		k = {ord('<'): self.back, ord('Q'): self.exit}
 		i = 0
 		while True:
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			i = d.index(s)
 			if s():
 				return
@@ -130,7 +130,7 @@ class Editor(object):
 		k = {ord('<'): self.back, ord('Q'): self.exit}
 		i = 0
 		while True:
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			i = d.index(s)
 			if s():
 				return
@@ -151,7 +151,7 @@ class Editor(object):
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
@@ -171,7 +171,7 @@ class Editor(object):
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
@@ -199,7 +199,7 @@ class Editor(object):
 
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
@@ -232,7 +232,7 @@ class Editor(object):
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
@@ -252,7 +252,7 @@ class Editor(object):
 				d.append(value)
 			add_ebe(n, d, k)
 
-			s = io.a.get_selection(n, d, k, i)
+			s = io.a.draw_menu(n, d, k, i)
 			if s == 1:
 				return
 			elif s == 2:
