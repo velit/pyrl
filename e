@@ -13,6 +13,6 @@ def main(w):
 	tile.tiles = load(f)
 	f.close()
 	from editor import Editor
-	Editor().ui()
+	Editor()
 
 wrapper(main)

@@ -30,6 +30,9 @@ class IO(object):
 	def drawmemory(self, level):
 		self.l.drawmemory(level)
 
+	def drawmenu(self, words, returns):
+		return self.m.draw_h_menu(words, returns)
+
 	def drawlos(self, visibility, level, reverse=False):
 		self.l.drawlos(visibility, level, reverse)
 
