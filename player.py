@@ -57,6 +57,7 @@ class Player(Creature):
 		a[ord('\x12')] = "redraw",
 
 		a[ord('H')] = "los_highlight",
+		a[ord('d')] = "debug",
 
 		a[ord('+')] = "change_sight_range", 1
 		a[ord('-')] = "change_sight_range", -1
@@ -140,6 +141,9 @@ class Player(Creature):
 					io.msg("Undefined command: '"+c+"'")
 				else:
 					io.msg("Undefined command key: "+str(c))
+
+	def debug(self):
+		io.msg(io.drawmenu(("Lol", "Test", "Lol"), (1, 2, 3)))
 
 	def path(self):
 		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))

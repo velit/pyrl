@@ -7,14 +7,10 @@ def draw(io, lines, returns, keys=(), start_line=0):
 	_print_menu(io, lines, indent)
 	return _update_ui(io, lines, returns, keys, start_line, indent)
 
-def draw_horizontal(io, lines, returns, keys=(), start_line=0):
-	_print_horizontal(io, lines)
-	return _update_ui(io, lines, returns, keys, start_line, 0, True)
-
-def _update_ui(io, l, r, k, sl, i, h=False):
+def _update_ui(io, l, r, k, sl, i):
 	sl = _roll_sl(sl, l, r)
 	while True:
-		c = _hilight_and_getch(io, sl, l, i, h)
+		c = _hilight_and_getch(io, sl, l, i)
 		if c in k:
 			curses.curs_set(1)
 			return k[c]
@@ -46,22 +42,6 @@ def _print_menu(io, l, i):
 	for y, line in enumerate(l):
 		_print_menu_line(io, y, i, l)
 
-def _print_horizontal(io, l):
-	curses.curs_set(0)
-	io.clear()
-	i = 0
-	for line in l:
-		io.w.addstr(0, i, line)
-		i += len(line) + 1
-		pass
-
-def _print_horizontal_word(io, sl, i, l, r):
-	r = color["reverse"] if r else color["normal"]
-	i = 0
-	for x in l[:sl]:
-		i += len(x) + 1
-	io.w.addstr(0, i, l[sl], r)
-
 def _print_menu_line(io, sl, i, l, reverse=False):
 	r = color["reverse"] if reverse else color["normal"]
 	if not isinstance(l[sl], str):
@@ -78,11 +58,10 @@ def _print_menu_word(io, y, x, word, r):
 	else:
 		io.w.addstr(y, x, str(word), r)
 
-def _hilight_and_getch(io, sl, l, i, h):
-	p = _print_menu_line if not h else _print_horizontal_word
-	p(io, sl, i, l, True)
+def _hilight_and_getch(io, sl, l, i):
+	_print_menu_line(io, sl, i, l, True)
 	c = io.w.getch()
-	p(io, sl, i, l, False)
+	_print_menu_line(io, sl, i, l, False)
 	return c
 
 def _roll_sl(sl, l, r, add=0):
