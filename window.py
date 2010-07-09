@@ -1,6 +1,6 @@
 import curses
 import menu
-import h_menu
+import menu_h
 
 from char import Char
 from colors import color
@@ -103,4 +103,4 @@ class Window(object):
 		return menu.draw(self, lines, returns, keys, i)
 
 	def draw_h_menu(self, words, returns):
-		return h_menu.draw(self, words, returns)
+		return menu_h.draw(self, words, returns)

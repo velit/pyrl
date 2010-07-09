@@ -2,9 +2,9 @@ import curses
 import _curses
 
 from colors import color
-from message import MessageBar
-from status import StatusBar
-from level_window import LevelWindow
+from w_message import MessageBar
+from w_status import StatusBar
+from w_level import LevelWindow
 from window import Window
 from char import Char
 from constants import YES, NO, DEFAULT

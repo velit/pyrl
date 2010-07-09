@@ -21,9 +21,9 @@ def _update_ui(io, w, r):
 	sw = _roll_sw(sw, w, r)
 	while True:
 		c = _hilight_and_getch(io, sw, w)
-		if c in (curses.KEY_RIGHT, ord('j')):
+		if c in (curses.KEY_RIGHT, ord('l')):
 			sw = _roll_sw(sw, w, r, 1)
-		elif c in (curses.KEY_LEFT, ord('k')):
+		elif c in (curses.KEY_LEFT, ord('h')):
 			sw = _roll_sw(sw, w, r, -1)
 		elif c == ord('\n') or c == ord('>'):
 			curses.curs_set(1)
