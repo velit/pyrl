@@ -7,10 +7,18 @@ class StatusBar(Window):
 		Window.__init__(self, window)
 		self.io = io
 		self.lines, self.width = self.w.getmaxyx()
-		self.elements = []
+		self.elements = {}
+		self.addcount = 0
 
-	def register(self, string, value):
-		self.elements.append((string, value))
+	def add_element(self, handle, string, value):
+		self.elements[handle] = self.addcount, string, value
+		self.addcount += 1
+
+	def set_element(self, handle, string, value):
+		self.elements[handle] = self.elements[handle][0], string, value
+
+	def del_element(self, handle):
+		del self.elements[handle]
 
 	def update(self):
 		self.clear()
@@ -18,5 +26,5 @@ class StatusBar(Window):
 		Window.update(self)
 
 	def print_elements(self):
-		for name, value in self.elements:
-			self.w.addstr(name + str(value()) + " ")
+		for priority, string, value in sorted(self.elements.values()):
+			self.w.addstr(string + str(value()) + " ")

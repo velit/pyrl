@@ -22,6 +22,9 @@ class Square(object):
 		def __setstate__(self, state):
 			self.y, self.x, self.tile, self.creature, self.memory_tile = state
 
+	def getloc(self):
+		return self.y, self.x
+
 	#returns true if the square is passable by creatures
 	def passable(self):
 		if self.creature:

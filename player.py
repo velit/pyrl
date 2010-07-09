@@ -27,14 +27,19 @@ class Player(Creature):
 		self.def_actions()
 
 	def register_status_texts(self):
-		io.s.register("HP: ", lambda: self.hp)
-		io.s.register("sight: ", lambda: self.sight)
+		io.s.add_element("hp", "HP: ", lambda: self.hp)
+		io.s.add_element("sight", "sight: ", lambda: self.sight)
 
 	def def_actions(self):
 		a = {}
 
-		a[ord('>')] = "descend",
-		a[ord('<')] = "ascend",
+		a[curses.KEY_DOWN] = "move", S
+		a[curses.KEY_LEFT] = "move", W
+		a[curses.KEY_RIGHT] = "move", E
+		a[curses.KEY_UP] = "move", N
+		a[ord('+')] = "change_sight_range", 1
+		a[ord('-')] = "change_sight_range", -1
+		a[ord('.')] = "move", STOP
 		a[ord('1')] = "move", SW
 		a[ord('2')] = "move", S
 		a[ord('3')] = "move", SE
@@ -44,23 +49,16 @@ class Player(Creature):
 		a[ord('7')] = "move", NW
 		a[ord('8')] = "move", N
 		a[ord('9')] = "move", NE
-		a[ord('.')] = "move", STOP
-		a[curses.KEY_UP] = "move", N
-		a[curses.KEY_DOWN] = "move", S
-		a[curses.KEY_LEFT] = "move", W
-		a[curses.KEY_RIGHT] = "move", E
-
+		a[ord('<')] = "ascend",
+		a[ord('>')] = "descend",
+		a[ord('H')] = "los_highlight",
+		a[ord('L')] = "loadgame",
 		a[ord('Q')] = "endgame",
 		a[ord('S')] = "savegame",
-		a[ord('L')] = "loadgame",
-		a[ord('p')] = "path",
 		a[ord('\x12')] = "redraw",
-
-		a[ord('H')] = "los_highlight",
 		a[ord('d')] = "debug",
-
-		a[ord('+')] = "change_sight_range", 1
-		a[ord('-')] = "change_sight_range", -1
+		a[ord('p')] = "path",
+		a[ord('k')] = "killall",
 
 		self.actions = a
 
@@ -143,7 +141,9 @@ class Player(Creature):
 					io.msg("Undefined command key: "+str(c))
 
 	def debug(self):
-		io.msg(io.drawmenu(("Lol", "Test", "Lol"), (1, 2, 3)))
+		io.msg((self.square.getloc(), self.l.squares["ds"].getloc()))
+		io.l.drawline(self.square, self.l.squares["ds"])
+		self.redraw()
 
 	def path(self):
 		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))
@@ -172,6 +172,7 @@ class Player(Creature):
 		self.redraw()
 
 	def redraw(self):
-		self.visibility.clear()
 		self.g.redraw()
-		self.update_los()
+
+	def killall(self):
+		self.l.killall()

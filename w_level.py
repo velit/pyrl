@@ -1,6 +1,7 @@
 import curses
 from window import Window
 from colors import color
+from bresenham import bresenham
 
 class LevelWindow(Window):
 	"""Handles the level display"""
@@ -72,37 +73,15 @@ class LevelWindow(Window):
 		except curses.error:
 			pass
 
-	def drawline(self, startSquare, targetsquare, char=None):
+	def drawline(self, s0, s1, char=None):
+		y0, x0 = s0.getloc()
+		y1, x1 = s1.getloc()
 		if char is None:
 			symbol = '*'
 			color_ = color["yellow"]
 		else:
 			symbol = char.symbol
 			color_ = char.color
-		x0, y0 = startSquare.y, startSquare.x
-		x1, y1 = targetsquare.y, targetsquare.x
-		steep = abs(y1 - y0) > abs(x1 - x0)
-		if steep:
-			x0, y0 = y0, x0
-			x1, y1 = y1, x1
-		if x0 > x1:
-			x0, x1 = x1, x0
-			y0, y1 = y1, y0
-		deltax = x1 - x0
-		deltay = abs(y1 - y0)
-		error = deltax / 2
-		ystep = None
-		y = y0
-		if y0 < y1:
-			ystep = 1
-		else:
-			ystep = -1
-		for x in range(x0, x1):
-			if steep:
-				self.w.addch(y, x, symbol, color_)
-			else:
-				self.w.addch(x, y, symbol, color_)
-			error -= deltay
-			if error < 0:
-				y += ystep
-				error += deltax
+		for y, x in bresenham(y0, x0, y1, x1):
+			self.w.addch(y, x, symbol, color_)
+		self.io.getch(y1, x1)
