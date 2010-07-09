@@ -254,6 +254,7 @@ class Editor(object):
 					self.modified = True
 
 	def edit_level(self, l):
+		self.modified = True
 		io.drawmap(l)
 		t = tiles["f"]
 		y, x = 0, 0
@@ -292,15 +293,12 @@ class Editor(object):
 				a = l.getsquare(y, x)
 				a.tile = t
 				io.l.drawchar(y, x, a.get_visible_char())
-			elif ch == ord('d'):
-				io.drawmenu(("test",), (1,))
-			elif ch == ord('f'):
-				t = tiles["f"]
-			elif ch == ord('w'):
-				t = tiles["w"]
-			elif ch == ord('<'):
-				t = tiles["us"]
-			elif ch == ord('>'):
-				t = tiles["ds"]
-			elif ch == ord('r'):
-				t = tiles["r"]
+			elif ch == ord('t'):
+				w = ["Pick a tile: "]
+				r = [None]
+				a = sorted(tiles.iteritems())
+				for key, value in a:
+					w.append(key)
+					r.append(value)
+				t = io.drawmenu(w, r)
+
