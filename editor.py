@@ -4,6 +4,7 @@ import shutil
 
 from os import path
 from io import io
+from edit_level import EditLevel
 from colors import color
 from tile import Tile, tiles
 from char import Char
@@ -17,7 +18,7 @@ def add_ebe(l, r, k):
 	k[ord('<')] = 1
 	k[ord('Q')] = 2
 
-class Editor(object):
+class Editor(EditLevel):
 	def __init__(self):
 		self.tiles = {}
 		self.levels = {}
@@ -252,53 +253,3 @@ class Editor(object):
 				if c in YES:
 					del self.levels[l[r.index(s)]]
 					self.modified = True
-
-	def edit_level(self, l):
-		self.modified = True
-		io.drawmap(l)
-		t = tiles["f"]
-		y, x = 0, 0
-		my, mx = l.rows, l.cols
-		moves = map(ord, ('1', '2', '3', '4', '5', '6', '7', '8', '9'))
-		moves.append(curses.KEY_UP)
-		moves.append(curses.KEY_DOWN)
-		moves.append(curses.KEY_LEFT)
-		moves.append(curses.KEY_RIGHT)
-		while True:
-			ch = io.getch(y, x)
-			if ch in moves:
-				if ch in (ord('1'), ord('2'), ord('3'), curses.KEY_DOWN):
-					y += 1
-				if ch in (ord('1'), ord('4'), ord('7'), curses.KEY_LEFT):
-					x -= 1
-				if ch in (ord('9'), ord('8'), ord('7'), curses.KEY_UP):
-					y -= 1
-				if ch in (ord('9'), ord('6'), ord('3'), curses.KEY_RIGHT):
-					x += 1
-				if y < 0:
-					y += my
-				if x < 0:
-					x += mx
-				if y >= my:
-					y -= my
-				if x >= mx:
-					x -= mx
-			elif ch == ord('Q'):
-				self.exit()
-			elif ch == ord('S'):
-				self.save()
-			elif ch == ord('B'):
-				return
-			elif ch == ord('\n'):
-				a = l.getsquare(y, x)
-				a.tile = t
-				io.l.drawchar(y, x, a.get_visible_char())
-			elif ch == ord('t'):
-				w = ["Pick a tile: "]
-				r = [None]
-				a = sorted(tiles.iteritems())
-				for key, value in a:
-					w.append(key)
-					r.append(value)
-				t = io.drawmenu(w, r)
-

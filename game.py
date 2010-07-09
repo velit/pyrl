@@ -73,4 +73,6 @@ class Game(object):
 			self.main.load()
 
 	def redraw(self):
+		self.p.visibility.clear()
 		self.p.l.drawmemory()
+		self.p.update_los()

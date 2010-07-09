@@ -7,7 +7,7 @@ from io import io
 from rdg import generateLevel, init_map
 
 class Level(object):
-	def __init__(self, game=None, id=None, generate=True):
+	def __init__(self, game=None, id=None, player=None, generate=True):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
@@ -67,8 +67,15 @@ class Level(object):
 		creature.square = square
 
 	def removecreature(self, creature):
+		self.g.p.visi_mod.add(creature.square)
 		creature.square.creature = None
 		self.creatures.remove(creature)
+
+	def killall(self):
+		while len(self.creatures) != 1:
+			c = self.creatures.pop()
+			self.g.p.visi_mod.add(c.square)
+			c.square.creature = None
 
 	def neighbor_nodes(self, y, x):
 		for j in range(y-1, y+2):
