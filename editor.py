@@ -18,7 +18,7 @@ def add_ebe(l, r, k):
 	k[ord('<')] = 1
 	k[ord('Q')] = 2
 
-class Editor(EditLevel):
+class Editor(object):
 	def __init__(self):
 		self.tiles = {}
 		self.levels = {}
@@ -228,7 +228,7 @@ class Editor(EditLevel):
 				self.exit()
 			else:
 				i = r.index(s)
-				self.edit_level(s)
+				EditLevel(self, s)
 
 	def delete_level(self):
 		i = 0

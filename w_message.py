@@ -20,8 +20,7 @@ class MessageBar(Window):
 
 	def update(self):
 		self.print_queue()
-		#Window.update(self)
-		self.w.noutrefresh()
+		Window.update(self)
 
 	def queue_msg(self, str):
 		self.msgqueue += str+" "

@@ -140,7 +140,7 @@ class Creature(object):
 	def has_range(self, square):
 		sy, sx = self.getloc()
 		py, px = square.y, square.x
-		return (sy - py) ** 2 + (sx - px) ** 2 <= (self.sight) ** 2
+		return (sy-py)*(sy-py) + (sx-px)*(sx-px) <= self.sight*self.sight
 
 	def has_los(self, square):
 		return self.has_range(square) and \
