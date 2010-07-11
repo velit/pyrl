@@ -18,13 +18,8 @@ class Window(object):
 	def update(self):
 		self.w.noutrefresh()
 
-	def getch(self, y=None, x=None, str=None):
-		if str:
-			self.clear_and_print(str)
-		if y is None and x is None:
-			return self.w.getch()
-		else:
-			return self.w.getch(y, x)
+	def getch(self, *args, **keys):
+		return self.w.getch(*args, **keys)
 
 	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
 		if str:
@@ -93,11 +88,8 @@ class Window(object):
 		self.update()
 		curses.doupdate()
 
-	def addstr(self, str):
-		self.w.addstr(str)
-
-	def _getch(self):
-		return self.w.getch()
+	def addstr(self, *args, **keys):
+		self.w.addstr(*args, **keys)
 
 	def draw_menu(self, lines, returns, keys=(), i=0):
 		return menu.draw(self, lines, returns, keys, i)

@@ -33,17 +33,17 @@ class IO(object):
 	def drawmenu(self, words, returns):
 		return self.m.draw_h_menu(words, returns)
 
-	def drawlos(self, visibility, level, reverse=False):
-		self.l.drawlos(visibility, level, reverse)
+	def drawlos(self, visibility, level, *reverse):
+		self.l.drawlos(visibility, level, *reverse)
 
 	def clearlos(self, visibility, level):
 		self.l.clearlos(visibility, level)
 
-	def drawline(self, startSquare, targetsquare, char=None):
-		self.l.drawline(self, startSquare, targetsquare, char=None)
+	def drawline(self, startSquare, targetsquare, *char):
+		self.l.drawline(self, startSquare, targetsquare, *char)
 
-	def getstr(self, str):
-		self.m.getstr(str)
+	def getstr(self, *str):
+		self.m.getstr(*str)
 
 	def msg(self, string):
 		self.m.queue_msg(str(string))
@@ -64,18 +64,15 @@ class IO(object):
 			color_ = color["blue"]
 		self.l.drawblock(square, color_)
 
-	def getch(self, y=None, x=None):
+	def getch(self, *args, **keys):
 		self.refresh()
-		if y is not None and x is not None:
-			return self.l.getch(y,x)
-		else:
-			return self.l.getch()
+		return self.l.getch(*args, **keys)
 
 	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
-		if str:
+		if str is not None:
 			self.msg(str)
 		self.refresh()
-		return self.l.getch_from_list()
+		return self.l.getch_from_list(list)
 
 	def drawpath(self, iterator):
 		curses.curs_set(0)

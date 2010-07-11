@@ -30,27 +30,22 @@ class LevelWindow(Window):
 			except curses.error:
 				pass
 
-	def drawchar(self, y, x, ch):
-		self.w.addch(y,x, ch.symbol, ch.color)
+	def drawsquare(self, s):
+		try:
+			self.w.addch(s.y, s.x, s.tile.visible_ch.symbol,
+						s.tile.visible_ch.color)
+		except curses.error:
+			pass
 
-	def drawlos(self, visibility, l, reverse=False):
+	def drawlos(self, visibility, l, reverse=None):
 		if reverse:
-			for s in visibility:
-				try:
-					self.w.addch(s.y, s.x,
-							s.get_visible_char().symbol,
-							s.get_visible_char().color
-							| color["reverse"])
-				except curses.error:
-					pass
-		else:
-			for s in visibility:
-				try:
-					self.w.addch(s.y, s.x,
-							s.get_visible_char().symbol,
-							s.get_visible_char().color)
-				except curses.error:
-					pass
+			reverse = color["reverse"]
+		for s in visibility:
+			try:
+				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
+						s.get_visible_char().color | reverse)
+			except curses.error:
+				pass
 
 	def clearlos(self, old_visibility, l):
 		for s in old_visibility:

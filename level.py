@@ -1,6 +1,7 @@
 import random
 import path
 
+from bresenham import bresenham
 from monster import Monster
 from tile import tiles
 from io import io
@@ -72,10 +73,12 @@ class Level(object):
 		self.creatures.remove(creature)
 
 	def killall(self):
-		while len(self.creatures) != 1:
+		self.creatures.remove(self.g.p)
+		while self.creatures:
 			c = self.creatures.pop()
 			self.g.p.visi_mod.add(c.square)
 			c.square.creature = None
+		self.creatures.append(self.g.p)
 
 	def neighbor_nodes(self, y, x):
 		for j in range(y-1, y+2):
@@ -129,34 +132,7 @@ class Level(object):
 		return cre
 
 	def check_los(self, startSquare, targetsquare):
-		x0, y0 = startSquare.y, startSquare.x
-		x1, y1 = targetsquare.y, targetsquare.x
-		steep = abs(y1 - y0) > abs(x1 - x0)
-		if steep:
-			x0, y0 = y0, x0
-			x1, y1 = y1, x1
-		if x0 > x1:
-			x0, x1 = x1, x0
-			y0, y1 = y1, y0
-		deltax = x1 - x0
-		deltay = abs(y1 - y0)
-		error = deltax / 2
-		ystep = None
-		y = y0
-		if y0 < y1:
-			ystep = 1
-		else:
-			ystep = -1
-		for x in range(x0, x1):
-			if steep:
-				if not self.getsquare(y, x).see_through():
-					return False
-			else:
-				if not self.getsquare(x, y).see_through():
-					return False
-			error -= deltay
-			if error < 0:
-				y += ystep
-				error += deltax
-		else:
-			return True
+		y0, x0 = startSquare.y, startSquare.x
+		y1, x1 = targetsquare.y, targetsquare.x
+		g=self.getsquare
+		return all(g(y,x).see_through() for y, x in bresenham(y0, x0, y1, x1))
