@@ -66,27 +66,47 @@ class Editor(object):
 		if self.modified:
 			c = io.a.getch_from_list(str="The data has been modified;"
 						" save before exit? [y/N] ")
-			if c in (ord("y"), ord("Y")):
+			if c in YES:
 				self.save(ask=False)
 		exit()
 
 	def export(self):
+		if self.modified:
+			c = io.a.getch_from__list(str="Data has been modified;"
+						" save before exporting editor data? [y/N] ")
+			if c in YES:
+				self.save(ask=False)
+
 		c = io.a.getch_from_list(str="Are you sure you wish to export"
 						" all data to pyrl? [y/N] ")
-		if c in (ord('y'), ord('Y')):
+		if c in YES:
 			t = path.join("editor_data", "tiles")
 			l = path.join("editor_data", "levels")
-			r = path.join("data")
+			d = path.join("data")
 			shutil.copy(t, d)
 			shutil.copy(l, d)
 
 		return True
 
+	def import_data(self):
+		c = io.a.getch_from_list(str="Are you sure you wish"
+					" to import game data? [y/N] ")
+		if c not in YES:
+			return
+
+		with open(path.join("data", "tiles"), "r") as f:
+			self.tiles = pickle.load(f)
+
+		with open(path.join("data", "levels"), "r") as f:
+			self.levels = pickle.load(f)
+
+		self.modified = True
+
 	def main_menu(self):
 		l = ("Tile editor", "Level editor", "Save data", "Load data",
-					"Export data", "Exit [Q]")
+					"Export data", "Import data", "Exit [Q]")
 		r = (self.tile_editor, self.level_editor, self.save, self.load,
-				self.export, self.exit)
+				self.export, self.import_data, self.exit)
 		k = {ord('Q'): self.exit}
 		i = 0
 		while True:
@@ -95,10 +115,10 @@ class Editor(object):
 			s()
 
 	def tile_editor(self):
-		l = ("Make a new tile", "Edit tiles", "Delete tiles", "",
-					"Back [<]", "Exit [Q]")
-		r = (self.new_tile, self.pick_tile, self.delete_tile, None,
-					self.back, self.exit)
+		l = ("Make a new tile", "Edit tiles", "Delete tiles", "Update tiles",
+				"", "Back [<]", "Exit [Q]")
+		r = (self.new_tile, self.pick_tile, self.delete_tile, self.update_tile,
+					None, self.back, self.exit)
 		k = {ord('<'): self.back, ord('Q'): self.exit}
 		i = 0
 		while True:
@@ -122,18 +142,24 @@ class Editor(object):
 
 	def new_tile(self):
 		handle = io.a.getstr("Tile handle")
-		self.tiles[handle] = Tile("name", '@', '@', False, False, False )
+		self.tiles[handle] = Tile()
 		self.modified = True
 
-	def pick_tile(self):
+	def _pick_dict(self, dict, str, give_key=False, level=False):
 		i = 0
 		while True:
-			l = ["Pick a tile to edit", ""]
+			l = ["Pick a "+str, ""]
 			r = [None, None]
 			k = {}
-			for key, value in sorted(self.tiles.iteritems()):
-				l.append((key, value.visible_ch))
-				r.append(value)
+			for key, value in sorted(dict.iteritems()):
+				if level:
+					l.append(key)
+				else:
+					l.append((key, value.ch_visible))
+				if give_key:
+					r.append(key)
+				else:
+					r.append(value)
 			add_ebe(l, r, k)
 
 			s = io.a.draw_menu(l, r, k, i)
@@ -143,31 +169,37 @@ class Editor(object):
 				self.exit()
 			else:
 				i = r.index(s)
-				self.edit_tile(s)
+				yield s
+
+	def pick_tile(self):
+		for s in self._pick_dict(self.tiles, "tile to edit"):
+			self.edit_tile(s)
 
 	def delete_tile(self):
-		i = 0
-		while True:
-			l = ["Pick a tile to delete", ""]
-			r = [None, None]
-			k = {}
-			for key, value in sorted(self.tiles.iteritems()):
-				l.append((key, value.visible_ch))
-				r.append(value)
-			add_ebe(l, r, k)
+		for s in self._pick_dict(self.tiles, "tile to delete", True):
+			c = io.a.getch_from_list(str="Are you sure you wish to delete"
+						" this tile? [y/N]: ")
+			if c in YES:
+				del self.tiles[s]
+				self.modified = True
 
-			s = io.a.draw_menu(l, r, k, i)
-			if s == 1:
-				return
-			elif s == 2:
-				self.exit()
-			else:
-				i = r.index(s)
-				c = io.a.getch_from_list(str="Are you sure you wish to delete"
-							" this tile? [y/N]: ")
-				if c in YES:
-					del self.tiles[l[r.index(s)][0]]
-					self.modified = True
+	def update_tile(self):
+		c = io.a.getch_from_list(str="Are you sure you wish to update"
+					" all the tiles? [y/N]: ")
+		if c in YES:
+			for tile in self.tiles:
+				d = []
+				u = Tile()
+				dict_tile = vars(self.tiles[tile])
+				dict_u = vars(u)
+				for i in dict_tile:
+					if i not in dict_u:
+						d.append(i)
+				dict_u.update(dict_tile)
+				for j in d:
+					del dict_u[j]
+				self.tiles[tile] = u
+				self.modified = True
 
 	def edit_tile(self, tile):
 		i = 0
@@ -210,46 +242,13 @@ class Editor(object):
 		self.modified = True
 
 	def pick_level(self):
-		i = 0
-		while True:
-			l = ["Pick a level to edit", ""]
-			r = [None, None]
-			k = {}
-			a = sorted(self.levels.iteritems())
-			for key, value in a:
-				l.append(key)
-				r.append(value)
-			add_ebe(l, r, k)
-
-			s = io.a.draw_menu(l, r, k, i)
-			if s == 1:
-				return
-			elif s == 2:
-				self.exit()
-			else:
-				i = r.index(s)
-				EditLevel(self, s)
+		for s in self._pick_dict(self.levels, "level to edit", False, True):
+			EditLevel(self, s)
 
 	def delete_level(self):
-		i = 0
-		while True:
-			l = ["Pick a level to delete", ""]
-			r = [None, None]
-			k = {}
-			for key, value in sorted(self.levels.iteritems()):
-				l.append(key)
-				r.append(value)
-			add_ebe(l, r, k)
-
-			s = io.a.draw_menu(l, r, k, i)
-			if s == 1:
-				return
-			elif s == 2:
-				self.exit()
-			else:
-				i = r.index(s)
-				c = io.a.getch_from_list(str="Are you sure you want to delete"
-							" this level? [y/N]: ")
-				if c in YES:
-					del self.levels[l[r.index(s)]]
-					self.modified = True
+		for s in self._pick_dict(self.levels, "level to delete", True):
+			c = io.a.getch_from_list(str="Are you sure you want to delete"
+						" this level? [y/N]: ")
+			if c in YES:
+				del self.levels[s]
+				self.modified = True

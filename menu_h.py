@@ -11,8 +11,18 @@ def _print_menu(io, w):
 	io.clear()
 	i = 0
 	for word in w:
-		io.w.addstr(0, i, word)
-		i += len(word) + 1
+		if isinstance(word, Char):
+			s = word.symbol
+			col = word.color
+			i += 4
+		else:
+			s = str(word)
+			col = color["normal"]
+			i += len(word) + 1
+		try:
+			io.w.addstr(0, i, s, col)
+		except curses.error:
+				pass
 		pass
 
 def _update_ui(io, w, r):
@@ -36,11 +46,23 @@ def _hilight_and_getch(io, sw, w):
 	return c
 
 def _print_menu_word(io, sw, w, r):
+	if isinstance(w[sw], Char):
+		s = w[sw].symbol
+		col = w[sw].color
+	else:
+		s = str(w[sw])
+		col = color["normal"]
 	r = color["reverse"] if r else color["normal"]
 	i = 0
 	for x in w[:sw]:
-		i += len(x) + 1
-	io.w.addstr(0, i, w[sw], r)
+		if isinstance(x, Char):
+			i += 2
+		else:
+			i += len(x) + 1
+	try:
+		io.w.addstr(0, i, s, col | r)
+	except curses.error:
+		pass
 
 def _roll_sw(sw, w, r, add=0):
 	sw += add

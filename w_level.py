@@ -32,8 +32,8 @@ class LevelWindow(Window):
 
 	def drawsquare(self, s):
 		try:
-			self.w.addch(s.y, s.x, s.tile.visible_ch.symbol,
-						s.tile.visible_ch.color)
+			self.w.addch(s.y, s.x, s.tile.ch_visible.symbol,
+						s.tile.ch_visible.color)
 		except curses.error:
 			pass
 
