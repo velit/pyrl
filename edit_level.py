@@ -17,7 +17,7 @@ class EditLevel(object):
 		self.funs = (self.point, self.rectangle, self.fill)
 		self.f = self.point
 		self.selected_tile = None
-		io.s.add_element("t", "[T]ile: ", lambda: self.t.visible_ch.symbol)
+		io.s.add_element("t", "[T]ile: ", lambda: self.t.ch_visible.symbol)
 		io.s.add_element("f", "[F]unction: ", lambda: self.f.func_name)
 		self.actions()
 
@@ -74,8 +74,8 @@ class EditLevel(object):
 			elif ch in (ord('t'), ord('T')):
 				w = ["Pick a tile: "]
 				r = [None]
-				for key, value in sorted(tiles.iteritems()):
-					w.append(key)
+				for value in sorted(tiles.values()):
+					w.append(value.ch_visible)
 					r.append(value)
 				self.t = io.drawmenu(w, r)
 			elif ch in (ord('f'), ord('F')):

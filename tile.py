@@ -1,13 +1,17 @@
+from char import Char
+
 class Tile(object):
 	"""The actual floor of a square."""
 
-	def __init__(self, name, visible, mem, passable, destroyable, see_through):
+	def __init__(self, name="name", visible=Char(), mem=Char(), passable=False,
+				destroyable=False, see_through=False, movement_cost=1000):
 		self.name = name
-		self.visible_ch = visible
-		self.memory_ch = mem
+		self.ch_visible = visible
+		self.ch_memory = mem
 		self.passable = passable
 		self.destroyable = destroyable
 		self.see_through = see_through
+		self.movement_cost = movement_cost
 
 #tiles = {
 #	"u": Tile("You have not seen this place yet",

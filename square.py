@@ -48,7 +48,7 @@ class Square(object):
 		if self.creature:
 			return self.creature.ch
 		else:
-			return self.tile.visible_ch
+			return self.tile.ch_visible
 
 	def get_memory_char(self):
-		return self.memory_tile.memory_ch
+		return self.memory_tile.ch_memory
