@@ -1,2 +1,0 @@
-camelcasemotion.vba.gz: call delete('/home/tappi/.vim/autoload/camelcasemotion.vim')|call delete('/home/tappi/.vim/plugin/camelcasemotion.vim')|call delete('/home/tappi/.vim/doc/camelcasemotion.txt')
-camelcasemotion.vba: call delete('/home/tappi/.vim/autoload/camelcasemotion.vim')|call delete('/home/tappi/.vim/plugin/camelcasemotion.vim')|call delete('/home/tappi/.vim/doc/camelcasemotion.txt')
