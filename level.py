@@ -22,6 +22,8 @@ class Level(object):
 				self.addcreature(Monster(self.g, self))
 		else:
 			self.map = init_map(self.rows, self.cols, tiles["f"])
+			for x in range(100):
+				self.addcreature(Monster(self.g, self))
 
 	def getsquare(self, y, x):
 		return self.map[y*self.cols + x]

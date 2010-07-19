@@ -1,6 +1,6 @@
+import colors
 from heapq import heappush, heappop
 from io import io
-from colors import color
 from constants import DEBUG
 
 def path(start, goal, level):
@@ -42,7 +42,7 @@ def _path(start, goal, level):
 			g[n] = g[s] + _dist(n, s)
 			h[n] = _h(n, start, goal)
 			heappush(openprio, (g[n] + h[n], n))
-			if DEBUG and n != goal: io.drawblock(n, color["green"])
+			if DEBUG and n != goal: io.drawblock(n, colors.green)
 			openmember.add(n)
 
 	return came_from

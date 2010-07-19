@@ -3,14 +3,14 @@ import curses
 import cPickle
 
 from os import path
+from constants import STATUS_BAR_SIZE, MSG_BAR_SIZE
 
 class Main(object):
 	def __init__(self, w, load):
 		import io
-		import tile
-		
-		io.io = io.IO(w, 2, 2)
+		io.io = io.IO(w, STATUS_BAR_SIZE, MSG_BAR_SIZE)
 
+		import tile
 		with open(path.join("data", "tiles"), "r") as f:
 			tile.tiles = cPickle.load(f)
 		
@@ -29,10 +29,7 @@ class Main(object):
 			self.game.redraw()
 
 def main(w):
-	if len(sys.argv) == 2 and sys.argv[1] == "-l":
-		load = True
-	else:
-		load = False
+	load = (len(sys.argv) == 2 and sys.argv[1] == "-l")
 	m = Main(w, load)
 
 	while True:

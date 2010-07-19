@@ -5,7 +5,6 @@ import shutil
 from os import path
 from io import io
 from edit_level import EditLevel
-from colors import color
 from tile import Tile, tiles
 from char import Char
 from level import Level

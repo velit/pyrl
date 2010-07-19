@@ -1,6 +1,6 @@
 import curses
+import colors
 from char import Char
-from colors import color
 
 def draw(io, lines, returns, keys=(), start_line=0):
 	indent = _get_indent(lines)
@@ -43,7 +43,7 @@ def _print_menu(io, l, i):
 		_print_menu_line(io, y, i, l)
 
 def _print_menu_line(io, sl, i, l, reverse=False):
-	r = color["reverse"] if reverse else color["normal"]
+	r = colors.reverse if reverse else colors.normal
 	if not isinstance(l[sl], str):
 		ln = len(l[sl][0])
 		_print_menu_word(io, sl, 0, l[sl][0], r)

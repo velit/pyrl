@@ -1,19 +1,20 @@
 import curses
 import menu
 import menu_h
+import colors
 
 from char import Char
-from colors import color
 from constants import YES, NO, DEFAULT
 
 class Window(object):
 	def __init__(self, window):
 		self.w = window
 		self.w.keypad(1)
+		self.rows, self.cols = self.w.getmaxyx()
 
 	def clear(self):
 		self.w.erase()
-		self.w.move(0,0)
+		self.w.move(0, 0)
 
 	def update(self):
 		self.w.noutrefresh()
@@ -61,9 +62,9 @@ class Window(object):
 			input = self._getstr(print_str + "[white/normal/black/red/green/"
 										"yellow/blue/purple/cyan/light_*]: ")
 			if input == "":
-				return color["normal"]
-			elif input in color:
-				return color[input]
+				return colors.normal
+			elif input in vars(colors):
+				return vars(colors)[input]
 
 	def getint(self, print_str=None):
 		while True:

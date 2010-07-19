@@ -1,6 +1,6 @@
 import curses
+import colors
 from char import Char
-from colors import color
 
 def draw(io, words, returns):
 	_print_menu(io, words)
@@ -17,7 +17,7 @@ def _print_menu(io, w):
 			i += 4
 		else:
 			s = str(word)
-			col = color["normal"]
+			col = colors.normal
 			i += len(word) + 1
 		try:
 			io.w.addstr(0, i, s, col)
@@ -51,8 +51,8 @@ def _print_menu_word(io, sw, w, r):
 		col = w[sw].color
 	else:
 		s = str(w[sw])
-		col = color["normal"]
-	r = color["reverse"] if r else color["normal"]
+		col = colors.normal
+	r = colors.reverse if r else colors.normal
 	i = 0
 	for x in w[:sw]:
 		if isinstance(x, Char):

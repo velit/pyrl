@@ -2,7 +2,6 @@ import curses
 
 from io import io
 from tile import tiles
-from colors import color
 from constants import *
 
 class EditLevel(object):
