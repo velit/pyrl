@@ -3,6 +3,11 @@ import string
 OPTIMIZATION = False
 DEBUG = False
 
+MSG_BAR_SIZE = 2
+STATUS_BAR_SIZE = 2
+
+MORE_STR = " (more)"
+
 YES = set((ord('y'), ord('Y')))
 NO = set((ord('n'), ord('N')))
 DEFAULT = set((ord('\n'), ord(' ')))
@@ -18,7 +23,7 @@ DY = {}
 DX = {}
 DY[STOP] = 0
 DX[STOP] = 0
-for dir in range(1, 1+9):
+for dir in range(1, 9 +1):
 	DY[dir] = 0
 	DX[dir] = 0
 	if dir in UP:

@@ -1,13 +1,13 @@
 import curses
+import colors
+from char import Char
 from window import Window
-from colors import color
 from bresenham import bresenham
 
 class LevelWindow(Window):
 	"""Handles the level display"""
-	def __init__(self, window, io):
-		Window.__init__(self, window)
-		self.io = io
+	def __init__(self, window):
+		super(LevelWindow, self).__init__(window)
 
 	def drawmap(self, level):
 		self.w.move(0,0)
@@ -37,13 +37,12 @@ class LevelWindow(Window):
 		except curses.error:
 			pass
 
-	def drawlos(self, visibility, l, reverse=None):
-		if reverse:
-			reverse = color["reverse"]
+	def drawlos(self, visibility, l, reverse=False):
+		color = colors.normal if not reverse else colors.reverse
 		for s in visibility:
 			try:
 				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
-						s.get_visible_char().color | reverse)
+						s.get_visible_char().color | color)
 			except curses.error:
 				pass
 
@@ -56,27 +55,21 @@ class LevelWindow(Window):
 			except curses.error:
 				pass
 
-	def drawstar(self, square, col):
+	def drawstar(self, square, col=colors.green):
 		try:
 			self.w.addch(square.y, square.x, "*", col)
 		except curses.error:
 			pass
 
-	def drawblock(self, square, col):
+	def drawblock(self, square, col=colors.blue):
 		try:
-			self.w.addch(square.y, square.x, " ", col | color["reverse"])
+			self.w.addch(square.y, square.x, " ", col)
 		except curses.error:
 			pass
 
-	def drawline(self, s0, s1, char=None):
+	def drawline(self, s0, s1, char=Char('*', colors.yellow)):
 		y0, x0 = s0.getloc()
 		y1, x1 = s1.getloc()
-		if char is None:
-			symbol = '*'
-			color_ = color["yellow"]
-		else:
-			symbol = char.symbol
-			color_ = char.color
 		for y, x in bresenham(y0, x0, y1, x1):
-			self.w.addch(y, x, symbol, color_)
-		self.io.getch(y1, x1)
+			self.w.addch(y, x, char.symbol, char.color)
+		self.getch(y1, x1)

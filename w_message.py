@@ -1,22 +1,22 @@
+import curses
+
 from window import Window
 from textwrap import TextWrapper
-import curses
+from constants import MORE_STR
 
 class MessageBar(Window):
 	"""Handles the messaging bar system."""
-	def __init__(self, window, io, more_str=" (more)"):
-		Window.__init__(self, window)
-		self.io = io
-		self.lines, self.width = self.w.getmaxyx()
+	def __init__(self, window):
+		super(MessageBar, self).__init__(window)
+
 		self.msgqueue = ""
-		self.more_str=more_str
 
 		#accommodate for printing the newline character
-		self.wrapper = TextWrapper(width=(self.width - 1))
+		self.wrapper = TextWrapper(width=(self.cols - 1))
 
 		#accommodate for the more_str if the messages continue on the next page
-		self.last_line_wrapper = TextWrapper(width=(self.width - 
-													len(self.more_str) - 1))
+		self.last_line_wrapper = TextWrapper(width=(self.cols - 
+													len(MORE_STR) - 1))
 
 	def update(self):
 		self.print_queue()
@@ -31,8 +31,8 @@ class MessageBar(Window):
 		cur_line = 0
 		skip_all = False
 		while True:
-			if cur_line < self.lines - 1:
-				if len(str) < self.width:
+			if cur_line < self.rows - 1:
+				if len(str) < self.cols:
 					self.w.addstr(cur_line, 0, str)
 					break
 				else:
@@ -40,13 +40,13 @@ class MessageBar(Window):
 					self.w.addstr(cur_line, 0, a[0])
 					str = " ".join(a[1:])
 					cur_line += 1
-			elif cur_line == self.lines - 1:
-				if len(str) < self.width:
+			elif cur_line == self.rows - 1:
+				if len(str) < self.cols:
 					self.w.addstr(cur_line, 0, str)
 					break
 				else:
 					a = self.last_line_wrapper.wrap(str)
-					self.w.addstr(cur_line, 0, a[0]+self.more_str)
+					self.w.addstr(cur_line, 0, a[0] + MORE_STR)
 					if not skip_all:
 						c = self.getch_from_list(list=(ord('\n'), ord(' ')))
 						if c == ord('\n'):

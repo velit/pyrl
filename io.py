@@ -1,7 +1,7 @@
 import curses
 import _curses
+import colors
 
-from colors import color
 from w_message import MessageBar
 from w_status import StatusBar
 from w_level import LevelWindow
@@ -14,14 +14,15 @@ class IO(object):
 		self.w = window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()
+
 		self.level_rows = self.rows - msg_bar_size - status_bar_size
 		self.level_cols = self.cols
 
-		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0), self)
+		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0))
 		self.s = StatusBar(self.w.derwin(status_bar_size, 0,
-							self.rows - status_bar_size, 0), self)
+							self.rows - status_bar_size, 0))
 		self.l = LevelWindow(self.w.derwin(self.level_rows, 0,
-											msg_bar_size, 0), self)
+											msg_bar_size, 0))
 		self.a = Window(self.w)
 
 	def drawmap(self, level):
@@ -54,15 +55,11 @@ class IO(object):
 		self.l.update()
 		curses.doupdate()
 
-	def drawstar(self, square, color_=None):
-		if color_ is None:
-			color_ = color["green"]
-		self.l.drawstar(square, color_)
+	def drawstar(self, square, *col):
+		self.l.drawstar(square, *col)
 	
-	def drawblock(self, square, color_=None):
-		if color_ is None:
-			color_ = color["blue"]
-		self.l.drawblock(square, color_)
+	def drawblock(self, square, *col):
+		self.l.drawblock(square, *col)
 
 	def getch(self, *args, **keys):
 		self.refresh()

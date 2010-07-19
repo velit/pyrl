@@ -1,10 +1,10 @@
 import curses
+import colors
 
 from creature import Creature
 from char import Char
 from tile import tiles
 from io import io
-from colors import color
 from constants import *
 
 class Player(Creature):
@@ -13,7 +13,7 @@ class Player(Creature):
 		super(Player, self).__init__(game, level)
 		self.name = "tappi"
 		self.n = "god"
-		self.ch = Char('@', color["white"])
+		self.ch = Char('@', colors.white)
 		self.hp = 50
 		self.dmg = 5
 
@@ -75,7 +75,9 @@ class Player(Creature):
 		return act[0](*act[1:])
 
 	def move(self, dir):
-		y,x = self.square.y + DY[dir], self.square.x + DX[dir]
+		if dir == STOP:
+			return True
+		y, x = self.square.y + DY[dir], self.square.x + DX[dir]
 		if self.l.legal_yx(y, x):
 			targetsquare = self.l.getsquare(y,x)
 			if targetsquare.passable():
