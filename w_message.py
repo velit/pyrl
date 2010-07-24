@@ -2,7 +2,7 @@ import curses
 
 from window import Window
 from textwrap import TextWrapper
-from constants import MORE_STR
+from constants import MORE_STR, DEFAULT
 
 class MessageBar(Window):
 	"""Handles the messaging bar system."""
@@ -12,7 +12,7 @@ class MessageBar(Window):
 		self.msgqueue = ""
 
 		#accommodate for printing the newline character
-		self.wrapper = TextWrapper(width=(self.cols - 1))
+		self.wrapper = TextWrapper(width=(self.cols))
 
 		#accommodate for the more_str if the messages continue on the next page
 		self.last_line_wrapper = TextWrapper(width=(self.cols - 
@@ -32,7 +32,7 @@ class MessageBar(Window):
 		skip_all = False
 		while True:
 			if cur_line < self.rows - 1:
-				if len(str) < self.cols:
+				if len(str) <= self.cols:
 					self.w.addstr(cur_line, 0, str)
 					break
 				else:
@@ -48,7 +48,7 @@ class MessageBar(Window):
 					a = self.last_line_wrapper.wrap(str)
 					self.w.addstr(cur_line, 0, a[0] + MORE_STR)
 					if not skip_all:
-						c = self.getch_from_list(list=(ord('\n'), ord(' ')))
+						c = self.getch_from_list(list=DEFAULT)
 						if c == ord('\n'):
 							skip_all = True
 					str = " ".join(a[1:])

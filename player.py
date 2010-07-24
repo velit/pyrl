@@ -121,9 +121,10 @@ class Player(Creature):
 
 
 	def debug(self):
-		io.msg((self.square.getloc(), self.l.squares["ds"].getloc()))
-		io.l.drawline(self.square, self.l.squares["ds"])
-		self.redraw()
+		io.msg("asdfg "*300)
+		#io.msg((self.square.getloc(), self.l.squares["ds"].getloc()))
+		#io.l.drawline(self.square, self.l.squares["ds"])
+		#self.redraw()
 
 	def path(self):
 		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))

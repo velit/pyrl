@@ -71,14 +71,14 @@ class EditLevel(object):
 			elif ch == ord('\n'):
 				self.f()
 			elif ch in (ord('t'), ord('T')):
-				w = ["Pick a tile: "]
+				w = ["Pick a tile:"]
 				r = [None]
-				for value in sorted(tiles.values()):
-					w.append(value.ch_visible)
+				for key, value in sorted(tiles.iteritems()):
+					w.append(key)
 					r.append(value)
 				self.t = io.drawmenu(w, r)
 			elif ch in (ord('f'), ord('F')):
-				w = ["Pick a function: "]
+				w = ["Pick a function:"]
 				r = [None]
 				for f in self.funs:
 					w.append(f.func_name)

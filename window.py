@@ -3,6 +3,7 @@ import menu
 import menu_h
 import colors
 
+from textwrap import wrap
 from char import Char
 from constants import YES, NO, DEFAULT
 
@@ -21,6 +22,15 @@ class Window(object):
 
 	def getch(self, *args, **keys):
 		return self.w.getch(*args, **keys)
+	
+	def gety(self):
+		return self.w.getyx()[0]
+
+	def getx(self):
+		return self.w.getyx()[1]
+
+	def getyx(self):
+		return self.w.getyx()
 
 	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
 		if str:
