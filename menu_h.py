@@ -3,34 +3,45 @@ import colors
 from char import Char
 
 def draw(io, words, returns):
-	_print_menu(io, words)
-	return _update_ui(io, words, returns)
+	a = _print_menu(io, words, returns)
+	return _update_ui(io, words, returns, a)
 
-def _print_menu(io, w):
+def _print_menu(io, w, r):
 	curses.curs_set(0)
 	io.clear()
-	i = 0
+	a = []
 	for word in w:
+		y, x = io.getyx()
 		if isinstance(word, Char):
 			s = word.symbol
 			col = word.color
-			i += 4
 		else:
-			s = str(word)
+			s = word
 			col = colors.normal
-			i += len(word) + 1
+		if len(s) > io.cols - x:
+			y, x = io.gety() + 1, a[_first_r(r)][1]
+		a.append((y, x))
 		try:
-			io.w.addstr(0, i, s, col)
+			io.w.addstr(y, x, s, col)
+			if io.getx() != io.cols - 1:
+				io.move(io.gety(), io.getx() + 1)
+			else:
+				io.move(io.gety() + 1, a[_first_r(r)][1])
 		except curses.error:
-				pass
-		pass
+			pass
+	return a
 
-def _update_ui(io, w, r):
+def _first_r(r):
+	for i, x in enumerate(r):
+		if x is not None:
+			return i
+
+def _update_ui(io, w, r, a):
 	#selected word
 	sw = 0
 	sw = _roll_sw(sw, w, r)
 	while True:
-		c = _hilight_and_getch(io, sw, w)
+		c = _hilight_and_getch(io, sw, w, a)
 		if c in (curses.KEY_RIGHT, ord('l')):
 			sw = _roll_sw(sw, w, r, 1)
 		elif c in (curses.KEY_LEFT, ord('h')):
@@ -39,13 +50,14 @@ def _update_ui(io, w, r):
 			curses.curs_set(1)
 			return r[sw]
 
-def _hilight_and_getch(io, sw, w):
-	_print_menu_word(io, sw, w, True)
+def _hilight_and_getch(io, sw, w, a):
+	_print_menu_word(io, sw, w, a, True)
 	c = io.w.getch()
-	_print_menu_word(io, sw, w, False)
+	_print_menu_word(io, sw, w, a, False)
 	return c
 
-def _print_menu_word(io, sw, w, r):
+def _print_menu_word(io, sw, w, a, r):
+	y, x = a[sw]
 	if isinstance(w[sw], Char):
 		s = w[sw].symbol
 		col = w[sw].color
@@ -53,14 +65,8 @@ def _print_menu_word(io, sw, w, r):
 		s = str(w[sw])
 		col = colors.normal
 	r = colors.reverse if r else colors.normal
-	i = 0
-	for x in w[:sw]:
-		if isinstance(x, Char):
-			i += 2
-		else:
-			i += len(x) + 1
 	try:
-		io.w.addstr(0, i, s, col | r)
+		io.w.addstr(y, x, s, col | r)
 	except curses.error:
 		pass
 
