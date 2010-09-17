@@ -6,6 +6,8 @@ DEBUG = False
 MSG_BAR_SIZE = 2
 STATUS_BAR_SIZE = 2
 
+TILES_LOADED_FROM_FILE = False
+
 MORE_STR = " (more)"
 
 YES = set((ord('y'), ord('Y')))

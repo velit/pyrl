@@ -8,10 +8,9 @@ def main(w):
 	import io
 	import tile
 
-	f = open(path.join("data", "tiles"), "r")
 	io.io = io.IO(w)
-	tile.tiles = load(f)
-	f.close()
+	#with open(path.join("data", "tiles"), "r") as f:
+	#	tile.tiles = load(f)
 	from editor import Editor
 	Editor()
 

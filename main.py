@@ -3,7 +3,7 @@ import curses
 import cPickle
 
 from os import path
-from constants import STATUS_BAR_SIZE, MSG_BAR_SIZE
+from constants import STATUS_BAR_SIZE, MSG_BAR_SIZE, TILES_LOADED_FROM_FILE
 
 class Main(object):
 	def __init__(self, w, load):
@@ -11,8 +11,9 @@ class Main(object):
 		io.io = io.IO(w, STATUS_BAR_SIZE, MSG_BAR_SIZE)
 
 		import tile
-		with open(path.join("data", "tiles"), "r") as f:
-			tile.tiles = cPickle.load(f)
+		if TILES_LOADED_FROM_FILE:
+			with open(path.join("data", "tiles"), "r") as f:
+				tile.tiles = cPickle.load(f)
 		
 		from game import Game
 		if load:
