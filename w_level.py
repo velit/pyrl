@@ -9,9 +9,9 @@ class LevelWindow(Window):
 	def __init__(self, window):
 		super(LevelWindow, self).__init__(window)
 
-	def drawmap(self, level):
+	def drawmap(self, map):
 		self.w.move(0,0)
-		for s in level.map:
+		for s in map:
 			try:
 				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
 							s.get_visible_char().color)
@@ -19,11 +19,11 @@ class LevelWindow(Window):
 				pass
 			# Writing to the last cell of a window raises an exception because
 			# the automatic cursor move to the next cell is illegal, this is
-			# the only way to the last cell with the current curses wrapper
+			# the only way to write to the last cell in the current wrapper
 
-	def drawmemory(self, level):
+	def drawmemory(self, map):
 		self.w.move(0,0)
-		for s in level.map:
+		for s in map:
 			try:
 				self.w.addch(s.y, s.x, s.get_memory_char().symbol,
 							s.get_memory_char().color)
@@ -37,7 +37,7 @@ class LevelWindow(Window):
 		except curses.error:
 			pass
 
-	def drawlos(self, visibility, l, reverse=False):
+	def drawlos(self, visibility, reverse=False):
 		color = colors.normal if not reverse else colors.reverse
 		for s in visibility:
 			try:
@@ -49,6 +49,10 @@ class LevelWindow(Window):
 	def clearlos(self, old_visibility, l):
 		for s in old_visibility:
 			try:
+			# The square we have in the container is the square we saw, but
+			# because we're updating what we whould be remembering, we need
+			# to update it to the current level square, thuse the seemingly
+			# redundant use of l.getsquare with the already on hand square
 				self.w.addch(s.y, s.x,
 							l.getsquare(s.y, s.x).get_memory_char().symbol,
 							l.getsquare(s.y, s.x).get_memory_char().color)

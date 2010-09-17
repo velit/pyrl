@@ -5,13 +5,13 @@ from tile import tiles
 from constants import *
 
 class EditLevel(object):
-	def __init__(self, editor, l):
+	def __init__(self, editor, map):
 		self.editor = editor
-		self.l = l
+		self.map = map
 		self.y = 0
 		self.x = 0
-		self.my = self.l.rows-1
-		self.mx = self.l.cols-1
+		self.my = self.map.rows-1
+		self.mx = self.map.cols-1
 		self.t = tiles["f"]
 		self.funs = (self.point, self.rectangle, self.fill)
 		self.f = self.point
@@ -23,7 +23,7 @@ class EditLevel(object):
 		self.edit_level()
 
 	def drawmap(self):
-		io.drawmap(self.l)
+		io.drawmap(self.map)
 
 	def actions(self):
 		a = {}
@@ -62,7 +62,7 @@ class EditLevel(object):
 
 	def edit_level(self):
 		while True:
-			io.drawmap(self.l)
+			self.drawmap()
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])
@@ -86,7 +86,7 @@ class EditLevel(object):
 				self.f = io.drawmenu(w, r)
 
 	def point(self):
-		s = self.l.getsquare(self.y, self.x)
+		s = self.map.getsquare(self.y, self.x)
 		s.tile = self.t
 
 	def rectangle(self):
@@ -97,10 +97,10 @@ class EditLevel(object):
 			y1, x1 = self.selected_tile
 			for y in range(min(y0, y1), max(y0, y1)+1):
 				for x in range(min(x0, x1), max(x0, x1)+1):
-					s = self.l.getsquare(y, x)
+					s = self.map.getsquare(y, x)
 					s.tile = self.t
 			self.selected_tile = None
 	
 	def fill(self):
-		for square in self.l.map:
+		for square in self.map:
 			square.tile = self.t

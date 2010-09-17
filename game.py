@@ -29,18 +29,18 @@ class Game(object):
 		self.p.l.removecreature(self.p)
 		if len(self.l) == self.l.index(self.p.l) + 1:
 			self.p.l = Level(self, len(self.l)+1)
-			self.p.l.addcreature(self.p, self.p.l.squares["us"])
+			self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
 			self.l.append(self.p.l)
 		else:
 			self.p.l = self.l[self.l.index(self.p.l) + 1]
-			self.p.l.addcreature(self.p, self.p.l.squares["us"])
+			self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
 		self.redraw()
 
 	def ascend(self):
 		if self.l.index(self.p.l) > 0:
 			self.p.l.removecreature(self.p)
 			self.p.l = self.l[self.l.index(self.p.l) - 1]
-			self.p.l.addcreature(self.p, self.p.l.squares["ds"])
+			self.p.l.addcreature(self.p, self.p.l.getsquare("ds"))
 			self.redraw()
 		else:
 			self.endgame()

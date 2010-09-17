@@ -1,41 +1,36 @@
-import random
 import path
 
 from bresenham import bresenham
 from monster import Monster
+from map import Map
 from tile import tiles
 from io import io
-from rdg import generateLevel, init_map
+from rdg import generateLevel
 
 class Level(object):
-	def __init__(self, game=None, id=None, player=None, generate=True):
+	def __init__(self, game, id, generate=True):
 		self.g = game
 		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
 		
 		self.creatures = []
-		self.squares = {}
 
-		if game and generate:
+		if generate:
 			generateLevel(self)
-			for x in range(100):
-				self.addcreature(Monster(self.g, self))
 		else:
-			self.map = init_map(self.rows, self.cols, tiles["f"])
-			for x in range(100):
-				self.addcreature(Monster(self.g, self))
+			self.map = Map(self.rows, self.cols, tiles["f"])
 
-	def getsquare(self, y, x):
-		return self.map[y*self.cols + x]
+		for x in range(100):
+			self.addcreature(Monster(self.g, self))
+
+	def getsquare(self, str_or_y, *x):
+		return self.map.getsquare(str_or_y, *x)
 
 	def get_free_tile(self):
-		while True:
-			tile = self.get_random_tile()
-			if tile.passable():
-				return tile
+		return self.map.get_free_tile()
 
 	def get_random_tile(self):
-		return random.choice(self.map)
+		return self.map.get_random_tile()
 
 	def visit_square(self, y, x):
 		if self.legal_yx(y, x):
@@ -50,10 +45,10 @@ class Level(object):
 		return 0 <= y < self.rows and 0 <= x < self.cols
 
 	def drawmap(self):
-		io.drawmap(self)
+		io.drawmap(self.map)
 	
 	def drawmemory(self):
-		io.drawmemory(self)
+		io.drawmemory(self.map)
 
 	def addcreature(self, creature, square = None):
 		if square is None:

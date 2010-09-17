@@ -1,5 +1,6 @@
 from random import randrange as rr, random as rand, choice
 
+from map import Map
 from square import Square as S
 from tile import tiles
 
@@ -7,12 +8,8 @@ w = tiles["w"]
 r = tiles["r"]
 f = tiles["f"]
 
-def init_map(rows, cols, tile=r):
-	y, x = rows, cols
-	return [S(tile, i / x, i % x) for i in range(y * x)]
-
 def generateLevel(level):
-	level.map = init_map(level.rows, level.cols)
+	level.map = Map(level.rows, level.cols, r)
 	_make_initial_room(level)
 	for x in range(2000):
 		if rand() < 0.50:
@@ -32,7 +29,7 @@ def add_staircase_up(level):
 			break
 
 	square.tile = tiles["us"]
-	level.squares["us"] = square
+	level.map.squares["us"] = square
 
 def add_staircase_down(level):
 	while True:
@@ -44,7 +41,7 @@ def add_staircase_down(level):
 			break
 
 	square.tile = tiles["ds"]
-	level.squares["ds"] = square
+	level.map.squares["ds"] = square
 
 def _make_initial_room(level):
 	while True:

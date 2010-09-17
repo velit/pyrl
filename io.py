@@ -25,17 +25,17 @@ class IO(object):
 											msg_bar_size, 0))
 		self.a = Window(self.w)
 
-	def drawmap(self, level):
-		self.l.drawmap(level)
+	def drawmap(self, map):
+		self.l.drawmap(map)
 
-	def drawmemory(self, level):
-		self.l.drawmemory(level)
+	def drawmemory(self, map):
+		self.l.drawmemory(map)
 
 	def drawmenu(self, words, returns):
 		return self.m.draw_h_menu(words, returns)
 
-	def drawlos(self, visibility, level, *reverse):
-		self.l.drawlos(visibility, level, *reverse)
+	def drawlos(self, visibility, *reverse):
+		self.l.drawlos(visibility, *reverse)
 
 	def clearlos(self, visibility, level):
 		self.l.clearlos(visibility, level)

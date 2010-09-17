@@ -5,6 +5,7 @@ import shutil
 from os import path
 from io import io
 from edit_level import EditLevel
+from map import Map
 from tile import Tile, tiles
 from char import Char
 from level import Level
@@ -19,7 +20,7 @@ def add_ebe(l, r, k):
 
 class Editor(object):
 	def __init__(self):
-		self.tiles = {}
+		self.tiles = tiles
 		self.levels = {}
 		self.modified = False
 		try:
@@ -39,9 +40,23 @@ class Editor(object):
 			pickle.dump(self.tiles, t)
 
 		with open(path.join("editor_data", "levels"), "w") as l:
-			pickle.dump(self.levels, l)
+			pickle.dump(self.staticise_levels(), l)
 
 		self.modified = False
+
+	def staticise_levels(self):
+		reverse = {}
+		mapfile = []
+		for k, v in tiles.iteritems():
+			reverse[v] = k
+
+		for key, map in self.levels.iteritems():
+			mapdata = ([], key, map.rows, map.cols)
+			for s in map:
+				mapdata[0].append(reverse[s.tile])
+			mapfile.append(mapdata)
+
+		return mapfile
 
 	def load(self, ask=True):
 		if ask:
@@ -50,13 +65,17 @@ class Editor(object):
 			if c not in YES:
 				return
 
-		with open(path.join("editor_data", "tiles"), "r") as f:
-			self.tiles = pickle.load(f)
+		#with open(path.join("editor_data", "tiles"), "r") as f:
+		#	self.tiles = pickle.load(f)
 
 		with open(path.join("editor_data", "levels"), "r") as f:
-			self.levels = pickle.load(f)
+			self.generate_levels(pickle.load(f))
 
 		self.modified = False
+
+	def generate_levels(self, mapfile):
+		for map, key, y, x in mapfile:
+			self.levels[key] = Map(y, x, seq=(self.tiles[x] for x in map))
 
 	def back(self):
 		return True
@@ -237,7 +256,7 @@ class Editor(object):
 
 	def new_level(self):
 		handle = io.a.getstr("Level handle")
-		self.levels[handle] = Level()
+		self.levels[handle] = Map(io.level_rows, io.level_cols, tiles["f"])
 		self.modified = True
 
 	def pick_level(self):

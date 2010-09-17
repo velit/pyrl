@@ -151,7 +151,7 @@ class Creature(object):
 		self.visibility = set()
 		self.cast_light()
 		io.clearlos(old - self.visibility, self.l)
-		io.drawlos(self.visibility -(old -self.visi_mod), self.l, self.reverse)
+		io.drawlos(self.visibility -(old -self.visi_mod), self.reverse)
 		self.visi_mod.clear()
 
 	def cast_light(self):
