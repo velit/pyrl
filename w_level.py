@@ -3,6 +3,7 @@ import colors
 from char import Char
 from window import Window
 from bresenham import bresenham
+from tile import tiles
 
 class LevelWindow(Window):
 	"""Handles the level display"""
@@ -13,8 +14,7 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(s.y, s.x, s.get_visible_char(),
-							s.get_visible_color())
+				self.w.addch(*s.get_visible_data())
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
@@ -25,8 +25,34 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(s.y, s.x, s.get_memory_char(),
-							s.get_memory_color())
+				self.w.addch(*s.get_memory_data())
+			except curses.error:
+				pass
+
+	def drawlos(self, visibility, l, color_shift="normal"):
+		for s in visibility:
+			try:
+				self.w.addch(*l.getsquare(*s).get_visible_data(color_shift))
+			except curses.error:
+				pass
+
+	def clearlos(self, old_visibility, l):
+		for s in old_visibility:
+			try:
+				self.w.addch(*l.getsquare(*s).get_memory_data())
+			except curses.error:
+				pass
+
+	def drawdummy(self, dummy):
+		self.w.move(0,0)
+		for t in dummy:
+			try:
+				if t in dummy.tiles:
+					self.w.addch(dummy.tiles[t].ch_memory.symbol,
+							colors.d[dummy.tiles[t].ch_memory.color])
+				else:
+					self.w.addch(tiles[t].ch_memory.symbol,
+							colors.d[tiles[t].ch_memory.color])
 			except curses.error:
 				pass
 
@@ -36,28 +62,6 @@ class LevelWindow(Window):
 						s.get_visible_color())
 		except curses.error:
 			pass
-
-	def drawlos(self, visibility, reverse=False):
-		color = colors.normal if not reverse else colors.reverse
-		for s in visibility:
-			try:
-				self.w.addch(s.y, s.x, s.get_visible_char(),
-						s.get_visible_color() | color)
-			except curses.error:
-				pass
-
-	def clearlos(self, old_visibility, l):
-		for s in old_visibility:
-			try:
-			# The square we have in the container is the square we saw, but
-			# because we're updating what we whould be remembering, we need
-			# to update it to the current level square, thuse the seemingly
-			# redundant use of l.getsquare with the already on hand square
-				self.w.addch(s.y, s.x,
-							l.getsquare(s.y, s.x).get_memory_char(),
-							l.getsquare(s.y, s.x).get_memory_color())
-			except curses.error:
-				pass
 
 	def drawstar(self, square, col=colors.green):
 		try:

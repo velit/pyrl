@@ -31,11 +31,14 @@ class IO(object):
 	def drawmemory(self, map):
 		self.l.drawmemory(map)
 
+	def drawdummy(self, dummy):
+		self.l.drawdummy(dummy)
+
 	def drawmenu(self, words, returns):
 		return self.m.draw_h_menu(words, returns)
 
-	def drawlos(self, visibility, *reverse):
-		self.l.drawlos(visibility, *reverse)
+	def drawlos(self, visibility, *color_shift):
+		self.l.drawlos(visibility, *color_shift)
 
 	def clearlos(self, visibility, level):
 		self.l.clearlos(visibility, level)

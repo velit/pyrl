@@ -37,7 +37,7 @@ class Level(object):
 		if self.legal_yx(y, x):
 			s = self.getsquare(y, x)
 			s.visit()
-			self.g.p.visibility.add(s)
+			self.g.p.visibility.add((s.y, s.x))
 
 	def see_through(self, y, x):
 		return self.legal_yx(y, x) and self.getsquare(y, x).see_through()
@@ -59,14 +59,14 @@ class Level(object):
 		creature.square = square
 
 	def movecreature(self, creature, square):
-		self.g.p.visi_mod.add(square)
-		self.g.p.visi_mod.add(creature.square)
+		self.g.p.visi_mod.add((square.y, square.x))
+		self.g.p.visi_mod.add((creature.square.y, creature.square.x))
 		square.creature = creature
 		creature.square.creature = None
 		creature.square = square
 
 	def removecreature(self, creature):
-		self.g.p.visi_mod.add(creature.square)
+		self.g.p.visi_mod.add((creature.square.y, creature.square.x))
 		creature.square.creature = None
 		self.creatures.remove(creature)
 
@@ -74,7 +74,7 @@ class Level(object):
 		self.creatures.remove(self.g.p)
 		while self.creatures:
 			c = self.creatures.pop()
-			self.g.p.visi_mod.add(c.square)
+			self.g.p.visi_mod.add((c.square.y, c.square.x))
 			c.square.creature = None
 		self.creatures.append(self.g.p)
 

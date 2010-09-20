@@ -120,7 +120,9 @@ class Player(Creature):
 
 
 	def debug(self):
-		io.msg("asdfg "*300)
+		self.l.drawmemory()
+		io.getch()
+		self.l.drawmap()
 		#io.msg((self.square.getloc(), self.l.squares["ds"].getloc()))
 		#io.l.drawline(self.square, self.l.squares["ds"])
 		#self.redraw()
@@ -149,7 +151,10 @@ class Player(Creature):
 		#pass
 	
 	def los_highlight(self):
-		self.reverse = not self.reverse
+		if self.reverse == "normal":
+			self.reverse = "reverse"
+		elif self.reverse == "reverse":
+			self.reverse = "normal"
 		self.redraw()
 
 	def redraw(self):
