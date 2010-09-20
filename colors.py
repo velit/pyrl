@@ -1,6 +1,6 @@
 import curses
 
-color_dict = {}
+d = {}
 
 for x in range(7):
 	curses.init_pair(x+1, x, 0)
@@ -32,3 +32,28 @@ dim = curses.A_DIM
 reverse = curses.A_REVERSE
 standout = curses.A_STANDOUT
 underline = curses.A_UNDERLINE
+
+d["brown"] = brown
+d["grey"] = grey
+d["black_on_black"] = black_on_black
+d["red"] = red
+d["green"] = green
+d["yellow"] = yellow
+d["blue"] = blue
+d["purple"] = purple
+d["cyan"] = cyan
+d["white"] = white
+d["black"] = black
+d["light_red"] = light_red
+d["light_green"] = light_green
+d["light_yellow"] = light_yellow
+d["light_blue"] = light_blue
+d["light_purple"] = light_purple
+d["light_cyan"] = light_cyan
+d["normal"] = normal
+d["blink"] = blink
+d["bold"] = bold
+d["dim"] = dim
+d["reverse"] = reverse
+d["standout"] = standout
+d["underline"] = underline

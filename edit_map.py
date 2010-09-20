@@ -2,12 +2,13 @@ import curses
 
 from io import io
 from tile import tiles
+from map import Map
 from constants import *
 
-class EditLevel(object):
-	def __init__(self, editor, map):
+class EditMap(object):
+	def __init__(self, editor, dummymap):
 		self.editor = editor
-		self.map = map
+		self.map = dummymap
 		self.y = 0
 		self.x = 0
 		self.my = self.map.rows-1
@@ -20,10 +21,10 @@ class EditLevel(object):
 		io.s.add_element("f", "[F]unction: ", lambda: self.f.func_name)
 		self.actions()
 
-		self.edit_level()
+		self.edit_map()
 
 	def drawmap(self):
-		io.drawmap(self.map)
+		io.drawmap(Map(self.map))
 
 	def actions(self):
 		a = {}
@@ -60,9 +61,9 @@ class EditLevel(object):
 		if self.x > self.mx:
 			self.x = self.mx
 
-	def edit_level(self):
+	def edit_map(self):
+		self.drawmap()
 		while True:
-			self.drawmap()
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])

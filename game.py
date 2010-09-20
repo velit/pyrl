@@ -1,5 +1,5 @@
 import curses
-import cPickle
+import cPickle as pickle
 
 from os import path
 
@@ -8,10 +8,16 @@ from player import Player
 from io import io
 from constants import YES, NO, DEFAULT
 
+#from dummy_map import DummyMap
+
 class Game(object):
 	def __init__(self, main):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 		self.main = main
+
+		#a = DummyMap(80, 50)
+		#with open("temp", "w") as f:
+		#	pickle.dump(a, f)
 
 		self.turn_counter = 0
 
@@ -54,7 +60,7 @@ class Game(object):
 	
 	def _save(self):
 		with open(path.join("data", "pyrl.svg"), "w") as f:
-			cPickle.dump(self, f)
+			pickle.dump(self, f)
 
 	def savegame(self, ask=True):
 		if not ask:

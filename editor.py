@@ -4,11 +4,11 @@ import shutil
 
 from os import path
 from io import io
-from edit_level import EditLevel
+from edit_map import EditMap
 from map import Map
+from dummy_map import DummyMap
 from tile import Tile, tiles
 from char import Char
-from level import Level
 from constants import YES, NO, DEFAULT
 
 def add_ebe(l, r, k):
@@ -20,8 +20,8 @@ def add_ebe(l, r, k):
 
 class Editor(object):
 	def __init__(self):
-		self.tiles = tiles
-		self.levels = {}
+		#self.tiles = tiles
+		self.maps = {}
 		self.modified = False
 		try:
 			self.load(ask=False)
@@ -36,27 +36,27 @@ class Editor(object):
 			if c not in YES:
 				return
 
-		with open(path.join("editor_data", "tiles"), "w") as t:
-			pickle.dump(self.tiles, t)
+		#with open(path.join("editor_data", "tiles"), "w") as t:
+		#	pickle.dump(self.tiles, t)
 
-		with open(path.join("editor_data", "levels"), "w") as l:
-			pickle.dump(self.staticise_levels(), l)
+		with open(path.join("editor_data", "maps"), "w") as l:
+			pickle.dump(self.maps, l)
 
 		self.modified = False
 
-	def staticise_levels(self):
-		reverse = {}
-		mapfile = []
-		for k, v in tiles.iteritems():
-			reverse[v] = k
+	#def staticise_maps(self):
+	#	reverse = {}
+	#	mapfile = []
+	#	for k, v in tiles.iteritems():
+	#		reverse[v] = k
 
-		for key, map in self.levels.iteritems():
-			mapdata = ([], key, map.rows, map.cols)
-			for s in map:
-				mapdata[0].append(reverse[s.tile])
-			mapfile.append(mapdata)
+	#	for key, map in self.maps.iteritems():
+	#		mapdata = ([], key, map.rows, map.cols)
+	#		for s in map:
+	#			mapdata[0].append(reverse[s.tile])
+	#		mapfile.append(mapdata)
 
-		return mapfile
+	#	return mapfile
 
 	def load(self, ask=True):
 		if ask:
@@ -68,14 +68,14 @@ class Editor(object):
 		#with open(path.join("editor_data", "tiles"), "r") as f:
 		#	self.tiles = pickle.load(f)
 
-		with open(path.join("editor_data", "levels"), "r") as f:
-			self.generate_levels(pickle.load(f))
+		with open(path.join("editor_data", "maps"), "r") as f:
+			self.maps = pickle.load(f)
 
 		self.modified = False
 
-	def generate_levels(self, mapfile):
-		for map, key, y, x in mapfile:
-			self.levels[key] = Map(y, x, seq=(self.tiles[x] for x in map))
+	#def generate_maps(self, mapfile):
+	#	for map, key, y, x in mapfile:
+	#		self.maps[key] = Map(y, x, (tiles[x] for x in map))
 
 	def back(self):
 		return True
@@ -99,7 +99,7 @@ class Editor(object):
 						" all data to pyrl? [y/N] ")
 		if c in YES:
 			t = path.join("editor_data", "tiles")
-			l = path.join("editor_data", "levels")
+			l = path.join("editor_data", "maps")
 			d = path.join("data")
 			shutil.copy(t, d)
 			shutil.copy(l, d)
@@ -112,18 +112,18 @@ class Editor(object):
 		if c not in YES:
 			return
 
-		with open(path.join("data", "tiles"), "r") as f:
-			self.tiles = pickle.load(f)
+		#with open(path.join("data", "tiles"), "r") as f:
+		#	self.tiles = pickle.load(f)
 
-		with open(path.join("data", "levels"), "r") as f:
-			self.levels = pickle.load(f)
+		with open(path.join("data", "maps"), "r") as f:
+			self.maps = pickle.load(f)
 
 		self.modified = True
 
 	def main_menu(self):
-		l = ("Tile editor", "Level editor", "Save data", "Load data",
+		l = ("View global tiles", "Map editor", "Save data", "Load data",
 					"Export data", "Import data", "Exit [Q]")
-		r = (self.tile_editor, self.level_editor, self.save, self.load,
+		r = (self.view_global_tiles, self.map_editor, self.save, self.load,
 				self.export, self.import_data, self.exit)
 		k = {ord('Q'): self.exit}
 		i = 0
@@ -131,6 +131,10 @@ class Editor(object):
 			s = io.a.draw_menu(l, r, k, i)
 			i = r.index(s)
 			s()
+
+	def view_global_tiles(self):
+		for s in self.pick_dict(tiles, "tile to view"):
+			self.view_tile(s)
 
 	def tile_editor(self):
 		l = ("Make a new tile", "Edit tiles", "Delete tiles", "Update tiles",
@@ -145,10 +149,10 @@ class Editor(object):
 			if s():
 				return
 
-	def level_editor(self):
-		l = ("Make a new level", "Edit levels", "Delete levels",
+	def map_editor(self):
+		l = ("Make a new map", "Edit maps", "Delete maps",
 					"", "Back [<]", "Exit [Q]")
-		r = (self.new_level, self.pick_level, self.delete_level,
+		r = (self.new_map, self.pick_map, self.delete_map,
 					None, self.back, self.exit)
 		k = {ord('<'): self.back, ord('Q'): self.exit}
 		i = 0
@@ -163,14 +167,14 @@ class Editor(object):
 		self.tiles[handle] = Tile()
 		self.modified = True
 
-	def _pick_dict(self, dict, str, give_key=False, level=False):
+	def pick_dict(self, dict, str, give_key=False, map=False):
 		i = 0
 		while True:
 			l = ["Pick a "+str, ""]
 			r = [None, None]
 			k = {}
 			for key, value in sorted(dict.iteritems()):
-				if level:
+				if map:
 					l.append(key)
 				else:
 					l.append((key, value.ch_visible))
@@ -190,11 +194,11 @@ class Editor(object):
 				yield s
 
 	def pick_tile(self):
-		for s in self._pick_dict(self.tiles, "tile to edit"):
+		for s in self.pick_dict(self.tiles, "tile to edit"):
 			self.edit_tile(s)
 
 	def delete_tile(self):
-		for s in self._pick_dict(self.tiles, "tile to delete", True):
+		for s in self.pick_dict(self.tiles, "tile to delete", True):
 			c = io.a.getch_from_list(str="Are you sure you wish to delete"
 						" this tile? [y/N]: ")
 			if c in YES:
@@ -218,6 +222,28 @@ class Editor(object):
 					del dict_u[j]
 				self.tiles[tile] = u
 				self.modified = True
+
+	def view_tile(self, tile):
+		i = 0
+		while True:
+			l = []
+			r = []
+			k = {}
+			a = sorted(vars(tile))
+			for key in a:
+				value = getattr(tile, key)
+				l.append((key, value))
+				r.append((key, value))
+
+			add_ebe(l, r, k)
+
+			s = io.a.draw_menu(l, r, k, i)
+			if s == 1:
+				return
+			elif s == 2:
+				self.exit()
+			else:
+				i = a.index(s[0])
 
 	def edit_tile(self, tile):
 		i = 0
@@ -254,19 +280,19 @@ class Editor(object):
 					raise TypeError("Attempt to modify unsupported type:"+
 							s[0])
 
-	def new_level(self):
-		handle = io.a.getstr("Level handle")
-		self.levels[handle] = Map(io.level_rows, io.level_cols, tiles["f"])
+	def new_map(self):
+		handle = io.a.getstr("Map handle")
+		self.maps[handle] = DummyMap(io.level_rows, io.level_cols, "f")
 		self.modified = True
 
-	def pick_level(self):
-		for s in self._pick_dict(self.levels, "level to edit", False, True):
-			EditLevel(self, s)
+	def pick_map(self):
+		for s in self.pick_dict(self.maps, "map to edit", False, True):
+			EditMap(self, s)
 
-	def delete_level(self):
-		for s in self._pick_dict(self.levels, "level to delete", True):
+	def delete_map(self):
+		for s in self.pick_dict(self.maps, "map to delete", True, True):
 			c = io.a.getch_from_list(str="Are you sure you want to delete"
-						" this level? [y/N]: ")
+						" this map? [y/N]: ")
 			if c in YES:
-				del self.levels[s]
+				del self.maps[s]
 				self.modified = True

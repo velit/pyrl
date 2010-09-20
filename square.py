@@ -1,7 +1,7 @@
 from tile import tiles
 from io import io
 from constants import OPTIMIZATION
-
+from colors import d
 
 class Square(object):
 	"""A cell that is a part of a level."""
@@ -46,9 +46,18 @@ class Square(object):
 
 	def get_visible_char(self):
 		if self.creature:
-			return self.creature.ch
+			return self.creature.ch.symbol
 		else:
-			return self.tile.ch_visible
+			return self.tile.ch_visible.symbol
 
 	def get_memory_char(self):
-		return self.memory_tile.ch_memory
+		return self.memory_tile.ch_memory.symbol
+
+	def get_visible_color(self):
+		if self.creature:
+			return d[self.creature.ch.color]
+		else:
+			return d[self.tile.ch_visible.color]
+
+	def get_memory_color(self):
+		return d[self.memory_tile.ch_memory.color]

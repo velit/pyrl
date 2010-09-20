@@ -54,7 +54,7 @@ def _print_menu_line(io, sl, i, l, reverse=False):
 
 def _print_menu_word(io, y, x, word, r):
 	if isinstance(word, Char):
-		io.w.addstr(y, x, word.symbol, word.color | r)
+		io.w.addstr(y, x, word.symbol, colors.d[word.color] | r)
 	else:
 		io.w.addstr(y, x, str(word), r)
 

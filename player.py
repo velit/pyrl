@@ -1,5 +1,4 @@
 import curses
-import colors
 
 from creature import Creature
 from char import Char
@@ -13,7 +12,7 @@ class Player(Creature):
 		super(Player, self).__init__(game, level)
 		self.name = "tappi"
 		self.n = "god"
-		self.ch = Char('@', colors.white)
+		self.ch = Char('@', "white")
 		self.hp = 50
 		self.dmg = 5
 

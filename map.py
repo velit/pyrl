@@ -1,19 +1,19 @@
-from __future__ import division
-
 import random
 
-from square import Square as S
+from tile import tiles
+from square import Square
 
 class Map(list):
-	def __init__(self, y, x, tile=None, seq=None):
-		if tile:
-			list.__init__(self, (S(tile, i // x, i % x) for i in range(y * x)))
-		else:
-			list.__init__(self, (S(tile, i // x, i % x) for (i, tile) in
-					enumerate(seq)))
-		self.rows = y
-		self.cols = x
-		self.squares = {}
+	def __init__(self, dummy):
+		self.rows = dummy.rows
+		self.cols = dummy.cols
+		self.squares = dummy.squares
+		x = self.cols #helpful alias / auttajatonttu
+		for i, tilekey in enumerate(dummy):
+			if tilekey in dummy.tiles:
+				self.append(Square(dummy.tiles[tilekey], i / x, i % x))
+			else:
+				self.append(Square(tiles[tilekey], i / x, i % x))
 
 	def getsquare(self, str_or_y, x=None):
 		if isinstance(str_or_y, str):
