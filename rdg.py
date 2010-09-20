@@ -1,6 +1,7 @@
 from random import randrange as rr, random as rand, choice
 
 from map import Map
+from dummy_map import DummyMap
 from square import Square as S
 from tile import tiles
 
@@ -9,7 +10,7 @@ r = tiles["r"]
 f = tiles["f"]
 
 def generateLevel(level):
-	level.map = Map(level.rows, level.cols, r)
+	level.map = Map(DummyMap(level.rows, level.cols, "r"))
 	_make_initial_room(level)
 	for x in range(2000):
 		if rand() < 0.50:

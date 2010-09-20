@@ -14,7 +14,7 @@ def _print_menu(io, w, r):
 		y, x = io.getyx()
 		if isinstance(word, Char):
 			s = word.symbol
-			col = word.color
+			col = colors.d[word.color]
 		else:
 			s = word
 			col = colors.normal
@@ -60,7 +60,7 @@ def _print_menu_word(io, sw, w, a, r):
 	y, x = a[sw]
 	if isinstance(w[sw], Char):
 		s = w[sw].symbol
-		col = w[sw].color
+		col = colors.d[w[sw].color]
 	else:
 		s = str(w[sw])
 		col = colors.normal

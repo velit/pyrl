@@ -13,8 +13,8 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
-							s.get_visible_char().color)
+				self.w.addch(s.y, s.x, s.get_visible_char(),
+							s.get_visible_color())
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
@@ -25,15 +25,15 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(s.y, s.x, s.get_memory_char().symbol,
-							s.get_memory_char().color)
+				self.w.addch(s.y, s.x, s.get_memory_char(),
+							s.get_memory_color())
 			except curses.error:
 				pass
 
 	def drawsquare(self, s):
 		try:
-			self.w.addch(s.y, s.x, s.tile.ch_visible.symbol,
-						s.tile.ch_visible.color)
+			self.w.addch(s.y, s.x, s.get_visible_char(),
+						s.get_visible_color())
 		except curses.error:
 			pass
 
@@ -41,8 +41,8 @@ class LevelWindow(Window):
 		color = colors.normal if not reverse else colors.reverse
 		for s in visibility:
 			try:
-				self.w.addch(s.y, s.x, s.get_visible_char().symbol,
-						s.get_visible_char().color | color)
+				self.w.addch(s.y, s.x, s.get_visible_char(),
+						s.get_visible_color() | color)
 			except curses.error:
 				pass
 
@@ -54,8 +54,8 @@ class LevelWindow(Window):
 			# to update it to the current level square, thuse the seemingly
 			# redundant use of l.getsquare with the already on hand square
 				self.w.addch(s.y, s.x,
-							l.getsquare(s.y, s.x).get_memory_char().symbol,
-							l.getsquare(s.y, s.x).get_memory_char().color)
+							l.getsquare(s.y, s.x).get_memory_char(),
+							l.getsquare(s.y, s.x).get_memory_color())
 			except curses.error:
 				pass
 

@@ -6,8 +6,8 @@ from random import choice
 
 mons = (('k', "kobold", "him"), ('@', "bandit", "him"), ('g', "goblin", "him"),
 		('j', "jelly", "it"), ('c', "centipede", "it"))
-col = (("black", colors.black), ("green", colors.light_green),
-		("yellow", colors.yellow), ("blue", colors.blue))
+col = (("black", "black"), ("green", "light_green"),
+		("yellow", "yellow"), ("blue", "blue"))
 
 class Monster(Creature):
 	def __init__(self, game, level):

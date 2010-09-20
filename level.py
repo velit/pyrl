@@ -3,6 +3,7 @@ import path
 from bresenham import bresenham
 from monster import Monster
 from map import Map
+from dummy_map import DummyMap
 from tile import tiles
 from io import io
 from rdg import generateLevel
@@ -18,7 +19,7 @@ class Level(object):
 		if generate:
 			generateLevel(self)
 		else:
-			self.map = Map(self.rows, self.cols, tiles["f"])
+			self.map = Map(DummyMap(self.rows, self.cols, "f"))
 
 		for x in range(100):
 			self.addcreature(Monster(self.g, self))
