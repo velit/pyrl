@@ -24,7 +24,7 @@ class EditMap(object):
 		self.edit_map()
 
 	def drawmap(self):
-		io.drawmap(Map(self.map))
+		io.drawdummy(self.map)
 
 	def actions(self):
 		a = {}
@@ -62,8 +62,8 @@ class EditMap(object):
 			self.x = self.mx
 
 	def edit_map(self):
-		self.drawmap()
 		while True:
+			self.drawmap()
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])

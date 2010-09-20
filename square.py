@@ -25,7 +25,6 @@ class Square(object):
 	def getloc(self):
 		return self.y, self.x
 
-	#returns true if the square is passable by creatures
 	def passable(self):
 		if self.creature:
 			return False
@@ -34,9 +33,12 @@ class Square(object):
 		else:
 			return False
 
+	# without regard for the passability of the square, is the underlying tile
 	def tile_passable(self):
 		if self.tile:
 			return self.tile.passable
+		else:
+			return False
 
 	def see_through(self):
 		return self.tile.see_through
@@ -44,20 +46,32 @@ class Square(object):
 	def visit(self):
 		self.memory_tile = self.tile
 
+	def get_visible_data(self, color_shift="normal", coords=True):
+		if coords:
+			if self.creature:
+				return (self.y, self.x, self.creature.ch.symbol,
+						d[self.creature.ch.color] | d[color_shift])
+			else:
+				return (self.y, self.x, self.tile.ch_visible.symbol,
+						d[self.tile.ch_visible.color] | d[color_shift])
+		else:
+			if self.creature:
+				return (self.creature.ch.symbol,
+						d[self.creature.ch.color] | d[color_shift])
+			else:
+				return (self.tile.ch_visible.symbol,
+						d[self.tile.ch_visible.color] | d[color_shift])
+
+	def get_memory_data(self, color_shift="normal", coords=True):
+		if coords:
+			return (self.y, self.x, self.memory_tile.ch_memory.symbol,
+					d[self.memory_tile.ch_memory.color] | d[color_shift])
+		else:
+			return (self.memory_tile.ch_memory.symbol,
+					d[self.memory_tile.ch_memory.color] | d[color_shift])
+
 	def get_visible_char(self):
 		if self.creature:
-			return self.creature.ch.symbol
+			return self.creature.ch
 		else:
-			return self.tile.ch_visible.symbol
-
-	def get_memory_char(self):
-		return self.memory_tile.ch_memory.symbol
-
-	def get_visible_color(self):
-		if self.creature:
-			return d[self.creature.ch.color]
-		else:
-			return d[self.tile.ch_visible.color]
-
-	def get_memory_color(self):
-		return d[self.memory_tile.ch_memory.color]
+			return self.tile.ch_visible
