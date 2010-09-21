@@ -13,11 +13,13 @@ class EditMap(object):
 		self.x = 0
 		self.my = self.map.rows-1
 		self.mx = self.map.cols-1
-		self.t = tiles["f"]
+		self.t = "f"
 		self.funs = (self.point, self.rectangle, self.fill)
 		self.f = self.point
 		self.selected_tile = None
-		io.s.add_element("t", "[T]ile: ", lambda: self.t.ch_visible.symbol)
+		io.s.add_element("t", "[T]ile: ", lambda:
+				self.map.tiles[self.t].ch_visible.symbol if self.t in
+				self.map.tiles else tiles[self.t].ch_visible.symbol)
 		io.s.add_element("f", "[F]unction: ", lambda: self.f.func_name)
 		self.actions()
 
@@ -71,12 +73,13 @@ class EditMap(object):
 				return
 			elif ch == ord('\n'):
 				self.f()
+				self.editor.modified = True
 			elif ch in (ord('t'), ord('T')):
 				w = ["Pick a tile:"]
 				r = [None]
-				for key, value in sorted(tiles.iteritems()):
+				for key in sorted(tiles):
 					w.append(key)
-					r.append(value)
+					r.append(key)
 				self.t = io.drawmenu(w, r)
 			elif ch in (ord('f'), ord('F')):
 				w = ["Pick a function:"]
@@ -87,8 +90,7 @@ class EditMap(object):
 				self.f = io.drawmenu(w, r)
 
 	def point(self):
-		s = self.map.getsquare(self.y, self.x)
-		s.tile = self.t
+		self.map.setsquare(self.y, self.x, self.t)
 
 	def rectangle(self):
 		if self.selected_tile is None:

@@ -10,3 +10,6 @@ class DummyMap(list):
 
 	def getsquare(self, y, x):
 		return self[y*self.cols + x]
+
+	def setsquare(self, y, x, tile):
+		self[y*self.cols + x] = tile

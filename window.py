@@ -20,8 +20,14 @@ class Window(object):
 	def update(self):
 		self.w.noutrefresh()
 
-	def getch(self, *args, **keys):
-		return self.w.getch(*args, **keys)
+	def addch(self, *args):
+		if len(args) == 4 or len(args) == 2:
+			self.w.addch(*(args[:-1] + (colors.d[args[-1]],)))
+		else:
+			self.w.addch(*args)
+
+	def getch(self, *args):
+		return self.w.getch(*args)
 	
 	def gety(self):
 		return self.w.getyx()[0]
@@ -72,9 +78,9 @@ class Window(object):
 			input = self._getstr(print_str + "[white/normal/black/red/green/"
 										"yellow/blue/purple/cyan/light_*]: ")
 			if input == "":
-				return colors.normal
-			elif input in vars(colors):
-				return vars(colors)[input]
+				return "normal"
+			elif input in colors.d:
+				return input
 
 	def getint(self, print_str=None):
 		while True:

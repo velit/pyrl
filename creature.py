@@ -21,7 +21,7 @@ class Creature(object):
 		self.visibility = set()
 		self.visi_mod = set()
 		self.hostile = False
-		self.reverse = "normal"
+		self.reverse = ""
 
 	def getloc(self):
 		return self.square.y, self.square.x
