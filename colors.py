@@ -51,9 +51,15 @@ d["light_blue"] = light_blue
 d["light_purple"] = light_purple
 d["light_cyan"] = light_cyan
 d["normal"] = normal
+
+_temp = {}
+for key, value in d.iteritems():
+	_temp[key+"r"] = value | reverse
+d.update(_temp)
+
+d["reverse"] = reverse
 d["blink"] = blink
 d["bold"] = bold
 d["dim"] = dim
-d["reverse"] = reverse
 d["standout"] = standout
 d["underline"] = underline

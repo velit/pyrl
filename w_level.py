@@ -25,41 +25,41 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(*s.get_memory_data())
+				self.addch(*s.get_memory_data())
 			except curses.error:
 				pass
 
 	def drawlos(self, visibility, l, color_shift="normal"):
 		for s in visibility:
 			try:
-				self.w.addch(*l.getsquare(*s).get_visible_data(color_shift))
+				self.addch(*l.getsquare(*s).get_visible_data(color_shift))
 			except curses.error:
 				pass
 
 	def clearlos(self, old_visibility, l):
 		for s in old_visibility:
 			try:
-				self.w.addch(*l.getsquare(*s).get_memory_data())
+				self.addch(*l.getsquare(*s).get_memory_data())
 			except curses.error:
 				pass
 
 	def drawdummy(self, dummy):
 		self.w.move(0,0)
-		for t in dummy:
+		x = dummy.cols
+		for i, t in enumerate(dummy):
 			try:
 				if t in dummy.tiles:
-					self.w.addch(dummy.tiles[t].ch_memory.symbol,
-							colors.d[dummy.tiles[t].ch_memory.color])
+					self.addch(i/x, i%x, dummy.tiles[t].ch_memory.symbol,
+							dummy.tiles[t].ch_memory.color)
 				else:
-					self.w.addch(tiles[t].ch_memory.symbol,
-							colors.d[tiles[t].ch_memory.color])
+					self.addch(i/x, i%x, tiles[t].ch_memory.symbol,
+							tiles[t].ch_memory.color)
 			except curses.error:
 				pass
 
 	def drawsquare(self, s):
 		try:
-			self.w.addch(s.y, s.x, s.get_visible_char(),
-						s.get_visible_color())
+			self.addch(s.get_visible_data())
 		except curses.error:
 			pass
 

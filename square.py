@@ -46,29 +46,29 @@ class Square(object):
 	def visit(self):
 		self.memory_tile = self.tile
 
-	def get_visible_data(self, color_shift="normal", coords=True):
+	def get_visible_data(self, color_shift="", coords=True):
 		if coords:
 			if self.creature:
 				return (self.y, self.x, self.creature.ch.symbol,
-						d[self.creature.ch.color] | d[color_shift])
+						self.creature.ch.color + color_shift)
 			else:
 				return (self.y, self.x, self.tile.ch_visible.symbol,
-						d[self.tile.ch_visible.color] | d[color_shift])
+						self.tile.ch_visible.color + color_shift)
 		else:
 			if self.creature:
 				return (self.creature.ch.symbol,
-						d[self.creature.ch.color] | d[color_shift])
+						self.creature.ch.color + color_shift)
 			else:
 				return (self.tile.ch_visible.symbol,
-						d[self.tile.ch_visible.color] | d[color_shift])
+						self.tile.ch_visible.color + color_shift)
 
-	def get_memory_data(self, color_shift="normal", coords=True):
+	def get_memory_data(self, color_shift="", coords=True):
 		if coords:
 			return (self.y, self.x, self.memory_tile.ch_memory.symbol,
-					d[self.memory_tile.ch_memory.color] | d[color_shift])
+					self.memory_tile.ch_memory.color + color_shift)
 		else:
 			return (self.memory_tile.ch_memory.symbol,
-					d[self.memory_tile.ch_memory.color] | d[color_shift])
+					self.memory_tile.ch_memory.color + color_shift)
 
 	def get_visible_char(self):
 		if self.creature:
