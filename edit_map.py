@@ -17,10 +17,11 @@ class EditMap(object):
 		self.funs = (self.point, self.rectangle, self.fill)
 		self.f = self.point
 		self.selected_tile = None
-		io.s.add_element("t", "[T]ile: ", lambda:
+		io.s.add_element("t", "Tile: ", lambda:
 				self.map.tiles[self.t].ch_visible.symbol if self.t in
 				self.map.tiles else tiles[self.t].ch_visible.symbol)
-		io.s.add_element("f", "[F]unction: ", lambda: self.f.func_name)
+		io.s.add_element("f", "Function: ", lambda: self.f.func_name)
+		io.s.add_element("k", "Keys: ", lambda: "tyf")
 		self.actions()
 
 		self.edit_map()
@@ -73,11 +74,22 @@ class EditMap(object):
 				return
 			elif ch == ord('\n'):
 				self.f()
+				if self.t == "ds":
+					self.map.squares["ds"] = (self.y, self.x)
+				elif self.t == "us":
+					self.map.squares["us"] = (self.y, self.x)
 				self.editor.modified = True
 			elif ch in (ord('t'), ord('T')):
 				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(tiles):
+					w.append(key)
+					r.append(key)
+				self.t = io.drawmenu(w, r)
+			elif ch in (ord('y'), ord('Y')):
+				w = ["Pick a tile:"]
+				r = [None]
+				for key in sorted(self.map.tiles):
 					w.append(key)
 					r.append(key)
 				self.t = io.drawmenu(w, r)
@@ -100,10 +112,9 @@ class EditMap(object):
 			y1, x1 = self.selected_tile
 			for y in range(min(y0, y1), max(y0, y1)+1):
 				for x in range(min(x0, x1), max(x0, x1)+1):
-					s = self.map.getsquare(y, x)
-					s.tile = self.t
+					s = self.map.setsquare(y, x, self.t)
 			self.selected_tile = None
 	
 	def fill(self):
-		for square in self.map:
-			square.tile = self.t
+		for x in range(len(self.map)):
+			self.map[x] = self.t

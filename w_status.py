@@ -26,4 +26,4 @@ class StatusBar(Window):
 
 	def print_elements(self):
 		for priority, string, value in sorted(self.elements.values()):
-			self.w.addstr(string + str(value()) + " ")
+			self.w.addstr(string + "[" + str(value()) + "] ")

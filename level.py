@@ -8,6 +8,9 @@ from tile import tiles
 from io import io
 from rdg import generateLevel
 
+#import os
+#import pickle
+
 class Level(object):
 	def __init__(self, game, id, generate=True):
 		self.g = game
@@ -18,11 +21,12 @@ class Level(object):
 
 		if generate:
 			generateLevel(self)
+			for x in range(100):
+				self.addcreature(Monster(self.g, self))
 		else:
+			#with open(os.path.join("editor_data", "maps"), "r") as f:
+			#	self.map = Map(pickle.load(f)["wilderness"])
 			self.map = Map(DummyMap(self.rows, self.cols, "f"))
-
-		for x in range(100):
-			self.addcreature(Monster(self.g, self))
 
 	def getsquare(self, str_or_y, *x):
 		return self.map.getsquare(str_or_y, *x)
