@@ -26,32 +26,32 @@ class Player(Creature):
 	def def_actions(self):
 		a = {}
 
-		a[curses.KEY_DOWN] = self.move, S
-		a[curses.KEY_LEFT] = self.move, W
-		a[curses.KEY_RIGHT] = self.move, E
-		a[curses.KEY_UP] = self.move, N
-		a[ord('+')] = self.change_sight_range, 1
-		a[ord('-')] = self.change_sight_range, -1
-		a[ord('.')] = self.move, STOP
-		a[ord('1')] = self.move, SW
-		a[ord('2')] = self.move, S
-		a[ord('3')] = self.move, SE
-		a[ord('4')] = self.move, W
-		a[ord('5')] = self.move, STOP
-		a[ord('6')] = self.move, E
-		a[ord('7')] = self.move, NW
-		a[ord('8')] = self.move, N
-		a[ord('9')] = self.move, NE
-		a[ord('<')] = self.ascend,
-		a[ord('>')] = self.descend,
-		a[ord('H')] = self.los_highlight,
-		a[ord('L')] = self.loadgame,
-		a[ord('Q')] = self.endgame,
-		a[ord('S')] = self.savegame,
-		a[ord('\x12')] = self.redraw,
-		a[ord('d')] = self.debug,
-		a[ord('k')] = self.killall,
-		a[ord('p')] = self.path,
+		a[curses.KEY_DOWN] = "move", S
+		a[curses.KEY_LEFT] = "move", W
+		a[curses.KEY_RIGHT] = "move", E
+		a[curses.KEY_UP] = "move", N
+		a[ord('+')] = "change_sight_range", 1
+		a[ord('-')] = "change_sight_range", -1
+		a[ord('.')] = "move", STOP
+		a[ord('1')] = "move", SW
+		a[ord('2')] = "move", S
+		a[ord('3')] = "move", SE
+		a[ord('4')] = "move", W
+		a[ord('5')] = "move", STOP
+		a[ord('6')] = "move", E
+		a[ord('7')] = "move", NW
+		a[ord('8')] = "move", N
+		a[ord('9')] = "move", NE
+		a[ord('<')] = "ascend",
+		a[ord('>')] = "descend",
+		a[ord('H')] = "los_highlight",
+		a[ord('L')] = "loadgame",
+		a[ord('Q')] = "endgame",
+		a[ord('S')] = "savegame",
+		a[ord('\x12')] = "redraw",
+		a[ord('d')] = "debug",
+		a[ord('k')] = "killall",
+		a[ord('p')] = "path",
 
 		self.actions = a
 
@@ -71,7 +71,7 @@ class Player(Creature):
 					io.msg("Undefined command key: "+str(c))
 
 	def exec_act(self, act):
-		return act[0](*act[1:])
+		return self.__getattribute__(act[0])(*act[1:])
 
 	def move(self, dir):
 		if dir == STOP:
