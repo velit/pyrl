@@ -14,12 +14,11 @@ from constants import YES, NO, DEFAULT
 BACK = 1
 EXIT = 4
 
-def add_ebe(l, r, k):
-	"""add an empty line, option to go back and exit to line selection"""
+def add_ebe(lrk_tuple):
+	l, r, k, = lrk_tuple
 	l.extend(("", "[<] Back", "[Q]uit"))
 	r.extend((None, BACK, EXIT))
-	k[ord('<')] = BACK
-	k[ord('Q')] = EXIT
+	k.update({ord('<'): BACK, ord('Q'): EXIT})
 
 class Editor(object):
 	def __init__(self):
@@ -29,7 +28,172 @@ class Editor(object):
 			self.load(ask=False)
 		except IOError:
 			pass
-		self.main_menu()
+
+		self.main_menu_items = (
+			("View global tiles", "Map editor", "Save data",
+			"Load data", "Export data", "Import data", "[Q]uit"),
+
+			(self.view_global_tiles, self.map_menu, self.save,
+			self.load, self.export, self.import_data, self.exit),
+
+			{ord('Q'): self.exit})
+
+		self.map_menu_items = (
+			["Make a new map", "Edit maps", "Delete maps"],
+			[self.new_map, self.edit_maps, self.delete_maps], {})
+
+		self.map_edit_menu_items = (
+			["Edit", "Edit tiles", "Make a new tile", "Delete tiles"],
+			["Edit", "Edit tiles", "Make a new tile", "Delete tiles"], {})
+
+		add_ebe(self.map_menu_items)
+		add_ebe(self.map_edit_menu_items)
+		self.static_menu(self.main_menu_items)
+
+	def map_menu(self):
+		self.static_menu(self.map_menu_items)
+
+	def edit_map(self, map):
+		self.static_menu(self.map_edit_menu_items, (self.map_edit_menu, map))
+
+	def view_global_tiles(self):
+		self.dict_menu(tiles, "Pick a tile to view", self.view_tile,
+				output_matrix=(1,1))
+
+	def view_tile(self, tile):
+		self.dict_menu(vars(tile), "Defined in source: Read Only", None, True,
+				(1,1), (0,0))
+
+	def edit_maps(self):
+		self.dict_menu(self.maps, "Pick a map to edit", self.edit_map,
+				not_tile=True)
+
+	def delete_maps(self):
+		self.dict_menu(self.maps, "Pick a map to delete", self.delete_map,
+				True, return_matrix=(1,0)) 
+
+	def map_edit_menu(self, s, map):
+		if s == "Edit":
+			EditMap(self, map)
+		elif s == "Edit tiles":
+			self.dict_menu(map.tiles, "Pick a tile to edit",
+					self.pick_attribute, output_matrix=(1,1))
+		elif s == "Make a new tile":
+			self.new_tile(map.tiles)
+		elif s == "Delete tiles":
+			self.dict_menu(map.tiles, "Pick a tile to delete",
+					(self.delete_tile, map.tiles), False, (1,1), (1,0))
+
+
+	def pick_attribute(self, tile):
+		self.dict_menu(vars(tile), "Pick an attribute to edit",
+				(self.edit_attribute, tile), True, (1,1), (1,1))
+
+	def edit_attribute(self, attr_tuple, tile):
+		key, value = attr_tuple
+		self.modified = True
+		if isinstance(value, bool):
+			setattr(tile, key, io.a.getbool(key))
+		elif isinstance(value, str):
+			setattr(tile, key, io.a.getstr(key))
+		elif isinstance(value, int):
+			setattr(tile, key, io.a.getint(key))
+		elif isinstance(value, Char):
+			setattr(tile, key, Char(io.a.getchar(key),
+				io.a.getcolor(key)))
+		else:
+			raise TypeError("Attempt to modify unsupported type: "+key)
+
+	def static_menu(self, menu, behaviour_f=None):
+		i = 0
+		while True:
+			s = io.a.draw_menu(menu[0], menu[1], menu[2], i)
+			i = menu[1].index(s)
+			if s == BACK:
+				return
+			elif s == EXIT:
+				exit()
+			elif behaviour_f is None:
+				s()
+			else:
+				behaviour_f[0](s, *behaviour_f[1:])
+
+	def dict_menu(self, dict, str, behaviour_f=None, not_tile=False,
+			output_matrix=(1,0), return_matrix=(0,1)):
+		i = 0
+		lkey = output_matrix[0]
+		lvalue = output_matrix[1]
+		rkey = return_matrix[0]
+		rvalue = return_matrix[1]
+		while True:
+			l = [str, ""]
+			r = [None, None]
+			k = {}
+			for key, value in sorted(dict.iteritems()):
+				if not_tile:
+					print_value = value
+				else:
+					print_value = value.ch_visible
+
+				if lkey and lvalue:
+					l.append((key, print_value))
+				elif lkey and not lvalue:
+					l.append(key)
+				elif not lkey and lvalue:
+					l.append(print_value)
+				else:
+					l.append("N/A")
+
+				if rkey and rvalue:
+					r.append((key, value))
+				elif rkey and not rvalue:
+					r.append(key)
+				elif not rkey and rvalue:
+					r.append(value)
+				else:
+					r.append(lambda: None)
+			add_ebe((l,r,k))
+
+			s = io.a.draw_menu(l, r, k, i)
+			i = r.index(s)
+			if s == BACK:
+				return
+			elif s == EXIT:
+				exit()
+			elif behaviour_f is None:
+				try:
+					s()
+				except TypeError:
+					s[0](*s[1:])
+			else:
+				try:
+					behaviour_f(s)
+				except TypeError:
+					behaviour_f[0](s, *behaviour_f[1:])
+
+	def new_map(self):
+		handle = io.a.getstr("Map handle")
+		self.maps[handle] = DummyMap(io.level_rows, io.level_cols, "f")
+		self.modified = True
+
+	def delete_map(self, key):
+		c = io.a.getch_from_list(str="Are you sure you want to delete"
+					" this map? [y/N]: ")
+		if c in YES:
+			del self.maps[key]
+			self.modified = True
+
+	def new_tile(self, tiles):
+		handle = io.a.getstr("Tile handle")
+		tiles[handle] = Tile()
+		self.modified = True
+
+	def delete_tile(self, key, tiles):
+		c = io.a.getch_from_list(str="Are you sure you wish to delete"
+				" this tile? [y/N]: ")
+		if c in YES:
+			del tiles[key]
+			self.modified = True
 
 	def save(self, ask=True):
 		if ask:
@@ -87,9 +251,6 @@ class Editor(object):
 
 		self.modified = True
 
-	def back(self):
-		return True
-
 	def exit(self):
 		if self.modified:
 			c = io.a.getch_from_list(str="The data has been modified;"
@@ -97,123 +258,6 @@ class Editor(object):
 			if c in YES:
 				self.save(ask=False)
 		exit()
-
-	def exec_ebe(self, s):
-		if s == EXIT:
-			self.exit()
-		else:
-			return s == BACK
-
-	def main_menu(self):
-		l = ["View global tiles", "Map editor", "[S]ave data",
-				"[L]oad data", "Export data", "Import data", "[Q]uit"]
-		r = [self.view_global_tiles, self.map_editor, self.save, self.load,
-				self.export, self.import_data, self.exit]
-		k = {ord('Q'): self.exit, ord('S'): self.save, ord('L'): self.load}
-		i = 0
-		while True:
-			s = io.a.draw_menu(l, r, k, i)
-			i = r.index(s)
-			s()
-
-	def view_global_tiles(self):
-		for s in self.pick_dict(tiles, "tile to view"):
-			self.view_tile(s)
-
-	def view_tile(self, tile):
-		i = 0
-		while True:
-			l = []
-			r = []
-			k = {}
-			a = sorted(vars(tile))
-			for key in a:
-				value = getattr(tile, key)
-				l.append((key, value))
-				r.append((key, value))
-
-			add_ebe(l, r, k)
-
-			s = io.a.draw_menu(l, r, k, i)
-			if s == BACK:
-				return
-			elif s == EXIT:
-				self.exit()
-			else:
-				i = a.index(s[0])
-
-	def map_editor(self):
-		l = ["Make a new map", "Edit maps", "Delete maps"]
-		r = [self.new_map, self.pick_map, self.delete_map]
-		k = {}
-		add_ebe(l, r, k)
-		i = 0
-		while True:
-			s = io.a.draw_menu(l, r, k, i)
-			i = r.index(s)
-			if self.exec_ebe(s):
-				return
-			else:
-				s()
-
-	def new_tile(self, tiles):
-		handle = io.a.getstr("Tile handle")
-		tiles[handle] = Tile()
-		self.modified = True
-
-	def pick_dict(self, dict, str, give_key=False, map=False):
-		i = 0
-		while True:
-			l = ["Pick a "+str, ""]
-			r = [None, None]
-			k = {}
-			for key, value in sorted(dict.iteritems()):
-				if map:
-					l.append(key)
-				else:
-					l.append((key, value.ch_visible))
-				if give_key:
-					r.append(key)
-				else:
-					r.append(value)
-			add_ebe(l, r, k)
-
-			s = io.a.draw_menu(l, r, k, i)
-			if self.exec_ebe(s):
-				return
-			else:
-				i = r.index(s)
-				yield s
-
-	def edit_map(self, map):
-		l = ["Edit", "Edit tiles", "Make a new tile", "Delete tiles"]
-		r = [EditMap, self.pick_tile, self.new_tile, self.delete_tile]
-		k = {}
-		add_ebe(l, r, k)
-		i = 0
-		while True:
-			s = io.a.draw_menu(l, r, k, i)
-			i = r.index(s)
-			if self.exec_ebe(s):
-				return
-			else:
-				if s == EditMap:
-					s(self, map)
-				else:
-					s(map.tiles)
-
-
-	def pick_tile(self, tiles):
-		for s in self.pick_dict(tiles, "tile to edit"):
-			self.edit_tile(s)
-
-	def delete_tile(self, tiles):
-		for s in self.pick_dict(tiles, "tile to delete", True):
-			c = io.a.getch_from_list(str="Are you sure you wish to delete"
-						" this tile? [y/N]: ")
-			if c in YES:
-				del tiles[s]
-				self.modified = True
 
 	def update_tile(self, tiles):
 		c = io.a.getch_from_list(str="Are you sure you wish to update"
@@ -231,54 +275,4 @@ class Editor(object):
 				for j in d:
 					del dict_u[j]
 				tiles[tile] = u
-				self.modified = True
-
-	def edit_tile(self, tile):
-		i = 0
-		while True:
-			l = ["Pick an attribute to edit", ""]
-			r = [None, None]
-			k = {}
-			a = sorted(vars(tile))
-			for key in a:
-				value = getattr(tile, key)
-				l.append((key, value))
-				r.append((key, value))
-
-			add_ebe(l, r, k)
-
-			s = io.a.draw_menu(l, r, k, i)
-			if self.exec_ebe(s):
-				return
-			else:
-				i = a.index(s[0])
-				self.modified = True
-				if isinstance(s[1], bool):
-					setattr(tile, s[0], io.a.getbool(s[0]))
-				elif isinstance(s[1], str):
-					setattr(tile, s[0], io.a.getstr(s[0]))
-				elif isinstance(s[1], int):
-					setattr(tile, s[0], io.a.getint(s[0]))
-				elif isinstance(s[1], Char):
-					setattr(tile, s[0], Char(io.a.getchar(s[0]),
-						io.a.getcolor(s[0])))
-				else:
-					raise TypeError("Attempt to modify unsupported type:"+
-							s[0])
-
-	def new_map(self):
-		handle = io.a.getstr("Map handle")
-		self.maps[handle] = DummyMap(io.level_rows, io.level_cols, "f")
-		self.modified = True
-
-	def pick_map(self):
-		for s in self.pick_dict(self.maps, "map to edit", False, True):
-			self.edit_map(s)
-
-	def delete_map(self):
-		for s in self.pick_dict(self.maps, "map to delete", True, True):
-			c = io.a.getch_from_list(str="Are you sure you want to delete"
-						" this map? [y/N]: ")
-			if c in YES:
-				del self.maps[s]
 				self.modified = True
