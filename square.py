@@ -33,7 +33,6 @@ class Square(object):
 		else:
 			return False
 
-	# without regard for the passability of the square, is the underlying tile
 	def tile_passable(self):
 		if self.tile:
 			return self.tile.passable

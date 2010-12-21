@@ -3,7 +3,7 @@ import path
 from bresenham import bresenham
 from monster import Monster
 from map import Map
-from dummy_map import DummyMap
+from dungeonproperties import TileMap
 from tile import tiles
 from io import io
 from rdg import generateLevel
@@ -26,16 +26,17 @@ class Level(object):
 		else:
 			#with open(os.path.join("editor_data", "maps"), "r") as f:
 			#	self.map = Map(pickle.load(f)["wilderness"])
-			self.map = Map(DummyMap(self.rows, self.cols, "f"))
+			self.map = Map(TileMap(self.rows, self.cols, "f"))
 
-	def getsquare(self, str_or_y, *x):
-		return self.map.getsquare(str_or_y, *x)
+	
+	def getsquare(self, y, *x):
+		return self.map.getsquare(y, *x)
 
-	def get_free_tile(self):
-		return self.map.get_free_tile()
+	def get_free_square(self):
+		return self.map.get_free_square()
 
-	def get_random_tile(self):
-		return self.map.get_random_tile()
+	def get_random_square(self):
+		return self.map.get_random_square()
 
 	def visit_square(self, y, x):
 		if self.legal_yx(y, x):
@@ -57,7 +58,7 @@ class Level(object):
 
 	def addcreature(self, creature, square = None):
 		if square is None:
-			square = self.get_free_tile()
+			square = self.get_free_square()
 		self.creatures.append(creature)
 		square.creature = creature
 		creature.square = square

@@ -93,7 +93,8 @@ class Player(Creature):
 		return True
 
 	def hit(self, creature):
-		io.msg("You hit the "+creature.name+" for "+str(self.dmg)+" damage.")
+		io.msg("You hit the "+creature.name+" for "+str(self.dmg)+
+				" damage.")
 		creature.lose_hp(self.dmg)
 
 	def descend(self):
@@ -135,15 +136,19 @@ class Player(Creature):
 		#io.msg(io.cols)
 		#i = 0
 		#for x in range(self.l.cols):
-		#	i +=io.l.drawline(self.l.getsquare(25, 40), self.l.getsquare(0, x))
+		#	i +=io.l.drawline(self.l.getsquare(25, 40),
+		#self.l.getsquare(0, x))
 		#for y in range(self.l.rows):
 		#	i +=io.l.drawline(self.l.getsquare(25, 40),
 		#			self.l.getsquare(y, self.l.cols-1))
 		#io.msg(i)
 		#io.msg(len(self.visibility-self.old_visibility))
-		#io.l.drawline(self.l.getsquare(25, 40), self.l.getsquare(44, 19))
-		#io.l.drawline(self.l.getsquare(44, 19), self.l.getsquare(25, 40))
-		#io.msg(sorted((x.y, x.x) for x in self.visibility if self.has_los(x)))
+		#io.l.drawline(self.l.getsquare(25, 40),
+		#self.l.getsquare(44, 19))
+		#io.l.drawline(self.l.getsquare(44, 19),
+		#self.l.getsquare(25, 40))
+		#io.msg(sorted((x.y, x.x) for x in self.visibility
+		#if self.has_los(x)))
 		io.msg(all(self.has_los(x) for x in self.visibility))
 		for x in self.l.map:
 			if not self.has_los(x): io.drawstar(x)

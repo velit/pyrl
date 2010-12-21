@@ -6,9 +6,9 @@ from map import Map
 from constants import *
 
 class EditMap(object):
-	def __init__(self, editor, dummymap):
+	def __init__(self, editor, tilemap):
 		self.editor = editor
-		self.map = dummymap
+		self.map = tilemap
 		self.y = 0
 		self.x = 0
 		self.my = self.map.rows-1
@@ -27,7 +27,7 @@ class EditMap(object):
 		self.edit_map()
 
 	def drawmap(self):
-		io.drawdummy(self.map)
+		io.drawtilemap(self.map)
 
 	def actions(self):
 		a = {}
@@ -46,7 +46,7 @@ class EditMap(object):
 		a[ord('8')] = self.move_cursor, N
 		a[ord('9')] = self.move_cursor, NE
 		a[ord('S')] = self.editor.save,
-		a[ord('Q')] = self.editor.exit,
+		a[ord('Q')] = self.editor.safe_exit,
 
 		self.actions = a
 
