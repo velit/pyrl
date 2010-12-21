@@ -31,8 +31,8 @@ class IO(object):
 	def drawmemory(self, map):
 		self.l.drawmemory(map)
 
-	def drawdummy(self, dummy):
-		self.l.drawdummy(dummy)
+	def drawtilemap(self, tilemap):
+		self.l.drawtilemap(tilemap)
 
 	def drawmenu(self, words, returns):
 		return self.m.draw_h_menu(words, returns)

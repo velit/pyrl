@@ -8,8 +8,11 @@ class DummyMap(list):
 		self.cols = x
 		self.squares = {}
 
-	def getsquare(self, y, x):
-		return self[y*self.cols + x]
+	def getsquare(self, y, x=None):
+		if x is not None:
+			return self[y*self.cols + x]
+		else:
+			return self.squares[y]
 
 	def setsquare(self, y, x, tile):
 		self[y*self.cols + x] = tile

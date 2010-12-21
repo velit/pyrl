@@ -6,7 +6,7 @@ from os import path
 from io import io
 from edit_map import EditMap
 from map import Map
-from dummy_map import DummyMap
+from dungeonproperties import DungeonProperties, TileMap
 from tile import Tile, tiles
 from char import Char
 from constants import YES, NO, DEFAULT
@@ -22,11 +22,11 @@ def add_ebe(lrk_tuple):
 
 class Editor(object):
 	def __init__(self):
-		self.maps = {}
+		self.data = DungeonProperties()
 		self.modified = False
 		try:
 			self.load(ask=False)
-		except IOError:
+		except:
 			pass
 
 		self.main_menu_items = (
@@ -34,9 +34,9 @@ class Editor(object):
 			"Load data", "Export data", "Import data", "[Q]uit"),
 
 			(self.view_global_tiles, self.map_menu, self.save,
-			self.load, self.export, self.import_data, self.exit),
+			self.load, self.export, self.import_data, self.safe_exit),
 
-			{ord('Q'): self.exit})
+			{ord('Q'): self.safe_exit})
 
 		self.map_menu_items = (
 			["Make a new map", "Edit maps", "Delete maps"],
@@ -112,7 +112,7 @@ class Editor(object):
 			if s == BACK:
 				return
 			elif s == EXIT:
-				exit()
+				self.safe_exit()
 			elif behaviour_f is None:
 				s()
 			else:
@@ -159,7 +159,7 @@ class Editor(object):
 			if s == BACK:
 				return
 			elif s == EXIT:
-				exit()
+				self.safe_exit()
 			elif behaviour_f is None:
 				try:
 					s()
@@ -173,7 +173,7 @@ class Editor(object):
 
 	def new_map(self):
 		handle = io.a.getstr("Map handle")
-		self.maps[handle] = DummyMap(io.level_rows, io.level_cols, "f")
+		self.maps[handle] = TileMap(io.level_rows, io.level_cols, "f")
 		self.modified = True
 
 	def delete_map(self, key):
@@ -251,7 +251,7 @@ class Editor(object):
 
 		self.modified = True
 
-	def exit(self):
+	def safe_exit(self):
 		if self.modified:
 			c = io.a.getch_from_list(str="The data has been modified;"
 						" save before exit? [y/N] ")

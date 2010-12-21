@@ -1,7 +1,7 @@
 from random import randrange as rr, random as rand, choice
 
 from map import Map
-from dummy_map import DummyMap
+from dungeonproperties import TileMap
 from square import Square as S
 from tile import tiles
 
@@ -10,7 +10,7 @@ r = tiles["r"]
 f = tiles["f"]
 
 def generateLevel(level):
-	level.map = Map(DummyMap(level.rows, level.cols, "r"))
+	level.map = Map(TileMap(level.rows, level.cols, "r"))
 	_make_initial_room(level)
 	for x in range(2000):
 		if rand() < 0.50:
@@ -22,7 +22,7 @@ def generateLevel(level):
 
 def add_staircase_up(level):
 	while True:
-		square = level.get_free_tile()
+		square = level.get_free_square()
 		y, x = square.y, square.x
 		g = level.getsquare
 		if g(y-1, x).tile == f and g(y+1, x).tile == f \
@@ -34,7 +34,7 @@ def add_staircase_up(level):
 
 def add_staircase_down(level):
 	while True:
-		square = level.get_free_tile()
+		square = level.get_free_square()
 		y, x = square.y, square.x
 		g = level.getsquare
 		if g(y-1, x).tile == f and g(y+1, x).tile == f and \
@@ -58,10 +58,10 @@ def _make_initial_room(level):
 
 def _get_wall_square(level):
 	while True:
-		tile = level.get_random_tile()
-		dir = _is_wall(level, tile)
+		square = level.get_random_square()
+		dir = _is_wall(level, square)
 		if dir[0]:
-			return tile, dir[1]
+			return square, dir[1]
 
 def _is_wall(level, square):
 	y, x = square.y, square.x
