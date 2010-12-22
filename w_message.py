@@ -48,7 +48,7 @@ class MessageBar(Window):
 					a = self.last_line_wrapper.wrap(str)
 					self.w.addstr(cur_line, 0, a[0] + MORE_STR)
 					if not skip_all:
-						c = self.getch_from_list(list=DEFAULT)
+						c = self.sel_getch(char_list=DEFAULT)
 						if c == ord('\n'):
 							skip_all = True
 					str = " ".join(a[1:])

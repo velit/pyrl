@@ -49,8 +49,8 @@ class IO(object):
 	def getstr(self, *str):
 		self.m.getstr(*str)
 
-	def msg(self, string):
-		self.m.queue_msg(str(string))
+	def msg(self, message):
+		self.m.queue_msg(str(message))
 	
 	def refresh(self):
 		self.m.update()
@@ -68,11 +68,11 @@ class IO(object):
 		self.refresh()
 		return self.l.getch(*args, **keys)
 
-	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
-		if str is not None:
-			self.msg(str)
+	def sel_getch(self, print_str=None, *args, **keys):
+		if print_str is not None:
+			self.msg(print_str)
 		self.refresh()
-		return self.l.getch_from_list(list)
+		return self.l.sel_getch(None, *args, **keys)
 
 	def drawpath(self, iterator):
 		curses.curs_set(0)

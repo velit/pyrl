@@ -38,31 +38,31 @@ class Window(object):
 	def getyx(self):
 		return self.w.getyx()
 
-	def getch_from_list(self, list=YES | NO | DEFAULT, str=None):
-		if str:
-			self.clear_and_print(str)
+	def sel_getch(self, print_str=None, char_list=YES | NO | DEFAULT):
+		if print_str:
+			self.clear_and_print(print_str)
 		c = self.w.getch()
-		while c not in list:
+		while c not in char_list:
 			c = self.w.getch()
 		return c
 
-	def clear_and_print(self, str):
+	def clear_and_print(self, print_str):
 		self.clear()
-		self.w.addstr(str)
+		self.w.addstr(print_str)
 
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)
 		curses.echo()
-		str = self.w.getstr()
+		print_str = self.w.getstr()
 		curses.noecho()
-		return str
+		return print_str
 
 	def getbool(self, print_str=None):
 		while True:
-			input = self._getstr(print_str + " [1/0]: ")
-			if input == "" or input == "0":
+			input = self._getstr(print_str + " [T/F]: ")
+			if input in ("", "0", "f", "false", "False"):
 				return False
-			elif input == "1":
+			elif input in ("1", "t", "true", "True"):
 				return True
 
 	def getchar(self, print_str=None):
@@ -92,8 +92,8 @@ class Window(object):
 			except ValueError:
 				pass
 
-	def getstr(self, str=None):
-		return self._getstr(str + " [str]: ")
+	def getstr(self, print_str=None):
+		return self._getstr(print_str + " [str]: ")
 
 	def getmaxyx(self):
 		return self.w.getmaxyx()

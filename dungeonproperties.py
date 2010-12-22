@@ -4,20 +4,20 @@ class DungeonProperties(object):
 	"""Includes properties of generated dungeons."""
 	def __init__(self):
 		self.tilemaps = {}
-		self.dungeon_structure = {}
+		self.dungeons = {}
 
 	def add_dungeon(self, dungeon_key):
-		self.dungeon_structure[dungeon_key] = []
+		self.dungeons[dungeon_key] = []
 
 	def del_dungeon(self, dungeon_key):
-		del self.dungeon_structure[dungeon_key]
+		del self.dungeons[dungeon_key]
 
-	def add_random_dungeon_structure(self, dungeon_key):
-		i = len(self.dungeon_structure[dungeon_key])
-		self.dungeon_structure[dungeon_key].append(DungeonStructureNode(i))
+	def add_random_level(self, dungeon_key):
+		i = len(self.dungeons[dungeon_key])
+		self.dungeons[dungeon_key].append(DungeonNode(i))
 
-	def add_predefined_dungeon_structure(self, dungeon_key, level_key): 
-		i = len(self.dungeon_structure[dungeon_key])
+	def add_predefined_level(self, dungeon_key, level_key): 
+		i = len(self.dungeons[dungeon_key])
 
 		passageways = {}
 		for key in self.tilemaps[level_key].squares:
@@ -26,21 +26,17 @@ class DungeonProperties(object):
 			else:
 				passageways[key] = "down"
 
-		self.dungeon_structure[dungeon_key].append(DungeonStructureNode(i,
-			False, level_key, passageways))
+		self.dungeons[dungeon_key].append(DungeonNode(i, False, level_key,
+			passageways))
 
-	def del_dungeon_structure(self, dungeon_key, i):
-		del self.dungeon_structure[dungeon_key][i]
+	def del_level(self, dungeon_key, i):
+		del self.dungeons[dungeon_key][i]
 
-	def add_tilemap(self, tilemap):
-		pass
-
-class DungeonStructureNode(object):
-	def __init__(self, danger_level=0, randomize = True, level_key = None,
+class DungeonNode(object):
+	def __init__(self, danger_level=0, tilemap_handle = None,
 			passageways = {"us": "up", "ds": "down"}):
 		self.danger_level = danger_level
-		self.randomize = randomize
-		self.level_key = level_key
+		self.tilemap_handle = tilemap_handle
 		self.passageways = passageways
 
 class TileMap(list):
