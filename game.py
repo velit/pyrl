@@ -48,7 +48,7 @@ class Game(object):
 	def endgame(self, ask=True):
 		if not ask:
 			exit()
-		c = io.getch_from_list(str="Do you wish to end the game? [y/N]:")
+		c = io.sel_getch("Do you wish to end the game? [y/N]:")
 		if c in YES:
 			exit()
 	
@@ -60,7 +60,7 @@ class Game(object):
 		if not ask:
 			self._save()
 			self.endgame(True)
-		c = io.getch_from_list(str="Do you wish to save the game? [Y/n]:")
+		c = io.sel_getch("Do you wish to save the game? [Y/n]:")
 		if c in YES | DEFAULT:
 			self._save()
 			self.endgame(True)
@@ -68,7 +68,7 @@ class Game(object):
 	def loadgame(self, ask=True):
 		if not ask:
 			self.main.load()
-		c = io.getch_from_list(str="Do you wish to load the game? [y/N]:")
+		c = io.sel_getch("Do you wish to load the game? [y/N]:")
 		if c in YES:
 			self.main.load()
 

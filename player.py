@@ -106,8 +106,7 @@ class Player(Creature):
 		return True
 
 	def die(self):
-		io.msg("You die... [more]")
-		io.getch_from_list((ord(' '), ord('\n')))
+		io.sel_getch("You die... [more]", char_list=DEFAULT)
 		self.g.endgame(False)
 
 	def endgame(self):

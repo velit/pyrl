@@ -1,6 +1,7 @@
 import curses
 import colors
 from char import Char
+from collections import Sequence
 
 def draw(io, lines, returns, keys=(), start_line=0):
 	indent = _get_indent(lines)
@@ -22,19 +23,43 @@ def _update_ui(io, l, r, k, sl, i):
 			curses.curs_set(1)
 			return r[sl]
 
-def _get_indent(lines):
+def _get_indent(lines, initial_i=0):
 	i = 0
 	# if any line has second words, find out indentation level
 	ii = isinstance
-	if any(not ii(l, str) for l in lines):
-		for l in lines:
-			if not ii(l, str):
-				if ii(l[0], Char):
-					i = max(i, 1)
-				else:
-					i = max(i, len(l[0]))
-		i += 1 #leave room between words
+	for l in lines:
+		if not ii(l, str) and ii(l, Sequence):
+			try:
+				b = l[initial_i]
+			except IndexError:
+				continue
+
+			if ii(b, str):
+				i = max(i, len(b)+1)
+			elif ii(b, Char):
+				i = max(i, 1+1)
+			else:
+				i = max(i, len(str(b))+1)
 	return i
+
+	#if any(not ii(l, str) and ii(l, Sequence) for l in lines):
+	#	for l in lines:
+	#		if not ii(l, str) and ii(l, Sequence):
+	#			b = l[0]
+
+	#			if ii(b, str):
+	#				i = max(i, len(b))
+	#			elif ii(b, Char):
+	#				i = max(i, 1)
+	#			else:
+	#				i = max(i, len(str(b)))
+	#		else:
+	#			if ii(l, str):
+	#				i = max(i, len(l))
+	#			elif ii(l, Char):
+	#				i = max(i, 1)
+	#			else:
+	#				i = max(i, len(str(l)))
 
 def _print_menu(io, l, i):
 	curses.curs_set(0)
@@ -44,8 +69,8 @@ def _print_menu(io, l, i):
 
 def _print_menu_line(io, sl, i, l, reverse=False):
 	r = colors.reverse if reverse else colors.normal
-	if not isinstance(l[sl], str):
-		ln = len(l[sl][0])
+	if not isinstance(l[sl], str) and isinstance(l[sl], Sequence):
+		ln = len(str(l[sl][0]))
 		_print_menu_word(io, sl, 0, l[sl][0], r)
 		_print_menu_word(io, sl, ln, " "*(i-ln), r)
 		_print_menu_word(io, sl, i, l[sl][1], r)
