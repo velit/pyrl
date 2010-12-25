@@ -26,32 +26,32 @@ class Player(Creature):
 	def def_actions(self):
 		a = {}
 
-		a[curses.KEY_DOWN] = "move", S
-		a[curses.KEY_LEFT] = "move", W
-		a[curses.KEY_RIGHT] = "move", E
-		a[curses.KEY_UP] = "move", N
-		a[ord('+')] = "change_sight_range", 1
-		a[ord('-')] = "change_sight_range", -1
-		a[ord('.')] = "move", STOP
-		a[ord('1')] = "move", SW
-		a[ord('2')] = "move", S
-		a[ord('3')] = "move", SE
-		a[ord('4')] = "move", W
-		a[ord('5')] = "move", STOP
-		a[ord('6')] = "move", E
-		a[ord('7')] = "move", NW
-		a[ord('8')] = "move", N
-		a[ord('9')] = "move", NE
-		a[ord('<')] = "ascend",
-		a[ord('>')] = "descend",
-		a[ord('H')] = "los_highlight",
-		a[ord('L')] = "loadgame",
-		a[ord('Q')] = "endgame",
-		a[ord('S')] = "savegame",
-		a[ord('\x12')] = "redraw",
-		a[ord('d')] = "debug",
-		a[ord('k')] = "killall",
-		a[ord('p')] = "path",
+		a[curses.KEY_DOWN] = "move", (S, )
+		a[curses.KEY_LEFT] = "move", (W, )
+		a[curses.KEY_RIGHT] = "move", (E, )
+		a[curses.KEY_UP] = "move", (N, )
+		a[ord('+')] = "change_sight_range", (1, )
+		a[ord('-')] = "change_sight_range", (-1, )
+		a[ord('.')] = "move", (STOP, )
+		a[ord('1')] = "move", (SW, )
+		a[ord('2')] = "move", (S, )
+		a[ord('3')] = "move", (SE, )
+		a[ord('4')] = "move", (W, )
+		a[ord('5')] = "move", (STOP, )
+		a[ord('6')] = "move", (E, )
+		a[ord('7')] = "move", (NW, )
+		a[ord('8')] = "move", (N, )
+		a[ord('9')] = "move", (NE, )
+		a[ord('<')] = "ascend", ()
+		a[ord('>')] = "descend", ()
+		a[ord('H')] = "los_highlight", ()
+		a[ord('L')] = "loadgame", ()
+		a[ord('Q')] = "endgame", ()
+		a[ord('S')] = "savegame", ()
+		a[ord('\x12')] = "redraw", ()
+		a[ord('d')] = "debug", ()
+		a[ord('k')] = "killall", ()
+		a[ord('p')] = "path", ()
 
 		self.actions = a
 
@@ -71,7 +71,7 @@ class Player(Creature):
 					io.msg("Undefined command key: "+str(c))
 
 	def exec_act(self, act):
-		return self.__getattribute__(act[0])(*act[1:])
+		return self.__getattribute__(act[0])(*act[1])
 
 	def move(self, dir):
 		if dir == STOP:
@@ -121,39 +121,9 @@ class Player(Creature):
 
 	def debug(self):
 		io.msg((io.level_rows, io.level_cols))
-		#self.l.drawmemory()
-		#io.getch()
-		#self.l.drawmap()
-		#io.msg((self.square.getloc(), self.l.squares["ds"].getloc()))
-		#io.l.drawline(self.square, self.l.squares["ds"])
-		#self.redraw()
 
 	def path(self):
-		#io.drawpath(self.l.path(self.square, self.l.squares["ds"]))
-		#io.msg(str(curses.A_NORMAL))
-		#io.msg(io.rows)
-		#io.msg(io.cols)
-		#i = 0
-		#for x in range(self.l.cols):
-		#	i +=io.l.drawline(self.l.getsquare(25, 40),
-		#self.l.getsquare(0, x))
-		#for y in range(self.l.rows):
-		#	i +=io.l.drawline(self.l.getsquare(25, 40),
-		#			self.l.getsquare(y, self.l.cols-1))
-		#io.msg(i)
-		#io.msg(len(self.visibility-self.old_visibility))
-		#io.l.drawline(self.l.getsquare(25, 40),
-		#self.l.getsquare(44, 19))
-		#io.l.drawline(self.l.getsquare(44, 19),
-		#self.l.getsquare(25, 40))
-		#io.msg(sorted((x.y, x.x) for x in self.visibility
-		#if self.has_los(x)))
-		io.msg(all(self.has_los(x) for x in self.visibility))
-		for x in self.l.map:
-			if not self.has_los(x): io.drawstar(x)
-		io.getch()
-		self.redraw()
-		#pass
+		io.msg("Everything is all right.")
 	
 	def los_highlight(self):
 		if self.reverse == "":

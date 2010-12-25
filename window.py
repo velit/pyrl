@@ -108,8 +108,8 @@ class Window(object):
 	def addstr(self, *args, **keys):
 		self.w.addstr(*args, **keys)
 
-	def draw_menu(self, lines, returns, keys=(), i=0):
-		return menu.draw(self, lines, returns, keys, i)
+	def draw_menu(self, *args, **keys):
+		return menu.draw(self, *args, **keys)
 
-	def draw_h_menu(self, words, returns):
-		return menu_h.draw(self, words, returns)
+	def draw_h_menu(self, *args, **keys):
+		return menu_h.draw(self, *args, **keys)

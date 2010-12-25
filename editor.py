@@ -12,13 +12,48 @@ from tile import Tile, tiles
 from char import Char
 from constants import YES, NO, DEFAULT
 
-def add_ebe(lrk_tuple):
-	l, r, k, = lrk_tuple
-	l.extend(("", "[<] Back", "[Q]uit"))
-	r.extend((None, "Back", "Exit"))
-	k.update({ord('<'): "Back", ord('Q'): "Exit"})
+BACK = "[<] Back"
+QUIT = "[Q]uit"
+
+MAIN_ITEMS = ((
+	"Welcome to the pyrl editor",
+	"",
+	"View global tiles",
+	"Edit maps",
+	"Edit dungeons",
+	"",
+	"Save data",
+	"Load data",
+	"Export data",
+	"Import data",
+	QUIT, 
+), (0, 1, 5))
+
+MAP_ITEMS = ((
+	"Edit",
+	"Edit tiles",
+	"",
+	BACK,
+	QUIT,
+), (2, ))
+
+DUNGEON_ITEMS = ((
+	"Edit",
+	"Add a generated level",
+	"Add a level",
+	"Delete a level",
+	"",
+	BACK,
+	QUIT,
+), (4, ))
+
+SELECT = (ord('\n'), ord('>'))
+DEL = 330
+INSERT = 331
+HOME = 262
 
 class Editor(object):
+
 	def __init__(self):
 		self.data = DungeonProperties()
 		self.modified = False
@@ -27,70 +62,78 @@ class Editor(object):
 		except:
 			pass
 
-		self.main_menu_items = (
-			("View global tiles", "Editor", "Save data",
-			"Load data", "Export data", "Import data", "[Q]uit"),
+		self.static_menu(MAIN_ITEMS, self.main_menu_behaviour)
 
-			(self.view_global_tiles, self.editor_menu, self.save,
-			self.load, self.export, self.import_data, self.safe_exit),
+	def main_menu_behaviour(self, choice, char):
+		if char in SELECT:
+			if choice == "View global tiles":
+				self.menu(tiles, "Pick a tile to view", "both", "value",
+					self.view_global_tiles)
 
-			{ord('Q'): self.safe_exit})
+			elif choice == "Edit maps":
+				self.menu(self.data.tilemaps,
+					"[Del]ete, [Ins]ert, [T]iles, Edit",
+					"key", "key", self.edit_map, (self.data.tilemaps, ))
 
-		self.editor_menu_items = (
-			["Make a new map", "Edit maps", "Delete maps",
-			"", "Make a new dungeon", "Edit dungeons", "Delete dungeons"],
+			elif choice == "Edit dungeons":
+				self.menu(self.data.dungeons,
+					"[Del]ete, [Ins]ert, Edit",
+					"key", "key", self.edit_dungeon, (self.data.dungeons, ))
 
-			[self.new_map, self.edit_maps, self.delete_maps, None,
-			self.new_dungeon, self.edit_dungeons, self.delete_dungeons], {})
+			elif choice == "Save data":
+				self.save()
+			elif choice == "Load data":
+				self.load()
+			elif choice == "Export data":
+				self.export()
+			elif choice == "Import data":
+				self.import_data()
+			elif choice == QUIT:
+				self.safe_exit()
 
-		self.map_menu_items = (
-			["Edit", "Edit tiles", "Make a new tile", "Delete tiles"],
-			["Edit", "Edit tiles", "Make a new tile", "Delete tiles"], {})
+	def edit_map(self, maps, key, char):
+		if char in SELECT:
+			self.static_menu(MAP_ITEMS, self.map_menu, (maps[key], ))
+		elif char == DEL:
+			self.delete_map(key)
+		elif char == INSERT:
+			self.add_map()
+		elif char in (ord('T'), ord('t')):
+			self.menu(maps[key].tiles, "[Del]ete, [Ins]ert, Edit",
+					"both", "key", self.edit_tile, (maps[key].tiles, ))
 
-		self.dungeon_menu_items = (
-			["Edit", "Add a generated level", "Add a level", "Delete a level"],
-			["Edit", "Add a generated level", "Add a level", "Delete a level"],
-			{})
+	def edit_dungeon(self, dungeons, key, char):
+		if char in SELECT:
+			self.static_menu(DUNGEON_ITEMS,
+					self.dungeon_menu, (dungeons[key], ))
+		elif char == DEL:
+			self.delete_dungeon(key)
+		elif char == INSERT:
+			self.add_dungeon()
 
-		add_ebe(self.editor_menu_items)
-		add_ebe(self.map_menu_items)
-		add_ebe(self.dungeon_menu_items)
-		#self.menu(self.data.dungeons["main"], "Pick a level to delete",
-		#		(self.delete_dungeon_level, self.data.dungeons["main"],
-		#			"key", "key"))
-		self.static_menu(self.main_menu_items)
+	def edit_tile(self, tiles, key, char):
+		if char in SELECT:
+			self.menu(vars(tiles[key]),
+					"Pick an attribute to edit",
+					"both", "key", self.edit_attribute, (vars(tiles[key]), ))
+		elif char == DEL:
+			self.delete_tile(tiles, key)
+		elif char == INSERT:
+			self.add_tile(tiles)
 
-	def editor_menu(self):
-		self.static_menu(self.editor_menu_items)
-
-	def edit_maps(self):
-		self.menu(self.data.tilemaps, "Pick a map to edit",
-				output_f=self.edit_map)
-
-	def edit_map(self, map):
-		self.static_menu(self.map_menu_items, self.map_menu, (map,))
-
-	def map_menu(self, decision, map):
+	def map_menu(self, map, decision, char):
 		if decision == "Edit":
 			EditMap(self, map)
 		elif decision == "Edit tiles":
 			self.menu(map.tiles, "Pick a tile to edit", "both", "value",
 					self.pick_attribute)
 		elif decision == "Make a new tile":
-			self.new_tile(map.tiles)
+			self.add_tile(map.tiles)
 		elif decision == "Delete tiles":
 			self.menu(map.tiles, "Pick a tile to delete", "both", "key",
 					self.delete_tile, (map.tiles,))
 
-	def edit_dungeons(self):
-		self.menu(self.data.dungeons, "Pick a dungeon to edit", "key",
-				"value", self.edit_dungeon)
-
-	def edit_dungeon(self, dungeon):
-		self.static_menu(self.dungeon_menu_items, self.dungeon_menu,
-				(dungeon,))
-
-	def dungeon_menu(self, decision, dungeon):
+	def dungeon_menu(self, dungeon, decision, char):
 		if decision == "Edit":
 			self.menu(dungeon, "Pick a level to edit", "both", "value",
 					self.pick_attribute)
@@ -103,71 +146,86 @@ class Editor(object):
 			self.menu(dungeon, "Pick a level to delete", "both", "key",
 					self.delete_dungeon_level, (dungeon,))
 
-	def view_global_tiles(self):
-		self.menu(tiles, "Pick a tile to view", "both", "value",
-				self.view_tile)
+	def view_global_tiles(self, tile, char):
+		if char not in SELECT: return
 
-	def view_tile(self, tile):
 		self.menu(vars(tile), "Read Only", "both", "neither")
 
-	def delete_maps(self):
-		self.menu(self.data.tilemaps, "Pick a map to delete", "key", "key",
-				self.delete_map)
+	def pick_attribute(self, tile, char):
+		if char not in SELECT: return
 
-	def delete_dungeons(self):
-		self.menu(self.data.dungeons, "Pick a dungeon to delete", "key", "key",
-				self.delete_dungeon)
+		self.menu(vars(tile), "Pick an attribute to edit", "both", "key",
+				self.edit_attribute, (vars(tile), ))
 
-	def pick_attribute(self, tile):
-		self.menu(vars(tile), "Pick an attribute to edit", "both", "both",
-				self.edit_attribute, (vars(tile),))
+	def edit_attribute(self, dict_, key, char, protected=True,
+			modifiable=()):
+		if char == INSERT and not protected:
+			handle = io.a.getstr("Attribute handle")
+			dict_[handle] = None
+		elif char in (HOME, ord('m'), ord('M')) and not protected:
+			self.modify_attribute(dict_, key)
+		elif char == DELETE and not protected:
+			ch = io.a.sel_getch(
+					"Are you sure you want to delete this attribute? [y/N]: ")
+			if ch in YES:
+				del dict_[key]
+		elif char in SELECT:
+			self.modified = True
+			if isinstance(dict_[key], bool):
+				dict_[key] = io.a.getbool(key)
+			elif isinstance(dict_[key], str):
+				dict_[key] = io.a.getstr(key)
+			elif isinstance(dict_[key], int):
+				dict_[key] = io.a.getint(key)
+			elif isinstance(dict_[key], Char):
+				dict_[key] = Char(io.a.getchar(key), io.a.getcolor(key))
+			elif dict_[key] == None and not protected:
+				self.modify_attribute(dict_, key)
+			elif isinstance(dict_[key], dict):
+				self.menu(dict_[key], "Pick an attribute to edit",
+						"both", "key", self.edit_attribute, (dict_[key], ))
+			else:
+				raise TypeError("Attempt to modify unsupported type: "+key)
 
-	def edit_attribute(self, attr_tuple, dict_):
-		key, value = attr_tuple
-		self.modified = True
-		if isinstance(value, bool):
-			dict_[key] = io.a.getbool(key)
-			#setattr(tile, key, io.a.getbool(key))
-		elif isinstance(value, str):
-			dict_[key] = io.a.getstr(key)
-			#setattr(tile, key, io.a.getstr(key))
-		elif isinstance(value, int):
-			dict_[key] = io.a.getint(key)
-			#setattr(tile, key, io.a.getint(key))
-		elif isinstance(value, Char):
-			dict_[key] = Char(io.a.getchar(key), io.a.getcolor(key))
-			#setattr(tile, key, Char(io.a.getchar(key),
-			#	io.a.getcolor(key)))
-		elif isinstance(value, dict):
-			self.menu(value, "Pick an attribute to edit", "both", "both",
-					self.edit_attribute, (value,))
-		else:
-			raise TypeError("Attempt to modify unsupported type: "+key)
+	def modify_attribute(self, dict_, key):
+		c = io.a.sel_getch("[B]ool, [S]tring, [I]nt, [C]har, [N]one",
+				map(ord, "BbSsIiCcNn"))
+		if c in map(ord, "Bb"):
+			dict_[key] = bool()
+		elif c in map(ord, "Ss"):
+			dict_[key] = str()
+		elif c in map(ord, "Ii"):
+			dict_[key] = int()
+		elif c in map(ord, "Cc"):
+			dict_[key] = Char()
+		elif c in map(ord, "Nn"):
+			dict_[key] = None
 
 	def edit_dict(self, attr_tuple, dict):
 		pass
 
-	def static_menu(self, menu, output_f=None, f_args=(), f_keys={}):
+	def static_menu(self, (lines, ignores),
+			output_f=None, f_args=(), f_keys={}):
 		i = 0
 		while True:
-			d = io.a.draw_menu(menu[0], menu[1], menu[2], i)
-			i = menu[1].index(d)
-			if d == "Back":
+			i, ch = io.a.draw_menu(i, lines, ignores)
+			if ch == ord('<') and BACK in lines or \
+					lines[i] == BACK and ch in SELECT:
 				return
-			elif d == "Exit":
+			elif ch == ord('Q') or lines[i] == QUIT and ch in SELECT:
 				self.safe_exit()
-			elif output_f is None:
-				d()
-			else:
-				output_f(d, *f_args, **f_keys)
+			elif output_f is not None:
+				f_keys["char"] = ch
+				output_f(*(f_args + (lines[i], )), **f_keys)
+
 
 	def menu(self, container, str_, print_="key", return_="value",
 			output_f=None, f_args=(), f_keys={}):
 		i = 0
 		while True:
-			l = [str_, ""]
-			r = [None, None]
-			k = {}
+			lines = [str_, ""]
+			returns = {}
+			ignores = None
 
 			if isinstance(container, list):
 				kv = enumerate(container)
@@ -180,43 +238,52 @@ class Editor(object):
 				if isinstance(value, Tile):
 					print_value = value.ch_visible
 				elif isinstance(value, DungeonNode):
-					print_value = ("Tile handle:"+
-						str(value.tilemap_handle))
+					print_value = ("Tile handle:"+ str(value.tilemap_handle))
 				else:
 					print_value = value
 
+				tmp_i = len(lines)
 				if print_ == "both":
-					l.append((key, print_value))
+					lines.append((key, print_value))
 				elif print_ == "key":
-					l.append(key)
+					lines.append(key)
 				elif print_ == "value":
-					l.append(print_value)
+					lines.append(print_value)
 				else:
-					l.append("N/A")
+					lines.append("N/A")
 
 				if return_ == "both":
-					r.append((key, value))
+					returns[tmp_i] = key, value
 				elif return_ == "key":
-					r.append(key)
+					returns[tmp_i] = key
 				elif return_ == "value":
-					r.append(value)
+					returns[tmp_i] = value
 				else:
-					r.append(lambda: None)
-			add_ebe((l,r,k))
+					returns[tmp_i] = None
 
-			d = io.a.draw_menu(l, r, k, i)
-			i = r.index(d)
-			if d == "Back":
+			lines.extend(("", BACK, QUIT))
+			returns.update({len(lines)-2: BACK, len(lines)-1: QUIT})
+			ignores = (0, 1, len(lines)-3)
+
+
+			i, ch = io.a.draw_menu(i, lines, ignores)
+
+			if i == len(lines)-2 or ch == ord('<'):
+				if ch in SELECT + (ord('<'), ):
+					return
+			elif i == len(lines)-1 or ch == ord('Q'):
+				if ch in SELECT + (ord('Q'), ):
+					self.safe_exit()
+			elif ch == ord('<') or i == len(lines)-2 and ch in SELECT:
 				return
-			elif d == "Exit":
+			elif ch == ord('Q') or i == len(lines)-1 and ch in SELECT:
 				self.safe_exit()
-			elif output_f is None:
-				d()
-			else:
-				output_f(d, *f_args, **f_keys)
+			elif output_f is not None:
+				f_keys["char"] = ch
+				output_f(*(f_args + (returns[i], )), **f_keys)
 
 
-	def new_map(self):
+	def add_map(self):
 		handle = io.a.getstr("Map handle")
 		self.data.tilemaps[handle] = TileMap(io.level_rows, io.level_cols, "f")
 		self.modified = True
@@ -228,19 +295,19 @@ class Editor(object):
 			del self.data.tilemaps[handle]
 			self.modified = True
 
-	def new_tile(self, tiles):
+	def add_tile(self, tiles):
 		handle = io.a.getstr("Tile handle")
 		tiles[handle] = Tile()
 		self.modified = True
 
-	def delete_tile(self, handle, tiles):
+	def delete_tile(self, tiles, handle):
 		c = io.a.sel_getch("Are you sure you wish to delete"
 				" this tile? [y/N]: ")
 		if c in YES:
 			del tiles[handle]
 			self.modified = True
 
-	def new_dungeon(self):
+	def add_dungeon(self):
 		handle = io.a.getstr("Dungeon handle")
 		self.data.add_dungeon(handle)
 		self.modified = True
