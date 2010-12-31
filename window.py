@@ -59,10 +59,11 @@ class Window(object):
 
 	def getbool(self, print_str=None):
 		while True:
-			input = self._getstr(print_str + " [T/F]: ")
-			if input in ("", "0", "f", "false", "False"):
+			input = self.sel_getch(print_str + " [T/F]: ",
+					map(ord, "01fFtT\n"))
+			if input in map(ord, "0fF\n"):
 				return False
-			elif input in ("1", "t", "true", "True"):
+			elif input in map(ord, "1tT"):
 				return True
 
 	def getchar(self, print_str=None):
