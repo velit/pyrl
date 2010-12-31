@@ -1,6 +1,6 @@
 import string
 
-OPTIMIZATION = False
+OPTIMIZATION = True
 DEBUG = False
 
 MSG_BAR_SIZE = 2

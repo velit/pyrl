@@ -32,16 +32,24 @@ class Player(Creature):
 		a[curses.KEY_UP] = "move", (N, )
 		a[ord('+')] = "change_sight_range", (1, )
 		a[ord('-')] = "change_sight_range", (-1, )
-		a[ord('.')] = "move", (STOP, )
 		a[ord('1')] = "move", (SW, )
+		a[ord('n')] = "move", (SW, )
 		a[ord('2')] = "move", (S, )
+		a[ord('j')] = "move", (S, )
 		a[ord('3')] = "move", (SE, )
+		a[ord('m')] = "move", (SE, )
 		a[ord('4')] = "move", (W, )
+		a[ord('h')] = "move", (W, )
 		a[ord('5')] = "move", (STOP, )
+		a[ord('.')] = "move", (STOP, )
 		a[ord('6')] = "move", (E, )
+		a[ord('l')] = "move", (E, )
 		a[ord('7')] = "move", (NW, )
+		a[ord('u')] = "move", (NW, )
 		a[ord('8')] = "move", (N, )
+		a[ord('k')] = "move", (N, )
 		a[ord('9')] = "move", (NE, )
+		a[ord('i')] = "move", (NE, )
 		a[ord('<')] = "ascend", ()
 		a[ord('>')] = "descend", ()
 		a[ord('H')] = "los_highlight", ()
@@ -50,7 +58,7 @@ class Player(Creature):
 		a[ord('S')] = "savegame", ()
 		a[ord('\x12')] = "redraw", ()
 		a[ord('d')] = "debug", ()
-		a[ord('k')] = "killall", ()
+		a[ord('K')] = "killall", ()
 		a[ord('p')] = "path", ()
 
 		self.actions = a
@@ -65,8 +73,7 @@ class Player(Creature):
 					break
 			else:
 				if 0 < c < 256:
-					c = chr(c)
-					io.msg("Undefined command: '"+c+"'")
+					io.msg("Undefined command: '"+chr(c)+"'")
 				else:
 					io.msg("Undefined command key: "+str(c))
 
