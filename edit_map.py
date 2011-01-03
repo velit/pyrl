@@ -1,9 +1,11 @@
 import curses
 
+from random import random
+
 from io import io
-from tile import tiles
+from tile import tiles, PassageTile
 from map import Map
-from constants import *
+from constants import DIR
 
 class EditMap(object):
 	def __init__(self, editor, tilemap):
@@ -14,7 +16,7 @@ class EditMap(object):
 		self.my = self.map.rows-1
 		self.mx = self.map.cols-1
 		self.t = "f"
-		self.funs = (self.point, self.rectangle, self.fill)
+		self.funs = (self.point, self.rectangle, self.fill, self.randomize)
 		self.f = self.point
 		self.selected_tile = None
 		io.s.add_element("t", "Tile: ", lambda:
@@ -31,20 +33,20 @@ class EditMap(object):
 
 	def actions(self):
 		a = {}
-		a[curses.KEY_DOWN] = self.move_cursor, S
-		a[curses.KEY_LEFT] = self.move_cursor, W
-		a[curses.KEY_RIGHT] = self.move_cursor, E
-		a[curses.KEY_UP] = self.move_cursor, N
-		a[ord('.')] = self.move_cursor, STOP
-		a[ord('1')] = self.move_cursor, SW
-		a[ord('2')] = self.move_cursor, S
-		a[ord('3')] = self.move_cursor, SE
-		a[ord('4')] = self.move_cursor, W
-		a[ord('5')] = self.move_cursor, STOP
-		a[ord('6')] = self.move_cursor, E
-		a[ord('7')] = self.move_cursor, NW
-		a[ord('8')] = self.move_cursor, N
-		a[ord('9')] = self.move_cursor, NE
+		a[curses.KEY_DOWN] = self.move_cursor, DIR.S
+		a[curses.KEY_LEFT] = self.move_cursor, DIR.W
+		a[curses.KEY_RIGHT] = self.move_cursor, DIR.E
+		a[curses.KEY_UP] = self.move_cursor, DIR.N
+		a[ord('.')] = self.move_cursor, DIR.STOP
+		a[ord('1')] = self.move_cursor, DIR.SW
+		a[ord('2')] = self.move_cursor, DIR.S
+		a[ord('3')] = self.move_cursor, DIR.SE
+		a[ord('4')] = self.move_cursor, DIR.W
+		a[ord('5')] = self.move_cursor, DIR.STOP
+		a[ord('6')] = self.move_cursor, DIR.E
+		a[ord('7')] = self.move_cursor, DIR.NW
+		a[ord('8')] = self.move_cursor, DIR.N
+		a[ord('9')] = self.move_cursor, DIR.NE
 		a[ord('S')] = self.editor.save,
 		a[ord('Q')] = self.editor.safe_exit,
 
@@ -54,7 +56,7 @@ class EditMap(object):
 		return act[0](*act[1:])
 	
 	def move_cursor(self, dir):
-		self.y, self.x = self.y + DY[dir], self.x + DX[dir]
+		self.y, self.x = self.y + DIR.DY[dir], self.x + DIR.DX[dir]
 		if self.y < 0:
 			self.y = 0
 		if self.x < 0:
@@ -70,16 +72,15 @@ class EditMap(object):
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])
-			elif ch == ord('B'):
+			elif ch in map(ord, "B<"):
 				return
 			elif ch == ord('\n'):
 				self.f()
-				if self.t == "ds":
-					self.map.squares["ds"] = (self.y, self.x)
-				elif self.t == "us":
-					self.map.squares["us"] = (self.y, self.x)
+				if isinstance(self.map.gettile(self.t), PassageTile):
+					self.map.squares[self.map.gettile(self.t).passage] \
+							= (self.y, self.x)
 				self.editor.modified = True
-			elif ch in (ord('t'), ord('T')):
+			elif ch in map(ord, "tT"):
 				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(tiles):
@@ -118,3 +119,8 @@ class EditMap(object):
 	def fill(self):
 		for x in range(len(self.map)):
 			self.map[x] = self.t
+
+	def randomize(self):
+		for i in range(len(self.map)):
+			if random() < 0.3:
+				self.map[i] = self.t

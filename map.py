@@ -1,7 +1,7 @@
 import random
 
-from tile import tiles
 from square import Square
+from tile import tiles
 
 class Map(list):
 	def __init__(self, tilemap):
@@ -11,12 +11,10 @@ class Map(list):
 		self.squares = {}
 		x = self.cols #auttajatonttu
 		for i, tilekey in enumerate(tilemap):
-			if tilekey in tilemap.tiles:
-				self.append(Square(tilemap.tiles[tilekey], i / x, i % x))
-			else:
-				self.append(Square(tiles[tilekey], i / x, i % x))
-		for key, value in tilemap.squares.iteritems():
-			self.squares[key] = self.getsquare(*value)
+			self.append(Square(tilemap.gettile(tilekey), i / x, i % x))
+
+		for key, (loc_y, loc_x) in tilemap.squares.iteritems():
+			self.squares[key] = self.getsquare(loc_y, loc_x)
 
 	def getsquare(self, y, x=None):
 		"""Returns a square according to parameters.
@@ -39,3 +37,30 @@ class Map(list):
 	def get_random_square(self):
 		"""Returns a random square from the Map."""
 		return random.choice(self)
+
+class TileMap(list):
+	"""A map containing the tiles of a level."""
+	def __init__(self, y, x, t="f"):
+		self.tiles = {}
+		list.__init__(self, (t for x in range(y*x)))
+		self.rows = y
+		self.cols = x
+		self.squares = {}
+
+	def getsquare(self, *args):
+		if len(args) == 2:
+			y, x = args
+			return self[y*self.cols + x]
+		else:
+			return self.squares[args[0]]
+
+	def setsquare(self, y, x, tile):
+		self[y*self.cols + x] = tile
+		
+	def gettile(self, handle):
+		if handle in self.tiles:
+			return self.tiles[handle]
+		elif handle in tiles:
+			return tiles[handle]
+		else:
+			raise Exception("handle '"+handle+"' not found")

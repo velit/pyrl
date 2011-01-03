@@ -1,4 +1,6 @@
-import string
+import dir_constants
+
+DIR = dir_constants
 
 OPTIMIZATION = True
 DEBUG = False
@@ -6,33 +8,18 @@ DEBUG = False
 MSG_BAR_SIZE = 2
 STATUS_BAR_SIZE = 2
 
-TILES_LOADED_FROM_FILE = False
-
 MORE_STR = " (more)"
 
-YES = set((ord('y'), ord('Y')))
-NO = set((ord('n'), ord('N')))
-DEFAULT = set((ord('\n'), ord(' ')))
-MOVES = set(map(ord, tuple(string.digits))); MOVES.add(ord('.'))
+SET_LEVEL = "set-level"
+NEXT_LEVEL = "next-level"
+PREVIOUS_LEVEL = "previous-level"
+UP = (PREVIOUS_LEVEL, )
+DOWN = (NEXT_LEVEL, )
 
-SW = 1; S = 2; SE = 3; W = 4; STOP = 5; E = 6; NW = 7; N = 8; NE = 9
-UP = (NW, N, NE)
-DOWN = (SW, S, SE)
-LEFT = (SW, W, NW)
-RIGHT = (SE, E, NE)
+PASSAGE_UP = "passage up"
+PASSAGE_DOWN = "passage down"
 
-DY = {}
-DX = {}
-DY[STOP] = 0
-DX[STOP] = 0
-for dir in range(1, 9 +1):
-	DY[dir] = 0
-	DX[dir] = 0
-	if dir in UP:
-		DY[dir] -= 1
-	elif dir in DOWN:
-		DY[dir] += 1
-	if dir in LEFT:
-		DX[dir] -= 1
-	elif dir in RIGHT:
-		DX[dir] += 1
+YES = set(map(ord, "yY"))
+NO = set(map(ord, "nN"))
+DEFAULT = set(map(ord, " \n"))
+MOVES = set(map(ord, "123456789."))

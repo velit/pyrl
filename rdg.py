@@ -1,15 +1,15 @@
 from random import randrange as rr, random as rand, choice
 
-from map import Map
-from dungeonproperties import TileMap
+from map import Map, TileMap
 from square import Square as S
 from tile import tiles
+from constants import PASSAGE_DOWN, PASSAGE_UP
 
 w = tiles["w"]
 r = tiles["r"]
 f = tiles["f"]
 
-def generateLevel(level):
+def generateLevel(level, passages):
 	level.map = Map(TileMap(level.rows, level.cols, "r"))
 	_make_initial_room(level)
 	for x in range(2000):
@@ -17,8 +17,10 @@ def generateLevel(level):
 			_attempt_corridor(level)
 		else:
 			_attempt_room(level)
-	add_staircase_up(level)
-	add_staircase_down(level)
+	if PASSAGE_UP in passages:
+		add_staircase_up(level)
+	if PASSAGE_DOWN in passages:
+		add_staircase_down(level)
 
 def add_staircase_up(level):
 	while True:
@@ -30,7 +32,7 @@ def add_staircase_up(level):
 			break
 
 	square.tile = tiles["us"]
-	level.map.squares["us"] = square
+	level.map.squares[PASSAGE_UP] = square
 
 def add_staircase_down(level):
 	while True:
@@ -42,7 +44,7 @@ def add_staircase_down(level):
 			break
 
 	square.tile = tiles["ds"]
-	level.map.squares["ds"] = square
+	level.map.squares[PASSAGE_DOWN] = square
 
 def _make_initial_room(level):
 	while True:

@@ -1,4 +1,4 @@
-from tile import tiles
+from tile import tiles, PassageTile
 from io import io
 from constants import OPTIMIZATION
 from colors import d
@@ -74,3 +74,6 @@ class Square(object):
 			return self.creature.ch
 		else:
 			return self.tile.ch_visible
+
+	def ispassage(self):
+		return isinstance(self.tile, PassageTile)

@@ -47,7 +47,8 @@ class IO(object):
 		self.l.drawline(self, startSquare, targetsquare, *char)
 
 	def getstr(self, *str):
-		self.m.getstr(*str)
+		self.refresh()
+		return self.m.getstr(*str)
 
 	def msg(self, message):
 		self.m.queue_msg(str(message))
