@@ -5,6 +5,8 @@ from window import Window
 from bresenham import bresenham
 from tile import tiles
 
+import time
+
 class LevelWindow(Window):
 	"""Handles the level display"""
 	def __init__(self, window):
@@ -14,7 +16,7 @@ class LevelWindow(Window):
 		self.w.move(0,0)
 		for s in map:
 			try:
-				self.w.addch(*s.get_visible_data())
+				self.addch(*s.get_visible_data())
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
@@ -63,21 +65,21 @@ class LevelWindow(Window):
 		except curses.error:
 			pass
 
-	def drawstar(self, square, col=colors.green):
+	def drawstar(self, square, col="green"):
 		try:
-			self.w.addch(square.y, square.x, "*", col)
+			self.addch(square.y, square.x, "*", col)
 		except curses.error:
 			pass
 
-	def drawblock(self, square, col=colors.blue):
+	def drawblock(self, square, col="blue"):
 		try:
-			self.w.addch(square.y, square.x, " ", col)
+			self.addch(square.y, square.x, " ", col)
 		except curses.error:
 			pass
 
-	def drawline(self, s0, s1, char=Char('*', colors.yellow)):
+	def drawline(self, s0, s1, char=Char('*', "yellow")):
 		y0, x0 = s0.getloc()
 		y1, x1 = s1.getloc()
 		for y, x in bresenham(y0, x0, y1, x1):
-			self.w.addch(y, x, char.symbol, char.color)
+			self.addch(y, x, char.symbol, char.color)
 		self.getch(y1, x1)

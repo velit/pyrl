@@ -12,7 +12,7 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 class Creature(object):
 	"""This is an abstract class representing a creature"""
 	def __init__(self, game, level):
-		self.sight = 50
+		self.sight = 15
 		self.hp = 10
 		self.dmg = 1
 		self.g = game

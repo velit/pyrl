@@ -6,11 +6,11 @@ import sys
 from os import path
 from io import io
 from edit_map import EditMap
-from map import Map
-from dungeonproperties import DungeonProperties, TileMap, DungeonNode
+from map import TileMap
+from dungeonproperties import DungeonProperties, DungeonNode
 from tile import Tile, tiles
 from char import Char
-from constants import YES, NO, DEFAULT
+from constants import YES, NO, DEFAULT, SET_LEVEL
 
 # key sets
 _A = tuple(map(ord, "aA"))
@@ -18,7 +18,9 @@ _D = tuple(map(ord, "dD"))
 _E = tuple(map(ord, "eE"))
 _M = tuple(map(ord, "mM"))
 _P = tuple(map(ord, "pP"))
+_S = tuple(map(ord, "sS"))
 _T = tuple(map(ord, "tT"))
+_V = tuple(map(ord, "vV"))
 _SELECT = tuple(map(ord, ">\n"))
 _DEL = (curses.KEY_DC, )
 _INSERT = (curses.KEY_IC, )
@@ -79,7 +81,7 @@ class Editor(object):
 
 			elif line == "Edit maps":
 				self.menu(self.data.tilemaps,
-					"[A]dd/[D]elete a level, Edit [T]iles, [E]dit",
+					"[A]dd/[D]elete a level, Edit [T]iles, [V]iew squares, [E]dit",
 					"key", self.edit_map)
 
 			elif line == "Edit dungeons":
@@ -112,6 +114,8 @@ class Editor(object):
 		elif char in _T:
 			self.menu(maps[k].tiles, "[A]dd/[D]elete tile, [E]dit",
 					"both", self.edit_tile)
+		elif char in _V:
+			self.menu(maps[k].squares, "View only", "both")
 
 	def edit_tile(self, tiles, k, char):
 		if char in _A:
@@ -144,17 +148,16 @@ class Editor(object):
 		elif char in _P:
 			returns = self.menu(self.data.tilemaps,
 					"Pick a tilemap for dungeon level", "key", "return")
-			if returns is not None:
-				__t, tilemap_handle, char2 = returns
-				if char2 in _SELECT:
-					self.add_static_dungeon_level(dungeon, tilemap_handle)
+			if returns is not None and returns[2] in _SELECT:
+					self.add_static_dungeon_level(dungeon, returns[1])
 		elif char in _D:
 			self.delete_dungeon_level(dungeon, i)
 
 	def edit_dungeon_level_attr(self, level_dict, k, char):
 		if char in _SELECT+_E:
 			if k == "passageways":
-				self.menu(level_dict[k], "[A]dd/[D]elete/[E]dit passageways",
+				self.menu(level_dict[k],
+						"Map passage Up/[D]own or to a [S]pecific level",
 						"both", self.edit_passageway)
 			elif k == "tilemap_handle":
 				pass
@@ -162,8 +165,18 @@ class Editor(object):
 				self.edit_attribute(level_dict, k)
 
 	def edit_passageway(self, passageways, k, char):
-		if char in _SELECT+_E:
-			pass
+		if char in _SELECT+_S:
+			d_r = self.menu(self.data.dungeons,
+					"Pick a dungeon for passage exit", "key", "return")
+			if d_r is not None and d_r[2] in _SELECT:
+				l_r = self.menu(d_r[0][d_r[1]],
+						"Pick a level for passage exit", "both", "return")
+				if l_r is not None and l_r[2] in _SELECT:
+					t_r = self.menu(l_r[0][l_r[1]].passageways,
+							"Pick a passage pair", "key", "return")
+					if t_r is not None and t_r[2] in _SELECT:
+						passageways[k] = (SET_LEVEL, (d_r[1], l_r[1], t_r[1]))
+
 		elif char in _A:
 			pass
 		elif char in _D:
@@ -303,17 +316,8 @@ class Editor(object):
 		dungeon.append(DungeonNode(i))
 		self.modified = True
 
-	def add_static_dungeon_level(self, dungeon, tilemap_handle):
-		i = len(dungeon)
-
-		passageways = {}
-		for key in self.data.tilemaps[tilemap_handle].squares:
-			if key == "us":
-				passageways[key] = "up"
-			else:
-				passageways[key] = "down"
-
-		dungeon.append(DungeonNode(i, tilemap_handle, passageways))
+	def add_static_dungeon_level(self, dungeon, tilemap_key):
+		self.data.add_predefined_level(dungeon, tilemap_key)
 		self.modified = True
 
 	def delete_dungeon_level(self, dungeon, i):
@@ -364,7 +368,7 @@ class Editor(object):
 		c = io.a.sel_getch("Are you sure you wish to export"
 						" all data to pyrl? [y/N] ")
 		if c in YES:
-			ed = path.join("editor_data", "tiles")
+			ed = path.join("editor_data", "data")
 			d = path.join("data")
 			shutil.copy(ed, d)
 
@@ -377,7 +381,7 @@ class Editor(object):
 		if c not in YES:
 			return
 
-		with open(path.join("data", "maps"), "r") as f:
+		with open(path.join("data", "data"), "r") as f:
 			self.data = pickle.load(f)
 
 		self.modified = True

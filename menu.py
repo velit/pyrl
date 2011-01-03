@@ -78,7 +78,12 @@ def _print_menu_line(io, line_i, indt, lines, reverse_color=False):
 
 def _print_menu_word(io, y, x, word, reverse_color):
 	if isinstance(word, Char):
-		io.w.addstr(y, x, word.symbol, colors.d[word.color] | reverse_color)
+		try:
+			io.w.addstr(y, x, word.symbol, colors.d[word.color] | reverse_color)
+		except curses.error:
+			pass
 	else:
-		io.w.addstr(y, x, str(word), reverse_color)
-
+		try:
+			io.w.addstr(y, x, str(word), reverse_color)
+		except curses.error:
+			pass

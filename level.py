@@ -2,35 +2,28 @@ import path
 
 from bresenham import bresenham
 from monster import Monster
-from map import Map
-from dungeonproperties import TileMap
+from map import Map, TileMap
 from tile import tiles
 from io import io
 from rdg import generateLevel
 
-#import os
-#import pickle
-
 class Level(object):
-	def __init__(self, game, id, generate=True):
+	def __init__(self, game, tilemap=None, passages=None):
 		self.g = game
-		self.id = id
 		self.rows, self.cols = io.level_rows, io.level_cols
 		
 		self.creatures = []
 
-		if generate:
-			generateLevel(self)
+		if tilemap is None:
+			generateLevel(self, passages)
 			for x in range(100):
 				self.addcreature(Monster(self.g, self))
 		else:
-			#with open(os.path.join("editor_data", "maps"), "r") as f:
-			#	self.map = Map(pickle.load(f)["wilderness"])
-			self.map = Map(TileMap(self.rows, self.cols, "f"))
+			self.map = Map(tilemap)
 
 	
-	def getsquare(self, y, *x):
-		return self.map.getsquare(y, *x)
+	def getsquare(self, *args, **kwords):
+		return self.map.getsquare(*args, **kwords)
 
 	def get_free_square(self):
 		return self.map.get_free_square()

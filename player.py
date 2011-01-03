@@ -4,11 +4,11 @@ from creature import Creature
 from char import Char
 from tile import tiles
 from io import io
-from constants import *
+from constants import DIR, DEFAULT, PASSAGE_UP, PASSAGE_DOWN
 
 class Player(Creature):
 	"""da player object"""
-	def __init__(self, game, level):
+	def __init__(self, game, level=None):
 		super(Player, self).__init__(game, level)
 		self.name = "tappi"
 		self.n = "god"
@@ -22,34 +22,35 @@ class Player(Creature):
 	def register_status_texts(self):
 		io.s.add_element("hp", "HP: ", lambda: self.hp)
 		io.s.add_element("sight", "sight: ", lambda: self.sight)
+		io.s.add_element("turns", "TC: ", lambda: self.g.turn_counter)
 
 	def def_actions(self):
 		a = {}
 
-		a[curses.KEY_DOWN] = "move", (S, )
-		a[curses.KEY_LEFT] = "move", (W, )
-		a[curses.KEY_RIGHT] = "move", (E, )
-		a[curses.KEY_UP] = "move", (N, )
+		a[curses.KEY_DOWN] = "move", (DIR.S, )
+		a[curses.KEY_LEFT] = "move", (DIR.W, )
+		a[curses.KEY_RIGHT] = "move", (DIR.E, )
+		a[curses.KEY_UP] = "move", (DIR.N, )
 		a[ord('+')] = "change_sight_range", (1, )
 		a[ord('-')] = "change_sight_range", (-1, )
-		a[ord('1')] = "move", (SW, )
-		a[ord('n')] = "move", (SW, )
-		a[ord('2')] = "move", (S, )
-		a[ord('j')] = "move", (S, )
-		a[ord('3')] = "move", (SE, )
-		a[ord('m')] = "move", (SE, )
-		a[ord('4')] = "move", (W, )
-		a[ord('h')] = "move", (W, )
-		a[ord('5')] = "move", (STOP, )
-		a[ord('.')] = "move", (STOP, )
-		a[ord('6')] = "move", (E, )
-		a[ord('l')] = "move", (E, )
-		a[ord('7')] = "move", (NW, )
-		a[ord('u')] = "move", (NW, )
-		a[ord('8')] = "move", (N, )
-		a[ord('k')] = "move", (N, )
-		a[ord('9')] = "move", (NE, )
-		a[ord('i')] = "move", (NE, )
+		a[ord('1')] = "move", (DIR.SW, )
+		a[ord('n')] = "move", (DIR.SW, )
+		a[ord('2')] = "move", (DIR.S, )
+		a[ord('j')] = "move", (DIR.S, )
+		a[ord('3')] = "move", (DIR.SE, )
+		a[ord('m')] = "move", (DIR.SE, )
+		a[ord('4')] = "move", (DIR.W, )
+		a[ord('h')] = "move", (DIR.W, )
+		a[ord('5')] = "move", (DIR.STOP, )
+		a[ord('.')] = "move", (DIR.STOP, )
+		a[ord('6')] = "move", (DIR.E, )
+		a[ord('l')] = "move", (DIR.E, )
+		a[ord('7')] = "move", (DIR.NW, )
+		a[ord('u')] = "move", (DIR.NW, )
+		a[ord('8')] = "move", (DIR.N, )
+		a[ord('k')] = "move", (DIR.N, )
+		a[ord('9')] = "move", (DIR.NE, )
+		a[ord('i')] = "move", (DIR.NE, )
 		a[ord('<')] = "ascend", ()
 		a[ord('>')] = "descend", ()
 		a[ord('H')] = "los_highlight", ()
@@ -64,8 +65,8 @@ class Player(Creature):
 		self.actions = a
 
 	def act(self):
-		#self.l.drawmap()
 		self.update_los()
+		self.l.drawmap()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
@@ -81,9 +82,9 @@ class Player(Creature):
 		return self.__getattribute__(act[0])(*act[1])
 
 	def move(self, dir):
-		if dir == STOP:
+		if dir == DIR.STOP:
 			return True
-		y, x = self.square.y + DY[dir], self.square.x + DX[dir]
+		y, x = self.square.y + DIR.DY[dir], self.square.x + DIR.DX[dir]
 		if self.l.legal_yx(y, x):
 			targetsquare = self.l.getsquare(y,x)
 			if targetsquare.passable():
@@ -104,13 +105,18 @@ class Player(Creature):
 				" damage.")
 		creature.lose_hp(self.dmg)
 
-	def descend(self):
-		self.g.descend()
-		return True
-
 	def ascend(self):
-		self.g.ascend()
-		return True
+		if self.square.ispassage() and self.square.tile.passage == PASSAGE_UP:
+			self.enter()
+
+	def descend(self):
+		if self.square.ispassage() and self.square.tile.passage == PASSAGE_DOWN:
+			self.enter()
+
+	def enter(self):
+		if self.square.ispassage():
+			self.g.enter(self.square.tile.passage)
+			return True
 
 	def die(self):
 		io.sel_getch("You die... [more]", char_list=DEFAULT)
@@ -130,7 +136,7 @@ class Player(Creature):
 		io.msg((io.level_rows, io.level_cols))
 
 	def path(self):
-		io.msg("Everything is all right.")
+		io.msg("Shhhhhhh. Everything will be all right.")
 	
 	def los_highlight(self):
 		if self.reverse == "":

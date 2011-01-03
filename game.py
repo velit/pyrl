@@ -6,18 +6,25 @@ from os import path
 from level import Level
 from player import Player
 from io import io
-from constants import YES, NO, DEFAULT
+from constants import YES, NO, DEFAULT, PASSAGE_DOWN, PASSAGE_UP
+from constants import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
 
 class Game(object):
-	def __init__(self, main):
+	def __init__(self):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
-		self.main = main
-
+		
 		self.turn_counter = 0
 
-		self.l = [Level(self, 1)]
-		self.p = Player(self, self.l[0])
-		self.p.l.addcreature(self.p)
+		with open(path.join("data", "data"), "r") as f:
+			data = pickle.load(f)
+
+		self.dungeons = {}
+		self.tilemaps = data.tilemaps
+		self.dungeon_properties = data.dungeons
+
+		self.p = Player(self)
+		self.level = ("", 0)
+		self.change_level("wild", 0, PASSAGE_DOWN)
 		self.redraw()
 	
 	def play(self):
@@ -25,25 +32,71 @@ class Game(object):
 			creature.act()
 		self.turn_counter += 1
 
-	def descend(self):
-		self.p.l.removecreature(self.p)
-		if len(self.l) == self.l.index(self.p.l) + 1:
-			self.p.l = Level(self, len(self.l)+1)
-			self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
-			self.l.append(self.p.l)
-		else:
-			self.p.l = self.l[self.l.index(self.p.l) + 1]
-			self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
+	def enter(self, passage):
+		info = self.get_passageways(*self.level)[passage]
+		if info[0] == SET_LEVEL:
+			self.change_level(*info[1])
+		elif info[0] == PREVIOUS_LEVEL:
+			dkey, i = self.level
+			self.change_level(dkey, i-1, PASSAGE_DOWN)
+		elif info[0] == NEXT_LEVEL:
+			dkey, i = self.level
+			self.change_level(dkey, i+1, PASSAGE_UP)
+
+	def get_level(self, dungeon_key, level_i):
+		return self.dungeons[dungeon_key][level_i]
+
+	def get_tilemap_handle(self, dungeon_key, level_i):
+		return self.dungeon_properties[dungeon_key][level_i].tilemap_handle
+
+	def get_passageways(self, dungeon_key, level_i):
+		return self.dungeon_properties[dungeon_key][level_i].passageways
+
+	def change_level(self, dkey, i, passage):
+		if self.p.l is not None:
+			self.p.l.removecreature(self.p)
+		try:
+			self.p.l = self.get_level(dkey, i)
+		except KeyError:
+			self.p.l = self.new_level(dkey, i)
+
+		self.p.l.addcreature(self.p, self.p.l.getsquare(passage))
+		self.level = (dkey, i)
 		self.redraw()
 
-	def ascend(self):
-		if self.l.index(self.p.l) > 0:
-			self.p.l.removecreature(self.p)
-			self.p.l = self.l[self.l.index(self.p.l) - 1]
-			self.p.l.addcreature(self.p, self.p.l.getsquare("ds"))
-			self.redraw()
+	def new_level(self, dkey, i):
+		if dkey not in self.dungeons:
+			self.dungeons[dkey] = {}
+		if i not in self.dungeons[dkey]:
+			self.dungeons[dkey][i] = {}
+		key = self.get_tilemap_handle(dkey, i)
+		if key is not None:
+			self.dungeons[dkey][i] = Level(self, self.tilemaps[key])
 		else:
-			self.endgame()
+			self.dungeons[dkey][i] = Level(self,
+					passages=self.get_passageways(dkey, i))
+		return self.dungeons[dkey][i]
+
+
+	#def descend(self):
+	#	self.p.l.removecreature(self.p)
+	#	if len(self.l) == self.l.index(self.p.l) + 1:
+	#		self.p.l = Level(self, len(self.l)+1)
+	#		self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
+	#		self.l.append(self.p.l)
+	#	else:
+	#		self.p.l = self.l[self.l.index(self.p.l) + 1]
+	#		self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
+	#	self.redraw()
+
+	#def ascend(self):
+	#	if self.l.index(self.p.l) > 0:
+	#		self.p.l.removecreature(self.p)
+	#		self.p.l = self.l[self.l.index(self.p.l) - 1]
+	#		self.p.l.addcreature(self.p, self.p.l.getsquare("ds"))
+	#		self.redraw()
+	#	else:
+	#		self.endgame()
 			
 	def endgame(self, ask=True):
 		if not ask:
