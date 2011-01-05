@@ -1,15 +1,15 @@
 import sys
+import pickle
 import curses
-import cPickle as pickle
+import os
 
-from os import path
 from constants import STATUS_BAR_SIZE, MSG_BAR_SIZE
+from game import Game
+from pio import init_io_module
 
-class Main(object):
+class Main():
 	def __init__(self, w, load):
-		import io
-		io.io = io.IO(w, STATUS_BAR_SIZE, MSG_BAR_SIZE)
-		from game import Game
+		init_io_module(w, STATUS_BAR_SIZE, MSG_BAR_SIZE)
 		if load:
 			self.load()
 		else:
@@ -19,7 +19,7 @@ class Main(object):
 		self.game.play()
 
 	def load(self):
-		with open(path.join("data", "pyrl.svg"), "r") as f:
+		with open(os.path.join("data", "pyrl.svg"), "r") as f:
 			self.game = pickle.load(f)
 			self.game.redraw()
 

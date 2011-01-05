@@ -1,30 +1,33 @@
-import curses
-import cPickle as pickle
+import pickle
+import os
 
-from os import path
-
+from pio import io
 from level import Level
 from player import Player
-from io import io
 from constants import YES, NO, DEFAULT, PASSAGE_DOWN, PASSAGE_UP
 from constants import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
+from constants import DEBUG
 
 class Game(object):
 	def __init__(self):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 		
 		self.turn_counter = 0
-
-		with open(path.join("data", "data"), "r") as f:
-			data = pickle.load(f)
-
 		self.dungeons = {}
-		self.tilemaps = data.tilemaps
-		self.dungeon_properties = data.dungeons
-
 		self.p = Player(self)
 		self.level = ("", 0)
-		self.change_level("wild", 0, PASSAGE_DOWN)
+
+		with open(os.path.join("data", "data"), "rb") as f:
+			data = pickle.load(f)
+
+		if DEBUG:
+			self.p.l = Level(self)
+			self.p.l.addcreature(self.p)
+		else:
+			self.tilemaps = data.tilemaps
+			self.dungeon_properties = data.dungeons
+			self.change_level("wild", 0, PASSAGE_DOWN)
+
 		self.redraw()
 	
 	def play(self):
@@ -77,27 +80,6 @@ class Game(object):
 					passages=self.get_passageways(dkey, i))
 		return self.dungeons[dkey][i]
 
-
-	#def descend(self):
-	#	self.p.l.removecreature(self.p)
-	#	if len(self.l) == self.l.index(self.p.l) + 1:
-	#		self.p.l = Level(self, len(self.l)+1)
-	#		self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
-	#		self.l.append(self.p.l)
-	#	else:
-	#		self.p.l = self.l[self.l.index(self.p.l) + 1]
-	#		self.p.l.addcreature(self.p, self.p.l.getsquare("us"))
-	#	self.redraw()
-
-	#def ascend(self):
-	#	if self.l.index(self.p.l) > 0:
-	#		self.p.l.removecreature(self.p)
-	#		self.p.l = self.l[self.l.index(self.p.l) - 1]
-	#		self.p.l.addcreature(self.p, self.p.l.getsquare("ds"))
-	#		self.redraw()
-	#	else:
-	#		self.endgame()
-			
 	def endgame(self, ask=True):
 		if not ask:
 			exit()
@@ -106,7 +88,7 @@ class Game(object):
 			exit()
 	
 	def _save(self):
-		with open(path.join("data", "pyrl.svg"), "w") as f:
+		with open(os.path.join("data", "pyrl.svg"), "wb") as f:
 			pickle.dump(self, f)
 
 	def savegame(self, ask=True):
@@ -126,6 +108,4 @@ class Game(object):
 			self.main.load()
 
 	def redraw(self):
-		self.p.visibility.clear()
-		self.p.l.drawmemory()
-		self.p.update_los()
+		self.p.redraw_view()

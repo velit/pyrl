@@ -1,5 +1,4 @@
 import curses
-import colors
 from char import Char
 from collections import Sequence
 
@@ -47,7 +46,7 @@ def _update_ui(io, start_line, indt, lines, line_ignores):
 
 def _hilight_and_getch(io, line_i, indt, lines):
 	_print_menu_line(io, line_i, indt, lines, True)
-	c = io.w.getch()
+	c = io.getch()
 	_print_menu_line(io, line_i, indt, lines, False)
 	return c
 
@@ -67,23 +66,23 @@ def _roll_index(start_line, lines, ignores, add=0):
 def _print_menu_line(io, line_i, indt, lines, reverse_color=False):
 	i = line_i
 	line = lines[i]
-	reverse = colors.reverse if reverse_color else colors.normal
 	if not isinstance(line, str) and isinstance(lines, Sequence):
 		ln = _get_len(line[0])
-		_print_menu_word(io, i, 0, line[0], reverse)
-		_print_menu_word(io, i, ln, " "*(indt-ln), reverse)
-		_print_menu_word(io, i, indt, line[1], reverse)
+		_print_menu_word(io, i, 0, line[0], reverse_color)
+		_print_menu_word(io, i, ln, " "*(indt-ln), reverse_color)
+		_print_menu_word(io, i, indt, line[1], reverse_color)
 	else:
-		_print_menu_word(io, i, 0, line, reverse)
+		_print_menu_word(io, i, 0, line, reverse_color)
 
 def _print_menu_word(io, y, x, word, reverse_color):
+	r = "r" if reverse_color else ""
 	if isinstance(word, Char):
 		try:
-			io.w.addstr(y, x, word.symbol, colors.d[word.color] | reverse_color)
+			io.addstr(y, x, word.symbol, word.color + r)
 		except curses.error:
 			pass
 	else:
 		try:
-			io.w.addstr(y, x, str(word), reverse_color)
+			io.addstr(y, x, str(word), "normal" + r)
 		except curses.error:
 			pass

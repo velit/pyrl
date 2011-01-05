@@ -9,6 +9,7 @@ MSG_BAR_SIZE = 2
 STATUS_BAR_SIZE = 2
 
 MORE_STR = " (more)"
+ENCODING = "ascii"
 
 SET_LEVEL = "set-level"
 NEXT_LEVEL = "next-level"

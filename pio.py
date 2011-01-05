@@ -1,17 +1,21 @@
 import curses
-import _curses
-import colors
 
 from w_message import MessageBar
 from w_status import StatusBar
 from w_level import LevelWindow
 from window import Window
-from char import Char
-from constants import YES, NO, DEFAULT
+from colors import init_colors
+from wrapper_io import Wrapper
 
-class IO(object):
-	def __init__(self, window, msg_bar_size=2, status_bar_size=2):
-		self.w = window
+io = Wrapper()
+
+def init_io_module(curs_window, msg_bar_size=2, status_bar_size=2):
+	init_colors()
+	Wrapper._inst = IO(curs_window, msg_bar_size, status_bar_size)
+
+class IO():
+	def __init__(self, curs_window, msg_bar_size=2, status_bar_size=2):
+		self.w = curs_window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()
 
@@ -19,10 +23,10 @@ class IO(object):
 		self.level_cols = self.cols
 
 		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0))
-		self.s = StatusBar(self.w.derwin(status_bar_size, 0,
-							self.rows - status_bar_size, 0))
-		self.l = LevelWindow(self.w.derwin(self.level_rows, 0,
-											msg_bar_size, 0))
+		self.s = StatusBar(
+			self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0))
+		self.l = LevelWindow(
+			self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
 		self.a = Window(self.w)
 
 	def drawmap(self, map):
@@ -81,3 +85,35 @@ class IO(object):
 			self.drawstar(x)
 		self.getch()
 		curses.curs_set(1)
+
+
+#def drawmap(map):
+#	io.drawmap(*args, **kwords)
+#def drawmemory(map):
+#	io.drawmemory(*args, **kwords)
+#def drawtilemap(tilemap):
+#	io.drawtilemap(*args, **kwords)
+#def drawmenu(words, returns):
+#	io.drawmenu(*args, **kwords)
+#def drawlos(visibility, *color_shift):
+#	io.drawlos(*args, **kwords)
+#def clearlos(visibility, level):
+#	io.clearlos(*args, **kwords)
+#def drawline(startSquare, targetsquare, *char):
+#	io.drawline(*args, **kwords)
+#def getstr(*str):
+#	io.getstr(*args, **kwords)
+#def msg(message):
+#	io.msg(*args, **kwords)
+#def refresh():
+#	io.refresh(*args, **kwords)
+#def drawstar(square, *col):
+#	io.drawstar(*args, **kwords)
+#def drawblock(square, *col):
+#	io.drawblock(*args, **kwords)
+#def getch(*args, **keys):
+#	io.getch(*args, **kwords)
+#def sel_getch(print_str=None, *args, **keys):
+#	io.sel_getch(*args, **kwords)
+#def drawpath(iterator):
+#	io.drawpath(*args, **kwords)

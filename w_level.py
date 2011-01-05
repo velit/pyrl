@@ -1,5 +1,4 @@
 import curses
-import colors
 from char import Char
 from window import Window
 from bresenham import bresenham
@@ -51,10 +50,10 @@ class LevelWindow(Window):
 		for i, t in enumerate(tilemap):
 			try:
 				if t in tilemap.tiles:
-					self.addch(i/x, i%x, tilemap.tiles[t].ch_memory.symbol,
+					self.addch(i//x, i%x, tilemap.tiles[t].ch_memory.symbol,
 							tilemap.tiles[t].ch_memory.color)
 				else:
-					self.addch(i/x, i%x, tiles[t].ch_memory.symbol,
+					self.addch(i//x, i%x, tiles[t].ch_memory.symbol,
 							tiles[t].ch_memory.color)
 			except curses.error:
 				pass

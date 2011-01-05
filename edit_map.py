@@ -2,7 +2,7 @@ import curses
 
 from random import random
 
-from io import io
+from pio import io
 from tile import tiles, PassageTile
 from map import Map
 from constants import DIR
@@ -22,7 +22,7 @@ class EditMap(object):
 		io.s.add_element("t", "Tile: ", lambda:
 				self.map.tiles[self.t].ch_visible.symbol if self.t in
 				self.map.tiles else tiles[self.t].ch_visible.symbol)
-		io.s.add_element("f", "Function: ", lambda: self.f.func_name)
+		io.s.add_element("f", "Function: ", lambda: self.f.__name__)
 		io.s.add_element("k", "Keys: ", lambda: "tyf")
 		self.actions()
 
@@ -72,7 +72,7 @@ class EditMap(object):
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])
-			elif ch in map(ord, "B<"):
+			elif ch in tuple(map(ord, "B<")):
 				return
 			elif ch == ord('\n'):
 				self.f()
@@ -80,7 +80,7 @@ class EditMap(object):
 					self.map.squares[self.map.gettile(self.t).passage] \
 							= (self.y, self.x)
 				self.editor.modified = True
-			elif ch in map(ord, "tT"):
+			elif ch in tuple(map(ord, "tT")):
 				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(tiles):
@@ -98,7 +98,7 @@ class EditMap(object):
 				w = ["Pick a function:"]
 				r = [None]
 				for f in self.funs:
-					w.append(f.func_name)
+					w.append(f.__name__)
 					r.append(f)
 				self.f = io.drawmenu(w, r)
 

@@ -5,7 +5,7 @@ import colors
 
 from textwrap import wrap
 from char import Char
-from constants import YES, NO, DEFAULT
+from constants import YES, NO, DEFAULT, ENCODING
 
 class Window(object):
 	def __init__(self, window):
@@ -41,9 +41,9 @@ class Window(object):
 	def sel_getch(self, print_str=None, char_list=YES | NO | DEFAULT):
 		if print_str:
 			self.clear_and_print(print_str)
-		c = self.w.getch()
+		c = self.getch()
 		while c not in char_list:
-			c = self.w.getch()
+			c = self.getch()
 		return c
 
 	def clear_and_print(self, print_str):
@@ -53,17 +53,17 @@ class Window(object):
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)
 		curses.echo()
-		print_str = self.w.getstr()
+		print_str = self.w.getstr().decode(ENCODING)
 		curses.noecho()
 		return print_str
 
 	def getbool(self, print_str=None):
 		while True:
 			input = self.sel_getch(print_str + " [T/F]: ",
-					map(ord, "01fFtT\n"))
-			if input in map(ord, "0fF\n"):
+					list(map(ord, "01fFtT\n")))
+			if input in list(map(ord, "0fF\n")):
 				return False
-			elif input in map(ord, "1tT"):
+			elif input in list(map(ord, "1tT")):
 				return True
 
 	def getchar(self, print_str=None):
@@ -107,7 +107,10 @@ class Window(object):
 		curses.doupdate()
 
 	def addstr(self, *args, **keys):
-		self.w.addstr(*args, **keys)
+		if len(args) == 4 or len(args) == 2:
+			self.w.addstr(*(args[:-1] + (colors.d[args[-1]],)))
+		else:
+			self.w.addstr(*args, **keys)
 
 	def wrap_print(self, words):
 		self.clear()
