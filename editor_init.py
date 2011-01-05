@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
 from curses import wrapper
+from editor import Editor
+from pio import init_io_module
 
 def main(w):
-	import io
-
-	io.io = io.IO(w)
-	from editor import Editor
+	init_io_module(w)
 	Editor()
 
 wrapper(main)

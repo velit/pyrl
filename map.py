@@ -11,9 +11,9 @@ class Map(list):
 		self.squares = {}
 		x = self.cols #auttajatonttu
 		for i, tilekey in enumerate(tilemap):
-			self.append(Square(tilemap.gettile(tilekey), i / x, i % x))
+			self.append(Square(tilemap.gettile(tilekey), i // x, i % x))
 
-		for key, (loc_y, loc_x) in tilemap.squares.iteritems():
+		for key, (loc_y, loc_x) in tilemap.squares.items():
 			self.squares[key] = self.getsquare(loc_y, loc_x)
 
 	def getsquare(self, y, x=None):

@@ -1,1 +1,1 @@
-#!/usr/bin/python editor_init.py
+#!/usr/bin/python3 editor_init.py

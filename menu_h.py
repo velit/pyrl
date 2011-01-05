@@ -1,5 +1,4 @@
 import curses
-import colors
 from char import Char
 
 def draw(io, words, returns):
@@ -14,15 +13,15 @@ def _print_menu(io, w, r):
 		y, x = io.getyx()
 		if isinstance(word, Char):
 			s = word.symbol
-			col = colors.d[word.color]
+			col = word.color
 		else:
 			s = word
-			col = colors.normal
+			col = "normal"
 		if len(s) > io.cols - x:
 			y, x = io.gety() + 1, a[_first_r(r)][1]
 		a.append((y, x))
 		try:
-			io.w.addstr(y, x, s, col)
+			io.addstr(y, x, s, col)
 			if io.getx() != io.cols - 1:
 				io.move(io.gety(), io.getx() + 1)
 			else:
@@ -52,7 +51,7 @@ def _update_ui(io, w, r, a):
 
 def _hilight_and_getch(io, sw, w, a):
 	_print_menu_word(io, sw, w, a, True)
-	c = io.w.getch()
+	c = io.getch()
 	_print_menu_word(io, sw, w, a, False)
 	return c
 
@@ -60,13 +59,13 @@ def _print_menu_word(io, sw, w, a, r):
 	y, x = a[sw]
 	if isinstance(w[sw], Char):
 		s = w[sw].symbol
-		col = colors.d[w[sw].color]
+		col = w[sw].color
 	else:
 		s = str(w[sw])
-		col = colors.normal
-	r = colors.reverse if r else colors.normal
+		col = "normal"
+	r = "r" if r else ""
 	try:
-		io.w.addstr(y, x, s, col | r)
+		io.addstr(y, x, s, col + r)
 	except curses.error:
 		pass
 

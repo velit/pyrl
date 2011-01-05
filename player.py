@@ -3,7 +3,7 @@ import curses
 from creature import Creature
 from char import Char
 from tile import tiles
-from io import io
+from pio import io
 from constants import DIR, DEFAULT, PASSAGE_UP, PASSAGE_DOWN
 
 class Player(Creature):
@@ -27,46 +27,45 @@ class Player(Creature):
 	def def_actions(self):
 		a = {}
 
-		a[curses.KEY_DOWN] = "move", (DIR.S, )
-		a[curses.KEY_LEFT] = "move", (DIR.W, )
-		a[curses.KEY_RIGHT] = "move", (DIR.E, )
-		a[curses.KEY_UP] = "move", (DIR.N, )
+		a[curses.KEY_DOWN] = "move_to_dir", (DIR.S, )
+		a[curses.KEY_LEFT] = "move_to_dir", (DIR.W, )
+		a[curses.KEY_RIGHT] = "move_to_dir", (DIR.E, )
+		a[curses.KEY_UP] = "move_to_dir", (DIR.N, )
 		a[ord('+')] = "change_sight_range", (1, )
 		a[ord('-')] = "change_sight_range", (-1, )
-		a[ord('1')] = "move", (DIR.SW, )
-		a[ord('n')] = "move", (DIR.SW, )
-		a[ord('2')] = "move", (DIR.S, )
-		a[ord('j')] = "move", (DIR.S, )
-		a[ord('3')] = "move", (DIR.SE, )
-		a[ord('m')] = "move", (DIR.SE, )
-		a[ord('4')] = "move", (DIR.W, )
-		a[ord('h')] = "move", (DIR.W, )
-		a[ord('5')] = "move", (DIR.STOP, )
-		a[ord('.')] = "move", (DIR.STOP, )
-		a[ord('6')] = "move", (DIR.E, )
-		a[ord('l')] = "move", (DIR.E, )
-		a[ord('7')] = "move", (DIR.NW, )
-		a[ord('u')] = "move", (DIR.NW, )
-		a[ord('8')] = "move", (DIR.N, )
-		a[ord('k')] = "move", (DIR.N, )
-		a[ord('9')] = "move", (DIR.NE, )
-		a[ord('i')] = "move", (DIR.NE, )
+		a[ord('.')] = "move_to_dir", (DIR.STOP, )
+		a[ord('1')] = "move_to_dir", (DIR.SW, )
+		a[ord('2')] = "move_to_dir", (DIR.S, )
+		a[ord('3')] = "move_to_dir", (DIR.SE, )
+		a[ord('4')] = "move_to_dir", (DIR.W, )
+		a[ord('5')] = "move_to_dir", (DIR.STOP, )
+		a[ord('6')] = "move_to_dir", (DIR.E, )
+		a[ord('7')] = "move_to_dir", (DIR.NW, )
+		a[ord('8')] = "move_to_dir", (DIR.N, )
+		a[ord('9')] = "move_to_dir", (DIR.NE, )
 		a[ord('<')] = "ascend", ()
 		a[ord('>')] = "descend", ()
 		a[ord('H')] = "los_highlight", ()
+		a[ord('K')] = "killall", ()
 		a[ord('L')] = "loadgame", ()
 		a[ord('Q')] = "endgame", ()
 		a[ord('S')] = "savegame", ()
 		a[ord('\x12')] = "redraw", ()
 		a[ord('d')] = "debug", ()
-		a[ord('K')] = "killall", ()
+		a[ord('h')] = "move_to_dir", (DIR.W, )
+		a[ord('i')] = "move_to_dir", (DIR.NE, )
+		a[ord('j')] = "move_to_dir", (DIR.S, )
+		a[ord('k')] = "move_to_dir", (DIR.N, )
+		a[ord('l')] = "move_to_dir", (DIR.E, )
+		a[ord('m')] = "move_to_dir", (DIR.SE, )
+		a[ord('n')] = "move_to_dir", (DIR.SW, )
 		a[ord('p')] = "path", ()
+		a[ord('u')] = "move_to_dir", (DIR.NW, )
 
 		self.actions = a
 
 	def act(self):
-		self.update_los()
-		self.l.drawmap()
+		self.update_view()
 		while True:
 			c = io.getch(self.square.y, self.square.x)
 			if c in self.actions:
@@ -81,20 +80,15 @@ class Player(Creature):
 	def exec_act(self, act):
 		return self.__getattribute__(act[0])(*act[1])
 
-	def move(self, dir):
+	def move_to_dir(self, dir):
 		if dir == DIR.STOP:
 			return True
 		y, x = self.square.y + DIR.DY[dir], self.square.x + DIR.DX[dir]
-		if self.l.legal_yx(y, x):
-			targetsquare = self.l.getsquare(y,x)
-			if targetsquare.passable():
-				self.l.movecreature(self, targetsquare)
-				return True
-			elif targetsquare.creature is not None:
-				self.hit(targetsquare.creature)
-				return True
-		io.msg("You can't move there.")
-		return False
+		if self.move(y, x):
+			return True
+		else:
+			io.msg("You can't move there.")
+			return False
 
 	def change_sight_range(self, amount):
 		self.sight += amount
@@ -108,10 +102,22 @@ class Player(Creature):
 	def ascend(self):
 		if self.square.ispassage() and self.square.tile.passage == PASSAGE_UP:
 			self.enter()
+		else:
+			try:
+				self.move(*self.l.getsquare(PASSAGE_UP).getloc())
+				return True
+			except KeyError:
+				return False
 
 	def descend(self):
 		if self.square.ispassage() and self.square.tile.passage == PASSAGE_DOWN:
 			self.enter()
+		else:
+			try:
+				self.move(*self.l.getsquare(PASSAGE_DOWN).getloc())
+				return True
+			except KeyError:
+				return False
 
 	def enter(self):
 		if self.square.ispassage():
@@ -131,7 +137,6 @@ class Player(Creature):
 	def loadgame(self):
 		self.g.loadgame()
 
-
 	def debug(self):
 		io.msg((io.level_rows, io.level_cols))
 
@@ -144,9 +149,6 @@ class Player(Creature):
 		elif self.reverse == "r":
 			self.reverse = ""
 		self.redraw()
-
-	def redraw(self):
-		self.g.redraw()
 
 	def killall(self):
 		io.msg("Abrakadabra.")

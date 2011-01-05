@@ -1,7 +1,5 @@
 from tile import tiles, PassageTile
-from io import io
 from constants import OPTIMIZATION
-from colors import d
 
 class Square(object):
 	"""A cell that is a part of a level."""

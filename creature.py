@@ -1,7 +1,7 @@
 import curses
 from random import randrange as rr
 from random import choice
-from io import io
+from pio import io
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1,  0,  0, -1, -1,  0,  0,  1],
@@ -113,6 +113,17 @@ class Creature(object):
 				return True
 		return False
 
+	def move(self, y, x):
+		if self.l.legal_yx(y, x):
+			targetsquare = self.l.getsquare(y,x)
+			if targetsquare.passable():
+				self.l.movecreature(self, targetsquare)
+				return True
+			elif targetsquare.creature is not None:
+				self.hit(targetsquare.creature)
+				return True
+		return False
+
 	def move_random(self):
 		for i in range(5):
 			y = self.square.y + rr(3) - 1
@@ -145,6 +156,15 @@ class Creature(object):
 	def has_los(self, square):
 		return self.has_range(square) and \
 				self.l.check_los(self.square, square)
+
+	def redraw_view(self):
+		self.visibility.clear()
+		self.l.drawmemory()
+		self.update_view()
+
+	def update_view(self):
+		self.update_los()
+		#self.l.drawmap()
 
 	def update_los(self):
 		old = self.visibility

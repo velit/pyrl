@@ -1,5 +1,3 @@
-import colors
-
 from char import Char
 from creature import Creature
 from random import choice

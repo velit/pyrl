@@ -1,1 +1,1 @@
-#!/usr/bin/python main.py
+#!/usr/bin/python3 main.py

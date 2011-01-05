@@ -4,7 +4,7 @@ import shutil
 import sys
 
 from os import path
-from io import io
+from pio import io
 from edit_map import EditMap
 from map import TileMap
 from dungeonproperties import DungeonProperties, DungeonNode
@@ -66,10 +66,7 @@ class Editor(object):
 	def __init__(self):
 		self.data = DungeonProperties()
 		self.modified = False
-		try:
-			self.load(ask=False)
-		except:
-			pass
+		self.load(ask=False)
 
 		self.static_menu(_MAIN_ITEMS, self.main_menu_behaviour)
 
@@ -195,7 +192,8 @@ class Editor(object):
 			return
 		self.modified = True
 
-	def static_menu(self, (lines, ignores), output_f=None, *f_args, **f_keys):
+	def static_menu(self, lines_ignores, output_f=None, *f_args, **f_keys):
+		(lines, ignores) = lines_ignores
 		i = 0
 		while True:
 			i, ch = io.a.draw_menu(i, lines, ignores)
@@ -219,7 +217,7 @@ class Editor(object):
 			if isinstance(container, list):
 				kv = enumerate(container)
 			elif isinstance(container, dict):
-				kv = sorted(container.iteritems())
+				kv = sorted(container.items())
 			else:
 				kv = container
 
@@ -263,16 +261,16 @@ class Editor(object):
 	def modify_attribute_type(self, dict_, key):
 		c = io.a.sel_getch(
 				"Select new type: [B]ool, [S]tring, [I]nt, [C]har, [N]one",
-				map(ord, "BbSsIiCcNn"))
-		if c in map(ord, "bB"):
+				tuple(map(ord, "BbSsIiCcNn")))
+		if c in tuple(map(ord, "bB")):
 			dict_[key] = bool()
-		elif c in map(ord, "sS"):
+		elif c in tuple(map(ord, "sS")):
 			dict_[key] = str()
-		elif c in map(ord, "iI"):
+		elif c in tuple(map(ord, "iI")):
 			dict_[key] = int()
-		elif c in map(ord, "cC"):
+		elif c in tuple(map(ord, "cC")):
 			dict_[key] = Char()
-		elif c in map(ord, "nN"):
+		elif c in tuple(map(ord, "nN")):
 			dict_[key] = None
 		else:
 			return
@@ -341,7 +339,7 @@ class Editor(object):
 			if c not in YES:
 				return
 
-		with open(path.join("editor_data", "data"), "w") as l:
+		with open(path.join("editor_data", "data"), "wb") as l:
 			pickle.dump(self.data, l)
 
 		self.modified = False
@@ -353,7 +351,7 @@ class Editor(object):
 			if c not in YES:
 				return
 
-		with open(path.join("editor_data", "data"), "r") as f:
+		with open(path.join("editor_data", "data"), "rb") as f:
 			self.data = pickle.load(f)
 
 		self.modified = False
@@ -375,13 +373,12 @@ class Editor(object):
 		return True
 
 	def import_data(self):
-		raise NotImplementedError("This method isn't up to date")
 		c = io.a.sel_getch("Are you sure you wish"
 					" to import game data? [y/N] ")
 		if c not in YES:
 			return
 
-		with open(path.join("data", "data"), "r") as f:
+		with open(path.join("data", "data"), "rb") as f:
 			self.data = pickle.load(f)
 
 		self.modified = True

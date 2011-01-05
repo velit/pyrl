@@ -97,7 +97,7 @@ def _attempt_room(level):
 	square, dir = _get_wall_square(level)
 	y0, x0 = square.y, square.x
 	height, width = rr(5, 11), rr(7, 14)
-	ypos, xpos = choice(range(height-2)), choice(range(width-2))
+	ypos, xpos = rr(height-2), rr(width-2)
 
 	if dir == "left":
 		y = y0 - 1 - ypos
