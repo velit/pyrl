@@ -5,15 +5,26 @@ from w_status import StatusBar
 from w_level import LevelWindow
 from window import Window
 from colors import init_colors
-from wrapper_io import Wrapper
-
-io = Wrapper()
 
 def init_io_module(curs_window, msg_bar_size=2, status_bar_size=2):
 	init_colors()
-	Wrapper._inst = IO(curs_window, msg_bar_size, status_bar_size)
+	Wrapper._inst = _IO(curs_window, msg_bar_size, status_bar_size)
 
-class IO():
+class Wrapper():
+	_inst = None
+
+	def __getattr__(self, name):
+		return getattr(Wrapper._inst, name)
+
+	def __setattr__(self, name, value):
+		return setattr(Wrapper._inst, name, value)
+
+	def __delattr__(self, name):
+		return delattr(Wrapper._inst, name, value)
+
+io = Wrapper()
+
+class _IO():
 	def __init__(self, curs_window, msg_bar_size=2, status_bar_size=2):
 		self.w = curs_window
 		self.w.keypad(1)
@@ -85,35 +96,3 @@ class IO():
 			self.drawstar(x)
 		self.getch()
 		curses.curs_set(1)
-
-
-#def drawmap(map):
-#	io.drawmap(*args, **kwords)
-#def drawmemory(map):
-#	io.drawmemory(*args, **kwords)
-#def drawtilemap(tilemap):
-#	io.drawtilemap(*args, **kwords)
-#def drawmenu(words, returns):
-#	io.drawmenu(*args, **kwords)
-#def drawlos(visibility, *color_shift):
-#	io.drawlos(*args, **kwords)
-#def clearlos(visibility, level):
-#	io.clearlos(*args, **kwords)
-#def drawline(startSquare, targetsquare, *char):
-#	io.drawline(*args, **kwords)
-#def getstr(*str):
-#	io.getstr(*args, **kwords)
-#def msg(message):
-#	io.msg(*args, **kwords)
-#def refresh():
-#	io.refresh(*args, **kwords)
-#def drawstar(square, *col):
-#	io.drawstar(*args, **kwords)
-#def drawblock(square, *col):
-#	io.drawblock(*args, **kwords)
-#def getch(*args, **keys):
-#	io.getch(*args, **kwords)
-#def sel_getch(print_str=None, *args, **keys):
-#	io.sel_getch(*args, **kwords)
-#def drawpath(iterator):
-#	io.drawpath(*args, **kwords)

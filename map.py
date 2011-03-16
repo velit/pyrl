@@ -1,7 +1,9 @@
 import random
 
 from square import Square
-from tile import tiles
+from tile import gettile
+
+from const.tiles import FLOOR
 
 class Map(list):
 	def __init__(self, tilemap):
@@ -11,7 +13,7 @@ class Map(list):
 		self.squares = {}
 		x = self.cols #auttajatonttu
 		for i, tilekey in enumerate(tilemap):
-			self.append(Square(tilemap.gettile(tilekey), i // x, i % x))
+			self.append(Square(gettile(tilemap,tilekey), i // x, i % x))
 
 		for key, (loc_y, loc_x) in tilemap.squares.items():
 			self.squares[key] = self.getsquare(loc_y, loc_x)
@@ -40,12 +42,12 @@ class Map(list):
 
 class TileMap(list):
 	"""A map containing the tiles of a level."""
-	def __init__(self, y, x, t="f"):
-		self.tiles = {}
-		list.__init__(self, (t for x in range(y*x)))
-		self.rows = y
-		self.cols = x
-		self.squares = {}
+	def __init__(self, rows, cols, tile=FLOOR):
+		list.__init__(self, (tile for i in range(rows*cols)))
+		self.rows = rows
+		self.cols = cols
+		self.tile_dict = {}
+		self.passageway_locs = {}
 
 	def getsquare(self, *args):
 		if len(args) == 2:
@@ -56,11 +58,3 @@ class TileMap(list):
 
 	def setsquare(self, y, x, tile):
 		self[y*self.cols + x] = tile
-		
-	def gettile(self, handle):
-		if handle in self.tiles:
-			return self.tiles[handle]
-		elif handle in tiles:
-			return tiles[handle]
-		else:
-			raise Exception("handle '"+handle+"' not found")

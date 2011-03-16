@@ -9,9 +9,12 @@ mult = [[1,  0,  0, -1, -1,  0,  0,  1],
 		[0,  1,  1,  0,  0, -1, -1,  0],
 		[1,  0,  0,  1, -1,  0,  0, -1]]
 
-class Creature(object):
+class Creature():
 	"""This is an abstract class representing a creature"""
 	def __init__(self, game, level):
+		self.name = "abstract"
+		self.n = "idea"
+		self.ch = Char('?', "white")
 		self.sight = 15
 		self.hp = 10
 		self.dmg = 1
@@ -101,8 +104,13 @@ class Creature(object):
 									if self.rcs(sy, sx - mx):
 										self.rcs(sy - my, sx - mx)
 
-	# Right click square (rts games)
+	def enter(self):
+		if self.square.ispassage():
+			self.g.enter(self.l.world_loc, self.square)
+			return True
+
 	def rcs(self, y, x, hostile=True):
+		"""Right click square (rts games)"""
 		if self.l.legal_yx(y, x):
 			s = self.l.getsquare(y, x)
 			if s.passable():
@@ -187,7 +195,7 @@ class Creature(object):
 	# http://roguebasin.roguelikedevelopment.org/ \
 	# index.php?title=FOV_using_recursive_shadowcasting
 	def _cast_light(self, level, cy, cx, row, start, end, r, xx, xy, yx, yy):
-		"Recursive lightcasting function"
+		""""Recursive lightcasting function""""
 		if start < end:
 			return
 		radius_squared = r*r

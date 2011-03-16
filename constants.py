@@ -1,7 +1,3 @@
-import dir_constants
-
-DIR = dir_constants
-
 OPTIMIZATION = True
 DEBUG = False
 
@@ -9,7 +5,7 @@ MSG_BAR_SIZE = 2
 STATUS_BAR_SIZE = 2
 
 MORE_STR = " (more)"
-ENCODING = "ascii"
+ENCODING = "utf-8"
 
 SET_LEVEL = "set-level"
 NEXT_LEVEL = "next-level"

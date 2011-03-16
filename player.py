@@ -2,9 +2,9 @@ import curses
 
 from creature import Creature
 from char import Char
-from tile import tiles
 from pio import io
-from constants import DIR, DEFAULT, PASSAGE_UP, PASSAGE_DOWN
+from constants import DEFAULT, PASSAGE_UP, PASSAGE_DOWN
+from const.directions import *
 
 class Player(Creature):
 	"""da player object"""
@@ -27,22 +27,22 @@ class Player(Creature):
 	def def_actions(self):
 		a = {}
 
-		a[curses.KEY_DOWN] = "move_to_dir", (DIR.S, )
-		a[curses.KEY_LEFT] = "move_to_dir", (DIR.W, )
-		a[curses.KEY_RIGHT] = "move_to_dir", (DIR.E, )
-		a[curses.KEY_UP] = "move_to_dir", (DIR.N, )
+		a[curses.KEY_DOWN] = "move_to_dir", (S, )
+		a[curses.KEY_LEFT] = "move_to_dir", (W, )
+		a[curses.KEY_RIGHT] = "move_to_dir", (E, )
+		a[curses.KEY_UP] = "move_to_dir", (N, )
 		a[ord('+')] = "change_sight_range", (1, )
 		a[ord('-')] = "change_sight_range", (-1, )
-		a[ord('.')] = "move_to_dir", (DIR.STOP, )
-		a[ord('1')] = "move_to_dir", (DIR.SW, )
-		a[ord('2')] = "move_to_dir", (DIR.S, )
-		a[ord('3')] = "move_to_dir", (DIR.SE, )
-		a[ord('4')] = "move_to_dir", (DIR.W, )
-		a[ord('5')] = "move_to_dir", (DIR.STOP, )
-		a[ord('6')] = "move_to_dir", (DIR.E, )
-		a[ord('7')] = "move_to_dir", (DIR.NW, )
-		a[ord('8')] = "move_to_dir", (DIR.N, )
-		a[ord('9')] = "move_to_dir", (DIR.NE, )
+		a[ord('.')] = "move_to_dir", (STOP, )
+		a[ord('1')] = "move_to_dir", (SW, )
+		a[ord('2')] = "move_to_dir", (S, )
+		a[ord('3')] = "move_to_dir", (SE, )
+		a[ord('4')] = "move_to_dir", (W, )
+		a[ord('5')] = "move_to_dir", (STOP, )
+		a[ord('6')] = "move_to_dir", (E, )
+		a[ord('7')] = "move_to_dir", (NW, )
+		a[ord('8')] = "move_to_dir", (N, )
+		a[ord('9')] = "move_to_dir", (NE, )
 		a[ord('<')] = "ascend", ()
 		a[ord('>')] = "descend", ()
 		a[ord('H')] = "los_highlight", ()
@@ -52,15 +52,15 @@ class Player(Creature):
 		a[ord('S')] = "savegame", ()
 		a[ord('\x12')] = "redraw", ()
 		a[ord('d')] = "debug", ()
-		a[ord('h')] = "move_to_dir", (DIR.W, )
-		a[ord('i')] = "move_to_dir", (DIR.NE, )
-		a[ord('j')] = "move_to_dir", (DIR.S, )
-		a[ord('k')] = "move_to_dir", (DIR.N, )
-		a[ord('l')] = "move_to_dir", (DIR.E, )
-		a[ord('m')] = "move_to_dir", (DIR.SE, )
-		a[ord('n')] = "move_to_dir", (DIR.SW, )
+		a[ord('h')] = "move_to_dir", (W, )
+		a[ord('i')] = "move_to_dir", (NE, )
+		a[ord('j')] = "move_to_dir", (S, )
+		a[ord('k')] = "move_to_dir", (N, )
+		a[ord('l')] = "move_to_dir", (E, )
+		a[ord('m')] = "move_to_dir", (SE, )
+		a[ord('n')] = "move_to_dir", (SW, )
 		a[ord('p')] = "path", ()
-		a[ord('u')] = "move_to_dir", (DIR.NW, )
+		a[ord('u')] = "move_to_dir", (NW, )
 
 		self.actions = a
 
@@ -81,9 +81,9 @@ class Player(Creature):
 		return self.__getattribute__(act[0])(*act[1])
 
 	def move_to_dir(self, dir):
-		if dir == DIR.STOP:
+		if dir == STOP:
 			return True
-		y, x = self.square.y + DIR.DY[dir], self.square.x + DIR.DX[dir]
+		y, x = self.square.y + DY[dir], self.square.x + DX[dir]
 		if self.move(y, x):
 			return True
 		else:
@@ -118,11 +118,6 @@ class Player(Creature):
 				return True
 			except KeyError:
 				return False
-
-	def enter(self):
-		if self.square.ispassage():
-			self.g.enter(self.square.tile.passage)
-			return True
 
 	def die(self):
 		io.sel_getch("You die... [more]", char_list=DEFAULT)

@@ -283,7 +283,7 @@ class Editor(object):
 
 	def add_map(self):
 		handle = io.a.getstr("Map handle")
-		self.data.tilemaps[handle] = TileMap(io.level_rows, io.level_cols, "f")
+		self.data.tilemaps[handle] = TileMap(io.level_rows, io.level_cols)
 		self.modified = True
 
 	def delete_map(self, handle):
@@ -351,8 +351,13 @@ class Editor(object):
 			if c not in YES:
 				return
 
-		with open(path.join("editor_data", "data"), "rb") as f:
-			self.data = pickle.load(f)
+		try:
+			with open(path.join("editor_data", "data"), "rb") as f:
+				self.data = pickle.load(f)
+		except IOError:
+			io.a.sel_getch("Something went wrong with loading, resetting to "
+						"default values.")
+			self.data = DungeonProperties()
 
 		self.modified = False
 

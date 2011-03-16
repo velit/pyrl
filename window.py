@@ -53,9 +53,9 @@ class Window(object):
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)
 		curses.echo()
-		print_str = self.w.getstr().decode(ENCODING)
+		return_str = self.w.getstr().decode(ENCODING)
 		curses.noecho()
-		return print_str
+		return return_str
 
 	def getbool(self, print_str=None):
 		while True:
