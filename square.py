@@ -1,4 +1,4 @@
-from tile import tiles, PassageTile
+from tile import tiles
 from constants import OPTIMIZATION
 
 class Square(object):
@@ -74,4 +74,4 @@ class Square(object):
 			return self.tile.ch_visible
 
 	def ispassage(self):
-		return isinstance(self.tile, PassageTile)
+		return self.tile.passageway

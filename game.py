@@ -15,7 +15,6 @@ class Game(object):
 		self.turn_counter = 0
 		self.dungeons = {}
 		self.p = Player(self)
-		self.level = ("", 0)
 
 		with open(os.path.join("data", "data"), "rb") as f:
 			data = pickle.load(f)

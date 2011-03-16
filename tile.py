@@ -1,36 +1,37 @@
 from char import Char
-from constants import PASSAGE_DOWN, PASSAGE_UP
+from const.tiles import *
 
 class Tile(object):
 	"""The actual floor of a square."""
-
 	def __init__(self, name="floor", visible=Char(), mem=Char(), passable=True,
-				see_through=True, movement_cost=1000):
+				see_through=True, movement_cost=1000, passageway=False):
 		self.name = name
 		self.ch_visible = visible
 		self.ch_memory = mem
 		self.passable = passable
 		self.see_through = see_through
 		self.movement_cost = movement_cost
+		self.passageway = passageway
 
-
-class PassageTile(Tile):
-	"""A tile that signifies a passageway exists."""
-
-	def __init__(self, passage=None, *args, **kwargs):
-		self.passage = passage
-		super(PassageTile, self).__init__(*args, **kwargs)
-
-tiles = {
-	"u": Tile("You have not seen this place yet",
+tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
+	UNKNOWN: Tile("You have not seen this place yet",
 			Char(' '), Char(' '), False, False),
-	"f": Tile("Dungeon floor", Char('.'), Char('.'), True, True),
-	"r": Tile("Dungeon rock", Char('#', "black"),
-			Char('#', "black"), False, False),
-	"w": Tile("Wall", Char('#', "brown"), Char('#', "black"),
+	FLOOR: Tile("Dungeon floor", Char('.'), Char('.')),
+	ROCK: Tile("Dungeon rock", Char('#', "black"), Char('#', "black"),
 			False, False),
-	"ds": PassageTile(PASSAGE_DOWN, "Down staircase",
-			Char('>', "red"), Char('>'), True, True),
-	"us": PassageTile(PASSAGE_UP, "Up staircase",
-			Char('<', "red"), Char('<'), True, True),
+	WALL: Tile("Wall", Char('#', "brown"), Char('#', "black"),
+			False, False),
+	STAIRS_DOWN: Tile("Down staircase", Char('>', "red"), Char('>'),
+			passageway=PASSAGE_DOWN),
+	STAIRS_UP: Tile("Up staircase", Char('<', "red"), Char('<'),
+			passageway=PASSAGE_UP),
 }
+
+def gettile(tile_dict, handle):
+	if handle in tiles:
+		return tiles[handle]
+	elif handle in tile_dict:
+		return tile_dict[handle]
+	else:
+		raise KeyError("Handle '{}' not in global tiles or '{}'".format(handle,
+			tile_dict))

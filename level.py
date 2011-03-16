@@ -3,14 +3,14 @@ import path
 from bresenham import bresenham
 from monster import Monster
 from map import Map, TileMap
-from tile import tiles
 from pio import io
 from rdg import generateLevel
 
-class Level(object):
-	def __init__(self, game, tilemap=None, passages=()):
+class Level():
+	def __init__(self, game, dungeon_key, dungeon_i, tilemap=None, passages=()):
 		self.g = game
 		self.rows, self.cols = io.level_rows, io.level_cols
+		self.world_loc = (dungeon_key, dungeon_i)
 		
 		self.creatures = []
 
