@@ -3,7 +3,7 @@ import curses
 from creature import Creature
 from char import Char
 from pio import io
-from constants import DEFAULT, PASSAGE_UP, PASSAGE_DOWN
+from const.game import DEFAULT, PASSAGE_UP, PASSAGE_DOWN
 from const.directions import *
 
 class Player(Creature):
@@ -137,7 +137,7 @@ class Player(Creature):
 
 	def path(self):
 		io.msg("Shhhhhhh. Everything will be all right.")
-	
+
 	def los_highlight(self):
 		if self.reverse == "":
 			self.reverse = "r"

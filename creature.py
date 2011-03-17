@@ -2,6 +2,7 @@ import curses
 from random import randrange as rr
 from random import choice
 from pio import io
+from char import Char
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1,  0,  0, -1, -1,  0,  0,  1],
@@ -43,7 +44,7 @@ class Creature():
 
 		# Modifier
 		my, mx = 0, 0
-		
+
 		if dy > 0:
 			my = 1
 		elif dy < 0:
@@ -104,8 +105,8 @@ class Creature():
 									if self.rcs(sy, sx - mx):
 										self.rcs(sy - my, sx - mx)
 
-	def enter(self):
-		if self.square.ispassage():
+	def exit(self):
+		if self.square.isexit()
 			self.g.enter(self.l.world_loc, self.square)
 			return True
 
@@ -195,7 +196,7 @@ class Creature():
 	# http://roguebasin.roguelikedevelopment.org/ \
 	# index.php?title=FOV_using_recursive_shadowcasting
 	def _cast_light(self, level, cy, cx, row, start, end, r, xx, xy, yx, yy):
-		""""Recursive lightcasting function""""
+		"""Recursive lightcasting function"""
 		if start < end:
 			return
 		radius_squared = r*r

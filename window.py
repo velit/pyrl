@@ -4,8 +4,7 @@ import menu_h
 import colors
 
 from textwrap import wrap
-from char import Char
-from constants import YES, NO, DEFAULT, ENCODING
+from const.game import YES, NO, DEFAULT, ENCODING
 
 class Window(object):
 	def __init__(self, window):
@@ -28,7 +27,7 @@ class Window(object):
 
 	def getch(self, *args):
 		return self.w.getch(*args)
-	
+
 	def gety(self):
 		return self.w.getyx()[0]
 

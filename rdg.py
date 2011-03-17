@@ -2,12 +2,14 @@ from random import randrange as rr, random as rand, choice
 
 from map import Map, TileMap
 from square import Square as S
-from tile import tiles
-from constants import PASSAGE_DOWN, PASSAGE_UP
+from tiles import gettile, WALL, ROCK, FLOOR
+from const.game import PASSAGE_DOWN, PASSAGE_UP
 
-w = tiles["w"]
-r = tiles["r"]
-f = tiles["f"]
+w = gettile(WALL)
+r = gettile(ROCK)
+f = gettile(FLOOR)
+us = gettile(STAIRS_UP)
+ds = gettile(STAIRS_DOWN)
 
 def generateLevel(level, passages):
 	level.map = Map(TileMap(level.rows, level.cols, "r"))
@@ -31,8 +33,8 @@ def add_staircase_up(level):
 				and g(y, x-1).tile == f and g(y, x+1).tile == f:
 			break
 
-	square.tile = tiles["us"]
-	level.map.squares[PASSAGE_UP] = square
+	square.tile = us
+	level.map.entrance_squares[PASSAGE_UP] = square
 
 def add_staircase_down(level):
 	while True:
@@ -44,18 +46,18 @@ def add_staircase_down(level):
 			break
 
 	square.tile = tiles["ds"]
-	level.map.squares[PASSAGE_DOWN] = square
+	level.map.entrance_squares[PASSAGE_DOWN] = square
 
 def _make_initial_room(level):
 	while True:
 		height, width = rr(5, 11), rr(7, 14)
 		if height*width <= 8*8:
 			break
-	while True: 
+	while True:
 		y, x = rr(1, level.rows-height-1), rr(1, level.cols-width-1)
 		if _rect_diggable(level, y, x, height, width):
 			break
-	
+
 	_make_room(level, y, x, height, width)
 
 def _get_wall_square(level):
@@ -91,7 +93,7 @@ def _rect_diggable(level, y0, x0, height, width):
 			if level.getsquare(y, x).tile != r and \
 					level.getsquare(y, x).tile != w:
 				return False
-	return True	
+	return True
 
 def _attempt_room(level):
 	square, dir = _get_wall_square(level)

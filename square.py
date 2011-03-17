@@ -1,5 +1,5 @@
-from tile import tiles
-from constants import OPTIMIZATION
+from tiles import gettile, UNKNOWN
+from const.game import OPTIMIZATION
 
 class Square(object):
 	"""A cell that is a part of a level."""
@@ -11,7 +11,7 @@ class Square(object):
 		self.x = x
 		self.tile = tile
 		self.creature = None
-		self.memory_tile = tiles["u"]
+		self.memory_tile = gettile(UNKNOWN)
 
 	if OPTIMIZATION:
 		def __getstate__(self):
@@ -43,35 +43,17 @@ class Square(object):
 	def visit(self):
 		self.memory_tile = self.tile
 
-	def get_visible_data(self, color_shift="", coords=True):
-		if coords:
-			if self.creature:
-				return (self.y, self.x, self.creature.ch.symbol,
-						self.creature.ch.color + color_shift)
-			else:
-				return (self.y, self.x, self.tile.ch_visible.symbol,
-						self.tile.ch_visible.color + color_shift)
-		else:
-			if self.creature:
-				return (self.creature.ch.symbol,
-						self.creature.ch.color + color_shift)
-			else:
-				return (self.tile.ch_visible.symbol,
-						self.tile.ch_visible.color + color_shift)
-
-	def get_memory_data(self, color_shift="", coords=True):
-		if coords:
-			return (self.y, self.x, self.memory_tile.ch_memory.symbol,
-					self.memory_tile.ch_memory.color + color_shift)
-		else:
-			return (self.memory_tile.ch_memory.symbol,
-					self.memory_tile.ch_memory.color + color_shift)
-
-	def get_visible_char(self):
+	def get_visible_char_data(self, color_shift=""):
 		if self.creature:
-			return self.creature.ch
+			return (self.creature.ch.symbol, self.creature.ch.color +
+					color_shift)
 		else:
-			return self.tile.ch_visible
+			return (self.tile.ch_visible.symbol, self.tile.ch_visible.color +
+					color_shift)
 
-	def ispassage(self):
-		return self.tile.passageway
+	def get_memory_char_data(self, color_shift=""):
+		return (self.memory_tile.ch_memory.symbol,
+				self.memory_tile.ch_memory.color + color_shift)
+
+	def isexit(self):
+		return self.tile.exit_point is not None

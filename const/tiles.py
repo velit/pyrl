@@ -1,6 +1,0 @@
-UNKNOWN = "u"
-FLOOR = "f"
-WALL = "w"
-ROCK = "r"
-STAIRS_UP = "us"
-STAIRS_DOWN = "ds"

@@ -11,7 +11,7 @@ class Level():
 		self.g = game
 		self.rows, self.cols = io.level_rows, io.level_cols
 		self.world_loc = (dungeon_key, dungeon_i)
-		
+
 		self.creatures = []
 
 		if tilemap is None:
@@ -21,7 +21,6 @@ class Level():
 		else:
 			self.map = Map(tilemap)
 
-	
 	def getsquare(self, *args, **kwords):
 		return self.map.getsquare(*args, **kwords)
 
@@ -45,7 +44,7 @@ class Level():
 
 	def drawmap(self):
 		io.drawmap(self.map)
-	
+
 	def drawmemory(self):
 		io.drawmemory(self.map)
 

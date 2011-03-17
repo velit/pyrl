@@ -2,7 +2,7 @@ import curses
 
 from window import Window
 from textwrap import TextWrapper
-from constants import MORE_STR, DEFAULT
+from const.game import MORE_STR, DEFAULT
 
 class MessageBar(Window):
 	"""Handles the messaging bar system."""
@@ -15,7 +15,7 @@ class MessageBar(Window):
 		self.wrapper = TextWrapper(width=(self.cols))
 
 		#accommodate for the more_str if the messages continue on the next page
-		self.last_line_wrapper = TextWrapper(width=(self.cols - 
+		self.last_line_wrapper = TextWrapper(width=(self.cols -
 													len(MORE_STR) - 1))
 
 	def update(self):
