@@ -105,9 +105,9 @@ class Creature():
 									if self.rcs(sy, sx - mx):
 										self.rcs(sy - my, sx - mx)
 
-	def exit(self):
-		if self.square.isexit()
-			self.g.enter(self.l.world_loc, self.square)
+	def exit_level(self):
+		if self.square.isexit():
+			self.g.exit_level(self.l.world_loc, self.square.getexit())
 			return True
 
 	def rcs(self, y, x, hostile=True):

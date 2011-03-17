@@ -34,8 +34,8 @@ class Game(object):
 			creature.act()
 		self.turn_counter += 1
 
-	def exit_level(self, exit_point):
-		passage_info = self.get_passages(*self.level)[exit_point]
+	def exit_level(self, world_loc, exit_point):
+		passage_info = self.get_passages(*world_loc)[exit_point]
 		if passage_info[0] == SET_LEVEL:
 			self.change_level(*passage_info[1])
 		elif passage_info[0] == PREVIOUS_LEVEL:

@@ -88,7 +88,7 @@ class EditMap(object):
 			elif ch in (ord('y'), ord('Y')):
 				w = ["Pick a tile:"]
 				r = [None]
-				for key in sorted(self.map.tiles):
+				for key in sorted(self.map.tile_dict):
 					w.append(key)
 					r.append(key)
 				self.t = io.drawmenu(w, r)

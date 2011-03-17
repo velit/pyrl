@@ -2,7 +2,7 @@ from random import randrange as rr, random as rand, choice
 
 from map import Map, TileMap
 from square import Square as S
-from tiles import gettile, WALL, ROCK, FLOOR
+from tiles import gettile, WALL, ROCK, FLOOR, STAIRS_UP, STAIRS_DOWN
 from const.game import PASSAGE_DOWN, PASSAGE_UP
 
 w = gettile(WALL)
@@ -45,7 +45,7 @@ def add_staircase_down(level):
 				g(y, x-1).tile == f and g(y, x+1).tile == f:
 			break
 
-	square.tile = tiles["ds"]
+	square.tile = ds
 	level.map.entrance_squares[PASSAGE_DOWN] = square
 
 def _make_initial_room(level):

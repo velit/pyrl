@@ -40,6 +40,7 @@ _MAIN_ITEMS = ((
 	"",
 	"Save data",
 	"Load data",
+	"Reset data",
 	"Export data",
 	"Import data",
 	_QUIT,
@@ -64,10 +65,11 @@ _DUNGEON_ITEMS = ((
 
 class Editor(object):
 
-	def __init__(self):
+	def __init__(self, load=True):
 		self.data = DungeonProperties()
 		self.modified = False
-		self.load(ask=False)
+		if load:
+			self.load(ask=False)
 
 		self.static_menu(_MAIN_ITEMS, self.main_menu_behaviour)
 
@@ -78,9 +80,8 @@ class Editor(object):
 					self.view_global_tiles)
 
 			elif line == "Edit maps":
-				self.menu(self.data.tilemaps,
-					"[A]dd/[D]elete a level, Edit [T]iles, [V]iew squares, [E]dit",
-					"key", self.edit_map)
+				self.menu(self.data.tilemaps, "[A]dd/[D]el, Edit [T]iles, "
+					"[V]iew entrances, [E]dit", "key", self.edit_map)
 
 			elif line == "Edit dungeons":
 				self.menu(self.data.dungeons,
@@ -95,6 +96,8 @@ class Editor(object):
 				self.export()
 			elif line == "Import data":
 				self.import_data()
+			elif line == "Reset data":
+				self.reset()
 			elif line == _QUIT:
 				self.safe_exit()
 
@@ -110,7 +113,7 @@ class Editor(object):
 		elif char in _A:
 			self.add_map()
 		elif char in _T:
-			self.menu(maps[k].tiles, "[A]dd/[D]elete tile, [E]dit",
+			self.menu(maps[k].tile_dict, "[A]dd/[D]elete tile, [E]dit",
 					"both", self.edit_tile)
 		elif char in _V:
 			self.menu(maps[k].entrance_locs, "View only", "both")
@@ -155,7 +158,7 @@ class Editor(object):
 		if char in _SELECT+_E:
 			if k == "passages":
 				self.menu(level_dict[k],
-						"Map exit Up/[D]own or to a [S]pecific level",
+						"Pick exit destination, [A]dd/[D]elete",
 						"both", self.edit_passages)
 			elif k == "tilemap_handle":
 				pass
@@ -360,6 +363,15 @@ class Editor(object):
 						"default values.")
 			self.data = DungeonProperties()
 
+		self.modified = False
+
+	def reset(self, ask=True):
+		if ask:
+			c = io.a.sel_getch("Are you sure you wish to reset settings to"
+					"their default values?")
+			if c not in YES:
+				return
+		self.data = DungeonProperties()
 		self.modified = False
 
 	def export(self):
