@@ -57,3 +57,6 @@ class Square(object):
 
 	def isexit(self):
 		return self.tile.exit_point is not None
+
+	def getexit(self):
+		return self.tile.exit_point

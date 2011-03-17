@@ -100,8 +100,8 @@ class Player(Creature):
 		creature.lose_hp(self.dmg)
 
 	def ascend(self):
-		if self.square.ispassage() and self.square.tile.passage == PASSAGE_UP:
-			self.enter()
+		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_UP:
+			self.exit_level()
 		else:
 			try:
 				self.move(*self.l.getsquare(PASSAGE_UP).getloc())
@@ -110,8 +110,8 @@ class Player(Creature):
 				return False
 
 	def descend(self):
-		if self.square.ispassage() and self.square.tile.passage == PASSAGE_DOWN:
-			self.enter()
+		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_DOWN:
+			self.exit_level()
 		else:
 			try:
 				self.move(*self.l.getsquare(PASSAGE_DOWN).getloc())

@@ -30,5 +30,5 @@ def gettile(handle, tile_dict=None):
 	elif handle in tiles:
 		return tiles[handle]
 	else:
-		raise KeyError("Handle '{}' not in global tiles or '{}'".format(handle,
+		raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle,
 			tile_dict))

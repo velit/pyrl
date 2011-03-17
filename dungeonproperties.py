@@ -22,7 +22,7 @@ class DungeonProperties(object):
 		i = len(dungeon)
 
 		passages = {}
-		for key in self.tilemaps[tilemap_key].entrance_squares:
+		for key in self.tilemaps[tilemap_key].entrance_locs:
 			if key == PASSAGE_UP:
 				passages[key] = UP
 			elif key == PASSAGE_DOWN:

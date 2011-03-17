@@ -10,7 +10,7 @@ class Map(list):
 		self.cols = tilemap.cols
 		self.entrance_squares = {}
 		for i, tilekey in enumerate(tilemap):
-			self.append(Square(gettile(tilekey, tilemap.tiles),
+			self.append(Square(gettile(tilekey, tilemap.tile_dict),
 					i // self.cols, i % self.cols))
 
 		for key, (loc_y, loc_x) in tilemap.entrance_locs.items():

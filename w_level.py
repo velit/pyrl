@@ -44,10 +44,10 @@ class LevelWindow(Window):
 			except curses.error:
 				pass
 
-	def drawtilemap(self, tilemap):
+	def drawtilemap(self, tm):
 		self.w.move(0,0)
-		x = tilemap.cols
-		for i, t in enumerate(map(gettile, tilemap)):
+		x = tm.cols
+		for i, t in enumerate(map(lambda th: gettile(th, tm.tile_dict), tm)):
 			try:
 				self.addch(i//x, i%x, t.ch_memory.symbol, t.ch_memory.color)
 
