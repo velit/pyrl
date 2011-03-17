@@ -8,9 +8,10 @@ from pio import io
 from edit_map import EditMap
 from map import TileMap
 from dungeonproperties import DungeonProperties, DungeonNode
-from tile import Tile, tiles
+from tile import Tile
+from tiles import tiles
 from char import Char
-from constants import YES, NO, DEFAULT, SET_LEVEL
+from const.game import YES, NO, DEFAULT, SET_LEVEL
 
 # key sets
 _A = tuple(map(ord, "aA"))
@@ -41,7 +42,7 @@ _MAIN_ITEMS = ((
 	"Load data",
 	"Export data",
 	"Import data",
-	_QUIT, 
+	_QUIT,
 ), (0, 1, 5))
 
 _MAP_ITEMS = ((
@@ -112,7 +113,7 @@ class Editor(object):
 			self.menu(maps[k].tiles, "[A]dd/[D]elete tile, [E]dit",
 					"both", self.edit_tile)
 		elif char in _V:
-			self.menu(maps[k].squares, "View only", "both")
+			self.menu(maps[k].entrance_locs, "View only", "both")
 
 	def edit_tile(self, tiles, k, char):
 		if char in _A:
@@ -152,16 +153,16 @@ class Editor(object):
 
 	def edit_dungeon_level_attr(self, level_dict, k, char):
 		if char in _SELECT+_E:
-			if k == "passageways":
+			if k == "passages":
 				self.menu(level_dict[k],
-						"Map passage Up/[D]own or to a [S]pecific level",
-						"both", self.edit_passageway)
+						"Map exit Up/[D]own or to a [S]pecific level",
+						"both", self.edit_passages)
 			elif k == "tilemap_handle":
 				pass
 			else:
 				self.edit_attribute(level_dict, k)
 
-	def edit_passageway(self, passageways, k, char):
+	def edit_passages(self, passages, k, char):
 		if char in _SELECT+_S:
 			d_r = self.menu(self.data.dungeons,
 					"Pick a dungeon for passage exit", "key", "return")
@@ -169,15 +170,15 @@ class Editor(object):
 				l_r = self.menu(d_r[0][d_r[1]],
 						"Pick a level for passage exit", "both", "return")
 				if l_r is not None and l_r[2] in _SELECT:
-					t_r = self.menu(l_r[0][l_r[1]].passageways,
+					t_r = self.menu(l_r[0][l_r[1]].passages,
 							"Pick a passage pair", "key", "return")
 					if t_r is not None and t_r[2] in _SELECT:
-						passageways[k] = (SET_LEVEL, (d_r[1], l_r[1], t_r[1]))
+						passages[k] = (SET_LEVEL, (d_r[1], l_r[1], t_r[1]))
 
 		elif char in _A:
 			pass
 		elif char in _D:
-			self.delete_attribute(passageways, k, "passageway")
+			self.delete_attribute(passages, k, "passage")
 
 	def edit_attribute(self, dict_, key):
 		if isinstance(dict_[key], bool):

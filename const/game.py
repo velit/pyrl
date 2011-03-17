@@ -13,8 +13,8 @@ PREVIOUS_LEVEL = "previous-level"
 UP = (PREVIOUS_LEVEL, )
 DOWN = (NEXT_LEVEL, )
 
-PASSAGE_UP = "passage up"
-PASSAGE_DOWN = "passage down"
+PASSAGE_UP = "an exit going up"
+PASSAGE_DOWN = "an exit going down"
 
 YES = set(map(ord, "yY"))
 NO = set(map(ord, "nN"))

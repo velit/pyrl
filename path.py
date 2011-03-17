@@ -1,6 +1,6 @@
 from heapq import heappush, heappop
 from pio import io
-from constants import DEBUG
+from const.game import DEBUG
 
 def path(start, goal, level):
 	"""A* search algorithm. Parameters are squares."""

@@ -67,7 +67,7 @@ class _IO():
 
 	def msg(self, message):
 		self.m.queue_msg(str(message))
-	
+
 	def refresh(self):
 		self.m.update()
 		self.s.update()
@@ -76,7 +76,7 @@ class _IO():
 
 	def drawstar(self, square, *col):
 		self.l.drawstar(square, *col)
-	
+
 	def drawblock(self, square, *col):
 		self.l.drawblock(square, *col)
 

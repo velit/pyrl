@@ -2,7 +2,7 @@ import curses
 
 from random import random
 from pio import io
-from tile import tiles
+from tiles import tiles, gettile
 from map import Map
 from const.directions import *
 
@@ -19,8 +19,7 @@ class EditMap(object):
 		self.f = self.point
 		self.selected_tile = None
 		io.s.add_element("t", "Tile: ", lambda:
-				self.map.tiles[self.t].ch_visible.symbol if self.t in
-				self.map.tiles else tiles[self.t].ch_visible.symbol)
+				gettile(self.t, self.map.tile_dict).ch_visible.symbol)
 		io.s.add_element("f", "Function: ", lambda: self.f.__name__)
 		io.s.add_element("k", "Keys: ", lambda: "tyf")
 		self.actions()
@@ -53,7 +52,7 @@ class EditMap(object):
 
 	def act(self, act):
 		return act[0](*act[1:])
-	
+
 	def move_cursor(self, dir):
 		self.y, self.x = self.y + DY[dir], self.x + DX[dir]
 		if self.y < 0:
@@ -75,9 +74,9 @@ class EditMap(object):
 				return
 			elif ch == ord('\n'):
 				self.f()
-				if isinstance(self.map.gettile(self.t), PassageTile):
-					self.map.squares[self.map.gettile(self.t).passage] \
-							= (self.y, self.x)
+				t = gettile(self.t, self.map.tile_dict)
+				if t.exit_point is not None:
+					self.map.entrance_locs[t.exit_point] = (self.y, self.x)
 				self.editor.modified = True
 			elif ch in tuple(map(ord, "tT")):
 				w = ["Pick a tile:"]
@@ -114,7 +113,7 @@ class EditMap(object):
 				for x in range(min(x0, x1), max(x0, x1)+1):
 					s = self.map.setsquare(y, x, self.t)
 			self.selected_tile = None
-	
+
 	def fill(self):
 		for x in range(len(self.map)):
 			self.map[x] = self.t

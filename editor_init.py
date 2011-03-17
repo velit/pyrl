@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from curses import wrapper
 from editor import Editor
 from pio import init_io_module

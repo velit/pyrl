@@ -3,7 +3,7 @@ import pickle
 import curses
 import os
 
-from constants import STATUS_BAR_SIZE, MSG_BAR_SIZE
+from const.game import STATUS_BAR_SIZE, MSG_BAR_SIZE
 from game import Game
 from pio import init_io_module
 
