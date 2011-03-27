@@ -1,7 +1,9 @@
 from char import Char
 
-class Tile(object):
+
+class Tile():
 	"""The actual floor of a square."""
+
 	def __init__(self, name="floor", visible=Char(), mem=Char(), passable=True,
 				see_through=True, movement_cost=1000, exit_point=None):
 		self.name = name

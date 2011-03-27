@@ -13,8 +13,11 @@ PREVIOUS_LEVEL = "previous-level"
 UP = (PREVIOUS_LEVEL, )
 DOWN = (NEXT_LEVEL, )
 
+DUNGEON = "dungeon"
+
 PASSAGE_UP = "an exit going up"
 PASSAGE_DOWN = "an exit going down"
+PASSAGE_RANDOM = "random entry point"
 
 YES = set(map(ord, "yY"))
 NO = set(map(ord, "nN"))

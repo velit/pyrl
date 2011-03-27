@@ -2,9 +2,10 @@ import curses
 
 d = {}
 
+
 def init_colors():
 	for x in range(7):
-		curses.init_pair(x+1, x, 0)
+		curses.init_pair(x + 1, x, 0)
 
 	d["brown"] = curses.color_pair(4) | curses.A_DIM
 
@@ -30,7 +31,7 @@ def init_colors():
 
 	_temp = {}
 	for key, value in d.items():
-		_temp[key+"r"] = value | curses.A_REVERSE
+		_temp[key + "r"] = value | curses.A_REVERSE
 	d.update(_temp)
 
 	d["blink"] = curses.A_BLINK

@@ -2,16 +2,19 @@ import curses
 from char import Char
 from collections import Sequence
 
+
 def draw(io, start_line, lines, line_ignores):
 	indt = _get_indent(lines)
 	_print_menu(io, indt, lines)
 	return _update_ui(io, start_line, indt, lines, line_ignores)
+
 
 def _get_len(obj):
 	try:
 		return len(obj)
 	except TypeError:
 		return len(str(obj))
+
 
 def _get_indent(lines, column=0):
 	indt = 0
@@ -20,17 +23,19 @@ def _get_indent(lines, column=0):
 		if not isinstance(l, str):
 			try:
 				o = l[column]
-				indt = max(indt, _get_len(o)+1)
+				indt = max(indt, _get_len(o) + 1)
 			except IndexError:
 				continue
 
 	return indt
+
 
 def _print_menu(io, indt, lines):
 	curses.curs_set(0)
 	io.clear()
 	for y in range(len(lines)):
 		_print_menu_line(io, y, indt, lines)
+
 
 def _update_ui(io, start_line, indt, lines, line_ignores):
 	i = _roll_index(start_line, lines, line_ignores)
@@ -44,11 +49,13 @@ def _update_ui(io, start_line, indt, lines, line_ignores):
 			curses.curs_set(1)
 			return i, ch
 
+
 def _hilight_and_getch(io, line_i, indt, lines):
 	_print_menu_line(io, line_i, indt, lines, True)
 	c = io.getch()
 	_print_menu_line(io, line_i, indt, lines, False)
 	return c
+
 
 def _roll_index(start_line, lines, ignores, add=0):
 	i = start_line + add
@@ -63,16 +70,18 @@ def _roll_index(start_line, lines, ignores, add=0):
 		i += direction
 	return i
 
+
 def _print_menu_line(io, line_i, indt, lines, reverse_color=False):
 	i = line_i
 	line = lines[i]
 	if not isinstance(line, str) and isinstance(lines, Sequence):
 		ln = _get_len(line[0])
 		_print_menu_word(io, i, 0, line[0], reverse_color)
-		_print_menu_word(io, i, ln, " "*(indt-ln), reverse_color)
+		_print_menu_word(io, i, ln, " " * (indt - ln), reverse_color)
 		_print_menu_word(io, i, indt, line[1], reverse_color)
 	else:
 		_print_menu_word(io, i, 0, line, reverse_color)
+
 
 def _print_menu_word(io, y, x, word, reverse_color):
 	r = "r" if reverse_color else ""

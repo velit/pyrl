@@ -1,9 +1,11 @@
 import curses
 from char import Char
 
+
 def draw(io, words, returns):
 	a = _print_menu(io, words, returns)
 	return _update_ui(io, words, returns, a)
+
 
 def _print_menu(io, w, r):
 	curses.curs_set(0)
@@ -30,10 +32,12 @@ def _print_menu(io, w, r):
 			pass
 	return a
 
+
 def _first_r(r):
 	for i, x in enumerate(r):
 		if x is not None:
 			return i
+
 
 def _update_ui(io, w, r, a):
 	#selected word
@@ -49,11 +53,13 @@ def _update_ui(io, w, r, a):
 			curses.curs_set(1)
 			return r[sw]
 
+
 def _hilight_and_getch(io, sw, w, a):
 	_print_menu_word(io, sw, w, a, True)
 	c = io.getch()
 	_print_menu_word(io, sw, w, a, False)
 	return c
+
 
 def _print_menu_word(io, sw, w, a, r):
 	y, x = a[sw]
@@ -68,6 +74,7 @@ def _print_menu_word(io, sw, w, a, r):
 		io.addstr(y, x, s, col + r)
 	except curses.error:
 		pass
+
 
 def _roll_sw(sw, w, r, add=0):
 	sw += add

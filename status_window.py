@@ -1,8 +1,10 @@
 import curses
 from window import Window
 
+
 class StatusBar(Window):
 	"""Handles the status bar system."""
+
 	def __init__(self, window):
 		super(StatusBar, self).__init__(window)
 		self.lines, self.width = self.w.getmaxyx()

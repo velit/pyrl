@@ -2,9 +2,11 @@ from heapq import heappush, heappop
 from pio import io
 from const.game import DEBUG
 
+
 def path(start, goal, level):
 	"""A* search algorithm. Parameters are squares."""
 	return _iterate_path(_path(start, goal, level), start, goal)
+
 
 def _path(start, goal, level):
 	"""A* search algorithm implementation. Parameters are squares."""
@@ -26,9 +28,12 @@ def _path(start, goal, level):
 		s = heappop(openprio)[1]
 		if s in closedset:
 			continue
-		if DEBUG and s != start: io.drawblock(s)
-		if DEBUG == 2: io.msg(str((g[s]+h[s], g[s], h[s])))
-		if DEBUG == 2: io.getch()
+		if DEBUG and s != start:
+			io.drawblock(s)
+		if DEBUG == 2:
+			io.msg(str((g[s] + h[s], g[s], h[s])))
+		if DEBUG == 2:
+			io.getch()
 		openmember.remove(s)
 		closedset.add(s)
 
@@ -41,10 +46,12 @@ def _path(start, goal, level):
 			g[n] = g[s] + _dist(n, s)
 			h[n] = _h(n, start, goal)
 			heappush(openprio, (g[n] + h[n], n))
-			if DEBUG and n != goal: io.drawblock(n, "green")
+			if DEBUG and n != goal:
+				io.drawblock(n, "green")
 			openmember.add(n)
 
 	return came_from
+
 
 def _iterate_path(path, start, goal):
 	"""Iterates the path structure returned by _path()."""
@@ -54,13 +61,15 @@ def _iterate_path(path, start, goal):
 		if cur != start:
 			yield cur
 
+
 def _dist(a, b):
 	"""Used by path(). Returns the path cost between a and b."""
 	y = abs(a.x - b.x)
 	x = abs(a.y - b.y)
-	diagonal = min(y,x)
-	straight = y+x
-	return 1415*diagonal + 1000 * (straight - 2*diagonal)
+	diagonal = min(y, x)
+	straight = y + x
+	return 1415 * diagonal + 1000 * (straight - 2 * diagonal)
+
 
 def _h(cur, start, goal):
 	"""A* pathing heuristic."""
@@ -71,8 +80,8 @@ def _h(cur, start, goal):
 	dy1 = cur.x - goal.x
 	dx2 = start.y - goal.y
 	dy2 = start.x - goal.x
-	cross = abs(dy1*dx2 - dy2*dx1)
-	diagonal = min(y,x)
-	straight = y+x
+	cross = abs(dy1 * dx2 - dy2 * dx1)
+	diagonal = min(y, x)
+	straight = y + x
 	#io.msg(str(cross/10.0))
-	return (1415*diagonal + 1000 * (straight - 2*diagonal)) + cross/10.0
+	return (1415 * diagonal + 1000 * (straight - 2 * diagonal)) + cross / 10.0

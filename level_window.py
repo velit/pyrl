@@ -4,13 +4,15 @@ from window import Window
 from bresenham import bresenham
 from tiles import gettile
 
+
 class LevelWindow(Window):
 	"""Handles the level display"""
+
 	def __init__(self, window):
 		super(LevelWindow, self).__init__(window)
 
 	def drawmap(self, map_obj):
-		self.w.move(0,0)
+		self.w.move(0, 0)
 		for s in map_obj:
 			try:
 				self.addch(s.y, s.x, *s.get_visible_char_data())
@@ -21,7 +23,7 @@ class LevelWindow(Window):
 			# the only way to write to the last cell in the current wrapper
 
 	def drawmemory(self, map_obj):
-		self.w.move(0,0)
+		self.w.move(0, 0)
 		for s in map_obj:
 			try:
 				self.addch(s.y, s.x, *s.get_memory_char_data())
@@ -30,6 +32,7 @@ class LevelWindow(Window):
 
 	# drawlos and clearlos draw based on coordinates, they need to fetch
 	# printing data with the getsquare function
+
 	def drawlos(self, visibility, l, color_shift=""):
 		for s in map(lambda coord: l.getsquare(*coord), visibility):
 			try:
@@ -45,11 +48,11 @@ class LevelWindow(Window):
 				pass
 
 	def drawtilemap(self, tm):
-		self.w.move(0,0)
+		self.w.move(0, 0)
 		x = tm.cols
 		for i, t in enumerate(map(lambda th: gettile(th, tm.tile_dict), tm)):
 			try:
-				self.addch(i//x, i%x, t.ch_memory.symbol, t.ch_memory.color)
+				self.addch(i // x, i % x, t.ch_memory.symbol, t.ch_memory.color)
 
 				#if t in tilemap.tile_dict:
 				#	self.addch(i//x, i%x, tilemap.tile_dict[t].ch_memory.symbol,

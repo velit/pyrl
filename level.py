@@ -6,11 +6,13 @@ from map import Map, TileMap
 from pio import io
 from rdg import generateLevel
 
+
 class Level():
-	def __init__(self, game, dungeon_key, dungeon_i, tilemap=None, passages=()):
+
+	def __init__(self, game, dungeon_key, level_i, tilemap=None, passages=()):
 		self.g = game
 		self.rows, self.cols = io.level_rows, io.level_cols
-		self.world_loc = (dungeon_key, dungeon_i)
+		self.world_loc = (dungeon_key, level_i)
 
 		self.creatures = []
 
@@ -48,7 +50,7 @@ class Level():
 	def drawmemory(self):
 		io.drawmemory(self.map)
 
-	def addcreature(self, creature, square = None):
+	def addcreature(self, creature, square=None):
 		if square is None:
 			square = self.get_free_square()
 		self.creatures.append(creature)
@@ -76,8 +78,8 @@ class Level():
 		self.creatures.append(self.g.p)
 
 	def neighbor_nodes(self, y, x):
-		for j in range(y-1, y+2):
-			for i in range(x-1, x+2):
+		for j in range(y - 1, y + 2):
+			for i in range(x - 1, x + 2):
 				if not ((y == j and x == i) and self.legal_yx(y, x) and
 						self.getsquare(j, i).tile_passable()):
 					yield self.getsquare(j, i)
@@ -87,21 +89,25 @@ class Level():
 
 	def get_closest_in_square(self, creature, radius):
 		y, x = self.square.y, self.square.x
-		for i in range(radius*2):
-			c = self.getsquare(y-radius, x-radius+i).creature
-			if c: return c
-			c = self.getsquare(y-radius+i, x+radius).creature
-			if c: return c
-			c = self.getsquare(y+radius, x+radius-i).creature
-			if c: return c
-			c = self.getsquare(y+radius-i, x-radius).creature
-			if c: return c
+		for i in range(radius * 2):
+			c = self.getsquare(y - radius, x - radius + i).creature
+			if c:
+				return c
+			c = self.getsquare(y - radius + i, x + radius).creature
+			if c:
+				return c
+			c = self.getsquare(y + radius, x + radius - i).creature
+			if c:
+				return c
+			c = self.getsquare(y + radius - i, x - radius).creature
+			if c:
+				return c
 		else:
 			return False
 
 	def get_closest_creatureFromArea(self, creature):
-		y,x=self.square.y, self.square.x
-		radius = min(self.rows-y, y, self.cols-x, x)
+		y, x = self.square.y, self.square.x
+		radius = min(self.rows - y, y, self.cols - x, x)
 		for i in range(1, radius):
 			c = self.get_closest_in_square(creature, i)
 			if c:
@@ -116,7 +122,7 @@ class Level():
 		for creature in self.creatures:
 			creature_square = creature.square
 			y, x = creature_square.y, creature_square.x
-			a = (ty-y) ** 2 + (tx-x) ** 2
+			a = (ty - y) ** 2 + (tx - x) ** 2
 			if a > 0:
 				if best is None:
 					best = a
@@ -129,5 +135,5 @@ class Level():
 	def check_los(self, startSquare, targetsquare):
 		y0, x0 = startSquare.y, startSquare.x
 		y1, x1 = targetsquare.y, targetsquare.x
-		g=self.getsquare
-		return all(g(y,x).see_through() for y, x in bresenham(y0, x0, y1, x1))
+		g = self.getsquare
+		return all(g(y, x).see_through() for y, x in bresenham(y0, x0, y1, x1))

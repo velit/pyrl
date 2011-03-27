@@ -4,8 +4,10 @@ from window import Window
 from textwrap import TextWrapper
 from const.game import MORE_STR, DEFAULT
 
+
 class MessageBar(Window):
 	"""Handles the messaging bar system."""
+
 	def __init__(self, window):
 		super(MessageBar, self).__init__(window)
 
@@ -23,7 +25,8 @@ class MessageBar(Window):
 		Window.update(self)
 
 	def queue_msg(self, str):
-		self.msgqueue += str+" "
+		if len(str) > 0:
+			self.msgqueue += str + " "
 
 	def print_queue(self):
 		self.clear()
