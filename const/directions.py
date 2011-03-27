@@ -16,7 +16,7 @@ RIGHT = (SE, E, NE)
 DY = {}
 DX = {}
 DX[STOP] = 0
-for dir in range(1, 9 +1):
+for dir in range(1, 9 + 1):
 	DY[dir] = 0
 	DX[dir] = 0
 	if dir in UP:

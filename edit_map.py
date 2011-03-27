@@ -6,7 +6,9 @@ from tiles import tiles, gettile
 from map import Map
 from const.directions import *
 
-class EditMap(object):
+
+class EditMap():
+
 	def __init__(self, editor, tilemap):
 		self.editor = editor
 		self.map = tilemap
@@ -109,8 +111,8 @@ class EditMap(object):
 		else:
 			y0, x0 = self.y, self.x
 			y1, x1 = self.selected_tile
-			for y in range(min(y0, y1), max(y0, y1)+1):
-				for x in range(min(x0, x1), max(x0, x1)+1):
+			for y in range(min(y0, y1), max(y0, y1) + 1):
+				for x in range(min(x0, x1), max(x0, x1) + 1):
 					s = self.map.setsquare(y, x, self.t)
 			self.selected_tile = None
 

@@ -2,11 +2,13 @@ from collections import namedtuple
 
 _Char = namedtuple("Char", ['symbol', 'color'])
 
+
 class Char(namedtuple("Char", "symbol color")):
 	__slots__ = ()
+
 	def __new__(cls, symbol='.', color="normal"):
 		if len(symbol) != 1:
-			raise ValueError("Symbol must be one character long: "+str(symbol))
+			raise ValueError("Symbol must be one character long: " + str(symbol))
 		return super(Char, cls).__new__(cls, symbol, color)
 
 #def Char(symbol='.', color="normal"):
@@ -27,4 +29,3 @@ class Char(namedtuple("Char", "symbol color")):
 
 #	def __len__(self):
 #		return 1
-

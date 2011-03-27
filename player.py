@@ -6,8 +6,10 @@ from pio import io
 from const.game import DEFAULT, PASSAGE_UP, PASSAGE_DOWN
 from const.directions import *
 
+
 class Player(Creature):
 	"""da player object"""
+
 	def __init__(self, game, level=None):
 		super(Player, self).__init__(game, level)
 		self.name = "tappi"
@@ -23,6 +25,7 @@ class Player(Creature):
 		io.s.add_element("hp", "HP: ", lambda: self.hp)
 		io.s.add_element("sight", "sight: ", lambda: self.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.g.turn_counter)
+		io.s.add_element("loc", "Loc: ", lambda:self.l.world_loc)
 
 	def def_actions(self):
 		a = {}
@@ -73,9 +76,9 @@ class Player(Creature):
 					break
 			else:
 				if 0 < c < 256:
-					io.msg("Undefined command: '"+chr(c)+"'")
+					io.msg("Undefined command: '{}'".format(chr(c)))
 				else:
-					io.msg("Undefined command key: "+str(c))
+					io.msg("Undefined command key: {}".format(c))
 
 	def exec_act(self, act):
 		return self.__getattribute__(act[0])(*act[1])
@@ -95,26 +98,34 @@ class Player(Creature):
 		return True
 
 	def hit(self, creature):
-		io.msg("You hit the "+creature.name+" for "+str(self.dmg)+
-				" damage.")
+		io.msg("You hit the {} for {} damage".format(creature.name, self.dmg))
 		creature.lose_hp(self.dmg)
+
+	def kill(self, square, msg):
+		if square.creature is not None:
+			io.msg(msg.format(square.creature.name))
+			square.creature.die()
 
 	def ascend(self):
 		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_UP:
-			self.exit_level()
+			return self.exit_level()
 		else:
 			try:
-				self.move(*self.l.getsquare(PASSAGE_UP).getloc())
+				s = self.l.getsquare(PASSAGE_UP)
+				self.kill(s, "")
+				self.move(*s.getloc())
 				return True
 			except KeyError:
 				return False
 
 	def descend(self):
 		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_DOWN:
-			self.exit_level()
+			return self.exit_level()
 		else:
 			try:
-				self.move(*self.l.getsquare(PASSAGE_DOWN).getloc())
+				s = self.l.getsquare(PASSAGE_DOWN)
+				self.kill(s, "")
+				self.move(*s.getloc())
 				return True
 			except KeyError:
 				return False

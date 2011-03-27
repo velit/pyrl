@@ -2,10 +2,14 @@ import random
 
 from square import Square
 from tiles import gettile, FLOOR
+from const.game import PASSAGE_RANDOM
+
 
 class Map(list):
-	def __init__(self, tilemap):
+
+	def __init__(self, tilemap, *args, **kwords):
 		"""Actual map data structure used in-game containing Squares."""
+		list.__init__(self)
 		self.rows = tilemap.rows
 		self.cols = tilemap.cols
 		self.entrance_squares = {}
@@ -23,9 +27,12 @@ class Map(list):
 		With two parameters returns according to coordinates.
 		"""
 		if len(args) == 1:
-			return self.entrance_squares[args[0]]
+			if args[0] == PASSAGE_RANDOM:
+				return self.get_free_square()
+			else:
+				return self.entrance_squares[args[0]]
 		else:
-			return self[args[0]*self.cols + args[1]]
+			return self[args[0] * self.cols + args[1]]
 
 	def get_free_square(self):
 		"""Randomly finds an unoccupied passable square and returns it."""
@@ -38,10 +45,16 @@ class Map(list):
 		"""Returns a random square from the Map."""
 		return random.choice(self)
 
+	def get_edge_square(self):
+		#TODO: implement
+		pass
+
+
 class TileMap(list):
 	"""A map containing the tiles of a level."""
+
 	def __init__(self, rows, cols, tile=FLOOR):
-		list.__init__(self, (tile for i in range(rows*cols)))
+		list.__init__(self, (tile for i in range(rows * cols)))
 		self.rows = rows
 		self.cols = cols
 		self.tile_dict = {}
@@ -51,7 +64,7 @@ class TileMap(list):
 		if len(args) == 1:
 			return self.entrance_locs[args[0]]
 		else:
-			return self[args[0]*self.cols + args[1]]
+			return self[args[0] * self.cols + args[1]]
 
 	def setsquare(self, y, x, tile):
-		self[y*self.cols + x] = tile
+		self[y * self.cols + x] = tile

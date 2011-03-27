@@ -9,8 +9,8 @@ ROCK = "r"
 STAIRS_UP = "us"
 STAIRS_DOWN = "ds"
 
-#TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
-tiles = {
+
+tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
 	UNKNOWN: Tile("You have not seen this place yet",
 			Char(' '), Char(' '), False, False),
 	FLOOR: Tile("Dungeon floor", Char('.'), Char('.')),
@@ -23,6 +23,7 @@ tiles = {
 	STAIRS_UP: Tile("Up staircase", Char('<', "red"), Char('<'),
 			exit_point=PASSAGE_UP),
 }
+
 
 def gettile(handle, tile_dict=None):
 	if tile_dict is not None and handle in tile_dict:

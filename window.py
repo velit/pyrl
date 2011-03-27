@@ -6,7 +6,9 @@ import colors
 from textwrap import wrap
 from const.game import YES, NO, DEFAULT, ENCODING
 
-class Window(object):
+
+class Window():
+
 	def __init__(self, window):
 		self.w = window
 		self.w.keypad(1)
@@ -132,7 +134,7 @@ class Window(object):
 					break
 				else:
 					a = self.last_line_wrapper.wrap(str)
-					self.w.addstr(cur_line, 0, a[0]+self.more_str)
+					self.w.addstr(cur_line, 0, a[0] + self.more_str)
 					if not skip_all:
 						c = self.getch_from_list(list=(ord('\n'), ord(' ')))
 						if c == ord('\n'):

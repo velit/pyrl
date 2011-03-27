@@ -5,13 +5,15 @@ from pio import io
 from char import Char
 
 # Multipliers for transforming coordinates to other octants:
-mult = [[1,  0,  0, -1, -1,  0,  0,  1],
-		[0,  1, -1,  0,  0, -1,  1,  0],
-		[0,  1,  1,  0,  0, -1, -1,  0],
-		[1,  0,  0,  1, -1,  0,  0, -1]]
+mult = [[1, 0, 0, -1, -1, 0, 0, 1],
+		[0, 1, -1, 0, 0, -1, 1, 0],
+		[0, 1, 1, 0, 0, -1, -1, 0],
+		[1, 0, 0, 1, -1, 0, 0, -1]]
+
 
 class Creature():
 	"""This is an abstract class representing a creature"""
+
 	def __init__(self, game, level):
 		self.name = "abstract"
 		self.n = "idea"
@@ -33,7 +35,7 @@ class Creature():
 	def act(self):
 		self.move_random()
 
-	def act_towards(self, y, x, c=(-1,1)):
+	def act_towards(self, y, x, c=(-1, 1)):
 		# Self
 		sy = self.square.y
 		sx = self.square.x
@@ -107,8 +109,12 @@ class Creature():
 
 	def exit_level(self):
 		if self.square.isexit():
-			self.g.exit_level(self.l.world_loc, self.square.getexit())
+			try:
+				self.g.enter_corresponding_level(self.l.world_loc, self.square.getexit())
+			except KeyError:
+				io.msg("This passage doesn't seem to lead anywhere.")
 			return True
+
 
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""
@@ -124,7 +130,7 @@ class Creature():
 
 	def move(self, y, x):
 		if self.l.legal_yx(y, x):
-			targetsquare = self.l.getsquare(y,x)
+			targetsquare = self.l.getsquare(y, x)
 			if targetsquare.passable():
 				self.l.movecreature(self, targetsquare)
 				return True
@@ -147,20 +153,20 @@ class Creature():
 			self.die()
 
 	def die(self):
-		io.msg("The "+self.name+" dies.")
+		io.msg("The " + self.name + " dies.")
 		self.l.removecreature(self)
 
 	def hit(self, creature):
 		if creature is self.g.p:
-			io.msg("The "+self.name+" hits the you.")
+			io.msg("The " + self.name + " hits the you.")
 		else:
-			io.msg("The "+self.name+" hits the "+creature.name+".")
+			io.msg("The " + self.name + " hits the " + creature.name + ".")
 		creature.lose_hp(self.dmg)
 
 	def has_range(self, square):
-		sy, sx = self.getloc()
-		py, px = square.y, square.x
-		return (sy-py)*(sy-py) + (sx-px)*(sx-px) <= self.sight*self.sight
+		dy = self.square.y - square.y
+		dx = self.square.x - square.x
+		return dy ** 2 + dx ** 2 <= self.sight ** 2
 
 	def has_los(self, square):
 		return self.has_range(square) and \
@@ -180,28 +186,29 @@ class Creature():
 		self.visibility = set()
 		self.cast_light()
 		io.clearlos(old - self.visibility, self.l)
-		io.drawlos(self.visibility -(old -self.visi_mod), self.l, self.reverse)
+		io.drawlos(self.visibility - (old - self.visi_mod), self.l, self.reverse)
 		self.visi_mod.clear()
 
 	def cast_light(self):
 		y, x = self.square.y, self.square.x
 		if self.sight > 0:
-			self.l.visit_square(y,x)
+			self.l.visit_square(y, x)
 		for oct in range(8):
 			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight,
 					mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
 
 	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
-	# Copyright 2001 
-	# http://roguebasin.roguelikedevelopment.org/ \
+	# Copyright 2001
+	# http://roguebasin.roguelikedevelopment.org/
 	# index.php?title=FOV_using_recursive_shadowcasting
+
 	def _cast_light(self, level, cy, cx, row, start, end, r, xx, xy, yx, yy):
 		"""Recursive lightcasting function"""
 		if start < end:
 			return
-		radius_squared = r*r
-		for j in range(row, r+1):
-			dx, dy = -j-1, -j
+		radius_squared = r * r
+		for j in range(row, r + 1):
+			dx, dy = 0 - 1 - j, 0 - j
 			blocked = False
 			while dx <= 0:
 				dx += 1
@@ -209,14 +216,14 @@ class Creature():
 				X, Y = cx + dx * xx + dy * xy, cy + dx * yx + dy * yy
 				# l_slope and r_slope store the slopes of the left and right
 				# extremities of the square we're considering:
-				l_slope, r_slope = (dx-0.5)/(dy+0.5), (dx+0.5)/(dy-0.5)
+				l_slope, r_slope = (dx - 0.5) / (dy + 0.5), (dx + 0.5) / (dy - 0.5)
 				if start < r_slope:
 					continue
 				elif end > l_slope:
 					break
 				else:
 					# Our light beam is touching this square; light it:
-					if dx*dx + dy*dy <= radius_squared:
+					if dx * dx + dy * dy <= radius_squared:
 						self.l.visit_square(Y, X)
 					if blocked:
 						# we're scanning a row of blocked squares:
@@ -230,10 +237,9 @@ class Creature():
 						if not level.see_through(Y, X) and j < r:
 							# This is a blocking square, start a child scan:
 							blocked = True
-							self._cast_light(level, cy, cx, j+1, start,
+							self._cast_light(level, cy, cx, j + 1, start,
 												l_slope, r, xx, xy, yx, yy)
 							new_start = r_slope
 			# Row is scanned; do next row unless last square was blocked:
 			if blocked:
 				break
-

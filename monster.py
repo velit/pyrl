@@ -7,7 +7,9 @@ mons = (('k', "kobold", "him"), ('@', "bandit", "him"), ('g', "goblin", "him"),
 col = (("black", "black"), ("green", "light_green"),
 		("yellow", "yellow"), ("blue", "blue"))
 
+
 class Monster(Creature):
+
 	def __init__(self, game, level):
 		super(Monster, self).__init__(game, level)
 		m = choice(mons)

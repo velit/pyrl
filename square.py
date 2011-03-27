@@ -1,10 +1,12 @@
 from tiles import gettile, UNKNOWN
 from const.game import OPTIMIZATION
 
-class Square(object):
+
+class Square():
 	"""A cell that is a part of a level."""
 
-	if OPTIMIZATION: __slots__ = ("x", "y", "tile", "creature", "memory_tile")
+	if OPTIMIZATION:
+		__slots__ = ("x", "y", "tile", "creature", "memory_tile")
 
 	def __init__(self, tile, y, x):
 		self.y = y
@@ -14,9 +16,12 @@ class Square(object):
 		self.memory_tile = gettile(UNKNOWN)
 
 	if OPTIMIZATION:
+
 		def __getstate__(self):
 			return self.y, self.x, self.tile, self.creature, self.memory_tile
+
 	if OPTIMIZATION:
+
 		def __setstate__(self, state):
 			self.y, self.x, self.tile, self.creature, self.memory_tile = state
 

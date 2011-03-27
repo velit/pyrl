@@ -1,14 +1,16 @@
 import curses
 
-from w_message import MessageBar
-from w_status import StatusBar
-from w_level import LevelWindow
+from message_window import MessageBar
+from status_window import StatusBar
+from level_window import LevelWindow
 from window import Window
 from colors import init_colors
+
 
 def init_io_module(curs_window, msg_bar_size=2, status_bar_size=2):
 	init_colors()
 	Wrapper._inst = _IO(curs_window, msg_bar_size, status_bar_size)
+
 
 class Wrapper():
 	_inst = None
@@ -24,7 +26,9 @@ class Wrapper():
 
 io = Wrapper()
 
+
 class _IO():
+
 	def __init__(self, curs_window, msg_bar_size=2, status_bar_size=2):
 		self.w = curs_window
 		self.w.keypad(1)
