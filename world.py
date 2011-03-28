@@ -42,15 +42,11 @@ class World():
 			self.new_level(dkey, level_i)
 			self.g.p.l = self.levels[dkey + str(level_i)]
 
-		self.g.p.l.addcreature(self.g.p, self.g.p.l.getsquare(passage))
+		self.g.p.l.addcreature(self.g.p, self.g.p.l.getsquare(entrance=passage))
 		if p_l is not None:
 			p_l.removecreature(self.g.p)
 		self.g.redraw()
 
 	def new_level(self, d, i):
-		tl = self.templates[d][i]
-		if tl.tilemap_key is None:
-			lvl = Level(self.g, d, i, passages=tl.passages)
-		else:
-			lvl = Level(self.g, d, i, self.templates.tilemaps[tl.tilemap_key])
+		lvl = Level(self.g, (d, i), self.templates[d][i])
 		self.levels[d + str(i)] = lvl

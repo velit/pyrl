@@ -19,12 +19,7 @@ class Game():
 		self.p = Player(self)
 		self.world = World(self)
 
-		if DEBUG:
-			self.p.l = Level(self)
-			self.p.l.addcreature(self.p)
-
 		self.world.change_level(DUNGEON)
-		self.redraw()
 
 	def enter_corresponding_level(self, *args, **kwords):
 		return self.world.enter_corresponding_level(*args, **kwords)

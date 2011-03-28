@@ -4,33 +4,34 @@ from bresenham import bresenham
 from monster import Monster
 from map import Map, TileMap
 from pio import io
-from rdg import generateLevel
+from rdg import generateMap
+from const.game import PASSAGE_RANDOM
 
 
 class Level():
 
-	def __init__(self, game, dungeon_key, level_i, tilemap=None, passages=()):
+	def __init__(self, game, world_loc, level_template=None):
 		self.g = game
 		self.rows, self.cols = io.level_rows, io.level_cols
-		self.world_loc = (dungeon_key, level_i)
+		self.world_loc = world_loc
 
 		self.creatures = []
 
-		if tilemap is None:
-			generateLevel(self, passages)
+		if level_template.tilemap is None:
+			self.map = generateMap(level_template)
 			for x in range(100):
 				self.addcreature(Monster(self.g, self))
 		else:
-			self.map = Map(tilemap)
+			self.map = Map(level_template.tilemap)
 
 	def getsquare(self, *args, **kwords):
 		return self.map.getsquare(*args, **kwords)
 
-	def get_free_square(self):
-		return self.map.get_free_square()
+	def get_free_square(self, *args, **kwords):
+		return self.map.get_free_square(*args, **kwords)
 
-	def get_random_square(self):
-		return self.map.get_random_square()
+	def get_random_square(self, *args, **kwords):
+		return self.map.get_random_square(*args, **kwords)
 
 	def visit_square(self, y, x):
 		if self.legal_yx(y, x):
@@ -54,20 +55,22 @@ class Level():
 		if square is None:
 			square = self.get_free_square()
 		self.creatures.append(creature)
+		self.map.creature_squares[creature] = square
 		square.creature = creature
-		creature.square = square
-
-	def movecreature(self, creature, square):
-		self.g.p.visi_mod.add((square.y, square.x))
-		self.g.p.visi_mod.add((creature.square.y, creature.square.x))
-		square.creature = creature
-		creature.square.creature = None
-		creature.square = square
 
 	def removecreature(self, creature):
-		self.g.p.visi_mod.add((creature.square.y, creature.square.x))
-		creature.square.creature = None
+		square = self.getsquare(creature=creature)
+		self.g.p.visi_mod.add(square.getloc())
+		square.creature = None
 		self.creatures.remove(creature)
+
+	def movecreature(self, creature, new_square):
+		old_square = self.getsquare(creature=creature)
+		self.g.p.visi_mod.add(old_square.getloc())
+		self.g.p.visi_mod.add(new_square.getloc())
+		old_square.creature = None
+		new_square.creature = creature
+		self.map.creature_squares[creature] = new_square
 
 	def killall(self):
 		self.creatures.remove(self.g.p)
