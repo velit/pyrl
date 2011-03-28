@@ -35,7 +35,7 @@ _MAIN_ITEMS = ((
 	"Welcome to the pyrl editor",
 	"",
 	"View global tiles",
-	"Edit maps",
+	"Edit tilemaps",
 	"Edit dungeons",
 	"",
 	"Save data",
@@ -144,9 +144,9 @@ class Editor():
 				self.menu(tiles, "Pick a tile to view", "both",
 					self.view_global_tiles)
 
-			elif line == "Edit maps":
+			elif line == "Edit tilemaps":
 				self.menu(self.tilemaps, "[A]dd/[D]el, Edit [T]iles, "
-					"[V]iew entrances, [E]dit", "key", self.edit_map)
+					"[V]iew entrances, [E]dit", "key", self.edit_tilemap)
 
 			elif line == "Edit dungeons":
 				self.menu(self.templates, "[A]dd/[D]elete a dungeon, [E]dit",
@@ -169,7 +169,7 @@ class Editor():
 		if char in _SELECT:
 			self.menu(vars(tiles[k]), k, "both")
 
-	def edit_map(self, maps, k, char):
+	def edit_tilemap(self, maps, k, char):
 		if char in _SELECT + _E:
 			TileMapEditor(self, maps[k])
 		elif char in _D:

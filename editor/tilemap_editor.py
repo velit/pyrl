@@ -11,25 +11,25 @@ class TileMapEditor():
 
 	def __init__(self, main, tilemap):
 		self.main = main
-		self.map = tilemap
+		self.tilemap = tilemap
 		self.y = 0
 		self.x = 0
-		self.my = self.map.rows-1
-		self.mx = self.map.cols-1
+		self.my = self.tilemap.rows-1
+		self.mx = self.tilemap.cols-1
 		self.t = "f"
 		self.funs = (self.point, self.rectangle, self.fill, self.randomize)
 		self.f = self.point
 		self.selected_tile = None
 		io.s.add_element("t", "Tile: ", lambda:
-				gettile(self.t, self.map.tile_dict).ch_visible.symbol)
+				gettile(self.t, self.tilemap.tile_dict).ch_visible.symbol)
 		io.s.add_element("f", "Function: ", lambda: self.f.__name__)
 		io.s.add_element("k", "Keys: ", lambda: "tyf")
 		self.actions()
 
-		self.edit_map()
+		self.edit()
 
 	def drawmap(self):
-		io.drawtilemap(self.map)
+		io.drawtilemap(self.tilemap)
 
 	def actions(self):
 		a = {}
@@ -66,7 +66,7 @@ class TileMapEditor():
 		if self.x > self.mx:
 			self.x = self.mx
 
-	def edit_map(self):
+	def edit(self):
 		while True:
 			self.drawmap()
 			ch = io.getch(self.y, self.x)
@@ -76,9 +76,9 @@ class TileMapEditor():
 				return
 			elif ch == ord('\n'):
 				self.f()
-				t = gettile(self.t, self.map.tile_dict)
+				t = gettile(self.t, self.tilemap.tile_dict)
 				if t.exit_point is not None:
-					self.map.entrance_locs[t.exit_point] = (self.y, self.x)
+					self.tilemap.entrance_locs[t.exit_point] = (self.y, self.x)
 				self.main.modified = True
 			elif ch in tuple(map(ord, "tT")):
 				w = ["Pick a tile:"]
@@ -90,7 +90,7 @@ class TileMapEditor():
 			elif ch in (ord('y'), ord('Y')):
 				w = ["Pick a tile:"]
 				r = [None]
-				for key in sorted(self.map.tile_dict):
+				for key in sorted(self.tilemap.tile_dict):
 					w.append(key)
 					r.append(key)
 				self.t = io.drawmenu(w, r)
@@ -103,7 +103,7 @@ class TileMapEditor():
 				self.f = io.drawmenu(w, r)
 
 	def point(self):
-		self.map.setsquare(self.y, self.x, self.t)
+		self.tilemap.setsquare(self.y, self.x, self.t)
 
 	def rectangle(self):
 		if self.selected_tile is None:
@@ -113,14 +113,14 @@ class TileMapEditor():
 			y1, x1 = self.selected_tile
 			for y in range(min(y0, y1), max(y0, y1) + 1):
 				for x in range(min(x0, x1), max(x0, x1) + 1):
-					s = self.map.setsquare(y, x, self.t)
+					s = self.tilemap.setsquare(y, x, self.t)
 			self.selected_tile = None
 
 	def fill(self):
-		for x in range(len(self.map)):
-			self.map[x] = self.t
+		for x in range(len(self.tilemap)):
+			self.tilemap[x] = self.t
 
 	def randomize(self):
-		for i in range(len(self.map)):
+		for i in range(len(self.tilemap)):
 			if random() < 0.3:
-				self.map[i] = self.t
+				self.tilemap[i] = self.t
