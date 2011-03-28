@@ -7,10 +7,10 @@ from map import Map
 from const.directions import *
 
 
-class EditMap():
+class TileMapEditor():
 
-	def __init__(self, editor, tilemap):
-		self.editor = editor
+	def __init__(self, main, tilemap):
+		self.main = main
 		self.map = tilemap
 		self.y = 0
 		self.x = 0
@@ -47,8 +47,8 @@ class EditMap():
 		a[ord('7')] = self.move_cursor, NW
 		a[ord('8')] = self.move_cursor, N
 		a[ord('9')] = self.move_cursor, NE
-		a[ord('S')] = self.editor.save,
-		a[ord('Q')] = self.editor.safe_exit,
+		a[ord('S')] = self.main.save,
+		a[ord('Q')] = self.main.safe_exit,
 
 		self.actions = a
 
@@ -79,7 +79,7 @@ class EditMap():
 				t = gettile(self.t, self.map.tile_dict)
 				if t.exit_point is not None:
 					self.map.entrance_locs[t.exit_point] = (self.y, self.x)
-				self.editor.modified = True
+				self.main.modified = True
 			elif ch in tuple(map(ord, "tT")):
 				w = ["Pick a tile:"]
 				r = [None]

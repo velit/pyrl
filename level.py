@@ -75,9 +75,9 @@ class Level():
 	def killall(self):
 		self.creatures.remove(self.g.p)
 		while self.creatures:
-			c = self.creatures.pop()
-			self.g.p.visi_mod.add((c.square.y, c.square.x))
-			c.square.creature = None
+			s = self.creatures.pop().getsquare()
+			self.g.p.visi_mod.add(s.getloc())
+			s.creature = None
 		self.creatures.append(self.g.p)
 
 	def neighbor_nodes(self, y, x):

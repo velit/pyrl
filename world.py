@@ -19,9 +19,8 @@ class World():
 		try:
 			with open(os.path.join("data", "level_templates"), "rb") as f:
 				self.templates = pickle.load(f)
-		except IOError:
-			io.a.sel_getch("Something went wrong with loading game files, "
-					"resetting to default values.")
+		except IOError as exc:
+			io.a.sel_getch("{}, resetting data to default values.".format(exc))
 			self.templates = LevelTemplates()
 
 	def enter_corresponding_level(self, world_loc, exit_point):

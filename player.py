@@ -92,7 +92,6 @@ class Player(Creature):
 			return True
 		else:
 			io.msg("You can't move there.")
-			return False
 
 	def change_sight_range(self, amount):
 		self.sight += amount
@@ -107,6 +106,11 @@ class Player(Creature):
 			io.msg(msg.format(square.creature.name))
 			square.creature.die()
 
+	def killall(self):
+		io.msg("Abrakadabra.")
+		self.l.killall()
+		return True
+
 	def ascend(self):
 		s = self.getsquare()
 		if s.isexit() and s.tile.exit_point == PASSAGE_UP:
@@ -115,7 +119,6 @@ class Player(Creature):
 				return True
 			except KeyError:
 				io.msg("This passage doesn't seem to lead anywhere.")
-				return False
 		else:
 			try:
 				s = self.l.getsquare(entrance=PASSAGE_UP)
@@ -123,7 +126,7 @@ class Player(Creature):
 				self.move(*s.getloc())
 				return True
 			except KeyError:
-				return False
+				io.msg("This level doesn't seem to have a upward passage.")
 
 	def descend(self):
 		s = self.getsquare()
@@ -133,7 +136,6 @@ class Player(Creature):
 				return True
 			except KeyError:
 				io.msg("This passage doesn't seem to lead anywhere.")
-				return False
 		else:
 			try:
 				s = self.l.getsquare(entrance=PASSAGE_DOWN)
@@ -141,7 +143,7 @@ class Player(Creature):
 				self.move(*s.getloc())
 				return True
 			except KeyError:
-				return False
+				io.msg("This level doesn't seem to have a downward passage.")
 
 	def die(self):
 		io.sel_getch("You die... [more]", char_list=DEFAULT)
@@ -169,8 +171,3 @@ class Player(Creature):
 		elif self.reverse == "r":
 			self.reverse = ""
 		self.redraw()
-
-	def killall(self):
-		io.msg("Abrakadabra.")
-		self.l.killall()
-		return True

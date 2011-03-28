@@ -1,6 +1,6 @@
 from curses import wrapper
-from editor import Editor
 from pio import init_io_module
+from editor.main import Editor
 
 
 def main(w):

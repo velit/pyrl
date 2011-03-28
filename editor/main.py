@@ -5,13 +5,13 @@ import sys
 
 from os import path
 from pio import io
-from edit_map import EditMap
 from map import TileMap
 from level_templates import LevelTemplates, LevelTemplate
 from tile import Tile
 from tiles import tiles
 from char import Char
 from const.game import YES, NO, DEFAULT, SET_LEVEL
+from editor.tilemap_editor import TileMapEditor
 
 # key sets
 _A = tuple(map(ord, "aA"))
@@ -66,14 +66,77 @@ _DUNGEON_ITEMS = ((
 
 class Editor():
 
-	def __init__(self, load=True):
-		self.templs = LevelTemplates()
+	def __init__(self, load=True, open_menu=True):
+		self.templates = LevelTemplates()
 		self.tilemaps = {}
-		self.modified = False
 		if load:
 			self.load(ask=False)
+		self.modified = False
 
 		self.static_menu(_MAIN_ITEMS, self.main_menu_behaviour)
+
+	def reset(self, ask=True):
+		if ask and io.sel_getch("Reset values? [y/N]") in YES:
+			self.__init__(load=False, open_menu=False)
+
+	def save(self, ask=True):
+		if ask and io.sel_getch("Save? [y/N] ") not in YES:
+			return
+		try:
+			with open(path.join("editor", "level_templates"), "wb") as fp:
+				pickle.dump(self.templates, fp)
+
+			with open(path.join("editor", "tilemaps"), "wb") as fp:
+				pickle.dump(self.tilemaps, fp)
+
+		except IOError as exc:
+			io.sel_getch("{}, data still saved in memory".format(exc))
+		else:
+			self.modified = False
+
+	def load(self, ask=True):
+		if ask and io.sel_getch("Load? [y/N] ") not in YES:
+			return
+		try:
+			with open(path.join("editor", "level_templates"), "rb") as fp:
+				self.templates = pickle.load(fp)
+		except IOError as exc:
+			io.sel_getch("{}, resetting.".format(exc))
+
+		try:
+			with open(path.join("editor", "tilemaps"), "rb") as fp:
+				self.tilemaps = pickle.load(fp)
+		except IOError as exc:
+			io.sel_getch("{}, resetting.".format(exc))
+
+		self.modified = False
+
+	def export(self):
+		if self.modified and io.sel_getch("Save before export? [y/N]") in YES:
+			self.save(ask=False)
+		if io.sel_getch("Export data to pyrl? [y/N]") in YES:
+			ed = path.join("editor", "level_templates")
+			d = path.join("data")
+			try:
+				shutil.copy(ed, d)
+			except IOError as exc:
+				io.sel_getch(exc)
+
+	def import_data(self):
+		if io.sel_getch("Import game data to memory? [y/N] ") not in YES:
+			return
+		try:
+			with open(path.join("data", "level_templates"), "rb") as f:
+				self.templates = pickle.load(f)
+		except IOError as exc:
+			io.sel_getch(exc)
+		else:
+			self.modified = True
+
+	def safe_exit(self):
+		if self.modified and io.sel_getch("Save before exit? [y/N] ") in YES:
+			self.save(ask=False)
+		exit()
 
 	def main_menu_behaviour(self, line, char):
 		if char in _SELECT:
@@ -86,8 +149,7 @@ class Editor():
 					"[V]iew entrances, [E]dit", "key", self.edit_map)
 
 			elif line == "Edit dungeons":
-				self.menu(self.templs,
-					"[A]dd/[D]elete a dungeon, [E]dit",
+				self.menu(self.templates, "[A]dd/[D]elete a dungeon, [E]dit",
 					"key", self.edit_dungeon)
 
 			elif line == "Save data":
@@ -109,7 +171,7 @@ class Editor():
 
 	def edit_map(self, maps, k, char):
 		if char in _SELECT + _E:
-			EditMap(self, maps[k])
+			TileMapEditor(self, maps[k])
 		elif char in _D:
 			self.delete_map(k)
 		elif char in _A:
@@ -161,7 +223,7 @@ class Editor():
 		if char in _SELECT + _E:
 			if k == "passages":
 				self.menu(level_dict[k],
-						"Pick exit destination, [A]dd/[D]elete",
+						"Define passages, [A]dd/[D]elete",
 						"both", self.edit_passages)
 			elif k == "tilemap_key":
 				pass
@@ -170,7 +232,7 @@ class Editor():
 
 	def edit_passages(self, passages, k, char):
 		if char in _SELECT + _S:
-			d_r = self.menu(self.templs,
+			d_r = self.menu(self.templates,
 					"Pick a dungeon for passage exit", "key", "return")
 			if d_r is not None and d_r[2] in _SELECT:
 				l_r = self.menu(d_r[0][d_r[1]],
@@ -188,13 +250,14 @@ class Editor():
 
 	def edit_attribute(self, dict_, key):
 		if isinstance(dict_[key], bool):
-			dict_[key] = io.a.getbool(key)
+			dict_[key] = io.getbool(key, dict_[key])
 		elif isinstance(dict_[key], str):
-			dict_[key] = io.a.getstr(key)
+			dict_[key] = io.getstr(key, dict_[key])
 		elif isinstance(dict_[key], int):
-			dict_[key] = io.a.getint(key)
+			dict_[key] = io.getint(key, dict_[key])
 		elif isinstance(dict_[key], Char):
-			dict_[key] = Char(io.a.getchar(key), io.a.getcolor(key))
+			dict_[key] = Char(io.getchar(key, dict_[key]),
+					io.getcolor(key, dict_[key]))
 		else:
 			return
 		self.modified = True
@@ -203,7 +266,7 @@ class Editor():
 		(lines, ignores) = lines_ignores
 		i = 0
 		while True:
-			i, ch = io.a.draw_menu(i, lines, ignores)
+			i, ch = io.draw_menu(i, lines, ignores)
 			if ch == ord('<') and _BACK in lines or \
 					lines[i] == _BACK and ch in _SELECT:
 				return
@@ -232,6 +295,10 @@ class Editor():
 					print_value = value.ch_visible
 				elif isinstance(value, LevelTemplate) and value.tilemap is None:
 					print_value = "Randomly generated"
+				elif isinstance(value, dict):
+					print_value = 'dict'
+				elif isinstance(value, list):
+					print_value = 'list'
 				else:
 					print_value = value
 
@@ -251,7 +318,7 @@ class Editor():
 			ignores = (0, 1, len(lines)-3)
 
 
-			i, ch = io.a.draw_menu(i, lines, ignores)
+			i, ch = io.draw_menu(i, lines, ignores)
 
 			if ch == ord('<') or i == len(lines)-2 and ch in _SELECT:
 				return
@@ -264,7 +331,7 @@ class Editor():
 					return
 
 	def modify_attribute_type(self, dict_, key):
-		c = io.a.sel_getch(
+		c = io.sel_getch(
 				"Select new type: [B]ool, [S]tring, [I]nt, [C]har, [N]one",
 				tuple(map(ord, "BbSsIiCcNn")))
 		if c in tuple(map(ord, "bB")):
@@ -282,12 +349,12 @@ class Editor():
 		self.modified = True
 
 	def add_attribute(self, dict_, key):
-		handle = io.a.getstr("Attribute handle")
+		handle = io.getstr("Attribute handle", "handle")
 		dict_[handle] = None
 		self.modified = True
 
 	def add_map(self):
-		handle = io.a.getstr("Map handle")
+		handle = io.getstr("Map handle", "map")
 		self.tilemaps[handle] = TileMap()
 		self.modified = True
 
@@ -295,7 +362,7 @@ class Editor():
 		self.delete_attribute(self.tilemaps, handle, "map")
 
 	def add_tile(self, tiles):
-		handle = io.a.getstr("Tile handle")
+		handle = io.getstr("Tile handle", "tile")
 		tiles[handle] = Tile()
 		self.modified = True
 
@@ -303,114 +370,41 @@ class Editor():
 		self.delete_attribute(tiles, handle, "tile")
 
 	def add_dungeon(self):
-		handle = io.a.getstr("Dungeon handle")
-		self.templs.add_dungeon_template(handle)
+		handle = io.getstr("Dungeon handle", "dungeon")
+		self.templates.add_dungeon_template(handle)
 		self.modified = True
 
 	def delete_dungeon(self, handle):
-		c = io.a.sel_getch("Are you sure you want to delete"
+		c = io.sel_getch("Are you sure you want to delete"
 					" this dungeon? [y/N]: ")
 		if c in YES:
-			del self.templs[handle]
+			del self.templates[handle]
 			self.modified = True
 
 	def add_generated_dungeon_level(self, dungeon):
-		self.templs.add_random_level_template(dungeon)
+		self.templates.add_random_level_template(dungeon)
 		self.modified = True
 
 	def add_static_dungeon_level(self, dungeon, tilemap_key):
-		self.templs.add_predefined_level_template(dungeon, tilemap_key)
+		self.templates.add_predefined_level_template(dungeon, tilemap_key)
 		self.modified = True
 
 	def delete_dungeon_level(self, dungeon, i):
-		c = io.a.sel_getch("Are you sure you want to delete"
+		c = io.sel_getch("Are you sure you want to delete"
 					" this dungeon level? [y/N]: ")
 		if c in YES:
 			del dungeon[i]
 			self.modified = True
 
 	def delete_attribute(self, dict_, key, str_):
-		ch = io.a.sel_getch(
+		ch = io.sel_getch(
 				"Are you sure you want to delete this {}? [y/N]: ".format(str_))
 		if ch in YES:
 			del dict_[key]
 			self.modified = True
 
-	def save(self, ask=True):
-		if ask:
-			c = io.a.sel_getch("Are you sure you wish"
-						" to save? [y/N] ")
-			if c not in YES:
-				return
-
-		with open(path.join("editor_data", "level_templates"), "wb") as l:
-			pickle.dump(self.templs, l)
-
-		self.modified = False
-
-	def load(self, ask=True):
-		if ask:
-			c = io.a.sel_getch("Are you sure you wish"
-						" to load? [y/N] ")
-			if c not in YES:
-				return
-
-		try:
-			with open(path.join("editor_data", "level_templates"), "rb") as f:
-				self.templs = pickle.load(f)
-		except IOError:
-			io.a.sel_getch("Something went wrong with loading, resetting to "
-						"default values.")
-			self.templs = LevelTemplates()
-
-		self.modified = False
-
-	def reset(self, ask=True):
-		if ask:
-			c = io.a.sel_getch("Are you sure you wish to reset settings to"
-					"their default values?")
-			if c not in YES:
-				return
-		self.templs = LevelTemplates()
-		self.modified = False
-
-	def export(self):
-		if self.modified:
-			c = io.a.sel_getch(str="Data has been modified;"
-						" save before exporting editor data? [y/N] ")
-			if c in YES:
-				self.save(ask=False)
-
-		c = io.a.sel_getch("Are you sure you wish to export"
-						" all data to pyrl? [y/N] ")
-		if c in YES:
-			ed = path.join("editor_data", "level_templates")
-			d = path.join("data")
-			shutil.copy(ed, d)
-
-		return True
-
-	def import_data(self):
-		c = io.a.sel_getch("Are you sure you wish"
-					" to import game data? [y/N] ")
-		if c not in YES:
-			return
-
-		with open(path.join("data", "level_templates"), "rb") as f:
-			self.templs = pickle.load(f)
-
-		self.modified = True
-
-	def safe_exit(self):
-		if self.modified:
-			c = io.a.sel_getch("The data has been modified;"
-						" save before exit? [y/N] ")
-			if c in YES:
-				self.save(ask=False)
-		exit()
-
 	def update_tile(self, tiles):
-		c = io.a.sel_getch("Are you sure you wish to update"
+		c = io.sel_getch("Are you sure you wish to update"
 					" all the tiles? [y/N]: ")
 		if c in YES:
 			for tile in tiles:
