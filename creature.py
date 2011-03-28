@@ -23,22 +23,23 @@ class Creature():
 		self.dmg = 1
 		self.g = game
 		self.l = level
-		self.square = None
 		self.visibility = set()
 		self.visi_mod = set()
 		self.hostile = False
 		self.reverse = ""
 
 	def getloc(self):
-		return self.square.y, self.square.x
+		return self.l.getsquare(creature=self).getloc()
+
+	def getsquare(self):
+		return self.l.getsquare(creature=self)
 
 	def act(self):
 		self.move_random()
 
 	def act_towards(self, y, x, c=(-1, 1)):
 		# Self
-		sy = self.square.y
-		sx = self.square.x
+		sy, sx = self.getloc()
 
 		# Difference
 		dy = y - sy
@@ -55,6 +56,8 @@ class Creature():
 			mx = 1
 		elif dx < 0:
 			mx = -1
+
+		#TODO: fix this mess
 
 		if self.rcs(sy + my, sx + mx):
 			r = choice(c)
@@ -108,13 +111,9 @@ class Creature():
 										self.rcs(sy - my, sx - mx)
 
 	def exit_level(self):
-		if self.square.isexit():
-			try:
-				self.g.enter_corresponding_level(self.l.world_loc, self.square.getexit())
-			except KeyError:
-				io.msg("This passage doesn't seem to lead anywhere.")
-			return True
-
+		if self.getsquare().isexit():
+			self.g.enter_corresponding_level(self.l.world_loc,
+					self.getsquare().getexit())
 
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""
@@ -133,19 +132,20 @@ class Creature():
 			targetsquare = self.l.getsquare(y, x)
 			if targetsquare.passable():
 				self.l.movecreature(self, targetsquare)
-				return True
 			elif targetsquare.creature is not None:
 				self.hit(targetsquare.creature)
-				return True
+			return True
 		return False
 
 	def move_random(self):
+		sy, sx = self.getloc()
 		for i in range(5):
-			y = self.square.y + rr(3) - 1
-			x = self.square.x + rr(3) - 1
-			if self.l.legal_yx(y, x):
-				self.rcs(self.square.y + rr(3) - 1, self.square.x + rr(3) - 1)
-				return
+			r = rr(9) + 1
+			y = sy - 1 + r // 3
+			x = sx - 1 + r % 3
+			if self.rcs(y, x):
+				return True
+		return False
 
 	def lose_hp(self, amount):
 		self.hp -= amount
@@ -164,13 +164,12 @@ class Creature():
 		creature.lose_hp(self.dmg)
 
 	def has_range(self, square):
-		dy = self.square.y - square.y
-		dx = self.square.x - square.x
-		return dy ** 2 + dx ** 2 <= self.sight ** 2
+		sy, sx = self.getloc()
+		return (sy - square.y) ** 2 + (sx - square.x) ** 2 <= self.sight ** 2
 
 	def has_los(self, square):
 		return self.has_range(square) and \
-				self.l.check_los(self.square, square)
+				self.l.check_los(self.getsquare(), square)
 
 	def redraw_view(self):
 		self.visibility.clear()
@@ -178,8 +177,8 @@ class Creature():
 		self.update_view()
 
 	def update_view(self):
-		self.update_los()
-		#self.l.drawmap()
+		#self.update_los()
+		self.l.drawmap()
 
 	def update_los(self):
 		old = self.visibility
@@ -190,7 +189,7 @@ class Creature():
 		self.visi_mod.clear()
 
 	def cast_light(self):
-		y, x = self.square.y, self.square.x
+		y, x = self.getloc()
 		if self.sight > 0:
 			self.l.visit_square(y, x)
 		for oct in range(8):

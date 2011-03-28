@@ -68,6 +68,7 @@ class Editor():
 
 	def __init__(self, load=True):
 		self.templs = LevelTemplates()
+		self.tilemaps = {}
 		self.modified = False
 		if load:
 			self.load(ask=False)
@@ -81,7 +82,7 @@ class Editor():
 					self.view_global_tiles)
 
 			elif line == "Edit maps":
-				self.menu(self.templs.tilemaps, "[A]dd/[D]el, Edit [T]iles, "
+				self.menu(self.tilemaps, "[A]dd/[D]el, Edit [T]iles, "
 					"[V]iew entrances, [E]dit", "key", self.edit_map)
 
 			elif line == "Edit dungeons":
@@ -148,10 +149,11 @@ class Editor():
 		elif char in _A:
 			self.add_generated_dungeon_level(dungeon)
 		elif char in _P:
-			returns = self.menu(self.templs.tilemaps,
+			returns = self.menu(self.tilemaps,
 					"Pick a tilemap for dungeon level", "key", "return")
 			if returns is not None and returns[2] in _SELECT:
-					self.add_static_dungeon_level(dungeon, returns[1])
+					self.add_static_dungeon_level(dungeon,
+							self.tilemaps[returns[1]])
 		elif char in _D:
 			self.delete_dungeon_level(dungeon, i)
 
@@ -228,9 +230,8 @@ class Editor():
 			for key, value in kv:
 				if isinstance(value, Tile):
 					print_value = value.ch_visible
-				elif isinstance(value, LevelTemplate):
-					print_value = ("Tile key:" + str(value.tilemap_key))\
-						if value.tilemap_key else "Randomly generated"
+				elif isinstance(value, LevelTemplate) and value.tilemap is None:
+					print_value = "Randomly generated"
 				else:
 					print_value = value
 
@@ -287,11 +288,11 @@ class Editor():
 
 	def add_map(self):
 		handle = io.a.getstr("Map handle")
-		self.templs.tilemaps[handle] = TileMap(io.level_rows, io.level_cols)
+		self.tilemaps[handle] = TileMap()
 		self.modified = True
 
 	def delete_map(self, handle):
-		self.delete_attribute(self.templs.tilemaps, handle, "map")
+		self.delete_attribute(self.tilemaps, handle, "map")
 
 	def add_tile(self, tiles):
 		handle = io.a.getstr("Tile handle")

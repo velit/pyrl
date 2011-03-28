@@ -2,7 +2,7 @@ import random
 
 from square import Square
 from tiles import gettile, FLOOR
-from const.game import PASSAGE_RANDOM
+from const.game import MAP_ROWS, MAP_COLS, PASSAGE_RANDOM
 
 
 class Map(list):
@@ -10,29 +10,28 @@ class Map(list):
 	def __init__(self, tilemap, *args, **kwords):
 		"""Actual map data structure used in-game containing Squares."""
 		list.__init__(self)
-		self.rows = tilemap.rows
 		self.cols = tilemap.cols
+		self.creature_squares = {}
 		self.entrance_squares = {}
-		for i, tilekey in enumerate(tilemap):
-			self.append(Square(gettile(tilekey, tilemap.tile_dict),
-					i // self.cols, i % self.cols))
+		for i, k in enumerate(tilemap):
+			self.append(Square(gettile(k, tilemap.tile_dict), i // self.cols,
+					i % self.cols))
 
 		for key, (loc_y, loc_x) in tilemap.entrance_locs.items():
 			self.entrance_squares[key] = self.getsquare(loc_y, loc_x)
 
-	def getsquare(self, *args):
-		"""Returns a square according to parameters.
-
-		With one parameter returns a square according to key.
-		With two parameters returns according to coordinates.
-		"""
-		if len(args) == 1:
-			if args[0] == PASSAGE_RANDOM:
+	def getsquare(self, *args, **kwords):
+		if "loc" in kwords:
+			return self.getsquare(kwords["loc"][0], kwords["loc"][1])
+		elif "entrance" in kwords:
+			if kwords["entrance"] == PASSAGE_RANDOM:
 				return self.get_free_square()
 			else:
-				return self.entrance_squares[args[0]]
+				return self.entrance_squares[kwords["entrance"]]
+		elif "creature" in kwords:
+			return self.creature_squares[kwords["creature"]]
 		else:
-			return self[args[0] * self.cols + args[1]]
+			return self[args[0]*self.cols + args[1]]
 
 	def get_free_square(self):
 		"""Randomly finds an unoccupied passable square and returns it."""
@@ -53,7 +52,7 @@ class Map(list):
 class TileMap(list):
 	"""A map containing the tiles of a level."""
 
-	def __init__(self, rows, cols, tile=FLOOR):
+	def __init__(self, rows=MAP_ROWS, cols=MAP_COLS, tile=FLOOR):
 		list.__init__(self, (tile for i in range(rows * cols)))
 		self.rows = rows
 		self.cols = cols

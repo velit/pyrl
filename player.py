@@ -70,7 +70,7 @@ class Player(Creature):
 	def act(self):
 		self.update_view()
 		while True:
-			c = io.getch(self.square.y, self.square.x)
+			c = io.getch(*self.getloc())
 			if c in self.actions:
 				if self.exec_act(self.actions[c]):
 					break
@@ -86,7 +86,8 @@ class Player(Creature):
 	def move_to_dir(self, dir):
 		if dir == STOP:
 			return True
-		y, x = self.square.y + DY[dir], self.square.x + DX[dir]
+		sy, sx = self.getloc()
+		y, x = sy + DY[dir], sx + DX[dir]
 		if self.move(y, x):
 			return True
 		else:
@@ -107,11 +108,17 @@ class Player(Creature):
 			square.creature.die()
 
 	def ascend(self):
-		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_UP:
-			return self.exit_level()
+		s = self.getsquare()
+		if s.isexit() and s.tile.exit_point == PASSAGE_UP:
+			try:
+				self.exit_level()
+				return True
+			except KeyError:
+				io.msg("This passage doesn't seem to lead anywhere.")
+				return False
 		else:
 			try:
-				s = self.l.getsquare(PASSAGE_UP)
+				s = self.l.getsquare(entrance=PASSAGE_UP)
 				self.kill(s, "")
 				self.move(*s.getloc())
 				return True
@@ -119,11 +126,17 @@ class Player(Creature):
 				return False
 
 	def descend(self):
-		if self.square.isexit() and self.square.tile.exit_point == PASSAGE_DOWN:
-			return self.exit_level()
+		s = self.getsquare()
+		if s.isexit() and s.tile.exit_point == PASSAGE_DOWN:
+			try:
+				self.exit_level()
+				return True
+			except KeyError:
+				io.msg("This passage doesn't seem to lead anywhere.")
+				return False
 		else:
 			try:
-				s = self.l.getsquare(PASSAGE_DOWN)
+				s = self.l.getsquare(entrance=PASSAGE_DOWN)
 				self.kill(s, "")
 				self.move(*s.getloc())
 				return True
@@ -145,6 +158,7 @@ class Player(Creature):
 
 	def debug(self):
 		io.msg((io.level_rows, io.level_cols))
+		io.msg(self.getloc())
 
 	def path(self):
 		io.msg("Shhhhhhh. Everything will be all right.")
