@@ -57,8 +57,7 @@ class Creature():
 		elif dx < 0:
 			mx = -1
 
-		#TODO: fix this mess
-
+		#TODO: make more aesthethically pleasing at some point
 		if self.rcs(sy + my, sx + mx):
 			r = choice(c)
 			if my == 0:

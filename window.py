@@ -58,44 +58,47 @@ class Window():
 		curses.noecho()
 		return return_str
 
-	def getbool(self, print_str=None):
+	def getbool(self, print_str=None, default=False):
 		while True:
 			input = self.sel_getch(print_str + " [T/F]: ",
 					list(map(ord, "01fFtT\n")))
-			if input in list(map(ord, "0fF\n")):
+			if input in list(map(ord, "0fF")):
 				return False
 			elif input in list(map(ord, "1tT")):
 				return True
+			else:
+				return default
 
-	def getchar(self, print_str=None):
+	def getchar(self, print_str=None, default="."):
 		while True:
 			input = self._getstr(print_str + " [char]: ")
 			if input == "":
-				return " "
+				return default
 			elif len(input) == 1:
 				return input
 
-	def getcolor(self, print_str=None):
+	def getcolor(self, print_str=None, default="normal"):
 		while True:
 			input = self._getstr(print_str + "[white/normal/black/red/green/"
 										"yellow/blue/purple/cyan/light_*]: ")
 			if input == "":
-				return "normal"
+				return default
 			elif input in colors.d:
 				return input
 
-	def getint(self, print_str=None):
+	def getint(self, print_str=None, default=0):
 		while True:
 			input = self._getstr(print_str + " [int]: ")
 			if input == "":
-				return 0
+				return default
 			try:
 				return int(input)
 			except ValueError:
 				pass
 
-	def getstr(self, print_str=None):
-		return self._getstr(print_str + " [str]: ")
+	def getstr(self, print_str=None, default=""):
+		str_ = self._getstr(print_str + " [str]: ")
+		return str_ if str_ != "" else default
 
 	def getmaxyx(self):
 		return self.w.getmaxyx()

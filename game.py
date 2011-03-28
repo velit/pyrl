@@ -32,8 +32,7 @@ class Game():
 	def endgame(self, ask=True):
 		if not ask:
 			exit()
-		c = io.sel_getch("Do you wish to end the game? [y/N]:")
-		if c in YES:
+		if io.sel_getch("Do you wish to end the game? [y/N]") in YES:
 			exit()
 
 	def _save(self):
@@ -44,16 +43,14 @@ class Game():
 		if not ask:
 			self._save()
 			self.endgame(True)
-		c = io.sel_getch("Do you wish to save the game? [Y/n]:")
-		if c in YES | DEFAULT:
+		if io.sel_getch("Do you wish to save the game? [y/N]") in YES:
 			self._save()
 			self.endgame(True)
 
 	def loadgame(self, ask=True):
 		if not ask:
 			self.main.load()
-		c = io.sel_getch("Do you wish to load the game? [y/N]:")
-		if c in YES:
+		if io.sel_getch("Do you wish to load the game? [y/N]") in YES:
 			self.main.load()
 
 	def redraw(self):

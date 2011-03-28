@@ -53,8 +53,11 @@ class _IO():
 	def drawtilemap(self, tilemap):
 		self.l.drawtilemap(tilemap)
 
-	def drawmenu(self, words, returns):
-		return self.m.draw_h_menu(words, returns)
+	def draw_menu(self, *args, **kwords):
+		return self.l.draw_menu(*args, **kwords)
+
+	def draw_h_menu(self, *args, **kwords):
+		return self.m.draw_h_menu(*args, **kwords)
 
 	def drawlos(self, visibility, *color_shift):
 		self.l.drawlos(visibility, *color_shift)
@@ -65,9 +68,45 @@ class _IO():
 	def drawline(self, startSquare, targetsquare, *char):
 		self.l.drawline(self, startSquare, targetsquare, *char)
 
-	def getstr(self, *str):
+	def getbool(self, *args, **kwords):
+		return_ =  self.m.getbool(*args, **kwords)
 		self.refresh()
-		return self.m.getstr(*str)
+		return return_
+
+	def getchar(self, *args, **kwords):
+		return_ =  self.m.getchar(*args, **kwords)
+		self.refresh()
+		return return_
+
+	def getcolor(self, *args, **kwords):
+		return_ =  self.m.getcolor(*args, **kwords)
+		self.refresh()
+		return return_
+
+	def getint(self, *args, **kwords):
+		return_ =  self.m.getint(*args, **kwords)
+		self.refresh()
+		return return_
+
+	def getstr(self, *args, **kwords):
+		return_ =  self.m.getstr(*args, **kwords)
+		self.refresh()
+		return return_
+
+	def getch(self, *args, **keys):
+		self.refresh()
+		return self.l.getch(*args, **keys)
+
+	def sel_getch(self, print_str=None, *args, **keys):
+		if print_str is not None:
+			curses.curs_set(0)
+			self.msg(print_str)
+			self.refresh()
+		return_ = self.l.sel_getch(None, *args, **keys)
+		if print_str is not None:
+			curses.curs_set(1)
+			self.refresh()
+		return return_
 
 	def msg(self, message):
 		self.m.queue_msg(str(message))
@@ -83,16 +122,6 @@ class _IO():
 
 	def drawblock(self, square, *col):
 		self.l.drawblock(square, *col)
-
-	def getch(self, *args, **keys):
-		self.refresh()
-		return self.l.getch(*args, **keys)
-
-	def sel_getch(self, print_str=None, *args, **keys):
-		if print_str is not None:
-			self.msg(print_str)
-		self.refresh()
-		return self.l.sel_getch(None, *args, **keys)
 
 	def drawpath(self, iterator):
 		curses.curs_set(0)
