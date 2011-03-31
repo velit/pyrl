@@ -5,11 +5,12 @@ from status_window import StatusBar
 from level_window import LevelWindow
 from window import Window
 from colors import init_colors
+from const.game import STATUS_BAR_SIZE, MSG_BAR_SIZE
 
 
-def init_io_module(curs_window, msg_bar_size=2, status_bar_size=2):
+def init_io_module(*args, **kwords):
 	init_colors()
-	Wrapper._inst = _IO(curs_window, msg_bar_size, status_bar_size)
+	Wrapper._inst = _IO(*args, **kwords)
 
 
 class Wrapper():
@@ -29,7 +30,8 @@ io = Wrapper()
 
 class _IO():
 
-	def __init__(self, curs_window, msg_bar_size=2, status_bar_size=2):
+	def __init__(self, curs_window, msg_bar_size=MSG_BAR_SIZE,
+				status_bar_size=STATUS_BAR_SIZE):
 		self.w = curs_window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()

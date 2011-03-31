@@ -1,28 +1,27 @@
 from random import randrange as rr, random as rand, choice
 
-from map import Map, TileMap
-from square import Square as S
-from tiles import gettile, WALL, ROCK, FLOOR, STAIRS_UP, STAIRS_DOWN
+from templates import MapTemplate
+from tiles import WALL, ROCK, FLOOR, STAIRS_UP, STAIRS_DOWN, gettile
 from const.game import PASSAGE_DOWN, PASSAGE_UP
 
-w = gettile(WALL)
-r = gettile(ROCK)
-f = gettile(FLOOR)
-us = gettile(STAIRS_UP)
-ds = gettile(STAIRS_DOWN)
+w = WALL
+r = ROCK
+f = FLOOR
+us = STAIRS_UP
+ds = STAIRS_DOWN
 
 
-def generateMap(level_template):
-	return MapGenerator(level_template).generate()
+def generateMap(rows, cols, passages):
+	return MapGenerator(rows, cols, passages).generate()
 
 
 class MapGenerator():
 
-	def __init__(self, level_template):
-		self.rows = level_template.rows
-		self.cols = level_template.cols
-		self.passages = level_template.passages
-		self.canvas = Map(TileMap(self.rows, self.cols, ROCK))
+	def __init__(self, rows, cols, passages):
+		self.rows = rows
+		self.cols = cols
+		self.passages = passages
+		self.canvas = MapTemplate(rows, cols, ROCK)
 
 	def generate(self):
 		self._make_initial_room()
@@ -37,31 +36,36 @@ class MapGenerator():
 			self.add_staircase_down()
 		return self.canvas
 
+	def get_free_loc(self):
+		while True:
+			y, x = self.get_random_loc()
+			if self.canvas.gettile(y, x).passable:
+				return y, x
+
+	def get_random_loc(self):
+		return rr(self.canvas.rows), rr(self.canvas.cols)
+
 	def add_staircase_up(self):
 		while True:
-			square = self.canvas.get_free_square()
-			y, x = square.y, square.x
-			g = self.canvas.getsquare
-			if g(y - 1, x).tile == f and g(y + 1, x).tile == f \
-					and g(y, x - 1).tile == f and g(y, x + 1).tile == f:
+			y, x = self.get_free_loc()
+			g = self.canvas.get_tile_id
+			if g(y - 1, x) == f and g(y + 1, x) == f \
+					and g(y, x - 1) == f and g(y, x + 1) == f:
 				break
 
-		square.tile = us
-		self.canvas.entrance_squares[PASSAGE_UP] = square
-
+		self.canvas.set_tile_id(y, x, us)
+		self.canvas.entrance_locs[PASSAGE_UP] = (y, x)
 
 	def add_staircase_down(self):
 		while True:
-			square = self.canvas.get_free_square()
-			y, x = square.y, square.x
-			g = self.canvas.getsquare
-			if g(y - 1, x).tile == f and g(y + 1, x).tile == f and \
-					g(y, x - 1).tile == f and g(y, x + 1).tile == f:
+			y, x = self.get_free_loc()
+			g = self.canvas.get_tile_id
+			if g(y - 1, x) == f and g(y + 1, x) == f and \
+					g(y, x - 1) == f and g(y, x + 1) == f:
 				break
 
-		square.tile = ds
-		self.canvas.entrance_squares[PASSAGE_DOWN] = square
-
+		self.canvas.set_tile_id(y, x, ds)
+		self.canvas.entrance_locs[PASSAGE_DOWN] = (y, x)
 
 	def _make_initial_room(self):
 		while True:
@@ -75,32 +79,28 @@ class MapGenerator():
 
 		self._make_room(y, x, height, width)
 
-
-	def _get_wall_square(self):
+	def _get_wall_loc(self):
 		while True:
-			square = self.canvas.get_random_square()
-			dir = self._is_wall(square)
+			y, x = self.get_random_loc()
+			dir = self._is_wall(y, x)
 			if dir[0]:
-				return square, dir[1]
+				return y, x, dir[1]
 
-
-	def _is_wall(self, square):
-		y, x = square.y, square.x
-		g = self.canvas.getsquare
+	def _is_wall(self, y, x):
+		g = self.canvas.get_tile_id
 		if y in (0, self.rows - 1) or x in (0, self.cols - 1):
 			return False, ""
-		if g(y - 1, x).tile == w and g(y + 1, x).tile == w:
-			if g(y, x - 1).tile == f and g(y, x + 1).tile == r:
+		if g(y - 1, x) == w and g(y + 1, x) == w:
+			if g(y, x - 1) == f and g(y, x + 1) == r:
 				return True, "right"
-			elif g(y, x - 1).tile == r and g(y, x + 1).tile == f:
+			elif g(y, x - 1) == r and g(y, x + 1) == f:
 				return True, "left"
-		elif g(y, x - 1).tile == w and g(y, x + 1).tile == w:
-			if g(y - 1, x).tile == f and g(y + 1, x).tile == r:
+		elif g(y, x - 1) == w and g(y, x + 1) == w:
+			if g(y - 1, x) == f and g(y + 1, x) == r:
 				return True, "down"
-			elif g(y - 1, x).tile == r and g(y + 1, x).tile == f:
+			elif g(y - 1, x) == r and g(y + 1, x) == f:
 				return True, "up"
 		return False, ""
-
 
 	def _rect_diggable(self, y0, x0, height, width):
 		if y0 < 0 or x0 < 0 or y0 + height >= self.rows \
@@ -108,15 +108,13 @@ class MapGenerator():
 			return False
 		for y in range(y0, y0 + height):
 			for x in range(x0, x0 + width):
-				if self.canvas.getsquare(y, x).tile != r and \
-						self.canvas.getsquare(y, x).tile != w:
+				if self.canvas.get_tile_id(y, x) != r and \
+						self.canvas.get_tile_id(y, x) != w:
 					return False
 		return True
 
-
 	def _attempt_room(self):
-		square, dir = self._get_wall_square()
-		y0, x0 = square.y, square.x
+		y0, x0, dir = self._get_wall_loc()
 		height, width = rr(5, 11), rr(7, 14)
 		ypos, xpos = rr(height-2), rr(width-2)
 
@@ -135,45 +133,35 @@ class MapGenerator():
 
 		if self._rect_diggable(y, x, height, width):
 			self._make_room(y, x, height, width)
-			self.canvas.getsquare(y0, x0).tile = f
-
+			self.canvas.set_tile_id(y0, x0, f)
 
 	def _make_room(self, y0, x0, height, width):
 		for y in range(y0, y0 + height):
 			for x in range(x0, x0 + width):
 				if y in (y0, y0 + height - 1) or x in (x0, x0 + width - 1):
-					self.canvas.getsquare(y, x).tile = w
+					self.canvas.set_tile_id(y, x, w)
 				else:
-					self.canvas.getsquare(y, x).tile = f
-
+					self.canvas.set_tile_id(y, x, f)
 
 	def _dig_rect(self, y0, x0, tile, height=1, width=1):
 		for y in range(y0, y0 + height):
 			for x in range(x0, x0 + width):
-				self.canvas.getsquare(y, x).tile = tile
-
+				self.canvas.set_tile_id(y, x, tile)
 
 	def _turn_rock_to_wall(self):
-		for square in self.canvas:
-				if square.tile == r:
-					square.tile = w
-
+		self.canvas.tiles = [w if x == r else x for x in self.canvas.tiles]
 
 	def _attempt_corridor(self):
-		square, dir = self._get_wall_square()
-		y, x = square.y, square.x
+		y, x, dir = self._get_wall_loc()
 		len = rr(7, 20)
 		if dir == "up" and self._rect_diggable(y - len, x - 1, len, 3) or \
 				dir == "down" and self._rect_diggable(y + 1, x - 1, len, 3) or \
 				dir == "left" and self._rect_diggable(y - 1, x - len, 3, len) or \
 				dir == "right" and self._rect_diggable(y - 1, x + 1, 3, len):
-			self._make_corridor(square, dir, len)
+			self._make_corridor(y, x, dir, len)
 			return True
 
-
-	def _make_corridor(self, square, dir, len):
-		y0, x0 = square.y, square.x
-
+	def _make_corridor(self, y0, x0, dir, len):
 		if dir in ("up", "down"):
 			fhei = whei = len
 			fwid = 1
