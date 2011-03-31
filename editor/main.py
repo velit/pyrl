@@ -5,11 +5,11 @@ import sys
 
 from os import path
 from pio import io
-from map import TileMap
-from level_templates import LevelTemplates, LevelTemplate
+from level_templates import LevelTemplates
 from tile import Tile
 from tiles import tiles
 from char import Char
+from templates import MapTemplate, LevelTemplate
 from const.game import YES, NO, DEFAULT, SET_LEVEL
 from editor.tilemap_editor import TileMapEditor
 
@@ -355,7 +355,7 @@ class Editor():
 
 	def add_map(self):
 		handle = io.getstr("Map handle", "map")
-		self.tilemaps[handle] = TileMap()
+		self.tilemaps[handle] = MapTemplate()
 		self.modified = True
 
 	def delete_map(self, handle):

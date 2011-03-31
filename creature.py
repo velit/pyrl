@@ -116,7 +116,7 @@ class Creature():
 
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""
-		if self.l.legal_yx(y, x):
+		if self.l.legal_loc(y, x):
 			s = self.l.getsquare(y, x)
 			if s.passable():
 				self.l.movecreature(self, s)
@@ -127,7 +127,7 @@ class Creature():
 		return False
 
 	def move(self, y, x):
-		if self.l.legal_yx(y, x):
+		if self.l.legal_loc(y, x):
 			targetsquare = self.l.getsquare(y, x)
 			if targetsquare.passable():
 				self.l.movecreature(self, targetsquare)

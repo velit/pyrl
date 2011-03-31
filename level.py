@@ -2,7 +2,7 @@ import path
 
 from bresenham import bresenham
 from monster import Monster
-from map import Map, TileMap
+from map import Map
 from pio import io
 from rdg import generateMap
 from const.game import PASSAGE_RANDOM
@@ -12,20 +12,26 @@ class Level():
 
 	def __init__(self, game, world_loc, level_template=None):
 		self.g = game
-		self.rows, self.cols = io.level_rows, io.level_cols
 		self.world_loc = world_loc
 
 		self.creatures = []
+		self.creature_squares = {}
 
-		if level_template.tilemap is None:
-			self.map = generateMap(level_template)
-			for x in range(100):
-				self.addcreature(Monster(self.g, self))
+		if level_template.map_not_rdg:
+			template = level_template.template
 		else:
-			self.map = Map(level_template.tilemap)
+			rows, cols = level_template.template
+			template = generateMap(rows, cols, level_template.passages)
+
+		self.map = Map(template)
+		for x in range(100):
+			self.addcreature(Monster(self.g, self))
 
 	def getsquare(self, *args, **kwords):
-		return self.map.getsquare(*args, **kwords)
+		if "creature" in kwords:
+			return self.creature_squares[kwords["creature"]]
+		else:
+			return self.map.getsquare(*args, **kwords)
 
 	def get_free_square(self, *args, **kwords):
 		return self.map.get_free_square(*args, **kwords)
@@ -34,16 +40,16 @@ class Level():
 		return self.map.get_random_square(*args, **kwords)
 
 	def visit_square(self, y, x):
-		if self.legal_yx(y, x):
+		if self.legal_loc(y, x):
 			s = self.getsquare(y, x)
 			s.visit()
 			self.g.p.visibility.add((s.y, s.x))
 
 	def see_through(self, y, x):
-		return self.legal_yx(y, x) and self.getsquare(y, x).see_through()
+		return self.legal_loc(y, x) and self.getsquare(y, x).see_through()
 
-	def legal_yx(self, y, x):
-		return 0 <= y < self.rows and 0 <= x < self.cols
+	def legal_loc(self, *args, **kwords):
+		return self.map.legal_loc(*args, **kwords)
 
 	def drawmap(self):
 		io.drawmap(self.map)
@@ -55,7 +61,7 @@ class Level():
 		if square is None:
 			square = self.get_free_square()
 		self.creatures.append(creature)
-		self.map.creature_squares[creature] = square
+		self.creature_squares[creature] = square
 		square.creature = creature
 
 	def removecreature(self, creature):
@@ -70,7 +76,7 @@ class Level():
 		self.g.p.visi_mod.add(new_square.getloc())
 		old_square.creature = None
 		new_square.creature = creature
-		self.map.creature_squares[creature] = new_square
+		self.creature_squares[creature] = new_square
 
 	def killall(self):
 		self.creatures.remove(self.g.p)
@@ -83,7 +89,7 @@ class Level():
 	def neighbor_nodes(self, y, x):
 		for j in range(y - 1, y + 2):
 			for i in range(x - 1, x + 2):
-				if not ((y == j and x == i) and self.legal_yx(y, x) and
+				if not ((y == j and x == i) and self.legal_loc(y, x) and
 						self.getsquare(j, i).tile_passable()):
 					yield self.getsquare(j, i)
 

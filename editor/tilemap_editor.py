@@ -76,7 +76,7 @@ class TileMapEditor():
 				return
 			elif ch == ord('\n'):
 				self.f()
-				t = gettile(self.t, self.tilemap.tile_dict)
+				t = self.tilemap.gettile(self.y, self.x)
 				if t.exit_point is not None:
 					self.tilemap.entrance_locs[t.exit_point] = (self.y, self.x)
 				self.main.modified = True

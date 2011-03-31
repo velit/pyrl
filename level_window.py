@@ -13,7 +13,7 @@ class LevelWindow(Window):
 
 	def drawmap(self, map_obj):
 		self.w.move(0, 0)
-		for s in map_obj:
+		for s in map_obj.squares:
 			try:
 				self.addch(s.y, s.x, *s.get_visible_char_data())
 			except curses.error:
@@ -24,7 +24,7 @@ class LevelWindow(Window):
 
 	def drawmemory(self, map_obj):
 		self.w.move(0, 0)
-		for s in map_obj:
+		for s in map_obj.squares:
 			try:
 				self.addch(s.y, s.x, *s.get_memory_char_data())
 			except curses.error:
