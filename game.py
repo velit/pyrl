@@ -4,7 +4,6 @@ import pickle
 from pio import io
 from player import Player
 from level import Level
-from world import World
 from template_structure import TemplateStructure
 
 from const.game import DEBUG
