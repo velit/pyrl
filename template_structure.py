@@ -4,8 +4,8 @@ from templates import LevelTemplate, DungeonTemplate, RDGTemplate
 from const.game import DUNGEON
 
 
-class LevelTemplates(dict):
-	"""A template for generated dungeons."""
+class TemplateStructure(dict):
+	"""A template for dungeons."""
 
 	def __init__(self):
 		dict.__init__(self)

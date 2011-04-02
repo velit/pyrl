@@ -149,7 +149,7 @@ class MapGenerator():
 				self.canvas.set_tile_id(y, x, tile)
 
 	def _turn_rock_to_wall(self):
-		self.canvas.tiles = [w if x == r else x for x in self.canvas.tiles]
+		self.canvas.tilemap = [w if x == r else x for x in self.canvas.tilemap]
 
 	def _attempt_corridor(self):
 		y, x, dir = self._get_wall_loc()

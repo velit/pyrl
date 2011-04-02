@@ -86,24 +86,24 @@ class TileMapEditor():
 				for key in sorted(tiles):
 					w.append(key)
 					r.append(key)
-				self.t = io.drawmenu(w, r)
+				self.t = io.draw_h_menu(w, r)
 			elif ch in (ord('y'), ord('Y')):
 				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(self.tilemap.tile_dict):
 					w.append(key)
 					r.append(key)
-				self.t = io.drawmenu(w, r)
+				self.t = io.draw_h_menu(w, r)
 			elif ch in (ord('f'), ord('F')):
 				w = ["Pick a function:"]
 				r = [None]
 				for f in self.funs:
 					w.append(f.__name__)
 					r.append(f)
-				self.f = io.drawmenu(w, r)
+				self.f = io.draw_h_menu(w, r)
 
 	def point(self):
-		self.tilemap.setsquare(self.y, self.x, self.t)
+		self.tilemap.set_tile_id(self.y, self.x, self.t)
 
 	def rectangle(self):
 		if self.selected_tile is None:

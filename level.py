@@ -5,17 +5,21 @@ from monster import Monster
 from map import Map
 from pio import io
 from rdg import generateMap
-from const.game import PASSAGE_RANDOM
+
+from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
+from const.game import PASSAGE_DOWN, PASSAGE_UP
 
 
 class Level():
 
 	def __init__(self, game, world_loc, level_template=None):
 		self.g = game
-		self.world_loc = world_loc
 
 		self.creatures = []
 		self.creature_squares = {}
+
+		self.world_loc = world_loc
+		self.passages = level_template.passages
 
 		if level_template.map_not_rdg:
 			template = level_template.template
@@ -38,6 +42,16 @@ class Level():
 
 	def get_random_square(self, *args, **kwords):
 		return self.map.get_random_square(*args, **kwords)
+
+	def enter_passage(self, exit_point):
+		passage_info = self.passages[exit_point]
+		d, i = self.world_loc
+		if passage_info[0] == SET_LEVEL:
+			self.g.change_level(*passage_info[1])
+		elif passage_info[0] == PREVIOUS_LEVEL:
+			self.g.change_level(d, i - 1, PASSAGE_DOWN)
+		elif passage_info[0] == NEXT_LEVEL:
+			self.g.change_level(d, i + 1, PASSAGE_UP)
 
 	def visit_square(self, y, x):
 		if self.legal_loc(y, x):

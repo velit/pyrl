@@ -14,7 +14,7 @@ class Map():
 		self.squares = []
 		self.entrance_squares = {}
 
-		for i, k in enumerate(template.tiles):
+		for i, k in enumerate(template.tilemap):
 			self.squares.append(Square(gettile(k, template.tile_dict),
 					i // self.cols, i % self.cols))
 

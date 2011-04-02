@@ -5,9 +5,10 @@ from pio import io
 from player import Player
 from level import Level
 from world import World
+from template_structure import TemplateStructure
 
-from const.game import YES, NO, DEFAULT, DUNGEON
 from const.game import DEBUG
+from const.game import YES, DUNGEON, PASSAGE_RANDOM
 
 
 class Game():
@@ -17,12 +18,33 @@ class Game():
 
 		self.turn_counter = 0
 		self.p = Player(self)
-		self.world = World(self)
+		self.levels = {}
+		self.templates = None
 
-		self.world.change_level(DUNGEON)
+		try:
+			with open(os.path.join("data", "data"), "rb") as f:
+				self.templates = pickle.load(f)
+		except IOError as exc:
+			io.a.sel_getch("{}, resetting data to default values.".format(exc))
+			self.templates = TemplateStructure()
 
-	def enter_corresponding_level(self, *args, **kwords):
-		return self.world.enter_corresponding_level(*args, **kwords)
+		self.change_level(DUNGEON)
+
+	def change_level(self, dkey, level_i=0, passage=PASSAGE_RANDOM):
+		old_level = self.p.l
+		try:
+			self.p.l = self.levels[dkey + str(level_i)]
+		except KeyError:
+			self.init_new_level(dkey, level_i)
+			self.p.l = self.levels[dkey + str(level_i)]
+
+		self.p.l.addcreature(self.p, self.p.l.getsquare(entrance=passage))
+		if old_level is not None:
+			old_level.removecreature(self.p)
+		self.redraw()
+
+	def init_new_level(self, d, i):
+		self.levels[d + str(i)] = Level(self, (d, i), self.templates[d][i])
 
 	def play(self):
 		for creature in self.p.l.creatures:
