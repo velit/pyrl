@@ -110,9 +110,7 @@ class Creature():
 										self.rcs(sy - my, sx - mx)
 
 	def exit_level(self):
-		if self.getsquare().isexit():
-			self.g.enter_corresponding_level(self.l.world_loc,
-					self.getsquare().getexit())
+		self.l.enter_passage(self.getsquare().getexit())
 
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""

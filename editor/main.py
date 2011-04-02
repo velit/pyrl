@@ -5,7 +5,7 @@ import sys
 
 from os import path
 from pio import io
-from level_templates import LevelTemplates
+from template_structure import TemplateStructure
 from tile import Tile
 from tiles import tiles
 from char import Char
@@ -67,7 +67,7 @@ _DUNGEON_ITEMS = ((
 class Editor():
 
 	def __init__(self, load=True, open_menu=True):
-		self.templates = LevelTemplates()
+		self.templates = TemplateStructure()
 		self.tilemaps = {}
 		if load:
 			self.load(ask=False)
@@ -83,10 +83,10 @@ class Editor():
 		if ask and io.sel_getch("Save? [y/N] ") not in YES:
 			return
 		try:
-			with open(path.join("editor", "level_templates"), "wb") as fp:
+			with open(path.join("editor", "data"), "wb") as fp:
 				pickle.dump(self.templates, fp)
 
-			with open(path.join("editor", "tilemaps"), "wb") as fp:
+			with open(path.join("editor", "maptemplates"), "wb") as fp:
 				pickle.dump(self.tilemaps, fp)
 
 		except IOError as exc:
@@ -98,13 +98,13 @@ class Editor():
 		if ask and io.sel_getch("Load? [y/N] ") not in YES:
 			return
 		try:
-			with open(path.join("editor", "level_templates"), "rb") as fp:
+			with open(path.join("editor", "data"), "rb") as fp:
 				self.templates = pickle.load(fp)
 		except IOError as exc:
 			io.sel_getch("{}, resetting.".format(exc))
 
 		try:
-			with open(path.join("editor", "tilemaps"), "rb") as fp:
+			with open(path.join("editor", "maptemplates"), "rb") as fp:
 				self.tilemaps = pickle.load(fp)
 		except IOError as exc:
 			io.sel_getch("{}, resetting.".format(exc))
@@ -115,7 +115,7 @@ class Editor():
 		if self.modified and io.sel_getch("Save before export? [y/N]") in YES:
 			self.save(ask=False)
 		if io.sel_getch("Export data to pyrl? [y/N]") in YES:
-			ed = path.join("editor", "level_templates")
+			ed = path.join("editor", "data")
 			d = path.join("data")
 			try:
 				shutil.copy(ed, d)
@@ -126,7 +126,7 @@ class Editor():
 		if io.sel_getch("Import game data to memory? [y/N] ") not in YES:
 			return
 		try:
-			with open(path.join("data", "level_templates"), "rb") as f:
+			with open(path.join("data", "data"), "rb") as f:
 				self.templates = pickle.load(f)
 		except IOError as exc:
 			io.sel_getch(exc)
@@ -293,7 +293,7 @@ class Editor():
 			for key, value in kv:
 				if isinstance(value, Tile):
 					print_value = value.ch_visible
-				elif isinstance(value, LevelTemplate) and value.tilemap is None:
+				elif isinstance(value, LevelTemplate) and value.template is None:
 					print_value = "Randomly generated"
 				elif isinstance(value, dict):
 					print_value = 'dict'
