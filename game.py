@@ -18,14 +18,14 @@ class Game():
 		self.turn_counter = 0
 		self.p = Player(self)
 		self.levels = {}
-		self.templates = None
+		self.templs = None
 
 		try:
 			with open(os.path.join("data", "data"), "rb") as f:
-				self.templates = pickle.load(f)
+				self.templs = pickle.load(f)
 		except IOError as exc:
 			io.a.sel_getch("{}, resetting data to default values.".format(exc))
-			self.templates = TemplateStructure()
+			self.templs = TemplateStructure()
 
 		self.change_level(DUNGEON)
 
@@ -43,7 +43,7 @@ class Game():
 		self.redraw()
 
 	def init_new_level(self, d, i):
-		self.levels[d + str(i)] = Level(self, (d, i), self.templates[d][i])
+		self.levels[d + str(i)] = Level(self, (d, i), self.templs.getlvl(d, i))
 
 	def play(self):
 		for creature in self.p.l.creatures:
