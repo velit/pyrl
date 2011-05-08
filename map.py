@@ -2,7 +2,7 @@ import random
 
 from square import Square
 from tiles import gettile, FLOOR
-from const.game import MAP_ROWS, MAP_COLS, PASSAGE_RANDOM
+from const.game import PASSAGE_RANDOM
 
 
 class Map():

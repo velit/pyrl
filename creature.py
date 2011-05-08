@@ -15,9 +15,9 @@ class Creature():
 	"""This is an abstract class representing a creature"""
 
 	def __init__(self, game, level):
-		self.name = "abstract"
-		self.n = "idea"
-		self.ch = Char('?', "white")
+		self.name = "creature"
+		self.n = "him"
+		self.ch = Char('@', "white")
 		self.sight = 15
 		self.hp = 10
 		self.dmg = 1

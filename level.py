@@ -28,8 +28,11 @@ class Level():
 			template = generateMap(rows, cols, level_template.passages)
 
 		self.map = Map(template)
-		for x in range(100):
-			self.addcreature(Monster(self.g, self))
+
+		for mons_templ in level_template.monsters:
+			self.addcreature(Monster(self.g, self, mons_templ))
+		#for x in range(100):
+		#	self.addcreature(Monster(self.g, self))
 
 	def getsquare(self, *args, **kwords):
 		if "creature" in kwords:

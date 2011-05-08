@@ -5,8 +5,10 @@ DEBUG = False
 MSG_BAR_SIZE = 2
 STATUS_BAR_SIZE = 2
 
-MAP_ROWS = 50 - MSG_BAR_SIZE - STATUS_BAR_SIZE
-MAP_COLS = 80
+n = 6
+
+MAP_ROWS = 5*n - MSG_BAR_SIZE - STATUS_BAR_SIZE
+MAP_COLS = 16*n
 
 MORE_STR = " (more)"
 ENCODING = "utf-8"
@@ -26,4 +28,4 @@ PASSAGE_RANDOM = "random entry point"
 YES = set(map(ord, "yY"))
 NO = set(map(ord, "nN"))
 DEFAULT = set(map(ord, " \n"))
-MOVES = set(map(ord, "123456789."))
+MOVES = set(map(ord, "123456790."))

@@ -1,5 +1,6 @@
 from tiles import gettile, FLOOR
 from const.game import MAP_ROWS, MAP_COLS, UP, DOWN, PASSAGE_UP, PASSAGE_DOWN
+from char import Char
 
 class MapTemplate():
 	"""A map containing the tiles of a level."""
@@ -28,6 +29,7 @@ class LevelTemplate():
 		self.passages = {}
 		self.map_not_rdg = map_not_rdg #true: map, false: rdg
 		self.template = template
+		self.monsters = []
 
 		if map_not_rdg:
 			for key in template.entrance_locs:
@@ -40,10 +42,16 @@ class LevelTemplate():
 		else:
 			self.passages = {PASSAGE_UP: UP, PASSAGE_DOWN: DOWN}
 
+	def addmonster(self, monster):
+		self.monsters.append(monster)
+
 
 def RDGTemplate(rows=MAP_ROWS, cols=MAP_COLS):
 	return (rows, cols)
 
 
-def DungeonTemplate():
-	return {}
+class MonsterTemplate():
+	def __init__(self, name="kobold", base_hp=10, ch=Char('k', "green")):
+		self.name = name
+		self.base_hp = base_hp
+		self.ch = ch

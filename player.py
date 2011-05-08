@@ -98,7 +98,7 @@ class Player(Creature):
 		return True
 
 	def hit(self, creature):
-		io.msg("You hit the {} for {} damage".format(creature.name, self.dmg))
+		io.msg("You hit the {} for {} damage.".format(creature.name, self.dmg))
 		creature.lose_hp(self.dmg)
 
 	def kill(self, square, msg):
