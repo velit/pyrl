@@ -1,4 +1,6 @@
 #!/bin/sh
 rm *.pyc
+rm *.py~
 rm editor/*.pyc
+rm editor/*.py~
 rm errors.err
