@@ -2,7 +2,26 @@ import random
 
 from char import Char
 from templates import LevelTemplate, RDGTemplate, MonsterTemplate
+from monster import mons
 from const.game import DUNGEON
+
+
+#class MonsterList(list):
+#	def __init__(self, *args, **kwords):
+#		super(MonsterList, self).__init__(*args, **kwords)
+
+#	def add_monster_template(self, monster_template):
+#		self.monsterlist.append(monster_template)
+
+#	def get_level_monster_list(self, level_i):
+#		level_monster_list = []
+#		for mt in self:
+#			start = mt.speciation_lvl
+#			stop = mt.extinction_lvl
+#			if start <= level_i:
+#				weight_coeff = level_i + 10 - mt.speciation_lvl
+#				level_monster_list.extend([mt]*weight_coeff)
+#		return level_monster_list
 
 
 class TemplateStructure():
@@ -10,12 +29,15 @@ class TemplateStructure():
 
 	def __init__(self):
 		self.levels = {}
+		self.monster_templates = []
 
 		self.add_dungeon_template(DUNGEON)
-		for x in range(4):
+		for x in range(20):
 			self.add_random_level_template(self.levels[DUNGEON])
-		boss = MonsterTemplate("The Crone", 50, Char('@', "purple"))
-		self.getlvl(DUNGEON, 3).addmonster(boss)
+		self.getlvl(DUNGEON, 3).addmonster(MonsterTemplate("The Crone", 50, Char('@', "purple")))
+
+		for m in mons:
+			self.add_monster_template(m)
 
 	def add_dungeon_template(self, dungeon_key):
 		self.levels[dungeon_key] = {}
@@ -30,3 +52,16 @@ class TemplateStructure():
 
 	def getlvl(self, d, i):
 		return self.levels[d][i]
+
+	def add_monster_template(self, monster_template):
+		self.monster_templates.append(monster_template)
+
+	def get_level_monster_list(self, level_i):
+		level_monster_list = []
+		for mt in self.monster_templates:
+			start = mt.speciation_lvl
+			stop = mt.extinction_lvl
+			if start <= level_i:
+				weight_coeff = level_i - mt.speciation_lvl
+				level_monster_list.extend([mt]*weight_coeff)
+		return level_monster_list

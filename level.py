@@ -1,4 +1,5 @@
 import path
+from random import choice
 
 from bresenham import bresenham
 from monster import Monster
@@ -14,11 +15,12 @@ class Level():
 
 	def __init__(self, game, world_loc, level_template=None):
 		self.g = game
+		self.world_loc = world_loc
 
 		self.creatures = []
 		self.creature_squares = {}
+		self.creature_spawn_list = self.g.templs.get_level_monster_list(world_loc[1])
 
-		self.world_loc = world_loc
 		self.passages = level_template.passages
 
 		if level_template.map_not_rdg:
@@ -31,8 +33,8 @@ class Level():
 
 		for mons_templ in level_template.monsters:
 			self.addcreature(Monster(self.g, self, mons_templ))
-		#for x in range(100):
-		#	self.addcreature(Monster(self.g, self))
+		for x in range(100):
+			self.spawn_random_creature()
 
 	def getsquare(self, *args, **kwords):
 		if "creature" in kwords:
@@ -73,6 +75,9 @@ class Level():
 
 	def drawmemory(self):
 		io.drawmemory(self.map)
+
+	def spawn_random_creature(self):
+		self.addcreature(Monster(self.g, self, choice(self.creature_spawn_list)))
 
 	def addcreature(self, creature, square=None):
 		if square is None:

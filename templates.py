@@ -51,7 +51,10 @@ def RDGTemplate(rows=MAP_ROWS, cols=MAP_COLS):
 
 
 class MonsterTemplate():
-	def __init__(self, name="kobold", base_hp=10, ch=Char('k', "green")):
+	def __init__(self, name="kobold", base_hp=10, ch=Char('k', "green"),
+			speciation_lvl=0, extinction_lvl=0):
 		self.name = name
 		self.base_hp = base_hp
 		self.ch = ch
+		self.speciation_lvl = speciation_lvl
+		self.extinction_lvl = extinction_lvl
