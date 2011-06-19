@@ -26,6 +26,10 @@ class Player(Creature):
 		io.s.add_element("sight", "sight: ", lambda: self.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.g.turn_counter)
 		io.s.add_element("loc", "Loc: ", lambda:self.l.world_loc)
+		io.s.add_element("ar", "AR: ", lambda: self.ar)
+		io.s.add_element("dmg", "DMG: ", lambda: self.dmg)
+		io.s.add_element("dr", "DR: ", lambda: self.dr)
+		io.s.add_element("pv", "PV: ", lambda: self.pv)
 
 	def def_actions(self):
 		a = {}
@@ -97,9 +101,16 @@ class Player(Creature):
 		self.sight += amount
 		return True
 
-	def hit(self, creature):
-		io.msg("You hit the {} for {} damage.".format(creature.name, self.dmg))
-		creature.lose_hp(self.dmg)
+	def attack(self, creature):
+		attack_succeeds, damage = self._attack(creature)
+		if attack_succeeds:
+			if damage > 0:
+				io.msg("You hit the {} for {} damage.".format(creature.name, damage))
+				creature.lose_hp(damage)
+			else:
+				io.msg("You fail to hurt the {}.".format(creature.name))
+		else:
+			io.msg("You miss the {}.".format(creature.name))
 
 	def kill(self, square, msg):
 		if square.creature is not None:
