@@ -24,7 +24,7 @@ class Game():
 			with open(os.path.join("data", "data"), "rb") as f:
 				self.templs = pickle.load(f)
 		except IOError as exc:
-			io.a.sel_getch("{}, resetting data to default values.".format(exc))
+			io.msg("{}, resetting data to default values.".format(exc))
 			self.templs = TemplateStructure()
 
 		self.change_level(DUNGEON)

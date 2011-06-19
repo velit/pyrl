@@ -1,8 +1,8 @@
 import curses
-from random import randrange as rr
-from random import choice
+from random import randrange, randint, choice
 from pio import io
 from char import Char
+from dice import dice
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1, 0, 0, -1, -1, 0, 0, 1],
@@ -20,13 +20,42 @@ class Creature():
 		self.ch = Char('@', "white")
 		self.sight = 15
 		self.hp = 10
-		self.dmg = 1
 		self.g = game
 		self.l = level
 		self.visibility = set()
 		self.visi_mod = set()
 		self.hostile = False
 		self.reverse = ""
+		self.dmg = 1
+		self.pv = 1
+		self.ar = 10
+		self.dr = 10
+
+	def attack(self, creature):
+		attack_succeeds, damage = self._attack(creature)
+		if attack_succeeds:
+			if creature is self.g.p:
+				if damage > 0:
+					io.msg("The {} hits you for {} damage.".format(self.name, damage))
+				else:
+					io.msg("The {} fails to hurt you.".format(self.name))
+			else:
+				if damage > 0:
+					io.msg("The {} hits the {} for {} damage.".format(self.name, creature.name, damage))
+				else:
+					io.msg("The {} fails to hurt {}.".format(self.name, creature.name))
+			creature.lose_hp(damage)
+		elif creature is self.g.p:
+				io.msg("The {} misses you.".format(self.name))
+		else:
+				io.msg("The {} misses the {}.".format(self.name, creature.name))
+
+	def _attack(self, creature):
+		roll = randint(1,100) + self.ar - creature.ar
+		if roll > 25:
+			return (True, max(self.dmg - creature.pv, 0))
+		else:
+			return (False, 0)
 
 	def getloc(self):
 		return self.l.getsquare(creature=self).getloc()
@@ -119,7 +148,7 @@ class Creature():
 			if s.passable():
 				self.l.movecreature(self, s)
 			elif s.creature is self.g.p:
-				self.hit(s.creature)
+				self.attack(s.creature)
 			else:
 				return True
 		return False
@@ -130,14 +159,14 @@ class Creature():
 			if targetsquare.passable():
 				self.l.movecreature(self, targetsquare)
 			elif targetsquare.creature is not None:
-				self.hit(targetsquare.creature)
+				self.attack(targetsquare.creature)
 			return True
 		return False
 
 	def move_random(self):
 		sy, sx = self.getloc()
 		for i in range(5):
-			r = rr(9) + 1
+			r = randrange(9) + 1
 			y = sy - 1 + r // 3
 			x = sx - 1 + r % 3
 			if self.rcs(y, x):
@@ -152,13 +181,6 @@ class Creature():
 	def die(self):
 		io.msg("The " + self.name + " dies.")
 		self.l.removecreature(self)
-
-	def hit(self, creature):
-		if creature is self.g.p:
-			io.msg("The " + self.name + " hits the you.")
-		else:
-			io.msg("The " + self.name + " hits the " + creature.name + ".")
-		creature.lose_hp(self.dmg)
 
 	def has_range(self, square):
 		sy, sx = self.getloc()
