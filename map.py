@@ -5,7 +5,7 @@ from tiles import gettile, FLOOR
 from const.game import PASSAGE_RANDOM
 
 
-class Map():
+class Map:
 	"""Actual map data structure used in-game containing Squares."""
 
 	def __init__(self, template):

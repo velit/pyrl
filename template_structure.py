@@ -24,7 +24,7 @@ from const.game import DUNGEON
 #		return level_monster_list
 
 
-class TemplateStructure():
+class TemplateStructure:
 	"""A template for dungeons."""
 
 	def __init__(self):

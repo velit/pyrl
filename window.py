@@ -7,7 +7,7 @@ from textwrap import wrap
 from const.game import YES, NO, DEFAULT, ENCODING
 
 
-class Window():
+class Window:
 
 	def __init__(self, window):
 		self.w = window

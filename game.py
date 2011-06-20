@@ -10,7 +10,7 @@ from const.game import DEBUG
 from const.game import YES, DUNGEON, PASSAGE_RANDOM
 
 
-class Game():
+class Game:
 
 	def __init__(self):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""

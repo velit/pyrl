@@ -15,7 +15,7 @@ def generateMap(rows, cols, passages):
 	return MapGenerator(rows, cols, passages).generate()
 
 
-class MapGenerator():
+class MapGenerator:
 
 	def __init__(self, rows, cols, passages):
 		self.rows = rows

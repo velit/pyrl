@@ -7,7 +7,7 @@ from game import Game
 from pio import init_io_module
 
 
-class Main():
+class Main:
 
 	def __init__(self, w, load):
 		init_io_module(w)

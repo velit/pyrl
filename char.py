@@ -18,7 +18,7 @@ class Char(namedtuple("Char", "symbol color")):
 
 #	return _Char(symbol, color)
 
-#class Char():
+#class Char:
 #	"""Printable ncurses char. Contains both color and symbol."""
 #	def __init__(self, symbol='.', color="normal"):
 #		if len(symbol) == 1:
