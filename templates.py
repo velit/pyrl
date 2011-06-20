@@ -2,7 +2,7 @@ from tiles import gettile, FLOOR
 from const.game import MAP_ROWS, MAP_COLS, UP, DOWN, PASSAGE_UP, PASSAGE_DOWN
 from char import Char
 
-class MapTemplate():
+class MapTemplate:
 	"""A map containing the tiles of a level."""
 
 	def __init__(self, rows=MAP_ROWS, cols=MAP_COLS, tile=FLOOR):
@@ -22,7 +22,7 @@ class MapTemplate():
 		return gettile(self.get_tile_id(y, x), self.tile_dict)
 
 
-class LevelTemplate():
+class LevelTemplate:
 
 	def __init__(self, danger_level=0, template=None, map_not_rdg=True):
 		self.danger_level = danger_level
@@ -50,7 +50,7 @@ def RDGTemplate(rows=MAP_ROWS, cols=MAP_COLS):
 	return (rows, cols)
 
 
-class MonsterTemplate():
+class MonsterTemplate:
 	def __init__(self, name="kobold", base_hp=10, ch=Char('k', "green"),
 			speciation_lvl=0, extinction_lvl=0):
 		self.name = name
@@ -58,3 +58,10 @@ class MonsterTemplate():
 		self.ch = ch
 		self.speciation_lvl = speciation_lvl
 		self.extinction_lvl = extinction_lvl
+
+
+class ItemTemplate:
+	def __init__(self):
+			pass
+			#TODO impl
+			# maybe change names to BlaaFile

@@ -2,7 +2,7 @@ from tiles import gettile, UNKNOWN
 from const.game import OPTIMIZATION
 
 
-class Square():
+class Square:
 	"""A cell that is a part of a level."""
 
 	if OPTIMIZATION:

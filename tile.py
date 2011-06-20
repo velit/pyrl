@@ -1,7 +1,7 @@
 from char import Char
 
 
-class Tile():
+class Tile:
 	"""The actual floor of a square."""
 
 	def __init__(self, name="floor", visible=Char(), mem=Char(), passable=True,

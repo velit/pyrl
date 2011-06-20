@@ -13,7 +13,7 @@ def init_io_module(*args, **kwords):
 	Wrapper._inst = _IO(*args, **kwords)
 
 
-class Wrapper():
+class Wrapper:
 	_inst = None
 
 	def __getattr__(self, name):
@@ -28,7 +28,7 @@ class Wrapper():
 io = Wrapper()
 
 
-class _IO():
+class _IO:
 
 	def __init__(self, curs_window, msg_bar_size=MSG_BAR_SIZE,
 				status_bar_size=STATUS_BAR_SIZE):

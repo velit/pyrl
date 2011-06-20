@@ -11,7 +11,7 @@ from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
 from const.game import PASSAGE_DOWN, PASSAGE_UP
 
 
-class Level():
+class Level:
 
 	def __init__(self, game, world_loc, level_template=None):
 		self.g = game
