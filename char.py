@@ -9,7 +9,7 @@ class Char(namedtuple("Char", "symbol color")):
 	def __new__(cls, symbol='.', color="normal"):
 		if len(symbol) != 1:
 			raise ValueError("Symbol must be one character long: " + str(symbol))
-		return super(Char, cls).__new__(cls, symbol, color)
+		return super().__new__(cls, symbol, color)
 
 #def Char(symbol='.', color="normal"):
 #	"""Printable ncurses char. Contains both color and symbol."""

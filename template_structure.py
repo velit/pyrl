@@ -8,7 +8,7 @@ from const.game import DUNGEON
 
 #class MonsterList(list):
 #	def __init__(self, *args, **kwords):
-#		super(MonsterList, self).__init__(*args, **kwords)
+#		super().__init__(*args, **kwords)
 
 #	def add_monster_template(self, monster_template):
 #		self.monsterlist.append(monster_template)

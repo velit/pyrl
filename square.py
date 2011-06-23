@@ -3,7 +3,7 @@ from const.game import OPTIMIZATION
 
 
 class Square:
-	"""A cell that is a part of a level."""
+	"""A cell, is a part of a level."""
 
 	if OPTIMIZATION:
 		__slots__ = ("x", "y", "tile", "creature", "memory_tile")
@@ -16,12 +16,10 @@ class Square:
 		self.memory_tile = gettile(UNKNOWN)
 
 	if OPTIMIZATION:
-
 		def __getstate__(self):
 			return self.y, self.x, self.tile, self.creature, self.memory_tile
 
 	if OPTIMIZATION:
-
 		def __setstate__(self, state):
 			self.y, self.x, self.tile, self.creature, self.memory_tile = state
 

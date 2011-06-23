@@ -11,7 +11,7 @@ class Player(Creature):
 	"""da player object"""
 
 	def __init__(self, game, level=None):
-		super(Player, self).__init__(game, level)
+		super().__init__(game, level)
 		self.name = "tappi"
 		self.n = "god"
 		self.ch = Char('@', "white")
@@ -85,7 +85,8 @@ class Player(Creature):
 					io.msg("Undefined command key: {}".format(c))
 
 	def exec_act(self, act):
-		return self.__getattribute__(act[0])(*act[1])
+		function, params = act
+		return getattr(self, function)(*params)
 
 	def move_to_dir(self, dir):
 		if dir == STOP:

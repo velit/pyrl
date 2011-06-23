@@ -9,7 +9,7 @@ class MessageBar(Window):
 	"""Handles the messaging bar system."""
 
 	def __init__(self, window):
-		super(MessageBar, self).__init__(window)
+		super().__init__(window)
 
 		self.msgqueue = ""
 
