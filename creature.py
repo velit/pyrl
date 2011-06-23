@@ -2,7 +2,6 @@ import curses
 from random import randrange, randint, choice
 from pio import io
 from char import Char
-from dice import dice
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1, 0, 0, -1, -1, 0, 0, 1],
@@ -18,18 +17,12 @@ class Creature:
 		self.name = "creature"
 		self.n = "him"
 		self.ch = Char('@', "white")
-		self.sight = 15
-		self.hp = 10
 		self.g = game
 		self.l = level
 		self.visibility = set()
 		self.visi_mod = set()
 		self.hostile = False
 		self.reverse = ""
-		self.dmg = 1
-		self.pv = 1
-		self.ar = 10
-		self.dr = 10
 
 	def attack(self, creature):
 		attack_succeeds, damage = self._attack(creature)
