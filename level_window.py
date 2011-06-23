@@ -9,7 +9,7 @@ class LevelWindow(Window):
 	"""Handles the level display"""
 
 	def __init__(self, window):
-		super(LevelWindow, self).__init__(window)
+		super().__init__(window)
 
 	def drawmap(self, map_obj):
 		self.w.move(0, 0)

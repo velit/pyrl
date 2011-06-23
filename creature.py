@@ -36,19 +36,25 @@ class Creature:
 		if attack_succeeds:
 			if creature is self.g.p:
 				if damage > 0:
-					io.msg("The {} hits you for {} damage.".format(self.name, damage))
+					msg = "The {} hits you for {} damage."
+					io.msg(msg.format(self.name, damage))
 				else:
-					io.msg("The {} fails to hurt you.".format(self.name))
+					msg = "The {} fails to hurt you."
+					io.msg(msg.format(self.name))
 			else:
 				if damage > 0:
-					io.msg("The {} hits the {} for {} damage.".format(self.name, creature.name, damage))
+					msg = "The {} hits the {} for {} damage."
+					io.msg(msg.format(self.name, creature.name, damage))
 				else:
-					io.msg("The {} fails to hurt {}.".format(self.name, creature.name))
+					msg = "The {} fails to hurt {}."
+					io.msg(msg.format(self.name, creature.name))
 			creature.lose_hp(damage)
 		elif creature is self.g.p:
-				io.msg("The {} misses you.".format(self.name))
+			msg = "The {} misses you."
+			io.msg(msg.format(self.name))
 		else:
-				io.msg("The {} misses the {}.".format(self.name, creature.name))
+			msg = "The {} misses the {}."
+			io.msg(msg.format(self.name, creature.name))
 
 	def _attack(self, creature):
 		roll = randint(1,100) + self.ar - creature.ar

@@ -24,7 +24,7 @@ mons = (
 class Monster(Creature):
 
 	def __init__(self, game, level, template=None):
-		super(Monster, self).__init__(game, level)
+		super().__init__(game, level)
 		if template is None:
 			m = choice(mons)
 			c = choice(col)
