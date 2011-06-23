@@ -33,11 +33,11 @@ class Stats:
 		self.int = self.base_int
 
 		self.sight = self.str // 2 + self.dex // 2 + self.con // 2
-		self.max_hp = self.con + self.str // 2
 		self.dmg = self.str // 5
 		self.pv = self.con // 10
 		self.ar = self.dex + self.int // 2
 		self.dr = self.dex + self.int // 2
+		self.max_hp = self.con + self.str // 2
 
 	def equip(self, slot, item):
 		self.update_stats()

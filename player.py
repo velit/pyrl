@@ -15,21 +15,21 @@ class Player(Creature):
 		self.name = "tappi"
 		self.n = "god"
 		self.ch = Char('@', "white")
-		self.hp = 50
-		self.dmg = 5
+		self.stat.base_str = 50
+		self.stat.base_con = 50
 
 		self.register_status_texts()
 		self.def_actions()
 
 	def register_status_texts(self):
 		io.s.add_element("hp", "HP: ", lambda: self.hp)
-		io.s.add_element("sight", "sight: ", lambda: self.sight)
+		io.s.add_element("sight", "sight: ", lambda: self.stat.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.g.turn_counter)
 		io.s.add_element("loc", "Loc: ", lambda:self.l.world_loc)
-		io.s.add_element("ar", "AR: ", lambda: self.ar)
-		io.s.add_element("dmg", "DMG: ", lambda: self.dmg)
-		io.s.add_element("dr", "DR: ", lambda: self.dr)
-		io.s.add_element("pv", "PV: ", lambda: self.pv)
+		io.s.add_element("ar", "AR: ", lambda: self.stat.ar)
+		io.s.add_element("dmg", "DMG: ", lambda: self.stat.dmg)
+		io.s.add_element("dr", "DR: ", lambda: self.stat.dr)
+		io.s.add_element("pv", "PV: ", lambda: self.stat.pv)
 
 	def def_actions(self):
 		a = {}
@@ -38,8 +38,6 @@ class Player(Creature):
 		a[curses.KEY_LEFT] = "move_to_dir", (W, )
 		a[curses.KEY_RIGHT] = "move_to_dir", (E, )
 		a[curses.KEY_UP] = "move_to_dir", (N, )
-		a[ord('+')] = "change_sight_range", (1, )
-		a[ord('-')] = "change_sight_range", (-1, )
 		a[ord('.')] = "move_to_dir", (STOP, )
 		a[ord('1')] = "move_to_dir", (SW, )
 		a[ord('2')] = "move_to_dir", (S, )
@@ -98,10 +96,6 @@ class Player(Creature):
 		else:
 			io.msg("You can't move there.")
 
-	def change_sight_range(self, amount):
-		self.sight += amount
-		return True
-
 	def attack(self, creature):
 		attack_succeeds, damage = self._attack(creature)
 		if attack_succeeds:
@@ -138,7 +132,7 @@ class Player(Creature):
 				self.move(*s.getloc())
 				return True
 			except KeyError:
-				io.msg("This level doesn't seem to have a upward passage.")
+				io.msg("This level doesn't seem to have an upward passage.")
 
 	def descend(self):
 		s = self.getsquare()
@@ -182,4 +176,4 @@ class Player(Creature):
 			self.reverse = "r"
 		elif self.reverse == "r":
 			self.reverse = ""
-		self.redraw()
+		self.redraw_view()

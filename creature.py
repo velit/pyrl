@@ -2,6 +2,7 @@ import curses
 from random import randrange, randint, choice
 from pio import io
 from char import Char
+from creature_stats import Stats
 
 # Multipliers for transforming coordinates to other octants:
 mult = [[1, 0, 0, -1, -1, 0, 0, 1],
@@ -23,6 +24,8 @@ class Creature:
 		self.visi_mod = set()
 		self.hostile = False
 		self.reverse = ""
+		self.stat = Stats()
+		self.hp = self.stat.max_hp
 
 	def attack(self, creature):
 		attack_succeeds, damage = self._attack(creature)
@@ -50,9 +53,9 @@ class Creature:
 			io.msg(msg.format(self.name, creature.name))
 
 	def _attack(self, creature):
-		roll = randint(1,100) + self.ar - creature.ar
+		roll = randint(1,100) + self.stat.ar - creature.stat.ar
 		if roll > 25:
-			return (True, max(self.dmg - creature.pv, 0))
+			return (True, max(self.stat.dmg - creature.stat.pv, 0))
 		else:
 			return (False, 0)
 
@@ -183,7 +186,7 @@ class Creature:
 
 	def has_range(self, square):
 		sy, sx = self.getloc()
-		return (sy - square.y) ** 2 + (sx - square.x) ** 2 <= self.sight ** 2
+		return (sy - square.y) ** 2 + (sx - square.x) ** 2 <= self.stat.sight ** 2
 
 	def has_los(self, square):
 		return self.has_range(square) and \
@@ -195,8 +198,8 @@ class Creature:
 		self.update_view()
 
 	def update_view(self):
-		#self.update_los()
-		self.l.drawmap()
+		self.update_los()
+		#self.l.drawmap()
 
 	def update_los(self):
 		old = self.visibility
@@ -208,10 +211,10 @@ class Creature:
 
 	def cast_light(self):
 		y, x = self.getloc()
-		if self.sight > 0:
+		if self.stat.sight > 0:
 			self.l.visit_square(y, x)
 		for oct in range(8):
-			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.sight,
+			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.stat.sight,
 					mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
 
 	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
