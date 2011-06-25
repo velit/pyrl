@@ -55,7 +55,7 @@ class Creature:
 	def _attack(self, creature):
 		roll = randint(1,100) + self.stat.ar - creature.stat.ar
 		if roll > 25:
-			return (True, max(self.stat.dmg - creature.stat.pv, 0))
+			return (True, max(self.stat.damage_roll() - creature.stat.pv, 0))
 		else:
 			return (False, 0)
 

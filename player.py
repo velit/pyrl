@@ -3,8 +3,11 @@ import curses
 from creature import Creature
 from char import Char
 from pio import io
+from item import Item, Weapon
 from const.game import DEFAULT, PASSAGE_UP, PASSAGE_DOWN
 from const.directions import *
+from const.stats import *
+from const.slots import *
 
 
 class Player(Creature):
@@ -15,19 +18,24 @@ class Player(Creature):
 		self.name = "tappi"
 		self.n = "god"
 		self.ch = Char('@', "white")
-		self.stat.base_str = 50
-		self.stat.base_con = 50
+
+		armor_stats = ((PV, 5), (DR, 10))
+		self.stat.equip(Item(armor_stats), BODY)
+
+		weapon = Weapon(1, 8, 2)
+		self.stat.equip(weapon, HANDS)
 
 		self.register_status_texts()
 		self.def_actions()
 
 	def register_status_texts(self):
-		io.s.add_element("hp", "HP: ", lambda: self.hp)
+		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(
+				*self.stat.get_damage_info()))
+		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.hp, self.stat.max_hp))
 		io.s.add_element("sight", "sight: ", lambda: self.stat.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.g.turn_counter)
 		io.s.add_element("loc", "Loc: ", lambda:self.l.world_loc)
 		io.s.add_element("ar", "AR: ", lambda: self.stat.ar)
-		io.s.add_element("dmg", "DMG: ", lambda: self.stat.dmg)
 		io.s.add_element("dr", "DR: ", lambda: self.stat.dr)
 		io.s.add_element("pv", "PV: ", lambda: self.stat.pv)
 
@@ -66,8 +74,16 @@ class Player(Creature):
 		a[ord('n')] = "move_to_dir", (SW, )
 		a[ord('p')] = "path", ()
 		a[ord('u')] = "move_to_dir", (NW, )
+		a[ord('Z')] = "z_command", ()
 
 		self.actions = a
+
+	def z_command(self):
+		c = io.getch()
+		if c == ord('Q'):
+			self.endgame(ask=False)
+		elif c == ord('Z'):
+			self.savegame(ask=False)
 
 	def act(self):
 		self.update_view()
@@ -155,14 +171,14 @@ class Player(Creature):
 		io.sel_getch("You die... [more]", char_list=DEFAULT)
 		self.g.endgame(False)
 
-	def endgame(self):
-		self.g.endgame()
+	def endgame(self, *a, **k):
+		self.g.endgame(*a, **k)
 
-	def savegame(self):
-		self.g.savegame()
+	def savegame(self, *a, **k):
+		self.g.savegame(*a, **k)
 
-	def loadgame(self):
-		self.g.loadgame()
+	def loadgame(self, *a, **k):
+		self.g.loadgame(*a, **k)
 
 	def debug(self):
 		io.msg((io.level_rows, io.level_cols))
