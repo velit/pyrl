@@ -63,8 +63,8 @@ class Game:
 	def savegame(self, ask=True):
 		if not ask:
 			self._save()
-			self.endgame(True)
-		if io.sel_getch("Do you wish to save the game? [y/N]") in YES:
+			self.endgame(False)
+		elif io.sel_getch("Do you wish to save the game? [y/N]") in YES:
 			self._save()
 			self.endgame(True)
 
