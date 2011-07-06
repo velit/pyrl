@@ -12,8 +12,10 @@ from const.game import YES, DUNGEON, PASSAGE_RANDOM
 
 class Game:
 
-	def __init__(self):
+	def __init__(self, main):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
+
+		self.main = main
 
 		self.turn_counter = 0
 		self.p = Player(self)

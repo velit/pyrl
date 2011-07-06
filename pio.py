@@ -8,22 +8,23 @@ from colors import init_colors
 from const.game import STATUS_BAR_SIZE, MSG_BAR_SIZE
 
 
-def init_io_module(*args, **kwords):
+def init_io_module(*a, **k):
 	init_colors()
-	Wrapper._inst = _IO(*args, **kwords)
+	Wrapper._inst = _IO(*a, **k)
 
 
 class Wrapper:
 	_inst = None
 
 	def __getattr__(self, name):
-		return getattr(Wrapper._inst, name)
+		return getattr(self._inst, name)
 
 	def __setattr__(self, name, value):
-		return setattr(Wrapper._inst, name, value)
+		return setattr(self._inst, name, value)
 
 	def __delattr__(self, name):
-		return delattr(Wrapper._inst, name, value)
+		return delattr(self._inst, name, value)
+
 
 io = Wrapper()
 
