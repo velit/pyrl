@@ -14,13 +14,13 @@ class Main:
 		if load:
 			self.load()
 		else:
-			self.game = Game()
+			self.game = Game(self)
 
 	def play(self):
 		self.game.play()
 
 	def load(self):
-		with open(os.path.join("data", "pyrl.svg"), "r") as f:
+		with open(os.path.join("data", "pyrl.svg"), "rb") as f:
 			self.game = pickle.load(f)
 			self.game.redraw()
 
