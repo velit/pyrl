@@ -63,7 +63,7 @@ class Player(Creature):
 		a[ord('L')] = "loadgame", ()
 		a[ord('Q')] = "endgame", ()
 		a[ord('S')] = "savegame", ()
-		a[ord('\x12')] = "redraw", ()
+		a[ord('\x12')] = "redraw_view", ()
 		a[ord('d')] = "debug", ()
 		a[ord('h')] = "move_to_dir", (W, )
 		a[ord('i')] = "move_to_dir", (NE, )
