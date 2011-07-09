@@ -16,20 +16,21 @@ class Main:
 		else:
 			self.game = Game(self)
 
-	def play(self):
-		self.game.play()
+	def start(self):
+		while True:
+			self.game.play()
 
 	def load(self):
 		with open(os.path.join("data", "pyrl.svg"), "rb") as f:
 			self.game = pickle.load(f)
 			self.game.redraw()
+			self.game.p.register_status_texts()
 
 
-def main(w):
+def wrap(w):
 	load = (len(sys.argv) == 2 and sys.argv[1] == "-l")
 	m = Main(w, load)
+	m.start()
 
-	while True:
-		m.play()
 
-curses.wrapper(main)
+curses.wrapper(wrap)

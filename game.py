@@ -2,12 +2,14 @@ import os
 import pickle
 
 from pio import io
+from input_interpretation import get_input_and_act
 from player import Player
 from level import Level
 from template_structure import TemplateStructure
 
 from const.game import DEBUG
 from const.game import YES, DUNGEON, PASSAGE_RANDOM
+from const.actions import MOVE
 
 
 class Game:
@@ -49,7 +51,9 @@ class Game:
 
 	def play(self):
 		for creature in self.p.l.creatures:
-			creature.act()
+			if creature == self.p:
+				creature.update_view()
+				get_input_and_act(self)
 		self.turn_counter += 1
 
 	def endgame(self, ask=True):

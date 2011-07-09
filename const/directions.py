@@ -1,17 +1,17 @@
 SW = 1
-S = 2
+SO = 2
 SE = 3
-W = 4
+WE = 4
 STOP = 5
-E = 6
+EA = 6
 NW = 7
-N = 8
+NO = 8
 NE = 9
 
-UP = (NW, N, NE)
-DOWN = (SW, S, SE)
-LEFT = (SW, W, NW)
-RIGHT = (SE, E, NE)
+UP = (NW, NO, NE)
+DOWN = (SW, SO, SE)
+LEFT = (SW, WE, NW)
+RIGHT = (SE, EA, NE)
 
 DY = {}
 DX = {}
