@@ -47,12 +47,12 @@ class LevelWindow(Window):
 			except curses.error:
 				pass
 
-	def drawtilemap(self, map_template):
+	def drawtilemap(self, map_file):
 		self.w.move(0, 0)
-		c = map_template.cols
-		for i in range(len(map_template.tilemap)):
+		c = map_file.cols
+		for i in range(len(map_file.tilemap)):
 			try:
-				t = map_template.gettile(i // c, i % c)
+				t = map_file.gettile(i // c, i % c)
 				self.addch(i // c, i % c, t.ch_memory.symbol, t.ch_memory.color)
 			except curses.error:
 				pass

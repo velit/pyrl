@@ -1,6 +1,6 @@
 from random import randrange as rr, random as rand, choice
 
-from templates import MapTemplate
+from map_file import MapFile
 from tiles import WALL, ROCK, FLOOR, STAIRS_UP, STAIRS_DOWN, gettile
 from const.game import PASSAGE_DOWN, PASSAGE_UP
 
@@ -21,7 +21,7 @@ class MapGenerator:
 		self.rows = rows
 		self.cols = cols
 		self.passages = passages
-		self.canvas = MapTemplate(rows, cols, ROCK)
+		self.canvas = MapFile(rows, cols, ROCK)
 
 	def generate(self):
 		self._make_initial_room()

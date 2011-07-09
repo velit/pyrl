@@ -14,26 +14,26 @@ from const.game import PASSAGE_DOWN, PASSAGE_UP
 
 class Level:
 
-	def __init__(self, game, world_loc, level_template=None):
+	def __init__(self, game, world_loc, level_file, creature_spawn_list):
 		self.g = game
 		self.world_loc = world_loc
 
 		self.creatures = []
 		self.creature_squares = {}
-		self.creature_spawn_list = self.g.templs.get_level_monster_list(world_loc[1])
+		self.creature_spawn_list = creature_spawn_list
 
-		self.passages = level_template.passages
+		self.passages = level_file.passages
 
-		if level_template.map_not_rdg:
-			template = level_template.template
+		if level_file.map_not_rdg:
+			map_file = level_file.map_file
 		else:
-			rows, cols = level_template.template
-			template = generateMap(rows, cols, level_template.passages)
+			rows, cols = level_file.map_file
+			map_file = generateMap(rows, cols, level_file.passages)
 
-		self.map = Map(template)
+		self.map = Map(map_file)
 
-		#for mons_templ in level_template.monsters:
-		#	self.addcreature(Monster(self.g, self, mons_templ))
+		#for mons_file in level_file.monster_files:
+		#	self.addcreature(Monster(self.g, self, mons_file))
 		#for x in range(100):
 		#	self.spawn_random_creature()
 
@@ -54,21 +54,11 @@ class Level:
 	def get_random_square(self, *a, **k):
 		return self.map.get_random_square(*a, **k)
 
-	def enter_passage(self, exit_point):
-		passage_info = self.passages[exit_point]
-		d, i = self.world_loc
-		if passage_info[0] == SET_LEVEL:
-			self.g.change_level(*passage_info[1])
-		elif passage_info[0] == PREVIOUS_LEVEL:
-			self.g.change_level(d, i - 1, PASSAGE_DOWN)
-		elif passage_info[0] == NEXT_LEVEL:
-			self.g.change_level(d, i + 1, PASSAGE_UP)
-
 	def visit_square(self, y, x):
 		if self.legal_coord(y, x):
 			s = self.getsquare(y, x)
 			s.visit()
-			self.g.p.visibility.add((s.y, s.x))
+			self.g.player.visibility.add((s.y, s.x))
 
 	def see_through(self, y, x):
 		return self.legal_coord(y, x) and self.getsquare(y, x).see_through()
@@ -97,14 +87,14 @@ class Level:
 
 	def removecreature(self, creature):
 		square = self.get_creature_square(creature)
-		self.g.p.visi_mod.add(square.getloc())
+		self.g.player.visi_mod.add(square.getloc())
 		square.creature = None
 		self.creatures.remove(creature)
 
 	def _movecreature(self, creature, new_square):
 		old_square = self.get_creature_square(creature)
-		self.g.p.visi_mod.add(old_square.getloc())
-		self.g.p.visi_mod.add(new_square.getloc())
+		self.g.player.visi_mod.add(old_square.getloc())
+		self.g.player.visi_mod.add(new_square.getloc())
 		old_square.creature = None
 		new_square.creature = creature
 		self.creature_squares[creature] = new_square
@@ -125,12 +115,12 @@ class Level:
 			return self.movecreature(creature, y, x)
 
 	def killall(self):
-		self.creatures.remove(self.g.p)
+		self.creatures.remove(self.g.player)
 		while self.creatures:
 			s = self.creatures.pop().getsquare()
-			self.g.p.visi_mod.add(s.getloc())
+			self.g.player.visi_mod.add(s.getloc())
 			s.creature = None
-		self.creatures.append(self.g.p)
+		self.creatures.append(self.g.player)
 
 	def neighbor_nodes(self, y, x):
 		for j in range(y - 1, y + 2):
