@@ -46,7 +46,7 @@ del no_kwds, no_args
 
 def get_input_and_act(game):
 	while True:
-		c = io.getch(*game.p.getloc())
+		c = io.getch(*game.player.getloc())
 		if c in actions:
 			if execute_action(game, actions[c]):
 				break

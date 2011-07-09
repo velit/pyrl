@@ -8,17 +8,17 @@ from const.game import PASSAGE_RANDOM
 class Map:
 	"""Actual map data structure used in-game containing Squares."""
 
-	def __init__(self, template):
-		self.rows = template.rows
-		self.cols = template.cols
+	def __init__(self, map_file):
+		self.rows = map_file.rows
+		self.cols = map_file.cols
 		self.squares = []
 		self.entrance_squares = {}
 
-		for i, k in enumerate(template.tilemap):
-			self.squares.append(Square(gettile(k, template.tile_dict),
+		for i, k in enumerate(map_file.tilemap):
+			self.squares.append(Square(gettile(k, map_file.tile_dict),
 					i // self.cols, i % self.cols))
 
-		for key, loc_ in template.entrance_locs.items():
+		for key, loc_ in map_file.entrance_locs.items():
 			self.entrance_squares[key] = self.getsquare(loc=loc_)
 
 	def getsquare(self, *a, **k):

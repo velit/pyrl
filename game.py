@@ -2,13 +2,14 @@ import os
 import pickle
 
 from pio import io
-from input_interpretation import get_input_and_act
 from player import Player
 from level import Level
-from template_structure import TemplateStructure
-
-from const.game import DEBUG
-from const.game import YES, DUNGEON, PASSAGE_RANDOM
+from input_interpretation import get_input_and_act
+from world_file import WorldFile
+from const.game import DEBUG, YES
+from const.game import DUNGEON
+from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
+from const.game import PASSAGE_UP, PASSAGE_DOWN, PASSAGE_RANDOM
 
 
 class Game:
@@ -17,40 +18,44 @@ class Game:
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 
 		self.main = main
-
 		self.turn_counter = 0
-		self.p = Player(self)
+
 		self.levels = {}
-		self.templs = None
-
-		try:
-			with open(os.path.join("data", "data"), "rb") as f:
-				self.templs = pickle.load(f)
-		except IOError as exc:
-			io.msg("{}, resetting data to default values.".format(exc))
-			self.templs = TemplateStructure()
-
+		self.world_file = WorldFile()
+		self.player = Player(self)
+		self.cur_level = None
 		self.change_level(DUNGEON)
+	
+	def enter_passage(self, level, square):
+		passage_info = level.passages[square.getexit()]
+		d, i = self.cur_level.world_loc
+		if passage_info[0] == SET_LEVEL:
+			self.change_level(*passage_info[1])
+		elif passage_info[0] == PREVIOUS_LEVEL:
+			self.change_level(d, i - 1, PASSAGE_DOWN)
+		elif passage_info[0] == NEXT_LEVEL:
+			self.change_level(d, i + 1, PASSAGE_UP)
 
 	def change_level(self, dkey, level_i=0, passage=PASSAGE_RANDOM):
-		old_level = self.p.l
+		old_level = self.cur_level
 		try:
-			self.p.l = self.levels[dkey + str(level_i)]
+			self.cur_level = self.levels[dkey + str(level_i)]
 		except KeyError:
 			self.init_new_level(dkey, level_i)
-			self.p.l = self.levels[dkey + str(level_i)]
+			self.cur_level = self.levels[dkey + str(level_i)]
 
-		self.p.l.addcreature(self.p, self.p.l.getsquare(entrance=passage))
+		self.cur_level.addcreature(self.player, self.cur_level.getsquare(entrance=passage))
 		if old_level is not None:
-			old_level.removecreature(self.p)
+			old_level.removecreature(self.player)
 		self.redraw()
 
 	def init_new_level(self, d, i):
-		self.levels[d + str(i)] = Level(self, (d, i), self.templs.getlvl(d, i))
+		f = self.world_file
+		self.levels[d + str(i)] = Level(self, (d, i), f.get_level_file(d, i), f.get_level_monster_list(i))
 
 	def play(self):
-		for creature in self.p.l.creatures:
-			if creature == self.p:
+		for creature in self.cur_level.creatures:
+			if creature == self.player:
 				creature.update_view()
 				get_input_and_act(self)
 		self.turn_counter += 1
@@ -80,4 +85,4 @@ class Game:
 			self.main.load()
 
 	def redraw(self):
-		self.p.redraw_view()
+		self.player.redraw_view()

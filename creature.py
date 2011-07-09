@@ -14,12 +14,11 @@ mult = [[1, 0, 0, -1, -1, 0, 0, 1],
 class Creature:
 	"""This is an abstract class representing a creature"""
 
-	def __init__(self, game, level):
+	def __init__(self, game):
 		self.name = "creature"
 		self.n = "him"
 		self.ch = Char('@', "white")
 		self.g = game
-		self.l = level
 		self.visibility = set()
 		self.visi_mod = set()
 		self.hostile = False
@@ -27,10 +26,14 @@ class Creature:
 		self.stat = Stats()
 		self.hp = self.stat.max_hp
 
+	@property
+	def l(self):
+		return self.g.cur_level
+
 	def attack(self, creature):
 		attack_succeeds, damage = self._attack(creature)
 		if attack_succeeds:
-			if creature is self.g.p:
+			if creature is self.g.player:
 				if damage > 0:
 					msg = "The {} hits you for {} damage."
 					io.msg(msg.format(self.name, damage))
@@ -45,7 +48,7 @@ class Creature:
 					msg = "The {} fails to hurt {}."
 					io.msg(msg.format(self.name, creature.name))
 			creature.lose_hp(damage)
-		elif creature is self.g.p:
+		elif creature is self.g.player:
 			msg = "The {} misses you."
 			io.msg(msg.format(self.name))
 		else:
@@ -140,16 +143,13 @@ class Creature:
 									if self.rcs(sy, sx - mx):
 										self.rcs(sy - my, sx - mx)
 
-	def exit_level(self):
-		self.l.enter_passage(self.getsquare().getexit())
-
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""
 		if self.l.legal_loc(y, x):
 			s = self.l.getsquare(y, x)
 			if s.passable():
 				self.l.movecreature(self, s)
-			elif s.creature is self.g.p:
+			elif s.creature is self.g.player:
 				self.attack(s.creature)
 			else:
 				return True

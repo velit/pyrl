@@ -12,8 +12,8 @@ from const.slots import *
 class Player(Creature):
 	"""da player object"""
 
-	def __init__(self, game, level=None):
-		super().__init__(game, level)
+	def __init__(self, game):
+		super().__init__(game)
 		self.name = "tappi"
 		self.n = "god"
 		self.ch = Char('@', "white")
