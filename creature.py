@@ -60,10 +60,10 @@ class Creature:
 			return (False, 0)
 
 	def getloc(self):
-		return self.l.getsquare(creature=self).getloc()
+		return self.l.get_creature_square(self).getloc()
 
 	def getsquare(self):
-		return self.l.getsquare(creature=self)
+		return self.l.get_creature_square(self)
 
 	def act(self):
 		self.move_random()

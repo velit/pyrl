@@ -21,16 +21,17 @@ class Map:
 		for key, loc_ in template.entrance_locs.items():
 			self.entrance_squares[key] = self.getsquare(loc=loc_)
 
-	def getsquare(self, *args, **kwords):
-		if "loc" in kwords:
-			return self.squares[kwords["loc"][0]*self.cols + kwords["loc"][1]]
-		elif "entrance" in kwords:
-			if kwords["entrance"] == PASSAGE_RANDOM:
+	def getsquare(self, *a, **k):
+		if "entrance" in k:
+			if k["entrance"] == PASSAGE_RANDOM:
 				return self.get_free_square()
 			else:
-				return self.entrance_squares[kwords["entrance"]]
+				return self.entrance_squares[k["entrance"]]
+		elif "loc" in k:
+			y, x = k["loc"]
 		else:
-			return self.squares[args[0]*self.cols + args[1]]
+			y, x = a
+		return self.squares[y*self.cols + x]
 
 	def get_free_square(self):
 		"""Randomly finds an unoccupied passable square and returns it."""
@@ -43,7 +44,11 @@ class Map:
 		"""Returns a random square from the Map."""
 		return random.choice(self.squares)
 
-	def legal_loc(self, y, x):
+	def legal_loc(self, loc):
+		y, x = loc
+		return 0 <= y < self.rows and 0 <= x < self.cols
+
+	def legal_coord(self, y, x):
 		return 0 <= y < self.rows and 0 <= x < self.cols
 
 	def get_edge_square(self):

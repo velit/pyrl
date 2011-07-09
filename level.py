@@ -1,6 +1,7 @@
 import path
-from random import choice
+import const.directions as dirs
 
+from random import choice
 from bresenham import bresenham
 from monster import Monster
 from map import Map
@@ -31,22 +32,27 @@ class Level:
 
 		self.map = Map(template)
 
-		for mons_templ in level_template.monsters:
-			self.addcreature(Monster(self.g, self, mons_templ))
-		for x in range(100):
-			self.spawn_random_creature()
+		#for mons_templ in level_template.monsters:
+		#	self.addcreature(Monster(self.g, self, mons_templ))
+		#for x in range(100):
+		#	self.spawn_random_creature()
 
-	def getsquare(self, *args, **kwords):
-		if "creature" in kwords:
-			return self.creature_squares[kwords["creature"]]
-		else:
-			return self.map.getsquare(*args, **kwords)
+	def getsquare(self, *a, **k):
+		return self.map.getsquare(*a, **k)
 
-	def get_free_square(self, *args, **kwords):
-		return self.map.get_free_square(*args, **kwords)
+	def get_creature_square(self, creature):
+		return self.creature_squares[creature]
 
-	def get_random_square(self, *args, **kwords):
-		return self.map.get_random_square(*args, **kwords)
+	def get_relative_loc(self, square, direction):
+		y, x = square.getloc()
+		dy, dx = dirs.DY[direction], dirs.DX[direction]
+		return y+dy, x+dx
+
+	def get_free_square(self, *a, **k):
+		return self.map.get_free_square(*a, **k)
+
+	def get_random_square(self, *a, **k):
+		return self.map.get_random_square(*a, **k)
 
 	def enter_passage(self, exit_point):
 		passage_info = self.passages[exit_point]
@@ -59,16 +65,19 @@ class Level:
 			self.g.change_level(d, i + 1, PASSAGE_UP)
 
 	def visit_square(self, y, x):
-		if self.legal_loc(y, x):
+		if self.legal_coord(y, x):
 			s = self.getsquare(y, x)
 			s.visit()
 			self.g.p.visibility.add((s.y, s.x))
 
 	def see_through(self, y, x):
-		return self.legal_loc(y, x) and self.getsquare(y, x).see_through()
+		return self.legal_coord(y, x) and self.getsquare(y, x).see_through()
 
-	def legal_loc(self, *args, **kwords):
-		return self.map.legal_loc(*args, **kwords)
+	def legal_loc(self, *a, **k):
+		return self.map.legal_loc(*a, **k)
+
+	def legal_coord(self, *a, **k):
+		return self.map.legal_coord(*a, **k)
 
 	def drawmap(self):
 		io.drawmap(self.map)
@@ -87,18 +96,33 @@ class Level:
 		square.creature = creature
 
 	def removecreature(self, creature):
-		square = self.getsquare(creature=creature)
+		square = self.get_creature_square(creature)
 		self.g.p.visi_mod.add(square.getloc())
 		square.creature = None
 		self.creatures.remove(creature)
 
-	def movecreature(self, creature, new_square):
-		old_square = self.getsquare(creature=creature)
+	def _movecreature(self, creature, new_square):
+		old_square = self.get_creature_square(creature)
 		self.g.p.visi_mod.add(old_square.getloc())
 		self.g.p.visi_mod.add(new_square.getloc())
 		old_square.creature = None
 		new_square.creature = creature
 		self.creature_squares[creature] = new_square
+
+	def movecreature(self, creature, y, x):
+		if self.legal_coord(y, x):
+			targetsquare = self.getsquare(y, x)
+			if targetsquare.passable():
+				self._movecreature(creature, targetsquare)
+				return True
+		return False
+
+	def move_creature_to_dir(self, creature, direction):
+		if direction == dirs.STOP:
+			return True
+		else:
+			y, x = self.get_relative_loc(creature, direction)
+			return self.movecreature(creature, y, x)
 
 	def killall(self):
 		self.creatures.remove(self.g.p)
