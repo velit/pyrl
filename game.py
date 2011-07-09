@@ -9,7 +9,6 @@ from template_structure import TemplateStructure
 
 from const.game import DEBUG
 from const.game import YES, DUNGEON, PASSAGE_RANDOM
-from const.actions import MOVE
 
 
 class Game:
