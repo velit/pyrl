@@ -3,12 +3,7 @@ from random import randrange, randint, choice
 from pio import io
 from char import Char
 from creature_stats import Stats
-
-# Multipliers for transforming coordinates to other octants:
-mult = [[1, 0, 0, -1, -1, 0, 0, 1],
-		[0, 1, -1, 0, 0, -1, 1, 0],
-		[0, 1, 1, 0, 0, -1, -1, 0],
-		[1, 0, 0, 1, -1, 0, 0, -1]]
+from fov import get_light_set
 
 
 class Creature:
@@ -203,63 +198,8 @@ class Creature:
 
 	def update_los(self):
 		old = self.visibility
-		self.visibility = set()
-		self.cast_light()
+		self.visibility = get_light_set(self.l.see_through, self.getloc(), self.stat.sight)
 		io.clearlos(old - self.visibility, self.l)
 		io.drawlos(self.visibility - (old - self.visi_mod), self.l, self.reverse)
+		self.l.visit_light_set(self.visibility - old)
 		self.visi_mod.clear()
-
-	def cast_light(self):
-		y, x = self.getloc()
-		if self.stat.sight > 0:
-			self.l.visit_square(y, x)
-		for oct in range(8):
-			self._cast_light(self.l, y, x, 1, 1.0, 0.0, self.stat.sight,
-					mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct])
-
-	# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
-	# Copyright 2001
-	# http://roguebasin.roguelikedevelopment.org/
-	# index.php?title=FOV_using_recursive_shadowcasting
-
-	def _cast_light(self, level, cy, cx, row, start, end, r, xx, xy, yx, yy):
-		"""Recursive lightcasting function"""
-		if start < end:
-			return
-		radius_squared = r * r
-		for j in range(row, r + 1):
-			dx, dy = 0 - 1 - j, 0 - j
-			blocked = False
-			while dx <= 0:
-				dx += 1
-				# Translate the dx, dy coordinates into map coordinates:
-				X, Y = cx + dx * xx + dy * xy, cy + dx * yx + dy * yy
-				# l_slope and r_slope store the slopes of the left and right
-				# extremities of the square we're considering:
-				l_slope, r_slope = (dx - 0.5) / (dy + 0.5), (dx + 0.5) / (dy - 0.5)
-				if start < r_slope:
-					continue
-				elif end > l_slope:
-					break
-				else:
-					# Our light beam is touching this square; light it:
-					if dx * dx + dy * dy <= radius_squared:
-						self.l.visit_square(Y, X)
-					if blocked:
-						# we're scanning a row of blocked squares:
-						if not level.see_through(Y, X):
-							new_start = r_slope
-							continue
-						else:
-							blocked = False
-							start = new_start
-					else:
-						if not level.see_through(Y, X) and j < r:
-							# This is a blocking square, start a child scan:
-							blocked = True
-							self._cast_light(level, cy, cx, j + 1, start,
-												l_slope, r, xx, xy, yx, yy)
-							new_start = r_slope
-			# Row is scanned; do next row unless last square was blocked:
-			if blocked:
-				break
