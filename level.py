@@ -54,11 +54,9 @@ class Level:
 	def get_random_square(self, *a, **k):
 		return self.map.get_random_square(*a, **k)
 
-	def visit_square(self, y, x):
-		if self.legal_coord(y, x):
-			s = self.getsquare(y, x)
-			s.visit()
-			self.g.player.visibility.add((s.y, s.x))
+	def visit_light_set(self, light_set):
+		for y, x in light_set:
+			self.getsquare(y, x).visit()
 
 	def see_through(self, y, x):
 		return self.legal_coord(y, x) and self.getsquare(y, x).see_through()
