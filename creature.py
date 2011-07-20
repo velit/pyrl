@@ -12,10 +12,11 @@ class Creature:
 	def __init__(self, game):
 		self.name = "creature"
 		self.n = "him"
-		self.ch = Char('@', "white")
+		self.char = Char('@', "white")
 		self.g = game
-		self.visibility = set()
-		self.visi_mod = set()
+		self.turn_visibility = set()
+		self.level_memory = {}
+		#self.visi_mod = set()
 		self.hostile = False
 		self.reverse = ""
 		self.stat = Stats()
@@ -51,14 +52,17 @@ class Creature:
 			io.msg(msg.format(self.name, creature.name))
 
 	def _attack(self, creature):
-		roll = randint(1,100) + self.stat.ar - creature.stat.ar
+		roll = randint(1, 100) + self.stat.ar - creature.stat.ar
 		if roll > 25:
 			return (True, max(self.stat.damage_roll() - creature.stat.pv, 0))
 		else:
 			return (False, 0)
 
 	def getloc(self):
-		return self.l.get_creature_square(self).getloc()
+		return self.l.get_creature_loc(self)
+
+	def getcoord(self):
+		return self.l.get_creature_coord(self)
 
 	def getsquare(self):
 		return self.l.get_creature_square(self)
@@ -68,7 +72,7 @@ class Creature:
 
 	def act_towards(self, y, x, c=(-1, 1)):
 		# Self
-		sy, sx = self.getloc()
+		sy, sx = self.getcoord()
 
 		# Difference
 		dy = y - sy
@@ -140,7 +144,7 @@ class Creature:
 
 	def rcs(self, y, x, hostile=True):
 		"""Right click square (rts games)"""
-		if self.l.legal_loc(y, x):
+		if self.l.legal_coord(y, x):
 			s = self.l.getsquare(y, x)
 			if s.passable():
 				self.l.movecreature(self, s)
@@ -151,7 +155,7 @@ class Creature:
 		return False
 
 	def move(self, y, x):
-		if self.l.legal_loc(y, x):
+		if self.l.legal_coord(y, x):
 			targetsquare = self.l.getsquare(y, x)
 			if targetsquare.passable():
 				self.l.movecreature(self, targetsquare)
@@ -161,7 +165,7 @@ class Creature:
 		return False
 
 	def move_random(self):
-		sy, sx = self.getloc()
+		sy, sx = self.getcoord()
 		for i in range(5):
 			r = randrange(9) + 1
 			y = sy - 1 + r // 3
@@ -180,16 +184,20 @@ class Creature:
 		self.l.removecreature(self)
 
 	def has_range(self, square):
-		sy, sx = self.getloc()
+		sy, sx = self.getcoord()
 		return (sy - square.y) ** 2 + (sx - square.x) ** 2 <= self.stat.sight ** 2
 
 	def has_los(self, square):
 		return self.has_range(square) and \
 				self.l.check_los(self.getsquare(), square)
 
+	def drawmemory(self):
+		io.clearlos(self.level_memory[self.l], self.l)
+
 	def redraw_view(self):
-		self.visibility.clear()
-		self.l.drawmemory()
+		io.clear_level()
+		self.turn_visibility.clear()
+		self.drawmemory()
 		self.update_view()
 
 	def update_view(self):
@@ -197,9 +205,9 @@ class Creature:
 		#self.l.drawmap()
 
 	def update_los(self):
-		old = self.visibility
-		self.visibility = get_light_set(self.l.see_through, self.getloc(), self.stat.sight)
-		io.clearlos(old - self.visibility, self.l)
-		io.drawlos(self.visibility - (old - self.visi_mod), self.l, self.reverse)
-		self.l.visit_light_set(self.visibility - old)
-		self.visi_mod.clear()
+		old = self.turn_visibility
+		new = get_light_set(self.l.see_through, self.getcoord(), self.stat.sight, self.l.map.cols)
+		io.clearlos(old - new, self.l)
+		io.drawlos(new - old, self.l, self.reverse)
+		self.level_memory[self.l] |= new - old
+		self.turn_visibility = new

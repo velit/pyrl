@@ -44,7 +44,7 @@ class Game:
 			self.init_new_level(dkey, level_i)
 			self.cur_level = self.levels[dkey + str(level_i)]
 
-		self.cur_level.addcreature(self.player, self.cur_level.getsquare(entrance=passage))
+		self.cur_level.addcreature(self.player, self.cur_level.get_entrance_loc(passage))
 		if old_level is not None:
 			old_level.removecreature(self.player)
 		self.redraw()

@@ -19,7 +19,7 @@ class Level:
 		self.world_loc = world_loc
 
 		self.creatures = []
-		self.creature_squares = {}
+		self.creature_locations = {}
 		self.creature_spawn_list = creature_spawn_list
 
 		self.passages = level_file.passages
@@ -33,30 +33,43 @@ class Level:
 		self.map = Map(map_file)
 
 		#for mons_file in level_file.monster_files:
-		#	self.addcreature(Monster(self.g, self, mons_file))
+		#	self.addcreature(Monster(self.g, mons_file))
 		#for x in range(100):
 		#	self.spawn_random_creature()
+
+	def __repr__(self):
+		return str(self.world_loc)
+
+	def get_entrance_loc
 
 	def getsquare(self, *a, **k):
 		return self.map.getsquare(*a, **k)
 
 	def get_creature_square(self, creature):
-		return self.creature_squares[creature]
+		return self.getsquare(location=self.get_creature_locations[creature])
 
-	def get_relative_loc(self, square, direction):
-		y, x = square.getloc()
+	def get_creature_coord(self, creature):
+		return self.get_coord_from_loc(self.creature_locations[creature])
+
+	def get_creature_loc(self, creature):
+		return self.creature_locations[creature]
+
+	def get_loc_from_coord(self, *a, **k):
+		return self.map.get_loc_from_coord(*a, **k)
+
+	def get_coord_from_loc(self, *a, **k):
+		return self.map.get_coord_from_loc(*a, **k)
+
+	def get_relative_coord(self, square, direction):
+		y, x = square.getcoord()
 		dy, dx = dirs.DY[direction], dirs.DX[direction]
 		return y+dy, x+dx
 
-	def get_free_square(self, *a, **k):
-		return self.map.get_free_square(*a, **k)
+	def get_free_coord(self, *a, **k):
+		return self.map.get_free_coord(*a, **k)
 
-	def get_random_square(self, *a, **k):
+	def get_random_square_and_coord(self, *a, **k):
 		return self.map.get_random_square(*a, **k)
-
-	def visit_light_set(self, light_set):
-		for y, x in light_set:
-			self.getsquare(y, x).visit()
 
 	def see_through(self, y, x):
 		return self.legal_coord(y, x) and self.getsquare(y, x).see_through()
@@ -74,28 +87,31 @@ class Level:
 		io.drawmemory(self.map)
 
 	def spawn_random_creature(self):
-		self.addcreature(Monster(self.g, self, choice(self.creature_spawn_list)))
+		self.addcreature(Monster(self.g, choice(self.creature_spawn_list)))
 
 	def addcreature(self, creature, square=None):
 		if square is None:
 			square = self.get_free_square()
 		self.creatures.append(creature)
-		self.creature_squares[creature] = square
+		self.creature_locations[creature] = square
 		square.creature = creature
+		if self not in creature.level_memory:
+			creature.level_memory[self] = set()
 
 	def removecreature(self, creature):
 		square = self.get_creature_square(creature)
-		self.g.player.visi_mod.add(square.getloc())
+		self.g.player.turn_visibility.discard(square.getloc())
 		square.creature = None
 		self.creatures.remove(creature)
 
 	def _movecreature(self, creature, new_square):
 		old_square = self.get_creature_square(creature)
-		self.g.player.visi_mod.add(old_square.getloc())
-		self.g.player.visi_mod.add(new_square.getloc())
+		self.g.player.turn_visibility.discard(old_square.getloc())
+		self.g.player.turn_visibility.discard(new_square.getloc())
+		io.msg(self.g.player.turn_visibility)
 		old_square.creature = None
 		new_square.creature = creature
-		self.creature_squares[creature] = new_square
+		self.creature_locations[creature] = new_square
 
 	def movecreature(self, creature, y, x):
 		if self.legal_coord(y, x):
@@ -109,71 +125,71 @@ class Level:
 		if direction == dirs.STOP:
 			return True
 		else:
-			y, x = self.get_relative_loc(creature, direction)
+			y, x = self.get_relative_coord(creature, direction)
 			return self.movecreature(creature, y, x)
 
-	def killall(self):
-		self.creatures.remove(self.g.player)
-		while self.creatures:
-			s = self.creatures.pop().getsquare()
-			self.g.player.visi_mod.add(s.getloc())
-			s.creature = None
-		self.creatures.append(self.g.player)
+	#def killall(self):
+	#	self.creatures.remove(self.g.player)
+	#	while self.creatures:
+	#		s = self.creatures.pop().getsquare()
+	#		self.g.player.turn_visibility.discard(s.getloc())
+	#		s.creature = None
+	#	self.creatures.append(self.g.player)
 
-	def neighbor_nodes(self, y, x):
-		for j in range(y - 1, y + 2):
-			for i in range(x - 1, x + 2):
-				if not ((y == j and x == i) and self.legal_loc(y, x) and
-						self.getsquare(j, i).tile_passable()):
-					yield self.getsquare(j, i)
+	#def neighbor_nodes(self, y, x):
+	#	for j in range(y - 1, y + 2):
+	#		for i in range(x - 1, x + 2):
+	#			if not ((y == j and x == i) and self.legal_loc(y, x) and
+	#					self.getsquare(j, i).tile_passable()):
+	#				yield self.getsquare(j, i)
 
-	def path(self, start, goal):
-		return path.path(start, goal, self)
+	#def path(self, start, goal):
+	#	return path.path(start, goal, self)
 
-	def get_closest_in_square(self, creature, radius):
-		y, x = self.square.y, self.square.x
-		for i in range(radius * 2):
-			c = self.getsquare(y - radius, x - radius + i).creature
-			if c:
-				return c
-			c = self.getsquare(y - radius + i, x + radius).creature
-			if c:
-				return c
-			c = self.getsquare(y + radius, x + radius - i).creature
-			if c:
-				return c
-			c = self.getsquare(y + radius - i, x - radius).creature
-			if c:
-				return c
-		else:
-			return False
+	#def get_closest_in_square(self, creature, radius):
+	#	y, x = self.square.y, self.square.x
+	#	for i in range(radius * 2):
+	#		c = self.getsquare(y - radius, x - radius + i).creature
+	#		if c:
+	#			return c
+	#		c = self.getsquare(y - radius + i, x + radius).creature
+	#		if c:
+	#			return c
+	#		c = self.getsquare(y + radius, x + radius - i).creature
+	#		if c:
+	#			return c
+	#		c = self.getsquare(y + radius - i, x - radius).creature
+	#		if c:
+	#			return c
+	#	else:
+	#		return False
 
-	def get_closest_creatureFromArea(self, creature):
-		y, x = self.square.y, self.square.x
-		radius = min(self.rows - y, y, self.cols - x, x)
-		for i in range(1, radius):
-			c = self.get_closest_in_square(creature, i)
-			if c:
-				return c
-		else:
-			return False
+	#def get_closest_creatureFromArea(self, creature):
+	#	y, x = self.square.y, self.square.x
+	#	radius = min(self.rows - y, y, self.cols - x, x)
+	#	for i in range(1, radius):
+	#		c = self.get_closest_in_square(creature, i)
+	#		if c:
+	#			return c
+	#	else:
+	#		return False
 
-	def get_closest_creature(self, target_creature):
-		tcreature_square = target_creature.square
-		ty, tx = tcreature_square.y, tcreature_square.x
-		best, cre = None, None
-		for creature in self.creatures:
-			creature_square = creature.square
-			y, x = creature_square.y, creature_square.x
-			a = (ty - y) ** 2 + (tx - x) ** 2
-			if a > 0:
-				if best is None:
-					best = a
-					cre = creature
-				elif a < best:
-					best = a
-					cre = creature
-		return cre
+	#def get_closest_creature(self, target_creature):
+	#	tcreature_square = target_creature.square
+	#	ty, tx = tcreature_square.y, tcreature_square.x
+	#	best, cre = None, None
+	#	for creature in self.creatures:
+	#		creature_square = creature.square
+	#		y, x = creature_square.y, creature_square.x
+	#		a = (ty - y) ** 2 + (tx - x) ** 2
+	#		if a > 0:
+	#			if best is None:
+	#				best = a
+	#				cre = creature
+	#			elif a < best:
+	#				best = a
+	#				cre = creature
+	#	return cre
 
 	def check_los(self, startSquare, targetsquare):
 		y0, x0 = startSquare.y, startSquare.x

@@ -54,7 +54,7 @@ class MapGenerator:
 				break
 
 		self.canvas.set_tile_id(y, x, us)
-		self.canvas.entrance_locs[PASSAGE_UP] = (y, x)
+		self.canvas.entrance_coords[PASSAGE_UP] = (y, x)
 
 	def add_staircase_down(self):
 		while True:
@@ -65,7 +65,7 @@ class MapGenerator:
 				break
 
 		self.canvas.set_tile_id(y, x, ds)
-		self.canvas.entrance_locs[PASSAGE_DOWN] = (y, x)
+		self.canvas.entrance_coords[PASSAGE_DOWN] = (y, x)
 
 	def _make_initial_room(self):
 		while True:
