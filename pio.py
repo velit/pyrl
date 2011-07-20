@@ -53,8 +53,8 @@ class _IO:
 	def clearlos(self, *a, **k):
 		self.l.clearlos(*a, **k)
 
-	def drawmap(self, *a, **k):
-		self.l.drawmap(*a, **k)
+	def drawlevel(self, *a, **k):
+		self.l.drawlevel(*a, **k)
 
 	def drawmemory(self, *a, **k):
 		self.l.drawmemory(*a, **k)

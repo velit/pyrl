@@ -7,9 +7,9 @@ from level import Level
 from input_interpretation import get_input_and_act
 from world_file import WorldFile
 from const.game import DEBUG, YES
-from const.game import DUNGEON
+from const.game import DUNGEON, FIRST_LEVEL
 from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
-from const.game import PASSAGE_UP, PASSAGE_DOWN, PASSAGE_RANDOM
+from const.game import PASSAGE_UP, PASSAGE_DOWN
 
 
 class Game:
@@ -23,41 +23,42 @@ class Game:
 		self.levels = {}
 		self.world_file = WorldFile()
 		self.player = Player(self)
-		self.cur_level = None
-		self.change_level(DUNGEON)
+		self.init_new_level(FIRST_LEVEL)
+		self.cur_level = self.levels[FIRST_LEVEL]
+		self.cur_level.addcreature(self.player)
 	
-	def enter_passage(self, level, square):
-		passage_info = level.passages[square.getexit()]
-		d, i = self.cur_level.world_loc
-		if passage_info[0] == SET_LEVEL:
-			self.change_level(*passage_info[1])
-		elif passage_info[0] == PREVIOUS_LEVEL:
-			self.change_level(d, i - 1, PASSAGE_DOWN)
-		elif passage_info[0] == NEXT_LEVEL:
-			self.change_level(d, i + 1, PASSAGE_UP)
+	def enter_passage(self, origin_world_loc, origin_passage):
+		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
+		if instruction == SET_LEVEL:
+			self.change_level((d, i))
+		else:
+			d, i = self.cur_level.world_loc
+			if instruction == PREVIOUS_LEVEL:
+				self.change_level((d, i - 1), PASSAGE_DOWN)
+			elif instruction == NEXT_LEVEL:
+				self.change_level((d, i + 1), PASSAGE_UP)
 
-	def change_level(self, dkey, level_i=0, passage=PASSAGE_RANDOM):
-		old_level = self.cur_level
+	def change_level(self, world_loc, passage):
+		self.cur_level.removecreature(self.player)
 		try:
-			self.cur_level = self.levels[dkey + str(level_i)]
+			self.cur_level = self.levels[world_loc]
 		except KeyError:
-			self.init_new_level(dkey, level_i)
-			self.cur_level = self.levels[dkey + str(level_i)]
-
-		self.cur_level.addcreature(self.player, self.cur_level.get_entrance_loc(passage))
-		if old_level is not None:
-			old_level.removecreature(self.player)
+			self.init_new_level(world_loc)
+			self.cur_level = self.levels[world_loc]
+		self.cur_level.addcreature(self.player, self.cur_level.get_passage_loc(passage))
 		self.redraw()
 
-	def init_new_level(self, d, i):
-		f = self.world_file
-		self.levels[d + str(i)] = Level(self, (d, i), f.get_level_file(d, i), f.get_level_monster_list(i))
+	def init_new_level(self, world_loc):
+		level_file = self.world_file.get_level_file(*world_loc)
+		danger_level = level_file.danger_level
+		level_monster_list = self.world_file.get_level_monster_list(danger_level)
+		self.levels[world_loc] = Level(self, world_loc, level_file, level_monster_list)
 
 	def play(self):
-		for creature in self.cur_level.creatures:
-			if creature == self.player:
-				creature.update_view()
-				get_input_and_act(self)
+		creature = self.cur_level.turn_scheduler.get()
+		if creature == self.player:
+			creature.update_view()
+			get_input_and_act(self)
 		self.turn_counter += 1
 
 	def endgame(self, ask=True):

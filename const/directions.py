@@ -13,17 +13,14 @@ DOWN = (SW, SO, SE)
 LEFT = (SW, WE, NW)
 RIGHT = (SE, EA, NE)
 
-DY = {}
-DX = {}
-DX[STOP] = 0
-for dir in range(1, 9 + 1):
-	DY[dir] = 0
-	DX[dir] = 0
-	if dir in UP:
-		DY[dir] -= 1
-	elif dir in DOWN:
-		DY[dir] += 1
-	if dir in LEFT:
-		DX[dir] -= 1
-	elif dir in RIGHT:
-		DX[dir] += 1
+DELTA = {
+	SW: (1, -1),
+	SO: (1, 0),
+	SE: (1, 1),
+	WE: (0, -1),
+	STOP: (0, 0),
+	EA: (0, 1),
+	NW: (-1, -1),
+	NO: (-1, 0),
+	NE: (-1, 1),
+}
