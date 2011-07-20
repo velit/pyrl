@@ -66,8 +66,7 @@ class Stats:
 		self.int = self.base["int"]
 		self.per = self.base["per"]
 
-		self.sight = 1
-		#self.sight = 6 + (self.per - 10) // 2
+		self.sight = 6 + (self.per - 10) // 2
 		self.dmg_bonus = self.str // 5
 		self.armed_dmg_bonus = 0
 		self.unarmed_dmg_bonus = 0

@@ -1,24 +1,35 @@
 from const.game import PASSAGE_UP, PASSAGE_DOWN, UP, DOWN
+from const.game import LEVEL_ROWS, LEVEL_COLS
+from tiles import FLOOR, gettile
 
 class LevelFile:
 
-	def __init__(self, danger_level=0, map_file=None, map_not_rdg=True):
+	def __init__(self, danger_level=0, rows=LEVEL_ROWS, cols=LEVEL_COLS):
+		self.rows = rows
+		self.cols = cols
 		self.danger_level = danger_level
-		self.passages = {}
-		self.map_not_rdg = map_not_rdg #true: map, false: rdg
-		self.map_file = map_file
+		self.passage_locations = {}
 		self.monster_files = []
+		self.tilefile = None
+		self.tile_dict = {}
 
-		if map_not_rdg:
-			for key in self.map_file.entrance_coords:
-				if key == PASSAGE_UP:
-					self.passages[key] = UP
-				elif key == PASSAGE_DOWN:
-					self.passages[key] = DOWN
-				else:
-					raise NotImplementedError
-		else:
-			self.passages = {PASSAGE_UP: UP, PASSAGE_DOWN: DOWN}
+	def get_tile_id(self, y, x):
+		return self.tilefile[self.getloc(y, x)]
 
-	def addmonster(self, monster):
+	def set_tile_id(self, y, x, tile_id):
+		self.tilefile[self.getloc(y, x)] = tile_id
+
+	def get_tile_from_coord(self, y, x):
+		return gettile(self.get_tile_id(y, x), self.tile_dict)
+
+	def get_tile_fromloc(self, loc):
+		return gettile(self.tilefile[loc], self.tile_dict)
+
+	def get_tilemap(self):
+		return [gettile(key, self.tile_dict) for key in self.tilefile]
+
+	def add_monster_file(self, monster):
 		self.monster_files.append(monster)
+
+	def getloc(self, y, x):
+		return y * self.cols + x

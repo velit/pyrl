@@ -4,8 +4,8 @@ _mult = ((1, 0, 0, -1, -1, 0, 0, 1),
 		(0, 1, 1, 0, 0, -1, -1, 0),
 		(1, 0, 0, 1, -1, 0, 0, -1))
 
-def get_light_set(visibility_func, loc, sight, cols):
-	y, x = loc
+def get_light_set(visibility_func, coord, sight, cols):
+	y, x = coord
 	light_set = {y * cols + x}
 	for oct in range(8):
 		_shadow_cast(light_set, visibility_func, cols, y, x, 1, 1.0, 0.0, sight,
@@ -41,14 +41,14 @@ def _shadow_cast(light_set, visibility_func, cols, cy, cx, row, start, end, r, x
 					light_set.add(Y * cols + X)
 				if blocked:
 					# we're scanning a row of blocked squares:
-					if not visibility_func(Y, X):
+					if not visibility_func(Y * cols + X):
 						new_start = r_slope
 						continue
 					else:
 						blocked = False
 						start = new_start
 				else:
-					if not visibility_func(Y, X) and j < r:
+					if not visibility_func(Y * cols + X) and j < r:
 						# This is a blocking square, start a child scan:
 						blocked = True
 						_shadow_cast(light_set, visibility_func, cols, cy, cx, j + 1, start, l_slope, r, xx, xy, yx, yy)

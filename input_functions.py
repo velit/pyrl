@@ -30,13 +30,14 @@ def loadgame(game, *a, **k):
 	game.loadgame(*a, **k)
 
 def debug(game):
-	io.msg(game.player.turn_visibility)
+	io.msg((game.player.loc, game.cur_level.passable(game.player.loc)))
 
 def path(game):
 	io.msg("Shhhhhhh. Everything will be all right.")
 
 def redraw_view(game):
 	game.redraw()
+	game.cur_level.draw()
 
 def los_highlight(game):
 	if game.player.reverse == "":
@@ -46,33 +47,36 @@ def los_highlight(game):
 	game.redraw()
 
 def descend(game):
-	s = game.player.getsquare()
-	if s.isexit() and s.getexit() == PASSAGE_DOWN:
-		try:
-			game.enter_passage(game.cur_level, s)
-		except KeyError:
-			io.msg("This passage doesn't seem to lead anywhere.")
+	loc = game.player.loc
+	l = game.cur_level
+	if l.isexit(loc) and l.getexit(loc) == PASSAGE_DOWN:
+		game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
+		#try:
+		#	game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
+		#except KeyError:
+		#	io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:
-			s = game.cur_level.getsquare(entrance=PASSAGE_DOWN)
+			new_loc = game.cur_level.get_passage_loc(PASSAGE_DOWN)
 		except KeyError:
 			io.msg("This level doesn't seem to have a downward passage.")
 		else:
-			game.cur_level.movecreature(game.player, *s.getcoord())
+			game.cur_level.movecreature(game.player, new_loc)
 	return True
 
 def ascend(game):
-	s = game.player.getsquare()
-	if s.isexit() and s.getexit() == PASSAGE_UP:
+	loc = game.player.loc
+	l = game.cur_level
+	if l.isexit(loc) and l.getexit(loc) == PASSAGE_UP:
 		try:
-			game.enter_passage(game.cur_level, s)
+			game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
 		except KeyError:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:
-			s = game.cur_level.getsquare(entrance=PASSAGE_UP)
+			new_loc = game.cur_level.get_passage_loc(PASSAGE_UP)
 		except KeyError:
-			io.msg("This level doesn't seem to have an upward passage.")
+			io.msg("This level doesn't seem to have a downward passage.")
 		else:
-			game.cur_level.movecreature(game.player, *s.getcoord())
+			game.cur_level.movecreature(game.player, new_loc)
 	return True

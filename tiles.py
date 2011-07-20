@@ -1,13 +1,7 @@
 from tile import Tile
 from char import Char
 from const.game import PASSAGE_UP, PASSAGE_DOWN
-
-UNKNOWN = "u"
-FLOOR = "f"
-WALL = "w"
-ROCK = "r"
-STAIRS_UP = "us"
-STAIRS_DOWN = "ds"
+from const.tiles import UNKNOWN, FLOOR, WALL, ROCK, STAIRS_UP, STAIRS_DOWN
 
 
 tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
@@ -31,5 +25,4 @@ def gettile(handle, tile_dict=None):
 	elif handle in tiles:
 		return tiles[handle]
 	else:
-		raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle,
-			tile_dict))
+		raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))

@@ -16,7 +16,7 @@ class Player(Creature):
 		super().__init__(game)
 		self.name = "tappi"
 		self.n = "god"
-		self.ch = Char('@', "white")
+		self.char = Char('@', "blue")
 
 		armor_stats = ((PV, 5), (DR, 10))
 		self.stat.equip(Item(armor_stats), BODY)
@@ -37,16 +37,16 @@ class Player(Creature):
 		io.s.add_element("dr", "DR: ", lambda: self.stat.dr)
 		io.s.add_element("pv", "PV: ", lambda: self.stat.pv)
 
-	def attack(self, creature):
-		attack_succeeds, damage = self._attack(creature)
-		if attack_succeeds:
-			if damage > 0:
-				io.msg("You hit the {} for {} damage.".format(creature.name, damage))
-				creature.lose_hp(damage)
-			else:
-				io.msg("You fail to hurt the {}.".format(creature.name))
-		else:
-			io.msg("You miss the {}.".format(creature.name))
+	#def attack(self, creature):
+	#	attack_succeeds, damage = self._attack(creature)
+	#	if attack_succeeds:
+	#		if damage > 0:
+	#			io.msg("You hit the {} for {} damage.".format(creature.name, damage))
+	#			creature.lose_hp(damage)
+	#		else:
+	#			io.msg("You fail to hurt the {}.".format(creature.name))
+	#	else:
+	#		io.msg("You miss the {}.".format(creature.name))
 
 	def die(self):
 		io.sel_getch("You die... [more]", char_list=DEFAULT)
