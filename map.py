@@ -1,6 +1,5 @@
 import random
 
-from square import Square
 from tiles import gettile, FLOOR
 from const.game import PASSAGE_RANDOM
 
@@ -11,46 +10,56 @@ class Map:
 	def __init__(self, map_file):
 		self.rows = map_file.rows
 		self.cols = map_file.cols
-		self.squares = []
-		self.entrance_squares = {}
+		self.tiles = [gettile(k, map_file.tile_dict) for k in map_file.tilemap]
+		self.creatures = {}
+		self.entrance_locations = {}
 
-		for i, k in enumerate(map_file.tilemap):
-			self.squares.append(Square(gettile(k, map_file.tile_dict),
-					i // self.cols, i % self.cols))
+		for key, y, x in map_file.entrance_coords.items():
+			self.entrance_locations[key] = y, x
 
-		for key, loc_ in map_file.entrance_locs.items():
-			self.entrance_squares[key] = self.getsquare(loc=loc_)
-
-	def getsquare(self, *a, **k):
-		if "entrance" in k:
-			if k["entrance"] == PASSAGE_RANDOM:
-				return self.get_free_square()
-			else:
-				return self.entrance_squares[k["entrance"]]
-		elif "loc" in k:
-			y, x = k["loc"]
+	def get_entrance_loc(self, entrance):
+		if entrance == PASSAGE_RANDOM:
+			return self.get_free_square()
 		else:
-			y, x = a
-		return self.squares[y*self.cols + x]
+			return self.entrance_locations[entrance]
 
-	def get_free_square(self):
-		"""Randomly finds an unoccupied passable square and returns it."""
+	def get_free_loc(self):
 		while True:
-			square = self.get_random_square()
-			if square.passable():
-				return square
+			loc = self.get_random_loc()
+			if self.passable(loc):
+				return loc
 
-	def get_random_square(self):
-		"""Returns a random square from the Map."""
-		return random.choice(self.squares)
+	def get_random_loc(self):
+		return random.randrange(len(self.tiles))
+
+	def passable(self, loc):
+		if loc in self.creatures:
+			return False
+		else:
+			return self.tiles[loc].passable
+
+	def see_through(self, loc):
+		return self.tiles[loc].see_through
+
+	def get_visible_char_data(self, loc, shift=""):
+		if loc in self.creatures:
+			symbol, color = self.creatures[loc].char
+		else:
+			symbol, color = self.tiles[loc].visible_char
+		return symbol, color + color_shift
+
+	def get_memory_char_data(self, loc, shift=""):
+		symbol, color = self.tiles[loc].memory_char
+		return symbol, color + shift
+
+	def isexit(self, loc):
+		return self.tiles[loc].exit_point is not None
+
+	def getexit(self):
+		return self.tiles[loc].exit_point
 
 	def legal_loc(self, loc):
-		y, x = loc
-		return 0 <= y < self.rows and 0 <= x < self.cols
+		return 0 <= loc < self.rows * self.cols
 
-	def legal_coord(self, y, x):
-		return 0 <= y < self.rows and 0 <= x < self.cols
-
-	def get_edge_square(self):
-		#TODO: implement
-		pass
+	def get_coord(loc):
+		return loc // self.cols, loc % self.cols

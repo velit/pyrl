@@ -8,7 +8,7 @@ class MapFile:
 		self.rows = rows
 		self.cols = cols
 		self.tilemap = [tile for i in range(rows * cols)]
-		self.entrance_locs = {}
+		self.entrance_coords = {}
 		self.tile_dict = {}
 
 	def get_tile_id(self, y, x):

@@ -33,15 +33,15 @@ class LevelWindow(Window):
 	# drawlos and clearlos draw based on coordinates, they need to fetch
 	# printing data with the getsquare function
 
-	def drawlos(self, visibility, l, color_shift=""):
-		for s in map(lambda coord: l.getsquare(*coord), visibility):
+	def drawlos(self, coord_set, l, color_shift=""):
+		for s in (l.getsquare(coord) for coord in coord_set):
 			try:
 				self.addch(s.y, s.x, *s.get_visible_char_data(color_shift))
 			except curses.error:
 				pass
 
-	def clearlos(self, old_visibility, l):
-		for s in map(lambda coord: l.getsquare(*coord), old_visibility):
+	def clearlos(self, coord_set, l):
+		for s in (l.getsquare(coord) for coord in coord_set):
 			try:
 				self.addch(s.y, s.x, *s.get_memory_char_data())
 			except curses.error:
@@ -76,8 +76,8 @@ class LevelWindow(Window):
 			pass
 
 	def drawline(self, s0, s1, char=Char('*', "yellow")):
-		y0, x0 = s0.getloc()
-		y1, x1 = s1.getloc()
+		y0, x0 = s0.getcoord()
+		y1, x1 = s1.getcoord()
 		for y, x in bresenham(y0, x0, y1, x1):
 			self.addch(y, x, char.symbol, char.color)
 		self.getch(y1, x1)

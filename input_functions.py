@@ -30,11 +30,13 @@ def loadgame(game, *a, **k):
 	game.loadgame(*a, **k)
 
 def debug(game):
-	io.msg((io.level_rows, io.level_cols))
-	io.msg(game.player.getloc())
+	io.msg(game.player.turn_visibility)
 
 def path(game):
 	io.msg("Shhhhhhh. Everything will be all right.")
+
+def redraw_view(game):
+	game.redraw()
 
 def los_highlight(game):
 	if game.player.reverse == "":
@@ -53,9 +55,10 @@ def descend(game):
 	else:
 		try:
 			s = game.cur_level.getsquare(entrance=PASSAGE_DOWN)
-			game.cur_level.movecreature(game.player, *s.getloc())
 		except KeyError:
 			io.msg("This level doesn't seem to have a downward passage.")
+		else:
+			game.cur_level.movecreature(game.player, *s.getcoord())
 	return True
 
 def ascend(game):
@@ -68,7 +71,8 @@ def ascend(game):
 	else:
 		try:
 			s = game.cur_level.getsquare(entrance=PASSAGE_UP)
-			game.cur_level.movecreature(game.player, *s.getloc())
-			return True
 		except KeyError:
 			io.msg("This level doesn't seem to have an upward passage.")
+		else:
+			game.cur_level.movecreature(game.player, *s.getcoord())
+	return True

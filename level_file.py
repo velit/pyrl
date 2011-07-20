@@ -10,7 +10,7 @@ class LevelFile:
 		self.monster_files = []
 
 		if map_not_rdg:
-			for key in self.map_file.entrance_locs:
+			for key in self.map_file.entrance_coords:
 				if key == PASSAGE_UP:
 					self.passages[key] = UP
 				elif key == PASSAGE_DOWN:

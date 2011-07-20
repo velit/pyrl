@@ -47,72 +47,75 @@ class _IO:
 			self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
 		self.a = Window(self.w)
 
-	def drawmap(self, map):
-		self.l.drawmap(map)
+	def clear_level(self, *a, **k):
+		self.l.clear(*a, **k)
 
-	def drawmemory(self, map):
-		self.l.drawmemory(map)
+	def clearlos(self, *a, **k):
+		self.l.clearlos(*a, **k)
 
-	def drawtilemap(self, tilemap):
-		self.l.drawtilemap(tilemap)
+	def drawmap(self, *a, **k):
+		self.l.drawmap(*a, **k)
 
-	def draw_menu(self, *args, **kwords):
-		return self.l.draw_menu(*args, **kwords)
+	def drawmemory(self, *a, **k):
+		self.l.drawmemory(*a, **k)
 
-	def draw_h_menu(self, *args, **kwords):
-		return self.m.draw_h_menu(*args, **kwords)
+	def drawtilemap(self, *a, **k):
+		self.l.drawtilemap(*a, **k)
 
-	def drawlos(self, visibility, *color_shift):
-		self.l.drawlos(visibility, *color_shift)
+	def draw_menu(self, *a, **k):
+		return self.l.draw_menu(*a, **k)
 
-	def clearlos(self, visibility, level):
-		self.l.clearlos(visibility, level)
+	def draw_h_menu(self, *a, **k):
+		return self.m.draw_h_menu(*a, **k)
 
-	def drawline(self, startSquare, targetsquare, *char):
-		self.l.drawline(self, startSquare, targetsquare, *char)
+	def drawlos(self, *a, **k):
+		self.l.drawlos(*a, **k)
 
-	def getbool(self, *args, **kwords):
-		return_ =  self.m.getbool(*args, **kwords)
+	def drawline(self, *a, **k):
+		self.l.drawline(*a, **k)
+
+	def getbool(self, *a, **k):
+		return_ =  self.m.getbool(*a, **k)
 		self.refresh()
 		return return_
 
-	def getchar(self, *args, **kwords):
-		return_ =  self.m.getchar(*args, **kwords)
+	def getchar(self, *a, **k):
+		return_ =  self.m.getchar(*a, **k)
 		self.refresh()
 		return return_
 
-	def getcolor(self, *args, **kwords):
-		return_ =  self.m.getcolor(*args, **kwords)
+	def getcolor(self, *a, **k):
+		return_ =  self.m.getcolor(*a, **k)
 		self.refresh()
 		return return_
 
-	def getint(self, *args, **kwords):
-		return_ =  self.m.getint(*args, **kwords)
+	def getint(self, *a, **k):
+		return_ =  self.m.getint(*a, **k)
 		self.refresh()
 		return return_
 
-	def getstr(self, *args, **kwords):
-		return_ =  self.m.getstr(*args, **kwords)
+	def getstr(self, *a, **k):
+		return_ =  self.m.getstr(*a, **k)
 		self.refresh()
 		return return_
 
-	def getch(self, *args, **keys):
+	def getch(self, *a, **k):
 		self.refresh()
-		return self.l.getch(*args, **keys)
+		return self.l.getch(*a, **k)
 
-	def sel_getch(self, print_str=None, *args, **keys):
+	def sel_getch(self, print_str=None, *a, **k):
 		if print_str is not None:
 			curses.curs_set(0)
 			self.msg(print_str)
 			self.refresh()
-		return_ = self.l.sel_getch(None, *args, **keys)
+		return_ = self.l.sel_getch(None, *a, **k)
 		if print_str is not None:
 			curses.curs_set(1)
 			self.refresh()
 		return return_
 
-	def msg(self, message):
-		self.m.queue_msg(str(message))
+	def msg(self, *a, **k):
+		self.m.queue_msg(*a, **k)
 
 	def refresh(self):
 		self.m.update()
@@ -120,11 +123,11 @@ class _IO:
 		self.l.update()
 		curses.doupdate()
 
-	def drawstar(self, square, *col):
-		self.l.drawstar(square, *col)
+	def drawstar(self, *a, **k):
+		self.l.drawstar(*a, **k)
 
-	def drawblock(self, square, *col):
-		self.l.drawblock(square, *col)
+	def drawblock(self, *a, **k):
+		self.l.drawblock(*a, **k)
 
 	def drawpath(self, iterator):
 		curses.curs_set(0)
