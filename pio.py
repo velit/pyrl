@@ -53,6 +53,9 @@ class _IO:
 	def clearlos(self, *a, **k):
 		self.l.clearlos(*a, **k)
 
+	def level_draw(self, *a, **k):
+		self.l.draw(*a, **k)
+
 	def drawlevel(self, *a, **k):
 		self.l.drawlevel(*a, **k)
 

@@ -1,6 +1,5 @@
-import curses
-
 from creature import Creature
+from monster_file import MonsterFile
 from char import Char
 from item import Item, Weapon
 from const.stats import *
@@ -8,10 +7,8 @@ from const.slots import *
 
 
 def Player():
-	player = Creature()
-	player.name = "tappi"
-	player.n = "god"
-	player.char = Char('@', "blue")
+	monster_file = MonsterFile("tappi", Char('@', "blue"), 0, 0)
+	player = Creature(monster_file)
 
 	armor_stats = ((PV, 5), (DR, 10))
 	player.stat.equip(Item(armor_stats), BODY)
@@ -20,18 +17,3 @@ def Player():
 	player.stat.equip(weapon, HANDS)
 
 	return player
-
-	#def attack(self, creature):
-	#	attack_succeeds, damage = self._attack(creature)
-	#	if attack_succeeds:
-	#		if damage > 0:
-	#			io.msg("You hit the {} for {} damage.".format(creature.name, damage))
-	#			creature.lose_hp(damage)
-	#		else:
-	#			io.msg("You fail to hurt the {}.".format(creature.name))
-	#	else:
-	#		io.msg("You miss the {}.".format(creature.name))
-
-	#def die(self):
-	#	io.sel_getch("You die... [more]", char_list=DEFAULT)
-	#	self.g.endgame(False)

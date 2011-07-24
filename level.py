@@ -4,7 +4,7 @@ import const.directions as dirs
 
 from random import randrange, choice
 from bresenham import bresenham
-from monster import Monster
+from creature import Creature
 from pio import io
 from const.game import PASSAGE_RANDOM
 from turn_scheduler import TurnScheduler
@@ -27,11 +27,11 @@ class Level:
 		self.tiles = level_file.get_tilemap()
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
-		#for mons_file in level_file.monster_files:
-		#	self.addcreature(Monster(mons_file))
+		for mons_file in level_file.monster_files:
+			self.addcreature(Creature(mons_file))
 
-		#for x in range(100):
-		#	self.spawn_random_creature()
+		for x in range(100):
+			self.spawn_random_creature()
 
 	def get_passage_loc(self, passage):
 		if passage == PASSAGE_RANDOM:
@@ -48,6 +48,9 @@ class Level:
 	def get_random_loc(self):
 		return randrange(len(self.tiles))
 
+	def get_creature(self, loc):
+		return self.creatures[loc]
+
 	def passable(self, loc):
 		if loc in self.creatures:
 			return False
@@ -60,16 +63,22 @@ class Level:
 	def get_loc_iterator(self):
 		return range(len(self.tiles))
 
-	def get_visible_char_data(self, loc, color_shift=""):
-		if loc in self.creatures:
-			symbol, color = self.creatures[loc].char
-		else:
-			symbol, color = self.tiles[loc].visible_char
-		return symbol, color + color_shift
+	def get_visible_data(self, location_set):
+		for loc in location_set:
+			yield loc // self.cols, loc % self.cols, self.get_visible_char(loc)
 
-	def get_memory_char_data(self, loc, color_shift=""):
-		symbol, color = self.tiles[loc].memory_char
-		return symbol, color + color_shift
+	def get_memory_data(self, location_set):
+		for loc in location_set:
+			yield loc // self.cols, loc % self.cols, self.get_memory_char(loc)
+
+	def get_visible_char(self, loc):
+		if loc in self.creatures:
+			return self.creatures[loc].char
+		else:
+			return self.tiles[loc].visible_char
+
+	def get_memory_char(self, loc):
+		return self.tiles[loc].memory_char
 
 	def isexit(self, loc):
 		return self.tiles[loc].exit_point is not None
@@ -89,14 +98,8 @@ class Level:
 	def get_relative_loc(self, loc, direction):
 		return loc + self.get_loc(*dirs.DELTA[direction])
 
-	def draw(self):
-		io.drawlevel(self)
-
-	def drawmemory(self):
-		io.drawmemory(self)
-
 	def spawn_random_creature(self):
-		self.addcreature(Monster(choice(self.creature_spawn_list)))
+		self.addcreature(Creature(choice(self.creature_spawn_list)))
 
 	def addcreature(self, creature, loc=None):
 		if loc is None:
@@ -106,8 +109,8 @@ class Level:
 		self.modified_locations.add(loc)
 		creature.loc = loc
 
-	def removecreature(self, creature):
-		loc = creature.loc
+	def removecreature(self, loc):
+		creature = self.get_creature(loc)
 		del self.creatures[loc]
 		self.turn_scheduler.remove(creature)
 		self.modified_locations.add(loc)
@@ -133,12 +136,6 @@ class Level:
 		else:
 			loc = self.get_relative_loc(creature.loc, direction)
 			return self.movecreature(creature, loc)
-
-	def killall(self):
-		creatures = self.turn_scheduler.get_actor_set()
-		creatures.remove(self.g.player)
-		for c in creatures:
-			self.removecreature(c)
 
 	def pop_modified_locs(self):
 		mod_locs = self.modified_locations
