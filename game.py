@@ -33,14 +33,14 @@ class Game:
 		self.register_status_texts()
 
 	def register_status_texts(self):
-		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format( *self.player.stat.get_damage_info()))
-		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.stat.max_hp))
-		io.s.add_element("sight", "sight: ", lambda: self.player.stat.sight)
+		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format( *self.player.get_damage_info()))
+		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.max_hp))
+		io.s.add_element("sight", "sight: ", lambda: self.player.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
 		io.s.add_element("loc", "Loc: ", lambda:self.cur_level.world_loc)
-		io.s.add_element("ar", "AR: ", lambda: self.player.stat.ar)
-		io.s.add_element("dr", "DR: ", lambda: self.player.stat.dr)
-		io.s.add_element("pv", "PV: ", lambda: self.player.stat.pv)
+		io.s.add_element("ar", "AR: ", lambda: self.player.ar)
+		io.s.add_element("dr", "DR: ", lambda: self.player.dr)
+		io.s.add_element("pv", "PV: ", lambda: self.player.pv)
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
@@ -65,10 +65,10 @@ class Game:
 		self.redraw()
 
 	def init_new_level(self, world_loc):
-		level_file = self.world_file.get_level_file(world_loc)
+		level_file = self.world_file.pop_level_file(world_loc)
 		danger_level = level_file.danger_level
 		level_monster_list = self.world_file.get_level_monster_list(danger_level)
-		self.levels[world_loc] = Level(self, world_loc, level_file, level_monster_list)
+		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
 
 	def play(self):
 		creature = self.cur_level.turn_scheduler.get()
@@ -110,7 +110,7 @@ class Game:
 
 	def update_view(self, level, creature):
 		old = self.old_visibility
-		new = get_light_set(level.see_through, level.get_coord(creature.loc), creature.stat.sight, level.cols)
+		new = get_light_set(level.see_through, level.get_coord(creature.loc), creature.sight, level.cols)
 		mod = level.pop_modified_locs()
 		level.update_visited_locs(new - old)
 

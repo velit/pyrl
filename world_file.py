@@ -2,6 +2,7 @@ from char import Char
 from level_file import LevelFile
 from monster_file import MonsterFile, monster_files
 from const.game import DUNGEON, UP, DOWN, PASSAGE_UP, PASSAGE_DOWN
+from const.game import LEVELS_PER_DUNGEON
 from const.game import PyrlException
 
 class WorldFile:
@@ -13,10 +14,10 @@ class WorldFile:
 		self.global_monster_files = []
 
 		self.add_dungeon(DUNGEON)
-		for x in range(10):
+		for x in range(LEVELS_PER_DUNGEON):
 			self.add_level_file(DUNGEON)
-		d3 = self.get_level_file((DUNGEON, 3))
-		d3.add_monster_file(MonsterFile("The Crone", 50, Char('@', "purple")))
+		d0 = self.get_level_file((DUNGEON, 0))
+		d0.add_monster_file(MonsterFile("The Crone", 50, Char('@', "purple")))
 
 		for m in monster_files:
 			self.add_monster_file(m)
@@ -38,6 +39,15 @@ class WorldFile:
 			return self.level_files[world_loc]
 		except KeyError:
 			raise PyrlException("Nonexistant level key: {}".format(world_loc))
+
+	def pop_level_file(self, world_loc):
+		try:
+			level_file = self.level_files[world_loc]
+		except KeyError:
+			raise PyrlException("Nonexistant level key: {}".format(world_loc))
+		else:
+			del self.level_files[world_loc]
+			return level_file
 
 	def get_passage_info(self, world_loc, passage):
 		return self.level_passageways[world_loc][passage]
