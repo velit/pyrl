@@ -1,5 +1,8 @@
 # old player
 
+#def damage_roll(self):
+#	return dice_roll(*self.get_damage_info())
+
 #def attack(self, creature):
 #	attack_succeeds, damage = self._attack(creature)
 #	if attack_succeeds:

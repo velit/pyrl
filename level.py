@@ -5,18 +5,16 @@ import const.directions as dirs
 from random import randrange, choice
 from bresenham import bresenham
 from creature import Creature
-from pio import io
-from const.game import PASSAGE_RANDOM
+from const.game import PASSAGE_RANDOM, MONSTERS_PER_LEVEL
 from turn_scheduler import TurnScheduler
 
 class Level:
 
-	def __init__(self, game, world_loc, level_file, creature_spawn_list):
+	def __init__(self, world_loc, level_file, creature_spawn_list):
 		self.modified_locations = set()
 		self.visited_locations = set()
 		self.turn_scheduler = TurnScheduler()
 		self.creatures = {}
-		self.g = game
 		self.world_loc = world_loc
 		self.rows = level_file.rows
 		self.cols = level_file.cols
@@ -30,7 +28,7 @@ class Level:
 		for mons_file in level_file.monster_files:
 			self.addcreature(Creature(mons_file))
 
-		for x in range(100):
+		for x in range(MONSTERS_PER_LEVEL):
 			self.spawn_random_creature()
 
 	def get_passage_loc(self, passage):
