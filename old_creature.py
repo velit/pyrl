@@ -1,3 +1,24 @@
+# old player
+
+#def attack(self, creature):
+#	attack_succeeds, damage = self._attack(creature)
+#	if attack_succeeds:
+#		if damage > 0:
+#			io.msg("You hit the {} for {} damage.".format(creature.name, damage))
+#			creature.lose_hp(damage)
+#		else:
+#			io.msg("You fail to hurt the {}.".format(creature.name))
+#	else:
+#		io.msg("You miss the {}.".format(creature.name))
+
+#def die(self):
+#	io.sel_getch("You die... [more]", char_list=DEFAULT)
+#	self.g.endgame(False)
+
+
+
+# old creatures
+
 #def attack(self, creature):
 #	attack_succeeds, damage = self._attack(creature)
 #	if attack_succeeds:

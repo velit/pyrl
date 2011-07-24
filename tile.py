@@ -1,4 +1,5 @@
 from char import Char
+from const.game import OPTIMIZATION
 
 
 class Tile:

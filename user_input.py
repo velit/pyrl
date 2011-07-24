@@ -36,7 +36,6 @@ class UserInput:
 			ord('>'): ("enter", (PASSAGE_DOWN, ), no_kwds),
 			ord('H'): ("los_highlight", no_args, no_kwds),
 			ord('K'): ("killall", no_args, no_kwds),
-			ord('L'): ("loadgame", no_args, no_kwds),
 			ord('Q'): ("endgame", no_args, no_kwds),
 			ord('S'): ("savegame", no_args, no_kwds),
 			ord('d'): ("debug", no_args, no_kwds),
@@ -45,16 +44,14 @@ class UserInput:
 		}
 
 	def get_and_act(self, game, level, creature):
-		while True:
-			c = io.getch(*level.get_coord(creature.loc))
-			if c in self.actions:
-				if self.execute_action(game, level, creature, self.actions[c]):
-					break
+		c = io.getch(*level.get_coord(creature.loc))
+		if c in self.actions:
+			return self.execute_action(game, level, creature, self.actions[c])
+		else:
+			if 0 < c < 256:
+				io.msg("Undefined key: '{}'".format(chr(c)))
 			else:
-				if 0 < c < 256:
-					io.msg("Undefined command: '{}'".format(chr(c)))
-				else:
-					io.msg("Undefined command key: {}".format(c))
+				io.msg("Undefined key: {}".format(c))
 
 	def execute_action(self, game, level, creature, act):
 		function, args, keywords = act
@@ -75,8 +72,12 @@ def z_command(game, level, creature):
 		game.savegame(ask=False)
 
 def killall(game, level, creature):
+	for loc in tuple(level.creatures):
+		if loc == creature.loc:
+			continue
+		else:
+			level.removecreature(loc)
 	io.msg("Abrakadabra.")
-	level.killall()
 	return True
 
 def endgame(game, level, creature, *a, **k):
@@ -84,9 +85,6 @@ def endgame(game, level, creature, *a, **k):
 
 def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
-
-def loadgame(game, level, creature, *a, **k):
-	game.loadgame(*a, **k)
 
 def debug(game, level, creature):
 	io.clear_level_buffer()
@@ -98,11 +96,7 @@ def redraw_view(game, level, creature):
 	game.redraw()
 
 def los_highlight(game, level, creature):
-	if game.reverse == "":
-		game.reverse = "r"
-	elif game.reverse == "r":
-		game.reverse = ""
-	game.draw()
+	game.reverse = not game.reverse
 
 def enter(game, level, creature, passage):
 	loc = game.player.loc
@@ -117,5 +111,7 @@ def enter(game, level, creature, passage):
 		except KeyError:
 			io.msg("This level doesn't seem to have a corresponding passage.")
 		else:
+			if not level.passable(new_loc):
+				level.removecreature(new_loc)
 			level.movecreature(game.player, new_loc)
 	return True

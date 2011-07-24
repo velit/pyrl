@@ -16,21 +16,20 @@ from const.game import PASSAGE_UP, PASSAGE_DOWN
 
 class Game:
 
-	def __init__(self, main):
+	def __init__(self):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 
-		self.reverse = ""
-		self.main = main
+		self.reverse = False
 		self.turn_counter = 0
-
+		self.user_input = UserInput()
 		self.old_visibility = set()
 		self.levels = {}
 		self.world_file = WorldFile()
 		self.player = Player()
+
 		self.init_new_level(FIRST_LEVEL)
 		self.cur_level = self.levels[FIRST_LEVEL]
 		self.cur_level.addcreature(self.player)
-		self.user_input = UserInput()
 		self.register_status_texts()
 
 	def register_status_texts(self):
@@ -61,7 +60,7 @@ class Game:
 		except KeyError:
 			self.init_new_level(world_loc)
 			self.cur_level = self.levels[world_loc]
-		old_level.removecreature(self.player)
+		old_level.removecreature(self.player.loc)
 		self.cur_level.addcreature(self.player, self.cur_level.get_passage_loc(passage))
 		self.redraw()
 
@@ -74,8 +73,11 @@ class Game:
 	def play(self):
 		creature = self.cur_level.turn_scheduler.get()
 		if creature == self.player:
-			self.draw()
-			self.user_input.get_and_act(self, self.cur_level, self.player)
+			while True:
+				self.draw()
+				took_action = self.user_input.get_and_act(self, self.cur_level, self.player)
+				if took_action:
+					break
 		self.turn_counter += 1
 
 	def endgame(self, ask=False):
@@ -96,17 +98,6 @@ class Game:
 		elif io.sel_getch("Do you wish to save the game? [y/N]") in YES:
 			self._save()
 
-	def loadgame(self, ask=False):
-		if ask:
-			if io.sel_getch("Do you wish to load the game? [y/N]") in YES:
-				self.main.load()
-		else:
-			self.main.load()
-			assert False
-
-	def _drawmemory(self, level):
-		io.clearlos(level.visited_locations, level)
-
 	def draw(self):
 		level, creature = self.cur_level, self.player
 		self.update_view(level, creature)
@@ -122,12 +113,18 @@ class Game:
 		new = get_light_set(level.see_through, level.get_coord(creature.loc), creature.stat.sight, level.cols)
 		mod = level.pop_modified_locs()
 		level.update_visited_locs(new - old)
-		io.clearlos(old - new, level)
-		io.drawlos(new - (old - mod), level, self.reverse)
+
+		out_of_sight_memory_data = level.get_memory_data(old - new)
+		io.level_draw(out_of_sight_memory_data)
+
+		new_visible_data = level.get_visible_data(new - (old - mod))
+		io.level_draw(new_visible_data, self.reverse)
+
 		self.old_visibility = new
 
 	def redraw_view(self, level, creature):
 		io.clear_level_buffer()
 		self.old_visibility.clear()
-		self._drawmemory(level)
+		memory_data = level.get_memory_data(level.visited_locations)
+		io.level_draw(memory_data)
 		self.update_view(level, creature)

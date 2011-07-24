@@ -14,7 +14,7 @@ class Main:
 		if load:
 			self.load()
 		else:
-			self.game = Game(self)
+			self.game = Game()
 
 	def start(self):
 		while True:
@@ -28,7 +28,7 @@ class Main:
 
 
 def wrap(w):
-	load = (len(sys.argv) == 2 and sys.argv[1] == "-l")
+	load = (len(sys.argv) == 2 and sys.argv[1] == "load")
 	m = Main(w, load)
 	m.start()
 
