@@ -4,7 +4,7 @@ import pickle
 from pio import io
 from player import Player
 from level import Level
-from input_interpretation import get_input_and_act
+from user_input import UserInput
 from fov import get_light_set
 from world_file import WorldFile
 
@@ -30,6 +30,7 @@ class Game:
 		self.init_new_level(FIRST_LEVEL)
 		self.cur_level = self.levels[FIRST_LEVEL]
 		self.cur_level.addcreature(self.player)
+		self.user_input = UserInput()
 		self.register_status_texts()
 
 	def register_status_texts(self):
@@ -74,32 +75,34 @@ class Game:
 		creature = self.cur_level.turn_scheduler.get()
 		if creature == self.player:
 			self.draw()
-			get_input_and_act(self, self.cur_level, self.player)
+			self.user_input.get_and_act(self, self.cur_level, self.player)
 		self.turn_counter += 1
 
-	def endgame(self, ask=True):
+	def endgame(self, ask=False):
 		if not ask:
 			exit()
 		if io.sel_getch("Do you wish to end the game? [y/N]") in YES:
 			exit()
 
 	def _save(self):
-		with open(os.path.join("data", "pyrl.svg"), "wb") as f:
+		path = os.path.join("data", "pyrl.svg")
+		with open(path, "wb") as f:
 			pickle.dump(self, f)
+		io.msg("Savegame file size: {} bytes".format(os.path.getsize(path)))
 
-	def savegame(self, ask=True):
+	def savegame(self, ask=False):
 		if not ask:
 			self._save()
-			self.endgame(False)
 		elif io.sel_getch("Do you wish to save the game? [y/N]") in YES:
 			self._save()
-			self.endgame(True)
 
-	def loadgame(self, ask=True):
-		if not ask:
+	def loadgame(self, ask=False):
+		if ask:
+			if io.sel_getch("Do you wish to load the game? [y/N]") in YES:
+				self.main.load()
+		else:
 			self.main.load()
-		if io.sel_getch("Do you wish to load the game? [y/N]") in YES:
-			self.main.load()
+			assert False
 
 	def _drawmemory(self, level):
 		io.clearlos(level.visited_locations, level)

@@ -23,8 +23,8 @@ class Main:
 	def load(self):
 		with open(os.path.join("data", "pyrl.svg"), "rb") as f:
 			self.game = pickle.load(f)
+			self.game.register_status_texts()
 			self.game.redraw()
-			self.game.p.register_status_texts()
 
 
 def wrap(w):
