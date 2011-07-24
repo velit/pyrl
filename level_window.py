@@ -13,7 +13,11 @@ class LevelWindow(Window):
 		super().__init__(window)
 
 	def addch(self, loc, cols, char):
-		self.w.addch(loc // cols, loc % cols, char[0], colors.d[char[1]])
+		self.w.addch(loc // cols, loc % cols, char[0], colors.CURSES_COLOR[char[1]])
+
+	def draw(self, seq, cols):
+		for y, x, symbol, color in seq:
+			self.addch(y, x, symbol, color)
 
 	def drawlevel(self, level):
 		self.w.move(0, 0)

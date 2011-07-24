@@ -31,8 +31,8 @@ actions = {
 	ord('n'): ("act_to_dir", (dirs.SW, ), no_kwds),
 	ord('u'): ("act_to_dir", (dirs.NW, ), no_kwds),
 	ord('p'): ("path", no_args, no_kwds),
-	ord('<'): ("ascend", no_args, no_kwds),
-	ord('>'): ("descend", no_args, no_kwds),
+	ord('<'): ("enter", (PASSAGE_UP, ), no_kwds),
+	ord('>'): ("enter", (PASSAGE_DOWN, ), no_kwds),
 	ord('H'): ("los_highlight", no_args, no_kwds),
 	ord('K'): ("killall", no_args, no_kwds),
 	ord('L'): ("loadgame", no_args, no_kwds),
@@ -44,11 +44,11 @@ actions = {
 }
 del no_kwds, no_args
 
-def get_input_and_act(game):
+def get_input_and_act(game, level, creature):
 	while True:
-		c = io.getch(*game.player.get_coord())
+		c = io.getch(*level.get_coord(creature.loc))
 		if c in actions:
-			if execute_action(game, actions[c]):
+			if execute_action(game, level, creature, actions[c]):
 				break
 		else:
 			if 0 < c < 256:
@@ -56,6 +56,6 @@ def get_input_and_act(game):
 			else:
 				io.msg("Undefined command key: {}".format(c))
 
-def execute_action(game, act):
+def execute_action(game, level, creature, act):
 	function, args, keywords = act
-	return getattr(input_functions, function)(game, *args, **keywords)
+	return getattr(input_functions, function)(game, level, creature, *args, **keywords)
