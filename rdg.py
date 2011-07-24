@@ -33,7 +33,7 @@ def add_staircase_up(level_file):
 		y, x = get_free_coord(level_file)
 		g = level_file.get_tile_id
 		if g(y - 1, x) == F and g(y + 1, x) == F \
-				and g(y, x - 1) == F and g(y, x + 1) == F:
+				and g(y, x - 1) == F and g(y, x + 1) == F and g(y, x) == F:
 			break
 
 	level_file.set_tile_id(y, x, US)
@@ -44,7 +44,7 @@ def add_staircase_down(level_file):
 		y, x = get_free_coord(level_file)
 		g = level_file.get_tile_id
 		if g(y - 1, x) == F and g(y + 1, x) == F and \
-				g(y, x - 1) == F and g(y, x + 1) == F:
+				g(y, x - 1) == F and g(y, x + 1) == F and g(y, x) == F:
 			break
 
 	level_file.set_tile_id(y, x, DS)
