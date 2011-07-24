@@ -1,10 +1,10 @@
 import curses
 from const.colors import *
 
-d = {}
-
+CURSES_COLOR = {}
 
 def init_colors():
+	d = CURSES_COLOR
 	for x in range(7):
 		curses.init_pair(x + 1, x, 0)
 

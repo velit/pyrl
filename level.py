@@ -12,6 +12,8 @@ from turn_scheduler import TurnScheduler
 class Level:
 
 	def __init__(self, game, world_loc, level_file, creature_spawn_list):
+		self.modified_locations = set()
+		self.visited_locations = set()
 		self.turn_scheduler = TurnScheduler()
 		self.creatures = {}
 		self.g = game
@@ -25,11 +27,11 @@ class Level:
 		self.tiles = level_file.get_tilemap()
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
-		for mons_file in level_file.monster_files:
-			self.addcreature(Monster(self.g, mons_file))
+		#for mons_file in level_file.monster_files:
+		#	self.addcreature(Monster(mons_file))
 
-		for x in range(100):
-			self.spawn_random_creature()
+		#for x in range(100):
+		#	self.spawn_random_creature()
 
 	def get_passage_loc(self, passage):
 		if passage == PASSAGE_RANDOM:
@@ -94,30 +96,27 @@ class Level:
 		io.drawmemory(self)
 
 	def spawn_random_creature(self):
-		self.addcreature(Monster(self.g, choice(self.creature_spawn_list)))
+		self.addcreature(Monster(choice(self.creature_spawn_list)))
 
 	def addcreature(self, creature, loc=None):
 		if loc is None:
 			loc = self.get_free_loc()
 		self.creatures[loc] = creature
-		creature.loc = loc
 		self.turn_scheduler.add(creature)
-		self.g.player.turn_visibility.discard(loc)
-		if self.world_loc not in creature.level_memory:
-			creature.level_memory[self.world_loc] = set()
+		self.modified_locations.add(loc)
+		creature.loc = loc
 
 	def removecreature(self, creature):
 		loc = creature.loc
 		del self.creatures[loc]
 		self.turn_scheduler.remove(creature)
-		self.g.player.turn_visibility.discard(loc)
+		self.modified_locations.add(loc)
 		creature.loc = None
 
 	def _movecreature(self, creature, new_loc):
-		old_loc = creature.loc
-		self.g.player.turn_mod.add(old_loc)
-		self.g.player.turn_mod.add(new_loc)
-		del self.creatures[old_loc]
+		self.modified_locations.add(creature.loc)
+		self.modified_locations.add(new_loc)
+		del self.creatures[creature.loc]
 		self.creatures[new_loc] = creature
 		creature.loc = new_loc
 
@@ -139,7 +138,15 @@ class Level:
 		creatures = self.turn_scheduler.get_actor_set()
 		creatures.remove(self.g.player)
 		for c in creatures:
-			c.die()
+			self.removecreature(c)
+
+	def pop_modified_locs(self):
+		mod_locs = self.modified_locations
+		self.modified_locations = set()
+		return mod_locs
+
+	def update_visited_locs(self, locations):
+		self.visited_locations |= locations
 
 	#def neighbor_nodes(self, y, x):
 	#	for j in range(y - 1, y + 2):

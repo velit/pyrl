@@ -21,14 +21,18 @@ class Window:
 	def update(self):
 		self.w.noutrefresh()
 
-	def addch(self, *args):
-		if len(args) == 4 or len(args) == 2:
-			self.w.addch(*(args[:-1] + (colors.d[args[-1]],)))
+	def addch(self, *a, **k):
+		if len(a) == 4:
+			y, x, symbol, col = a
+			self.w.addch(y, x, symbol, colors.CURSES_COLOR[col])
+		elif len(a) == 2:
+			symbol, col = a
+			self.w.addch(symbol, colors.CURSES_COLOR[col])
 		else:
-			self.w.addch(*args)
+			self.w.addch(*a, **k)
 
-	def getch(self, *args):
-		return self.w.getch(*args)
+	def getch(self, *a, **k):
+		return self.w.getch(*a, **k)
 
 	def gety(self):
 		return self.w.getyx()[0]
@@ -110,11 +114,11 @@ class Window:
 		self.update()
 		curses.doupdate()
 
-	def addstr(self, *args, **keys):
-		if len(args) == 4 or len(args) == 2:
-			self.w.addstr(*(args[:-1] + (colors.d[args[-1]],)))
+	def addstr(self, *a, **k):
+		if len(a) == 4 or len(a) == 2:
+			self.w.addstr(*(a[:-1] + (colors.d[a[-1]],)))
 		else:
-			self.w.addstr(*args, **keys)
+			self.w.addstr(*a, **k)
 
 	def wrap_print(self, words):
 		self.clear()
@@ -147,8 +151,8 @@ class Window:
 					self.clear()
 		self.msgqueue = ""
 
-	def draw_menu(self, *args, **keys):
-		return menu.draw(self, *args, **keys)
+	def draw_menu(self, *a, **k):
+		return menu.draw(self, *a, **k)
 
-	def draw_h_menu(self, *args, **keys):
-		return menu_h.draw(self, *args, **keys)
+	def draw_h_menu(self, *a, **k):
+		return menu_h.draw(self, *a, **k)

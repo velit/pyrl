@@ -47,7 +47,7 @@ class _IO:
 			self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
 		self.a = Window(self.w)
 
-	def clear_level(self, *a, **k):
+	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
 
 	def clearlos(self, *a, **k):

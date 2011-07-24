@@ -1,82 +1,62 @@
 from pio import io
-from const.game import PASSAGE_UP, PASSAGE_DOWN
+from const.game import PASSAGE_UP, PASSAGE_DOWN, PyrlException
 
-def act_to_dir(game, direction):
-	if game.cur_level.move_creature_to_dir(game.player, direction):
+def act_to_dir(game, level, creature, direction):
+	if level.move_creature_to_dir(game.player, direction):
 		return True
 	else:
 		io.msg("You can't move there.")
 		return False
 
-def z_command(game):
+def z_command(game, level, creature):
 	c = io.getch()
 	if c == ord('Q'):
 		game.endgame(ask=False)
 	elif c == ord('Z'):
 		game.savegame(ask=False)
 
-def killall(game):
+def killall(game, level, creature):
 	io.msg("Abrakadabra.")
-	game.cur_level.killall()
+	level.killall()
 	return True
 
-def endgame(game, *a, **k):
+def endgame(game, level, creature, *a, **k):
 	game.endgame(*a, **k)
 
-def savegame(game, *a, **k):
+def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
-def loadgame(game, *a, **k):
+def loadgame(game, level, creature, *a, **k):
 	game.loadgame(*a, **k)
 
-def debug(game):
-	io.msg((game.player.loc, game.cur_level.passable(game.player.loc)))
+def debug(game, level, creature):
+	io.clear_level_buffer()
 
-def path(game):
+def path(game, level, creature):
 	io.msg("Shhhhhhh. Everything will be all right.")
 
-def redraw_view(game):
-	game.redraw()
-	game.cur_level.draw()
-
-def los_highlight(game):
-	if game.player.reverse == "":
-		game.player.reverse = "r"
-	elif game.player.reverse == "r":
-		game.player.reverse = ""
+def redraw_view(game, level, creature):
 	game.redraw()
 
-def descend(game):
-	loc = game.player.loc
-	l = game.cur_level
-	if l.isexit(loc) and l.getexit(loc) == PASSAGE_DOWN:
-		game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
-		#try:
-		#	game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
-		#except KeyError:
-		#	io.msg("This passage doesn't seem to lead anywhere.")
-	else:
-		try:
-			new_loc = game.cur_level.get_passage_loc(PASSAGE_DOWN)
-		except KeyError:
-			io.msg("This level doesn't seem to have a downward passage.")
-		else:
-			game.cur_level.movecreature(game.player, new_loc)
-	return True
+def los_highlight(game, level, creature):
+	if game.reverse == "":
+		game.reverse = "r"
+	elif game.reverse == "r":
+		game.reverse = ""
+	game.draw()
 
-def ascend(game):
+def enter(game, level, creature, passage):
 	loc = game.player.loc
-	l = game.cur_level
-	if l.isexit(loc) and l.getexit(loc) == PASSAGE_UP:
+	if level.isexit(loc) and level.getexit(loc) == passage:
 		try:
-			game.enter_passage(game.cur_level.world_loc, l.getexit(loc))
-		except KeyError:
+			game.enter_passage(level.world_loc, level.getexit(loc))
+		except PyrlException:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:
-			new_loc = game.cur_level.get_passage_loc(PASSAGE_UP)
+			new_loc = level.get_passage_loc(passage)
 		except KeyError:
-			io.msg("This level doesn't seem to have a downward passage.")
+			io.msg("This level doesn't seem to have a corresponding passage.")
 		else:
-			game.cur_level.movecreature(game.player, new_loc)
+			level.movecreature(game.player, new_loc)
 	return True

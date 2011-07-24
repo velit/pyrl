@@ -5,7 +5,9 @@ from pio import io
 from player import Player
 from level import Level
 from input_interpretation import get_input_and_act
+from fov import get_light_set
 from world_file import WorldFile
+
 from const.game import DEBUG, YES
 from const.game import DUNGEON, FIRST_LEVEL
 from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
@@ -17,15 +19,28 @@ class Game:
 	def __init__(self, main):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 
+		self.reverse = ""
 		self.main = main
 		self.turn_counter = 0
 
+		self.old_visibility = set()
 		self.levels = {}
 		self.world_file = WorldFile()
-		self.player = Player(self)
+		self.player = Player()
 		self.init_new_level(FIRST_LEVEL)
 		self.cur_level = self.levels[FIRST_LEVEL]
 		self.cur_level.addcreature(self.player)
+		self.register_status_texts()
+
+	def register_status_texts(self):
+		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format( *self.player.stat.get_damage_info()))
+		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.stat.max_hp))
+		io.s.add_element("sight", "sight: ", lambda: self.player.stat.sight)
+		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
+		io.s.add_element("loc", "Loc: ", lambda:self.cur_level.world_loc)
+		io.s.add_element("ar", "AR: ", lambda: self.player.stat.ar)
+		io.s.add_element("dr", "DR: ", lambda: self.player.stat.dr)
+		io.s.add_element("pv", "PV: ", lambda: self.player.stat.pv)
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
@@ -39,17 +54,18 @@ class Game:
 				self.change_level((d, i + 1), PASSAGE_UP)
 
 	def change_level(self, world_loc, passage):
-		self.cur_level.removecreature(self.player)
+		old_level = self.cur_level
 		try:
 			self.cur_level = self.levels[world_loc]
 		except KeyError:
 			self.init_new_level(world_loc)
 			self.cur_level = self.levels[world_loc]
+		old_level.removecreature(self.player)
 		self.cur_level.addcreature(self.player, self.cur_level.get_passage_loc(passage))
 		self.redraw()
 
 	def init_new_level(self, world_loc):
-		level_file = self.world_file.get_level_file(*world_loc)
+		level_file = self.world_file.get_level_file(world_loc)
 		danger_level = level_file.danger_level
 		level_monster_list = self.world_file.get_level_monster_list(danger_level)
 		self.levels[world_loc] = Level(self, world_loc, level_file, level_monster_list)
@@ -57,8 +73,8 @@ class Game:
 	def play(self):
 		creature = self.cur_level.turn_scheduler.get()
 		if creature == self.player:
-			creature.update_view()
-			get_input_and_act(self)
+			self.draw()
+			get_input_and_act(self, self.cur_level, self.player)
 		self.turn_counter += 1
 
 	def endgame(self, ask=True):
@@ -85,5 +101,30 @@ class Game:
 		if io.sel_getch("Do you wish to load the game? [y/N]") in YES:
 			self.main.load()
 
+	def _drawmemory(self, level):
+		io.clearlos(level.visited_locations, level)
+
+	def draw(self):
+		level, creature = self.cur_level, self.player
+		self.update_view(level, creature)
+		#io.drawlevel(level)
+
 	def redraw(self):
-		self.player.redraw_view()
+		level, creature = self.cur_level, self.player
+		self.redraw_view(level, creature)
+		#io.drawlevel(level)
+
+	def update_view(self, level, creature):
+		old = self.old_visibility
+		new = get_light_set(level.see_through, level.get_coord(creature.loc), creature.stat.sight, level.cols)
+		mod = level.pop_modified_locs()
+		level.update_visited_locs(new - old)
+		io.clearlos(old - new, level)
+		io.drawlos(new - (old - mod), level, self.reverse)
+		self.old_visibility = new
+
+	def redraw_view(self, level, creature):
+		io.clear_level_buffer()
+		self.old_visibility.clear()
+		self._drawmemory(level)
+		self.update_view(level, creature)

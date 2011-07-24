@@ -30,3 +30,5 @@ YES = set(map(ord, "yY"))
 NO = set(map(ord, "nN"))
 DEFAULT = set(map(ord, " \n"))
 MOVES = set(map(ord, "123456790."))
+
+class PyrlException(Exception): pass
