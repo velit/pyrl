@@ -58,7 +58,26 @@ class UserInput:
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def act_to_dir(game, level, creature, direction):
-	if level.move_creature_to_dir(game.player, direction):
+	if direction == dirs.STOP:
+		return True
+	target_loc = level.get_relative_loc(creature.loc, direction)
+	if level.move_creature(creature, target_loc):
+		return True
+	elif level.has_creature(target_loc):
+		attack_succeeds, name, dies, damage = level.creature_attack(creature, target_loc)
+		if attack_succeeds:
+			if damage > 0:
+				if dies:
+					io.msg("You hit the {} for {} damage and kill it.".format(name, damage))
+				else:
+					io.msg("You hit the {} for {} damage.".format(name, damage))
+			else:
+				if dies:
+					io.msg("You fail to hur the {}. The {} suddenly collapses!".format(name, name))
+				else:
+					io.msg("You fail to hurt the {}.".format(name))
+		else:
+			io.msg("You miss the {}.".format(name))
 		return True
 	else:
 		io.msg("You can't move there.")
@@ -76,7 +95,7 @@ def killall(game, level, creature):
 		if loc == creature.loc:
 			continue
 		else:
-			level.removecreature(loc)
+			level.remove_creature(loc)
 	io.msg("Abrakadabra.")
 	return True
 
@@ -100,9 +119,9 @@ def los_highlight(game, level, creature):
 
 def enter(game, level, creature, passage):
 	loc = game.player.loc
-	if level.isexit(loc) and level.getexit(loc) == passage:
+	if level.is_exit(loc) and level.get_exit(loc) == passage:
 		try:
-			game.enter_passage(level.world_loc, level.getexit(loc))
+			game.enter_passage(level.world_loc, level.get_exit(loc))
 		except PyrlException:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
@@ -111,7 +130,7 @@ def enter(game, level, creature, passage):
 		except KeyError:
 			io.msg("This level doesn't seem to have a corresponding passage.")
 		else:
-			if not level.passable(new_loc):
-				level.removecreature(new_loc)
-			level.movecreature(game.player, new_loc)
+			if not level.is_passable(new_loc):
+				level.remove_creature(new_loc)
+			level.move_creature(game.player, new_loc)
 	return True

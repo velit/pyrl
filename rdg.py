@@ -22,7 +22,7 @@ def add_generated_tilefile(level_file):
 def get_free_coord(level_file):
 	while True:
 		y, x = get_random_coord(level_file)
-		if level_file.get_tile_from_coord(y, x).passable:
+		if level_file.get_tile_from_coord(y, x).is_passable:
 			return y, x
 
 def get_random_coord(level_file):

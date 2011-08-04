@@ -17,7 +17,7 @@ class WorldFile:
 		for x in range(LEVELS_PER_DUNGEON):
 			self.add_level_file(DUNGEON)
 		d0 = self.get_level_file((DUNGEON, 0))
-		d0.add_monster_file(MonsterFile("The Crone", 50, Char('@', "purple")))
+		d0.add_monster_file(MonsterFile("The Crone", Char('@', "purple")))
 
 		for m in monster_files:
 			self.add_monster_file(m)

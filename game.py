@@ -29,7 +29,7 @@ class Game:
 
 		self.init_new_level(FIRST_LEVEL)
 		self.cur_level = self.levels[FIRST_LEVEL]
-		self.cur_level.addcreature(self.player)
+		self.cur_level.add_creature(self.player)
 		self.register_status_texts()
 
 	def register_status_texts(self):
@@ -60,8 +60,8 @@ class Game:
 		except KeyError:
 			self.init_new_level(world_loc)
 			self.cur_level = self.levels[world_loc]
-		old_level.removecreature(self.player.loc)
-		self.cur_level.addcreature(self.player, self.cur_level.get_passage_loc(passage))
+		old_level.remove_creature(self.player.loc)
+		self.cur_level.add_creature(self.player, self.cur_level.get_passage_loc(passage))
 		self.redraw()
 
 	def init_new_level(self, world_loc):
@@ -98,27 +98,35 @@ class Game:
 		elif io.sel_getch("Do you wish to save the game? [y/N]") in YES:
 			self._save()
 
+	use_vision = True
+	#use_vision = False
 	def draw(self):
 		level, creature = self.cur_level, self.player
-		self.update_view(level, creature)
-		#io.drawlevel(level)
+		if self.use_vision:
+			self.update_view(level, creature)
+		else:
+			data = level.get_visible_data(level.get_loc_iter())
+			io.draw(data)
 
 	def redraw(self):
 		level, creature = self.cur_level, self.player
-		self.redraw_view(level, creature)
-		#io.drawlevel(level)
+		if self.use_vision:
+			self.redraw_view(level, creature)
+		else:
+			data = level.get_visible_data(level.get_loc_iter())
+			io.draw(data)
 
 	def update_view(self, level, creature):
 		old = self.old_visibility
-		new = get_light_set(level.see_through, level.get_coord(creature.loc), creature.sight, level.cols)
+		new = get_light_set(level.is_see_through, level.get_coord(creature.loc), creature.sight, level.cols)
 		mod = level.pop_modified_locs()
 		level.update_visited_locs(new - old)
 
 		out_of_sight_memory_data = level.get_memory_data(old - new)
-		io.level_draw(out_of_sight_memory_data)
+		io.draw(out_of_sight_memory_data)
 
 		new_visible_data = level.get_visible_data(new - (old - mod))
-		io.level_draw(new_visible_data, self.reverse)
+		io.draw(new_visible_data, self.reverse)
 
 		self.old_visibility = new
 
@@ -126,5 +134,5 @@ class Game:
 		io.clear_level_buffer()
 		self.old_visibility.clear()
 		memory_data = level.get_memory_data(level.visited_locations)
-		io.level_draw(memory_data)
+		io.draw(memory_data)
 		self.update_view(level, creature)
