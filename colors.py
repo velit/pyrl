@@ -8,13 +8,11 @@ def init_colors():
 	for x in range(7):
 		curses.init_pair(x + 1, x, 0)
 
-	d[BROWN] = curses.color_pair(4) | curses.A_DIM
-
 	d[GREY] = curses.color_pair(0)
 	d[BLACK_ON_BLACK] = curses.color_pair(1)
 	d[RED] = curses.color_pair(2)
 	d[GREEN] = curses.color_pair(3)
-	d[YELLOW] = curses.color_pair(4)
+	d[BROWN] = curses.color_pair(4)
 	d[BLUE] = curses.color_pair(5)
 	d[PURPLE] = curses.color_pair(6)
 	d[CYAN] = curses.color_pair(7)
@@ -23,7 +21,7 @@ def init_colors():
 	d[BLACK] = curses.color_pair(1) | curses.A_BOLD
 	d[LIGHT_RED] = curses.color_pair(2) | curses.A_BOLD
 	d[LIGHT_GREEN] = curses.color_pair(3) | curses.A_BOLD
-	d[LIGHT_YELLOW] = curses.color_pair(4) | curses.A_BOLD
+	d[YELLOW] = curses.color_pair(4) | curses.A_BOLD
 	d[LIGHT_BLUE] = curses.color_pair(5) | curses.A_BOLD
 	d[LIGHT_PURPLE] = curses.color_pair(6) | curses.A_BOLD
 	d[LIGHT_CYAN] = curses.color_pair(7) | curses.A_BOLD
