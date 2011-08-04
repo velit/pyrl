@@ -29,6 +29,11 @@ class Creature:
 		addition = self.dmg_bonus
 		return dice, sides, addition
 
+	def lose_hp(self, amount):
+		if amount > 0:
+			self.hp -= amount
+		return self.hp <= 0
+
 	@property
 	def sight(self):
 		return 6 + (self.per - 10) // 2

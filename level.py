@@ -7,6 +7,7 @@ from bresenham import bresenham
 from creature import Creature
 from const.game import PASSAGE_RANDOM, MONSTERS_PER_LEVEL
 from turn_scheduler import TurnScheduler
+from combat import get_melee_attack
 
 class Level:
 
@@ -26,10 +27,54 @@ class Level:
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
 		for mons_file in level_file.monster_files:
-			self.addcreature(Creature(mons_file))
+			self.add_creature(Creature(mons_file))
 
 		for x in range(MONSTERS_PER_LEVEL):
-			self.spawn_random_creature()
+			self._spawn_random_creature()
+
+	def _get_free_loc(self):
+		while True:
+			loc = self._get_random_loc()
+			if self.is_passable(loc):
+				return loc
+
+	def _get_random_loc(self):
+		return randrange(len(self.tiles))
+
+	def _get_visible_char(self, loc):
+		if loc in self.creatures:
+			return self.creatures[loc].char
+		else:
+			return self.tiles[loc].visible_char
+
+	def _get_loc(self, y, x):
+		return y * self.cols + x
+
+	def _legal_loc(self, loc):
+		return 0 <= loc < self.rows * self.cols
+
+	def _spawn_random_creature(self):
+		self.add_creature(Creature(choice(self.creature_spawn_list)))
+
+	def get_exit(self, loc):
+		return self.tiles[loc].exit_point
+
+	def get_coord(self, loc):
+		return loc // self.cols, loc % self.cols
+
+	def get_relative_loc(self, loc, direction):
+		return loc + self._get_loc(*dirs.DELTA[direction])
+
+	def get_loc_iter(self):
+		return range(len(self.tiles))
+
+	def get_visible_data(self, location_set):
+		for loc in location_set:
+			yield loc // self.cols, loc % self.cols, self._get_visible_char(loc)
+
+	def get_memory_data(self, location_set):
+		for loc in location_set:
+			yield loc // self.cols, loc % self.cols, self.tiles[loc].memory_char
 
 	def get_passage_loc(self, passage):
 		if passage == PASSAGE_RANDOM:
@@ -37,103 +82,60 @@ class Level:
 		else:
 			return self.passage_locations[passage]
 
-	def get_free_loc(self):
-		while True:
-			loc = self.get_random_loc()
-			if self.passable(loc):
-				return loc
+	def has_creature(self, loc):
+		return loc in self.creatures
 
-	def get_random_loc(self):
-		return randrange(len(self.tiles))
-
-	def get_creature(self, loc):
-		return self.creatures[loc]
-
-	def passable(self, loc):
+	def is_passable(self, loc):
 		if loc in self.creatures:
 			return False
 		else:
-			return self.tiles[loc].passable
+			return self.tiles[loc].is_passable
 
-	def see_through(self, loc):
-		return self.tiles[loc].see_through
+	def is_see_through(self, loc):
+		return self.tiles[loc].is_see_through
 
-	def get_loc_iterator(self):
-		return range(len(self.tiles))
-
-	def get_visible_data(self, location_set):
-		for loc in location_set:
-			yield loc // self.cols, loc % self.cols, self.get_visible_char(loc)
-
-	def get_memory_data(self, location_set):
-		for loc in location_set:
-			yield loc // self.cols, loc % self.cols, self.get_memory_char(loc)
-
-	def get_visible_char(self, loc):
-		if loc in self.creatures:
-			return self.creatures[loc].char
-		else:
-			return self.tiles[loc].visible_char
-
-	def get_memory_char(self, loc):
-		return self.tiles[loc].memory_char
-
-	def isexit(self, loc):
+	def is_exit(self, loc):
 		return self.tiles[loc].exit_point is not None
 
-	def getexit(self, loc):
-		return self.tiles[loc].exit_point
-
-	def legal_loc(self, loc):
-		return 0 <= loc < self.rows * self.cols
-
-	def get_loc(self, y, x):
-		return y * self.cols + x
-
-	def get_coord(self, loc):
-		return loc // self.cols, loc % self.cols
-
-	def get_relative_loc(self, loc, direction):
-		return loc + self.get_loc(*dirs.DELTA[direction])
-
-	def spawn_random_creature(self):
-		self.addcreature(Creature(choice(self.creature_spawn_list)))
-
-	def addcreature(self, creature, loc=None):
+	def add_creature(self, creature, loc=None):
 		if loc is None:
-			loc = self.get_free_loc()
+			loc = self._get_free_loc()
 		self.creatures[loc] = creature
 		self.turn_scheduler.add(creature)
 		self.modified_locations.add(loc)
 		creature.loc = loc
 
-	def removecreature(self, loc):
-		creature = self.get_creature(loc)
+	def remove_creature(self, loc):
+		creature = self.creatures[loc]
 		del self.creatures[loc]
 		self.turn_scheduler.remove(creature)
 		self.modified_locations.add(loc)
 		creature.loc = None
 
-	def _movecreature(self, creature, new_loc):
+	def _move_creature(self, creature, new_loc):
 		self.modified_locations.add(creature.loc)
 		self.modified_locations.add(new_loc)
 		del self.creatures[creature.loc]
 		self.creatures[new_loc] = creature
 		creature.loc = new_loc
 
-	def movecreature(self, creature, loc):
-		if self.legal_loc(loc):
-			if self.passable(loc):
-				self._movecreature(creature, loc)
+	def move_creature(self, creature, loc):
+		if self._legal_loc(loc):
+			if self.is_passable(loc):
+				self._move_creature(creature, loc)
 				return True
 		return False
 
-	def move_creature_to_dir(self, creature, direction):
-		if direction == dirs.STOP:
-			return True
+	def creature_attack(self, creature, target_loc):
+		target = self.creatures[target_loc]
+		attack_succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
+		if attack_succeeds:
+			dies = target.lose_hp(damage)
+			if dies:
+				self.remove_creature(target_loc)
+			return attack_succeeds, target.name, dies, damage
 		else:
-			loc = self.get_relative_loc(creature.loc, direction)
-			return self.movecreature(creature, loc)
+			return attack_succeeds, target.name, False, 0
 
 	def pop_modified_locs(self):
 		mod_locs = self.modified_locations
@@ -143,63 +145,11 @@ class Level:
 	def update_visited_locs(self, locations):
 		self.visited_locations |= locations
 
-	#def neighbor_nodes(self, y, x):
-	#	for j in range(y - 1, y + 2):
-	#		for i in range(x - 1, x + 2):
-	#			if not ((y == j and x == i) and self.legal_loc(y, x) and
-	#					self.getsquare(j, i).tile_passable()):
-	#				yield self.getsquare(j, i)
-
 	#def path(self, start, goal):
 	#	return path.path(start, goal, self)
-
-	#def get_closest_in_square(self, creature, radius):
-	#	y, x = self.square.y, self.square.x
-	#	for i in range(radius * 2):
-	#		c = self.getsquare(y - radius, x - radius + i).creature
-	#		if c:
-	#			return c
-	#		c = self.getsquare(y - radius + i, x + radius).creature
-	#		if c:
-	#			return c
-	#		c = self.getsquare(y + radius, x + radius - i).creature
-	#		if c:
-	#			return c
-	#		c = self.getsquare(y + radius - i, x - radius).creature
-	#		if c:
-	#			return c
-	#	else:
-	#		return False
-
-	#def get_closest_creatureFromArea(self, creature):
-	#	y, x = self.square.y, self.square.x
-	#	radius = min(self.rows - y, y, self.cols - x, x)
-	#	for i in range(1, radius):
-	#		c = self.get_closest_in_square(creature, i)
-	#		if c:
-	#			return c
-	#	else:
-	#		return False
-
-	#def get_closest_creature(self, target_creature):
-	#	tcreature_square = target_creature.square
-	#	ty, tx = tcreature_square.y, tcreature_square.x
-	#	best, cre = None, None
-	#	for creature in self.creatures:
-	#		creature_square = creature.square
-	#		y, x = creature_square.y, creature_square.x
-	#		a = (ty - y) ** 2 + (tx - x) ** 2
-	#		if a > 0:
-	#			if best is None:
-	#				best = a
-	#				cre = creature
-	#			elif a < best:
-	#				best = a
-	#				cre = creature
-	#	return cre
 
 	#def check_los(self, startSquare, targetsquare):
 	#	y0, x0 = startSquare.y, startSquare.x
 	#	y1, x1 = targetsquare.y, targetsquare.x
 	#	g = self.getsquare
-	#	return all(g(y, x).see_through() for y, x in bresenham(y0, x0, y1, x1))
+	#	return all(g(y, x).is_see_through() for y, x in bresenham(y0, x0, y1, x1))
