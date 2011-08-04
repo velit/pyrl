@@ -8,6 +8,8 @@ NW = 7
 NO = 8
 NE = 9
 
+ALL_DIRECTIONS = (SW, SO, SE, WE, EA, NW, NO, NE)
+
 UP = (NW, NO, NE)
 DOWN = (SW, SO, SE)
 LEFT = (SW, WE, NW)

@@ -53,6 +53,13 @@ class Level:
 	def _legal_loc(self, loc):
 		return 0 <= loc < self.rows * self.cols
 
+	def _make_coord_to_legal_loc(self, y, x):
+		if y < 0: y = 0
+		elif y >= self.rows: y = self.rows - 1
+		if x < 0: x = 0
+		elif x >= self.cols: x = self.cols - 1
+		return self._get_loc(y, x)
+
 	def _spawn_random_creature(self):
 		self.add_creature(Creature(choice(self.creature_spawn_list)))
 
@@ -63,7 +70,10 @@ class Level:
 		return loc // self.cols, loc % self.cols
 
 	def get_relative_loc(self, loc, direction):
-		return loc + self._get_loc(*dirs.DELTA[direction])
+		y, x = self.get_coord(loc)
+		dy, dx = dirs.DELTA[direction]
+		ny, nx = y + dy, x + dx
+		return self._make_coord_to_legal_loc(ny, nx)
 
 	def get_loc_iter(self):
 		return range(len(self.tiles))
@@ -145,11 +155,32 @@ class Level:
 	def update_visited_locs(self, locations):
 		self.visited_locations |= locations
 
+	def check_los(self, loc1, loc2):
+		y0, x0 = self.get_coord(loc1)
+		y1, x1 = self.get_coord(loc2)
+		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(y0, x0, y1, x1))
+
+	def get_information(self, loc):
+		if loc in self.visited_locations:
+			if self.has_creature(loc):
+				return self.creatures[loc].name
+			else:
+				return self.tiles[loc].name
+		else:
+			return "You don't know anything about this place."
+
+	def get_legal_neighbor_locs(self, loc):
+		pass
+
+	def get_pathable_neighbor_locs(self, loc):
+		for direction in dirs.ALL_DIRECTIONS:
+			neighbor_loc = self.get_relative_loc(loc, direction)
+			if self.is_passable(
+			yield 
+				if not ((y == j and x == i) and self.legal_loc(y, x) and self.getsquare(j, i).tile_passable()):
+
+	def get_passable_neighbor_locs(self, loc):
+		pass
+
 	#def path(self, start, goal):
 	#	return path.path(start, goal, self)
-
-	#def check_los(self, startSquare, targetsquare):
-	#	y0, x0 = startSquare.y, startSquare.x
-	#	y1, x1 = targetsquare.y, targetsquare.x
-	#	g = self.getsquare
-	#	return all(g(y, x).is_see_through() for y, x in bresenham(y0, x0, y1, x1))

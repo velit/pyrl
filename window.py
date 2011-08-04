@@ -21,15 +21,19 @@ class Window:
 	def update(self):
 		self.w.noutrefresh()
 
-	def addch(self, *a, **k):
-		if len(a) == 4:
-			y, x, symbol, col = a
-			self.w.addch(y, x, symbol, colors.CURSES_COLOR[col])
-		elif len(a) == 2:
-			symbol, col = a
-			self.w.addch(symbol, colors.CURSES_COLOR[col])
+	def addch(self, y, x, char):
+		symbol, color = char
+		if (y, x) == (self.rows - 1, self.cols - 1):
+			try:
+				self.w.addch(y, x, symbol, colors.CURSES_COLOR[color])
+			except curses.error:
+				pass
+			# Writing to the last cell of a window raises an exception because
+			# the automatic cursor move to the next cell is illegal, this is
+			# the only way to write to the last cell in the current wrapper
+			# according to my knowledge
 		else:
-			self.w.addch(*a, **k)
+			self.w.addch(y, x, symbol, colors.CURSES_COLOR[color])
 
 	def getch(self, *a, **k):
 		return self.w.getch(*a, **k)
