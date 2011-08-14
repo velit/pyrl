@@ -1,11 +1,14 @@
 import path
 import rdg
-import const.directions as dirs
+import const.directions as DIRS
+import const.game as CG
+import const.debug as D
 
+from pio import io
+from char import Char
 from random import randrange, choice
 from bresenham import bresenham
 from creature import Creature
-from const.game import PASSAGE_RANDOM, MONSTERS_PER_LEVEL
 from turn_scheduler import TurnScheduler
 from combat import get_melee_attack
 
@@ -22,14 +25,14 @@ class Level:
 		self.danger_level = level_file.danger_level
 		self.passage_locations = level_file.passage_locations
 		if level_file.tilefile is None:
-			rdg.add_generated_tilefile(level_file)
+			rdg.add_generated_tilefile(level_file, CG.LEVEL_TYPE)
 		self.tiles = level_file.get_tilemap()
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
 		for mons_file in level_file.monster_files:
 			self.add_creature(Creature(mons_file))
 
-		for x in range(MONSTERS_PER_LEVEL):
+		for x in range(CG.MONSTERS_PER_LEVEL):
 			self._spawn_random_creature()
 
 	def _get_free_loc(self):
@@ -50,15 +53,8 @@ class Level:
 	def _get_loc(self, y, x):
 		return y * self.cols + x
 
-	def _legal_loc(self, loc):
-		return 0 <= loc < self.rows * self.cols
-
-	def _make_coord_to_legal_loc(self, y, x):
-		if y < 0: y = 0
-		elif y >= self.rows: y = self.rows - 1
-		if x < 0: x = 0
-		elif x >= self.cols: x = self.cols - 1
-		return self._get_loc(y, x)
+	def _legal_loc(self, loc, dy=0, dx=0):
+		return 0 <= loc // self.cols + dy < self.rows and 0 <= loc % self.cols + dx < self.cols
 
 	def _spawn_random_creature(self):
 		self.add_creature(Creature(choice(self.creature_spawn_list)))
@@ -70,10 +66,12 @@ class Level:
 		return loc // self.cols, loc % self.cols
 
 	def get_relative_loc(self, loc, direction):
-		y, x = self.get_coord(loc)
-		dy, dx = dirs.DELTA[direction]
-		ny, nx = y + dy, x + dx
-		return self._make_coord_to_legal_loc(ny, nx)
+		dy, dx = DIRS.DELTA[direction]
+		if not self._legal_loc(loc, dy, dx):
+			msg = "Location in direction {} from coords {} {} is out of bounds."
+			raise Exception(msg.format(direction, *self.get_coord(loc)))
+		else:
+			return loc + self._get_loc(dy, dx)
 
 	def get_loc_iter(self):
 		return range(len(self.tiles))
@@ -87,13 +85,16 @@ class Level:
 			yield loc // self.cols, loc % self.cols, self.tiles[loc].memory_char
 
 	def get_passage_loc(self, passage):
-		if passage == PASSAGE_RANDOM:
+		if passage == CG.PASSAGE_RANDOM:
 			return self.get_free_loc()
 		else:
 			return self.passage_locations[passage]
 
 	def has_creature(self, loc):
 		return loc in self.creatures
+
+	def is_tile_passable(self, loc):
+		return self.tiles[loc].is_passable
 
 	def is_passable(self, loc):
 		if loc in self.creatures:
@@ -169,18 +170,30 @@ class Level:
 		else:
 			return "You don't know anything about this place."
 
-	def get_legal_neighbor_locs(self, loc):
-		pass
-
-	def get_pathable_neighbor_locs(self, loc):
-		for direction in dirs.ALL_DIRECTIONS:
+	def pathing_neighbors(self, loc):
+		for direction in DIRS.ALL_DIRECTIONS:
 			neighbor_loc = self.get_relative_loc(loc, direction)
-			if self.is_passable(
-			yield 
-				if not ((y == j and x == i) and self.legal_loc(y, x) and self.getsquare(j, i).tile_passable()):
+			if self.is_tile_passable(neighbor_loc):
+				if direction in DIRS.DIAGONAL:
+					yield neighbor_loc, int(round(self.tiles[loc].movement_cost * DIRS.DIAGONAL_MODIFIER))
+				else:
+					yield neighbor_loc, self.tiles[loc].movement_cost
 
-	def get_passable_neighbor_locs(self, loc):
-		pass
+	def pathing_heuristic(self, cur_loc, start_loc, goal_loc):
+		"""A* pathing heuristic."""
+		cur_y, cur_x = self.get_coord(cur_loc)
+		start_y, start_x = self.get_coord(start_loc)
+		goal_y, goal_x = self.get_coord(goal_loc)
 
-	#def path(self, start, goal):
-	#	return path.path(start, goal, self)
+		diagonal_movement = min(abs(cur_y - goal_y), abs(cur_x - goal_x))
+		orthogonal_movement = abs(cur_y - goal_y) + abs(cur_x - goal_x) - 2 * diagonal_movement
+		cost = CG.MOVEMENT_COST * (orthogonal_movement + diagonal_movement * DIRS.DIAGONAL_MODIFIER)
+
+		if D.CROSS:
+			cross_product = abs((cur_x - goal_x) * (start_y - goal_y) - (start_x - goal_x) * (cur_y - goal_y)) / 100
+			return cost + cross_product
+		else:
+			return cost
+
+	def path(self, start_loc, goal_loc):
+		return path.path(start_loc, goal_loc, self.pathing_neighbors, self.pathing_heuristic, self.cols)

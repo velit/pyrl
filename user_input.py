@@ -1,42 +1,43 @@
 import curses
 import sys
-import const.directions as dirs
+import const.directions as DIRS
+import const.game as CG
+import const.debug as D
 
 from pio import io
-from const.game import PASSAGE_UP, PASSAGE_DOWN, PyrlException
 from char import Char
 
 direction_keys = {
-	curses.KEY_DOWN: dirs.SO,
-	curses.KEY_LEFT: dirs.WE,
-	curses.KEY_RIGHT: dirs.EA,
-	curses.KEY_UP: dirs.NO,
-	ord('.'): dirs.STOP,
-	ord('1'): dirs.SW,
-	ord('2'): dirs.SO,
-	ord('3'): dirs.SE,
-	ord('4'): dirs.WE,
-	ord('5'): dirs.STOP,
-	ord('6'): dirs.EA,
-	ord('7'): dirs.NW,
-	ord('8'): dirs.NO,
-	ord('9'): dirs.NE,
-	ord('h'): dirs.WE,
-	ord('i'): dirs.NE,
-	ord('j'): dirs.SO,
-	ord('k'): dirs.NO,
-	ord('l'): dirs.EA,
-	ord('m'): dirs.SE,
-	ord('n'): dirs.SW,
-	ord('u'): dirs.NW,
+	curses.KEY_DOWN: DIRS.SO,
+	curses.KEY_LEFT: DIRS.WE,
+	curses.KEY_RIGHT: DIRS.EA,
+	curses.KEY_UP: DIRS.NO,
+	ord('.'): DIRS.STOP,
+	ord('1'): DIRS.SW,
+	ord('2'): DIRS.SO,
+	ord('3'): DIRS.SE,
+	ord('4'): DIRS.WE,
+	ord('5'): DIRS.STOP,
+	ord('6'): DIRS.EA,
+	ord('7'): DIRS.NW,
+	ord('8'): DIRS.NO,
+	ord('9'): DIRS.NE,
+	ord('h'): DIRS.WE,
+	ord('i'): DIRS.NE,
+	ord('j'): DIRS.SO,
+	ord('k'): DIRS.NO,
+	ord('l'): DIRS.EA,
+	ord('m'): DIRS.SE,
+	ord('n'): DIRS.SW,
+	ord('u'): DIRS.NW,
 	}
 
 class UserInput:
 	def __init__(self):
 		no_args, no_kwds = (), {}
 		self.actions = {
-			ord('<'): ("enter", (PASSAGE_UP, ), no_kwds),
-			ord('>'): ("enter", (PASSAGE_DOWN, ), no_kwds),
+			ord('<'): ("enter", (CG.PASSAGE_UP, ), no_kwds),
+			ord('>'): ("enter", (CG.PASSAGE_DOWN, ), no_kwds),
 			ord('Q'): ("endgame", no_args, no_kwds),
 			ord('S'): ("savegame", no_args, no_kwds),
 			ord('d'): ("debug", no_args, no_kwds),
@@ -59,7 +60,7 @@ class UserInput:
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def act_to_dir(game, level, creature, direction):
-	if direction == dirs.STOP:
+	if direction == DIRS.STOP:
 		return True
 	target_loc = level.get_relative_loc(creature.loc, direction)
 	if level.move_creature(creature, target_loc):
@@ -97,7 +98,7 @@ def look(game, level, creature):
 	while True:
 		c = io.getch(*level.get_coord(loc))
 		game.redraw()
-		direction = dirs.STOP
+		direction = DIRS.STOP
 		if c in direction_keys:
 			direction = direction_keys[c]
 		elif c == ord('d'):
@@ -121,9 +122,22 @@ def debug(game, level, creature):
 	if c == ord('v'):
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
+		io.msg("Show map set to {}".format(game.flags.show_map))
+	elif c == ord('c'):
+		D.CROSS = not D.CROSS
+		io.msg("Path heuristic cross set to {}".format(D.CROSS))
+	elif c == ord('l'):
+		CG.LEVEL_TYPE = "arena" if CG.LEVEL_TYPE == "dungeon" else "dungeon"
+		io.msg("Level type set to {}".format(CG.LEVEL_TYPE))
+	elif c == ord('b'):
+		io.draw_block((4,4))
+	elif c == ord('d'):
+		D.PATH = not D.PATH
+		io.msg("Path debug set to {}".format(D.PATH))
 	elif c == ord('h'):
 		game.flags.reverse = not game.flags.reverse
 		game.redraw()
+		io.msg("Reverse set to {}".format(game.flags.reverse))
 	elif c == ord('k'):
 		for loc in tuple(level.creatures):
 			if loc == creature.loc:
@@ -132,7 +146,9 @@ def debug(game, level, creature):
 				level.remove_creature(loc)
 		io.msg("Abrakadabra.")
 	elif c == ord('p'):
-		io.msg("pathing f, unimplemented")
+		passage_up = level.get_passage_loc(CG.PASSAGE_UP)
+		passage_down = level.get_passage_loc(CG.PASSAGE_DOWN)
+		io.draw_path((loc // level.cols, loc % level.cols) for loc in level.path(passage_up, passage_down))
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 256 else c))
 
@@ -144,7 +160,7 @@ def enter(game, level, creature, passage):
 	if level.is_exit(loc) and level.get_exit(loc) == passage:
 		try:
 			game.enter_passage(level.world_loc, level.get_exit(loc))
-		except PyrlException:
+		except CG.PyrlException:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:

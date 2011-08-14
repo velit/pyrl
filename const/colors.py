@@ -1,6 +1,6 @@
 BLACK_ON_BLACK = "black_on_black"
 BROWN = "brown"
-GREY = "grey"
+GRAY = "gray"
 RED = "red"
 GREEN = "green"
 YELLOW = "yellow"

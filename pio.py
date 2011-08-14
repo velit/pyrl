@@ -1,11 +1,12 @@
 import curses
 
+import const.game as CG
+
 from message_window import MessageBar
 from status_window import StatusBar
 from level_window import LevelWindow
 from window import Window
 from colors import init_colors
-from const.game import STATUS_BAR_SIZE, MSG_BAR_SIZE
 
 
 def init_io_module(*a, **k):
@@ -31,8 +32,8 @@ io = Wrapper()
 
 class _IO:
 
-	def __init__(self, curs_window, msg_bar_size=MSG_BAR_SIZE,
-				status_bar_size=STATUS_BAR_SIZE):
+	def __init__(self, curs_window, msg_bar_size=CG.MSG_BAR_SIZE,
+				status_bar_size=CG.STATUS_BAR_SIZE):
 		self.w = curs_window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()
@@ -117,15 +118,18 @@ class _IO:
 		self.l.update()
 		curses.doupdate()
 
-	def drawstar(self, *a, **k):
-		self.l.drawstar(*a, **k)
+	def draw_star(self, *a, **k):
+		self.l.draw_star(*a, **k)
 
-	def drawblock(self, *a, **k):
-		self.l.drawblock(*a, **k)
+	def draw_block(self, *a, **k):
+		self.l.draw_block(*a, **k)
 
-	def drawpath(self, iterator):
+	def draw_char(self, *a, **k):
+		self.l.draw_char(*a, **k)
+
+	def draw_path(self, iterator):
 		curses.curs_set(0)
 		for x in iterator:
-			self.drawstar(x)
+			self.draw_block(x, "green")
 		self.getch()
 		curses.curs_set(1)

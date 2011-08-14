@@ -2,9 +2,9 @@ import curses
 import menu
 import menu_h
 import colors
+import const.game as CG
 
 from textwrap import wrap
-from const.game import YES, NO, DEFAULT, ENCODING
 
 
 class Window:
@@ -47,7 +47,7 @@ class Window:
 	def getyx(self):
 		return self.w.getyx()
 
-	def sel_getch(self, print_str=None, char_list=YES | NO | DEFAULT):
+	def sel_getch(self, print_str=None, char_list=CG.YES | CG.NO | CG.DEFAULT):
 		if print_str:
 			self.clear_and_print(print_str)
 		c = self.getch()
@@ -62,7 +62,7 @@ class Window:
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)
 		curses.echo()
-		return_str = self.w.getstr().decode(ENCODING)
+		return_str = self.w.getstr().decode(CG.ENCODING)
 		curses.noecho()
 		return return_str
 
