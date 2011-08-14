@@ -1,6 +1,6 @@
+import const.game as CG
 from tile import Tile
 from char import Char
-from const.game import PASSAGE_UP, PASSAGE_DOWN
 from const.tiles import UNKNOWN, FLOOR, WALL, ROCK, STAIRS_UP, STAIRS_DOWN
 
 
@@ -13,9 +13,9 @@ tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
 	WALL: Tile("Wall", Char('#', "brown"), Char('#', "black"),
 			False, False),
 	STAIRS_DOWN: Tile("Down staircase", Char('>', "red"), Char('>'),
-			exit_point=PASSAGE_DOWN),
+			exit_point=CG.PASSAGE_DOWN),
 	STAIRS_UP: Tile("Up staircase", Char('<', "red"), Char('<'),
-			exit_point=PASSAGE_UP),
+			exit_point=CG.PASSAGE_UP),
 }
 
 

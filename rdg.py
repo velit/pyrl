@@ -1,21 +1,26 @@
-from random import randrange as rr, random as rand, choice
+import const.game as CG
 
+from random import randrange as rr, random as rand, choice
 from const.tiles import WALL as W
 from const.tiles import ROCK as R
 from const.tiles import FLOOR as F
 from const.tiles import STAIRS_UP as US
 from const.tiles import STAIRS_DOWN as DS
-from const.game import PASSAGE_DOWN, PASSAGE_UP
 
 
-def add_generated_tilefile(level_file):
+def add_generated_tilefile(level_file, type="arena"):
 	_init_tilemap(level_file)
-	_make_initial_room(level_file)
-	for x in range(2000):
-		if rand() < 0.50:
-			_attempt_corridor(level_file)
-		else:
-			_attempt_room(level_file)
+
+	if type == "dungeon":
+		_make_initial_room(level_file)
+		for x in range(2000):
+			if rand() < 0.50:
+				_attempt_corridor(level_file)
+			else:
+				_attempt_room(level_file)
+	elif type == "arena":
+		_make_room(level_file, 0, 0, level_file.rows, level_file.cols)
+
 	add_staircase_up(level_file)
 	add_staircase_down(level_file)
 
@@ -37,7 +42,7 @@ def add_staircase_up(level_file):
 			break
 
 	level_file.set_tile_id(y, x, US)
-	level_file.passage_locations[PASSAGE_UP] = level_file.getloc(y, x)
+	level_file.passage_locations[CG.PASSAGE_UP] = level_file.getloc(y, x)
 
 def add_staircase_down(level_file):
 	while True:
@@ -48,7 +53,7 @@ def add_staircase_down(level_file):
 			break
 
 	level_file.set_tile_id(y, x, DS)
-	level_file.passage_locations[PASSAGE_DOWN] = level_file.getloc(y, x)
+	level_file.passage_locations[CG.PASSAGE_DOWN] = level_file.getloc(y, x)
 
 def _init_tilemap(level_file):
 	level_file.tilefile = [R for x in range(level_file.rows * level_file.cols)]

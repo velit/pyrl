@@ -8,7 +8,7 @@ def init_colors():
 	for x in range(7):
 		curses.init_pair(x + 1, x, 0)
 
-	d[GREY] = curses.color_pair(0)
+	d[GRAY] = curses.color_pair(0)
 	d[BLACK_ON_BLACK] = curses.color_pair(1)
 	d[RED] = curses.color_pair(2)
 	d[GREEN] = curses.color_pair(3)

@@ -17,18 +17,22 @@ class LevelWindow(Window):
 		for y, x, (symbol, color) in char_payload_iterator:
 			self.addch(y, x, (symbol, color + reverse_str))
 
-	def drawstar(self, coord, col="green"):
+	def draw_char(self, coord, char):
+		y, x = coord
+		self.addch(y, x, char)
+
+	def draw_star(self, coord, col="green"):
 		y, x = coord
 		char = Char("*", col)
 		self.addch(y, x, char)
 
-	def drawblock(self, coord, col="blue"):
+	def draw_block(self, coord, col="blue"):
 		y, x = coord
-		char = Char(" ", col)
+		char = Char(" ", col + "r")
 		self.addch(y, x, char)
 
-	def drawline(self, coord_A, coord_B, char=Char('*', "yellow")):
-		yA, xA = coord_A
-		yB, xB = coord_B
+	def draw_line(self, coordA, coordB, char=Char('*', "yellow")):
+		yA, xA = coordA
+		yB, xB = coordB
 		for y, x in bresenham(yA, xA, yB, xB):
 			self.addch(y, x, char)

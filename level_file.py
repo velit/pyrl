@@ -1,10 +1,10 @@
-from const.game import PASSAGE_UP, PASSAGE_DOWN, UP, DOWN
-from const.game import LEVEL_ROWS, LEVEL_COLS
-from tiles import FLOOR, gettile
+import const.game as CG
+
+from tiles import gettile
 
 class LevelFile:
 
-	def __init__(self, danger_level=0, rows=LEVEL_ROWS, cols=LEVEL_COLS):
+	def __init__(self, danger_level=0, rows=CG.LEVEL_ROWS, cols=CG.LEVEL_COLS):
 		self.rows = rows
 		self.cols = cols
 		self.danger_level = danger_level

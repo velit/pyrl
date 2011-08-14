@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import const.game as CG
+
 from pio import io
 from player import Player
 from level import Level
@@ -9,11 +11,6 @@ from ai import AI
 from fov import get_light_set
 from world_file import WorldFile
 from debug_flags import Flags
-
-from const.game import DEBUG, YES
-from const.game import DUNGEON, FIRST_LEVEL
-from const.game import SET_LEVEL, PREVIOUS_LEVEL, NEXT_LEVEL
-from const.game import PASSAGE_UP, PASSAGE_DOWN
 
 
 class Game:
@@ -30,8 +27,8 @@ class Game:
 		self.player = Player()
 		self.flags = Flags()
 
-		self.init_new_level(FIRST_LEVEL)
-		self.cur_level = self.levels[FIRST_LEVEL]
+		self.init_new_level(CG.FIRST_LEVEL)
+		self.cur_level = self.levels[CG.FIRST_LEVEL]
 		self.cur_level.add_creature(self.player)
 		self.register_status_texts()
 
@@ -47,14 +44,14 @@ class Game:
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
-		if instruction == SET_LEVEL:
+		if instruction == CG.SET_LEVEL:
 			self.change_level((d, i))
 		else:
 			d, i = self.cur_level.world_loc
-			if instruction == PREVIOUS_LEVEL:
-				self.change_level((d, i - 1), PASSAGE_DOWN)
-			elif instruction == NEXT_LEVEL:
-				self.change_level((d, i + 1), PASSAGE_UP)
+			if instruction == CG.PREVIOUS_LEVEL:
+				self.change_level((d, i - 1), CG.PASSAGE_DOWN)
+			elif instruction == CG.NEXT_LEVEL:
+				self.change_level((d, i + 1), CG.PASSAGE_UP)
 
 	def change_level(self, world_loc, passage):
 		old_level = self.cur_level
@@ -88,7 +85,7 @@ class Game:
 	def endgame(self, ask=False):
 		if not ask:
 			exit()
-		if io.sel_getch("Do you wish to end the game? [y/N]") in YES:
+		if io.sel_getch("Do you wish to end the game? [y/N]") in CG.YES:
 			exit()
 
 	def _save(self):
@@ -100,7 +97,7 @@ class Game:
 	def savegame(self, ask=False):
 		if not ask:
 			self._save()
-		elif io.sel_getch("Do you wish to save the game? [y/N]") in YES:
+		elif io.sel_getch("Do you wish to save the game? [y/N]") in CG.YES:
 			self._save()
 
 	def draw(self):

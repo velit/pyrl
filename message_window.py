@@ -1,8 +1,9 @@
 import curses
 
+import const.game as CG
+
 from window import Window
 from textwrap import TextWrapper
-from const.game import MORE_STR, DEFAULT
 
 
 class MessageBar(Window):
@@ -17,7 +18,7 @@ class MessageBar(Window):
 		self.wrapper = TextWrapper(width=(self.cols))
 
 		#accommodate for the more_str if the messages continue on the next page
-		self.last_line_wrapper = TextWrapper(width=(self.cols - len(MORE_STR) - 1))
+		self.last_line_wrapper = TextWrapper(width=(self.cols - len(CG.MORE_STR) - 1))
 
 	def update(self):
 		self.print_queue()
@@ -49,9 +50,9 @@ class MessageBar(Window):
 					break
 				else:
 					a = self.last_line_wrapper.wrap(msg)
-					self.w.addstr(cur_line, 0, a[0] + MORE_STR)
+					self.w.addstr(cur_line, 0, a[0] + CG.MORE_STR)
 					if not skip_all:
-						c = self.sel_getch(char_list=DEFAULT)
+						c = self.sel_getch(char_list=CG.DEFAULT)
 						if c == ord('\n'):
 							skip_all = True
 					msg = " ".join(a[1:])

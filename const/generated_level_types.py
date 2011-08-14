@@ -1,0 +1,2 @@
+DUNGEON = "dungeon"
+ARENA = "arena"
