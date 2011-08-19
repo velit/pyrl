@@ -95,7 +95,13 @@ def z_command(game, level, creature):
 def look(game, level, creature):
 	loc = creature.loc
 	drawline_flag = False
+	direction = DIRS.STOP
 	while True:
+		loc = level.get_relative_loc(loc, direction)
+		io.msg(level.look_information(loc))
+		if drawline_flag:
+			io.drawline(level.get_coord(creature.loc), level.get_coord(loc), Char("*", "yellow"))
+			io.msg("LoS: {}".format(level.check_los(creature.loc, loc)))
 		c = io.getch(*level.get_coord(loc))
 		game.redraw()
 		direction = DIRS.STOP
@@ -105,11 +111,6 @@ def look(game, level, creature):
 			drawline_flag = not drawline_flag
 		elif c in map(ord, "QqzZ "):
 			break
-		loc = level.get_relative_loc(loc, direction)
-		io.msg(level.get_information(loc))
-		if drawline_flag:
-			io.drawline(level.get_coord(creature.loc), level.get_coord(loc), Char("*", "yellow"))
-			io.msg("LoS: {}".format(level.check_los(creature.loc, loc)))
 
 def endgame(game, level, creature, *a, **k):
 	game.endgame(*a, **k)

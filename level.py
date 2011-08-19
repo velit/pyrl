@@ -7,7 +7,7 @@ import const.debug as D
 from pio import io
 from char import Char
 from random import randrange, choice
-from bresenham import bresenham
+from generic_algorithms import bresenham, chebyshev_distance
 from creature import Creature
 from turn_scheduler import TurnScheduler
 from combat import get_melee_attack
@@ -108,6 +108,55 @@ class Level:
 	def is_exit(self, loc):
 		return self.tiles[loc].exit_point is not None
 
+	def pop_modified_locs(self):
+		mod_locs = self.modified_locations
+		self.modified_locations = set()
+		return mod_locs
+
+	def update_visited_locs(self, locations):
+		self.visited_locations |= locations
+
+	def check_los(self, loc1, loc2):
+		y0, x0 = self.get_coord(loc1)
+		y1, x1 = self.get_coord(loc2)
+		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(y0, x0, y1, x1))
+
+	def look_information(self, loc):
+		if loc in self.visited_locations:
+			if self.has_creature(loc):
+				return self.creatures[loc].name
+			else:
+				return self.tiles[loc].name
+		else:
+			return "You don't know anything about this place."
+
+	def pathing_neighbors(self, loc):
+		for direction in DIRS.ALL_DIRECTIONS:
+			neighbor_loc = self.get_relative_loc(loc, direction)
+			if self.is_tile_passable(neighbor_loc):
+				if direction in DIRS.DIAGONAL:
+					yield neighbor_loc, int(round(self.tiles[loc].movement_cost * DIRS.DIAGONAL_MODIFIER))
+				else:
+					yield neighbor_loc, self.tiles[loc].movement_cost
+
+	def pathing_heuristic(self, locA, locB, cross_product_loc=None):
+		"""A* pathing heuristic."""
+		ay, ax = self.get_coord(locA)
+		by, bx = self.get_coord(locB)
+
+		orthogonal_steps, diagonal_steps = chebyshev_distance(ay, ax, by, bx)
+		cost = CG.MOVEMENT_COST * (orthogonal_steps + diagonal_steps * DIRS.DIAGONAL_MODIFIER)
+
+		if cross_product_loc is not None:
+			cross_y, cross_x = self.get_coord(cross_product_loc)
+			cross_product = abs((ax - bx) * (cross_y - by) - (cross_x - bx) * (ay - by)) / 100
+			return cost + cross_product
+		else:
+			return cost
+
+	def path(self, start_loc, goal_loc):
+		return path.path(start_loc, goal_loc, self.pathing_neighbors, self.pathing_heuristic, self.cols)
+
 	def add_creature(self, creature, loc=None):
 		if loc is None:
 			loc = self._get_free_loc()
@@ -148,52 +197,10 @@ class Level:
 		else:
 			return attack_succeeds, target.name, False, 0
 
-	def pop_modified_locs(self):
-		mod_locs = self.modified_locations
-		self.modified_locations = set()
-		return mod_locs
-
-	def update_visited_locs(self, locations):
-		self.visited_locations |= locations
-
-	def check_los(self, loc1, loc2):
-		y0, x0 = self.get_coord(loc1)
-		y1, x1 = self.get_coord(loc2)
-		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(y0, x0, y1, x1))
-
-	def get_information(self, loc):
-		if loc in self.visited_locations:
-			if self.has_creature(loc):
-				return self.creatures[loc].name
-			else:
-				return self.tiles[loc].name
-		else:
-			return "You don't know anything about this place."
-
-	def pathing_neighbors(self, loc):
+	def get_passable_locations(self, creature):
+		locations = []
 		for direction in DIRS.ALL_DIRECTIONS:
-			neighbor_loc = self.get_relative_loc(loc, direction)
-			if self.is_tile_passable(neighbor_loc):
-				if direction in DIRS.DIAGONAL:
-					yield neighbor_loc, int(round(self.tiles[loc].movement_cost * DIRS.DIAGONAL_MODIFIER))
-				else:
-					yield neighbor_loc, self.tiles[loc].movement_cost
-
-	def pathing_heuristic(self, cur_loc, start_loc, goal_loc):
-		"""A* pathing heuristic."""
-		cur_y, cur_x = self.get_coord(cur_loc)
-		start_y, start_x = self.get_coord(start_loc)
-		goal_y, goal_x = self.get_coord(goal_loc)
-
-		diagonal_movement = min(abs(cur_y - goal_y), abs(cur_x - goal_x))
-		orthogonal_movement = abs(cur_y - goal_y) + abs(cur_x - goal_x) - 2 * diagonal_movement
-		cost = CG.MOVEMENT_COST * (orthogonal_movement + diagonal_movement * DIRS.DIAGONAL_MODIFIER)
-
-		if D.CROSS:
-			cross_product = abs((cur_x - goal_x) * (start_y - goal_y) - (start_x - goal_x) * (cur_y - goal_y)) / 100
-			return cost + cross_product
-		else:
-			return cost
-
-	def path(self, start_loc, goal_loc):
-		return path.path(start_loc, goal_loc, self.pathing_neighbors, self.pathing_heuristic, self.cols)
+			loc = self.get_relative_loc(creature.loc, direction)
+			if self.is_passable(loc):
+				locations.append(loc)
+		return locations

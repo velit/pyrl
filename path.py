@@ -20,7 +20,7 @@ def _path(start, goal, neighbors, heuristic, cols):
 	openmember.add(start)
 
 	g[start] = 0
-	h[start] = heuristic(start, start, goal)
+	h[start] = heuristic(start, goal, start)
 
 	while openprio[0][1] != goal:
 		# Best selected node
@@ -42,7 +42,7 @@ def _path(start, goal, neighbors, heuristic, cols):
 
 			came_from[n] = s
 			g[n] = g[s] + cost
-			h[n] = heuristic(n, start, goal)
+			h[n] = heuristic(n, goal, start)
 			heappush(openprio, (g[n] + h[n], n))
 			if D.PATH and n != goal:
 				io.draw_char((n // cols, n % cols), ('?', "redr"))

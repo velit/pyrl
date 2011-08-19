@@ -3,3 +3,4 @@
 *.pyc
 data/pyrl.svg
 Session.vim
+errors.err
