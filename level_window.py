@@ -2,7 +2,7 @@ import curses
 import colors
 from char import Char
 from window import Window
-from bresenham import bresenham
+from generic_algorithms import bresenham
 from tiles import gettile
 
 
