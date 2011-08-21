@@ -32,7 +32,5 @@ class LevelWindow(Window):
 		self.addch(y, x, char)
 
 	def draw_line(self, coordA, coordB, char=Char('*', "yellow")):
-		yA, xA = coordA
-		yB, xB = coordB
-		for y, x in bresenham(yA, xA, yB, xB):
+		for y, x in bresenham(coordA, coordB):
 			self.addch(y, x, char)

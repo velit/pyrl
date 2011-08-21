@@ -1,13 +1,25 @@
 import random
+
 from const.directions import ALL_DIRECTIONS
+from pio import io
 
 class AI:
 	def __init__(self):
 		pass
 
 	def act(self, game, level, creature):
+		if level.creature_can_reach(creature, game.player.loc):
+			attack_succeeds, name, dies, damage = level.creature_attack(creature, game.player.loc)
+			if attack_succeeds:
+				if damage > 0:
+					io.msg("The {} hits you for {} damage.".format(creature.name, damage))
+				else:
+					io.msg("The {} fails to hurt you.".format(creature.name))
+			else:
+				io.msg("The {} misses you.".format(creature.name))
+			return
+
 		locations = level.get_passable_locations(creature)
-		#TODO: make hit player also fix min
 		if not len(locations) > 0:
 			return
 		min_loc = locations[0]

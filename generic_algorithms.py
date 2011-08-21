@@ -1,4 +1,5 @@
-def bresenham(ay, ax, by, bx, includelast=True):
+def bresenham(coord_a, coord_b, includelast=True):
+	(ay, ax), (by, bx) = coord_a, coord_b
 	steep = abs(bx - ax) > abs(by - ay)
 	if steep:
 		ay, ax = ax, ay
@@ -18,7 +19,8 @@ def bresenham(ay, ax, by, bx, includelast=True):
 			x += xstep
 			error += deltay
 
-def chebyshev_distance(ay, ax, by, bx):
+def chebyshev_distance(coord_a, coord_b):
+	(ay, ax), (by, bx) = coord_a, coord_b
 	diagonal_steps = min(abs(ay - by), abs(ax - bx))
 	orthogonal_steps = abs(ay - by) + abs(ax - bx) - 2 * diagonal_steps
 	return orthogonal_steps, diagonal_steps

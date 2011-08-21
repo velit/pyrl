@@ -2,14 +2,14 @@ from math import sqrt
 
 DIAGONAL_MODIFIER = sqrt(2)
 
-SW = "south west"
+SW = "southwest"
 SO = "south"
-SE = "south east"
+SE = "southeast"
 WE = "west"
 EA = "east"
-NW = "north west"
+NW = "northwest"
 NO = "north"
-NE = "north east"
+NE = "northeast"
 STOP = "current position"
 
 ALL_DIRECTIONS = (SW, SO, SE, WE, EA, NW, NO, NE)

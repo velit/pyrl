@@ -48,7 +48,7 @@ class Window:
 		return self.w.getyx()
 
 	def sel_getch(self, print_str=None, char_list=CG.YES | CG.NO | CG.DEFAULT):
-		if print_str:
+		if print_str is not None:
 			self.clear_and_print(print_str)
 		c = self.getch()
 		while c not in char_list:
