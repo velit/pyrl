@@ -75,7 +75,7 @@ def act_to_dir(game, level, creature, direction):
 					io.msg("You hit the {} for {} damage.".format(name, damage))
 			else:
 				if dies:
-					io.msg("You fail to hur the {}. The {} suddenly collapses!".format(name, name))
+					io.msg("You fail to hurt the {}. The {} suddenly collapses!".format(name, name))
 				else:
 					io.msg("You fail to hurt the {}.".format(name))
 		else:

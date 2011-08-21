@@ -68,8 +68,8 @@ class Level:
 	def get_relative_loc(self, loc, direction):
 		dy, dx = DIRS.DELTA[direction]
 		if not self._legal_loc(loc, dy, dx):
-			msg = "Location in direction {} from coords {} {} is out of bounds."
-			raise Exception(msg.format(direction, *self.get_coord(loc)))
+			msg = "Location {} of {},{} is out of bounds."
+			raise IndexError(msg.format(direction, *self.get_coord(loc)))
 		else:
 			return loc + self._get_loc(dy, dx)
 
@@ -117,9 +117,9 @@ class Level:
 		self.visited_locations |= locations
 
 	def check_los(self, loc1, loc2):
-		y0, x0 = self.get_coord(loc1)
-		y1, x1 = self.get_coord(loc2)
-		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(y0, x0, y1, x1))
+		coordA = self.get_coord(loc1)
+		coordB = self.get_coord(loc2)
+		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
 
 	def look_information(self, loc):
 		if loc in self.visited_locations:
@@ -144,7 +144,7 @@ class Level:
 		ay, ax = self.get_coord(locA)
 		by, bx = self.get_coord(locB)
 
-		orthogonal_steps, diagonal_steps = chebyshev_distance(ay, ax, by, bx)
+		orthogonal_steps, diagonal_steps = chebyshev_distance((ay, ax), (by, bx))
 		cost = CG.MOVEMENT_COST * (orthogonal_steps + diagonal_steps * DIRS.DIAGONAL_MODIFIER)
 
 		if cross_product_loc is not None:
@@ -185,6 +185,10 @@ class Level:
 				self._move_creature(creature, loc)
 				return True
 		return False
+
+	def creature_can_reach(self, creature, target_loc):
+		orth, dia = chebyshev_distance(self.get_coord(creature.loc), self.get_coord(target_loc))
+		return orth + dia in (0, 1)
 
 	def creature_attack(self, creature, target_loc):
 		target = self.creatures[target_loc]
