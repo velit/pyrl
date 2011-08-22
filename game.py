@@ -71,16 +71,20 @@ class Game:
 		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
 
 	def play(self):
-		game, level, creature = self, self.cur_level, self.cur_level.turn_scheduler.get()
-		if creature == self.player:
+		game, level, player = self, self.cur_level, self.player
+		creature = level.turn_scheduler.get()
+		if creature == player:
+			i = 0
 			while True:
 				self.draw()
 				took_action = self.user_input.get_and_act(game, level, creature)
 				if took_action:
+					i += 1
+					self.turn_counter += 1
+				if i == 1:
 					break
-			self.turn_counter += 1
 		else:
-			self.ai.act(game, level, creature)
+			self.ai.act(level, creature, player.loc)
 
 	def endgame(self, ask=False):
 		if not ask:
@@ -109,9 +113,9 @@ class Game:
 	def redraw(self):
 		io.clear_level_buffer()
 		level, creature = self.cur_level, self.player
+		self.redraw_view(level, creature)
 		if self.flags.show_map:
 			io.draw(level.get_visible_data(level.get_loc_iter()))
-		self.redraw_view(level, creature)
 
 	def update_view(self, level, creature):
 		old = self.old_visibility
