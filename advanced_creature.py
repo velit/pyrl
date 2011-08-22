@@ -59,8 +59,8 @@ class AdvancedCreature(Creature):
 
 	@property
 	def unarmed_dice(self):
-		return super().unarmed_dice + self.get_item_stats()
+		return super().unarmed_dice + self.get_item_stats(UNARMED_DICE)
 
 	@property
 	def unarmed_sides(self):
-		return super().unarmed_sides + self.get_item_stats()
+		return super().unarmed_sides + self.get_item_stats(UNARMED_SIDES)

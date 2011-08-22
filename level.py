@@ -122,11 +122,18 @@ class Level:
 		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
 
 	def look_information(self, loc):
+
 		if loc in self.visited_locations:
+			information = "{}x{} ".format(*self.get_coord(loc))
 			if self.has_creature(loc):
-				return self.creatures[loc].name
+				c = self.creatures[loc]
+				creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} dmg_bonus:{} dice:{} sides:{} "
+				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, c.dmg_bonus,
+						c.unarmed_dice, c.unarmed_sides)
+				information += "target:{}".format(c.last_target_loc if c.last_target_loc is None else self.get_coord(c.last_target_loc))
 			else:
-				return self.tiles[loc].name
+				information += self.tiles[loc].name
+			return information
 		else:
 			return "You don't know anything about this place."
 
@@ -186,9 +193,19 @@ class Level:
 				return True
 		return False
 
-	def creature_can_reach(self, creature, target_loc):
+	def creature_has_range(self, creature, target_loc):
 		orth, dia = chebyshev_distance(self.get_coord(creature.loc), self.get_coord(target_loc))
 		return orth + dia in (0, 1)
+
+	def creature_has_sight(self, creature, target_loc):
+		cy, cx = self.get_coord(creature.loc)
+		ty, tx = self.get_coord(target_loc)
+		#dy, dx = self.get_coord(max(creature.loc, target_loc) - min(creature.loc, target_loc))
+		if (cy - ty) ** 2 + (cx - tx) ** 2 <= creature.sight ** 2:
+		#if dy ** 2 + dx ** 2 <= creature.sight:
+			return self.check_los(creature.loc, target_loc)
+		else:
+			return False
 
 	def creature_attack(self, creature, target_loc):
 		target = self.creatures[target_loc]

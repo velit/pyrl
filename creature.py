@@ -8,12 +8,14 @@ class Creature:
 		self.name = creature_file.name
 		self.char = creature_file.char
 		self.loc = None
+		self.last_target_loc = None
 
 		self.str = 10
 		self.dex = 10
 		self.con = 10
 		self.int = 10
 		self.per = 10
+
 
 		self.hp = self.max_hp
 
