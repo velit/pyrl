@@ -7,21 +7,22 @@ class AI:
 	def __init__(self):
 		pass
 
-	def act(self, level, creature, loc):
-		if level.creature_has_sight(creature, loc):
-			creature.last_target_loc = loc
-			if level.creature_has_range(creature, loc):
-				return self.attack(level, creature, loc)
+	def act(self, level, creature, loc=None):
+		if loc is not None:
+			if level.creature_has_sight(creature, loc):
+				creature.target_loc = loc
+				if level.creature_has_range(creature, loc):
+					return self.attack(level, creature, loc)
+				else:
+					return self.move_towards(level, creature, loc)
+			elif creature.target_loc is not None:
+				if creature.loc == creature.target_loc:
+					creature.target_loc = None
+				else:
+					return self.move_towards(level, creature, creature.target_loc)
 			else:
-				return self.move_towards(level, creature, loc)
-		elif creature.last_target_loc is not None:
-			if creature.loc == creature.last_target_loc:
-				creature.last_target_loc = None
-			else:
-				return self.move_towards(level, creature, creature.last_target_loc)
-		else:
-			return
-			#return self.move_random(level, creature)
+				return
+		#return self.move_random(level, creature)
 
 	def move_towards(self, level, creature, target_loc):
 		locations = level.get_passable_locations(creature)
