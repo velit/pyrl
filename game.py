@@ -71,20 +71,25 @@ class Game:
 		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
 
 	def play(self):
-		game, level, player = self, self.cur_level, self.player
-		creature = level.turn_scheduler.get()
-		if creature == player:
-			i = 0
-			while True:
-				self.draw()
-				took_action = self.user_input.get_and_act(game, level, creature)
-				if took_action:
-					i += 1
-					self.turn_counter += 1
-				if i == 1:
-					break
+		if self.cur_level.turn_scheduler.is_new_turn():
+			pass#new_turn_stuff_here
+
+		creature = self.cur_level.turn_scheduler.get()
+		if creature == self.player:
+			self.player_act()
 		else:
-			self.ai.act(level, creature, player.loc)
+			self.ai.act(self.cur_level, creature, self.player.loc)
+
+	def player_act(self):
+		i = 0
+		while True:
+			self.draw()
+			took_action = self.user_input.get_and_act(self, self.cur_level, self.player)
+			if took_action:
+				i += 1
+				self.turn_counter += 1
+			if i == 2:
+				break
 
 	def endgame(self, ask=False):
 		if not ask:

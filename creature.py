@@ -8,14 +8,14 @@ class Creature:
 		self.name = creature_file.name
 		self.char = creature_file.char
 		self.loc = None
-		self.last_target_loc = None
+		self.target_loc = None
+		self.target_dir = None
 
-		self.str = 10
-		self.dex = 10
-		self.con = 10
-		self.int = 10
-		self.per = 10
-
+		self.strength = 10
+		self.dexterity = 10
+		self.toughness = 10
+		self.intelligence = 10
+		self.perception = 10
 
 		self.hp = self.max_hp
 
@@ -38,32 +38,32 @@ class Creature:
 
 	@property
 	def sight(self):
-		return 6 + (self.per - 10) // 2
+		return 6 + (self.perception - 10) // 2
 
 	@property
 	def max_hp(self):
-		return self.con + self.str // 2
+		return self.toughness + self.strength // 2
 
 	@property
 	def dmg_bonus(self):
-		return self.str // 5
+		return self.strength // 5
 
 	@property
 	def pv(self):
-		return self.con // 10
+		return self.toughness // 10
 
 	@property
 	def ar(self):
-		return self.dex + self.int // 2
+		return self.dexterity + self.intelligence // 2
 
 	@property
 	def dr(self):
-		return self.dex + self.int // 2
+		return self.dexterity + self.intelligence // 2
 
 	@property
 	def unarmed_dice(self):
-		return self.str // 20 + 1
+		return self.strength // 20 + 1
 
 	@property
 	def unarmed_sides(self):
-		return self.str // 3 + self.dex // 6
+		return self.strength // 3 + self.dexterity // 6
