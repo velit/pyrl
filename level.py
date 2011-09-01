@@ -30,7 +30,7 @@ class Level:
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
 		for mons_file in level_file.monster_files:
-			self.add_creature(Creature(mons_file))
+			self._spawn_predefined_creature(mons_file)
 
 		for x in range(CG.MONSTERS_PER_LEVEL):
 			self._spawn_random_creature()
@@ -57,7 +57,12 @@ class Level:
 		return 0 <= loc // self.cols + dy < self.rows and 0 <= loc % self.cols + dx < self.cols
 
 	def _spawn_random_creature(self):
-		self.add_creature(Creature(choice(self.creature_spawn_list)))
+		creature = Creature(choice(self.creature_spawn_list))
+		self.add_creature(creature)
+
+	def _spawn_predefined_creature(self, mons_file):
+		creature = Creature(mons_file)
+		self.add_creature(creature)
 
 	def get_exit(self, loc):
 		return self.tiles[loc].exit_point
@@ -168,16 +173,16 @@ class Level:
 		if loc is None:
 			loc = self._get_free_loc()
 		self.creatures[loc] = creature
-		self.turn_scheduler.add(creature)
 		self.modified_locations.add(loc)
 		creature.loc = loc
+		self.turn_scheduler.add(creature)
 
 	def remove_creature(self, loc):
 		creature = self.creatures[loc]
 		del self.creatures[loc]
-		self.turn_scheduler.remove(creature)
 		self.modified_locations.add(loc)
 		creature.loc = None
+		self.turn_scheduler.remove(creature)
 
 	def _move_creature(self, creature, new_loc):
 		self.modified_locations.add(creature.loc)
@@ -213,10 +218,13 @@ class Level:
 		if attack_succeeds:
 			dies = target.lose_hp(damage)
 			if dies:
-				self.remove_creature(target_loc)
+				self.creature_death(target)
 			return attack_succeeds, target.name, dies, damage
 		else:
 			return attack_succeeds, target.name, False, 0
+
+	def creature_death(self, creature):
+		self.remove_creature(creature.loc)
 
 	def get_passable_locations(self, creature):
 		locations = []

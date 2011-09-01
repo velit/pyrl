@@ -37,7 +37,7 @@ class Game:
 		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.max_hp))
 		io.s.add_element("sight", "sight: ", lambda: self.player.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("loc", "Loc: ", lambda:self.cur_level.world_loc)
+		io.s.add_element("loc", "Loc: ", lambda: self.cur_level.world_loc)
 		io.s.add_element("ar", "AR: ", lambda: self.player.ar)
 		io.s.add_element("dr", "DR: ", lambda: self.player.dr)
 		io.s.add_element("pv", "PV: ", lambda: self.player.pv)
@@ -71,8 +71,13 @@ class Game:
 		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
 
 	def play(self):
+		#checks:
+		if self.player.is_dead():
+			io.notify("You die... [more]")
+			io.notify("Just kidding, there is no [more]")
+			self.endgame(False)
 		if self.cur_level.turn_scheduler.is_new_turn():
-			pass#new_turn_stuff_here
+			self.turn_counter += 1
 
 		creature = self.cur_level.turn_scheduler.get()
 		if creature == self.player:
@@ -87,11 +92,11 @@ class Game:
 			took_action = self.user_input.get_and_act(self, self.cur_level, self.player)
 			if took_action:
 				i += 1
-				self.turn_counter += 1
 			if i == 2:
 				break
 
-	def endgame(self, ask=False):
+	def endgame(self, ask=False, message=""):
+		io.msg(message)
 		if not ask:
 			exit()
 		if io.sel_getch("Do you wish to end the game? [y/N]") in CG.YES:

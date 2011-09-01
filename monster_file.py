@@ -16,5 +16,5 @@ monster_files = (
 	MonsterFile("orc", Char('o', "green"), -1, 0),
 	MonsterFile("giant worm", Char('w', "brown"), 0, 0),
 	MonsterFile("fire imp", Char('I', "red"), 3, 0),
-	MonsterFile("greater moloch", Char('&', "light_yellow"), 18, 0),
+	MonsterFile("moloch", Char('&', "yellow"), 18, 0),
 )

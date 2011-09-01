@@ -36,6 +36,9 @@ class Creature:
 			self.hp -= amount
 		return self.hp <= 0
 
+	def is_dead(self):
+		return self.hp < 0
+
 	@property
 	def sight(self):
 		return 6 + (self.perception - 10) // 2
