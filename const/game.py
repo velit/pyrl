@@ -38,7 +38,10 @@ PASSAGE_RANDOM = "random entry point"
 
 YES = set(map(ord, "yY"))
 NO = set(map(ord, "nN"))
-DEFAULT = set(map(ord, " \n"))
+DEFAULT = set(map(ord, " zZ\n"))
+YES_D = YES | DEFAULT
+NO_D = NO | DEFAULT
+ALL = YES | NO | DEFAULT
 MOVES = set(map(ord, "123456790."))
 
 class PyrlException(Exception): pass

@@ -13,7 +13,7 @@ def attack(self, creature):
 		io.msg("You miss the {}.".format(creature.name))
 
 def die(self):
-	io.sel_getch("You die... [more]", char_list=DEFAULT)
+	io.notify("You die... [more]")
 	self.g.endgame(False)
 
 

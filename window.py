@@ -47,7 +47,10 @@ class Window:
 	def getyx(self):
 		return self.w.getyx()
 
-	def sel_getch(self, print_str=None, char_list=CG.YES | CG.NO | CG.DEFAULT):
+	def notify(self, print_str=None):
+		return self.sel_getch(print_str, char_list=CG.DEFAULT)
+
+	def sel_getch(self, print_str=None, char_list=CG.ALL):
 		if print_str is not None:
 			self.clear_and_print(print_str)
 		c = self.getch()
@@ -87,6 +90,7 @@ class Window:
 
 	def getcolor(self, print_str=None, default="normal"):
 		while True:
+			#TODO: might want to change to getch?
 			input = self._getstr(print_str + "[white/normal/black/red/green/"
 										"yellow/blue/purple/cyan/light_*]: ")
 			if input == "":

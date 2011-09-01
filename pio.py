@@ -42,10 +42,8 @@ class _IO:
 		self.level_cols = self.cols
 
 		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0))
-		self.s = StatusBar(
-			self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0))
-		self.l = LevelWindow(
-			self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
+		self.s = StatusBar(self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0))
+		self.l = LevelWindow(self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
 		self.a = Window(self.w)
 
 	def clear_level_buffer(self, *a, **k):
@@ -70,44 +68,45 @@ class _IO:
 		self.l.drawline(*a, **k)
 
 	def getbool(self, *a, **k):
-		return_ =  self.m.getbool(*a, **k)
+		return_data =  self.m.getbool(*a, **k)
 		self.refresh()
-		return return_
+		return return_data
 
 	def getchar(self, *a, **k):
-		return_ =  self.m.getchar(*a, **k)
+		return_data =  self.m.getchar(*a, **k)
 		self.refresh()
-		return return_
+		return return_data
 
 	def getcolor(self, *a, **k):
-		return_ =  self.m.getcolor(*a, **k)
+		return_data =  self.m.getcolor(*a, **k)
 		self.refresh()
-		return return_
+		return return_data
 
 	def getint(self, *a, **k):
-		return_ =  self.m.getint(*a, **k)
+		return_data =  self.m.getint(*a, **k)
 		self.refresh()
-		return return_
+		return return_data
 
 	def getstr(self, *a, **k):
-		return_ =  self.m.getstr(*a, **k)
+		return_data =  self.m.getstr(*a, **k)
 		self.refresh()
-		return return_
+		return return_data
 
 	def getch(self, *a, **k):
 		self.refresh()
 		return self.l.getch(*a, **k)
 
-	def sel_getch(self, print_str=None, *a, **k):
+	def notify(self, print_str=None, *a, **k):
 		if print_str is not None:
-			curses.curs_set(0)
 			self.msg(print_str)
 			self.refresh()
-		return_ = self.l.sel_getch(None, *a, **k)
+		return self.l.notify(None, *a, **k)
+
+	def sel_getch(self, print_str=None, *a, **k):
 		if print_str is not None:
-			curses.curs_set(1)
+			self.msg(print_str)
 			self.refresh()
-		return return_
+		return self.l.sel_getch(None, *a, **k)
 
 	def msg(self, *a, **k):
 		self.m.queue_msg(*a, **k)
