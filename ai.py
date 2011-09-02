@@ -7,12 +7,12 @@ class AI:
 	def __init__(self):
 		pass
 
-	def act(self, level, creature, loc=None):
+	def act(self, game, level, creature, loc=None):
 		if loc is not None:
 			if level.creature_has_sight(creature, loc):
 				creature.target_loc = loc
 				if level.creature_has_range(creature, loc):
-					return self.attack(level, creature, loc)
+					return self.attack(game, level, creature, loc)
 				else:
 					return self.move_towards(level, creature, loc)
 			elif creature.target_loc is not None:
@@ -28,7 +28,7 @@ class AI:
 		locations = level.get_passable_locations(creature)
 		if not len(locations) > 0:
 			return
-		min_loc = min(locations, key=lambda loc: level.pathing_heuristic(loc, target_loc))
+		min_loc = min(locations, key=lambda loc: level.distance_cost(loc, target_loc))
 		level.move_creature(creature, min_loc)
 
 	def move_random(self, level, creature):
@@ -38,12 +38,6 @@ class AI:
 			if level.move_creature(creature, loc):
 				break
 
-	def attack(self, level, creature, target_loc):
-		attack_succeeds, name, dies, damage = level.creature_attack(creature, target_loc)
-		if attack_succeeds:
-			if damage > 0:
-				io.msg("The {} hits you for {} damage.".format(creature.name, damage))
-			else:
-				io.msg("The {} fails to hurt you.".format(creature.name))
-		else:
-			io.msg("The {} misses you.".format(creature.name))
+	def attack(self, game, level, creature, target_loc):
+		target = level.get_creature(target_loc)
+		game.creature_attack(level, creature, target)

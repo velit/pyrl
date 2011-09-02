@@ -19,8 +19,17 @@ def bresenham(coord_a, coord_b, includelast=True):
 			x += xstep
 			error += deltay
 
-def chebyshev_distance(coord_a, coord_b):
-	(ay, ax), (by, bx) = coord_a, coord_b
+
+def chebyshev(coordA, coordB):
+	ay, ax = coordA
+	by, bx = coordB
 	diagonal_steps = min(abs(ay - by), abs(ax - bx))
 	orthogonal_steps = abs(ay - by) + abs(ax - bx) - 2 * diagonal_steps
 	return orthogonal_steps, diagonal_steps
+
+
+def cross_product(line_start_coord, wild_coord, line_finish_coord):
+	start_y, start_x = line_start_coord
+	wild_y, wild_x = wild_coord
+	finish_y, finish_x = line_finish_coord
+	return abs((start_x - wild_x) * (finish_y - wild_y) - (finish_x - wild_x) * (start_y - wild_y))

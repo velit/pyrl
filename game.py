@@ -11,6 +11,7 @@ from ai import AI
 from fov import get_light_set
 from world_file import WorldFile
 from debug_flags import Flags
+from combat import get_melee_attack, get_combat_message
 
 
 class Game:
@@ -31,6 +32,9 @@ class Game:
 		self.cur_level = self.levels[CG.FIRST_LEVEL]
 		self.cur_level.add_creature(self.player)
 		self.register_status_texts()
+
+	def is_player(self, creature):
+		return self.player is creature
 
 	def register_status_texts(self):
 		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format( *self.player.get_damage_info()))
@@ -60,7 +64,7 @@ class Game:
 		except KeyError:
 			self.init_new_level(world_loc)
 			self.cur_level = self.levels[world_loc]
-		old_level.remove_creature(self.player.loc)
+		old_level.remove_creature(self.player)
 		self.cur_level.add_creature(self.player, self.cur_level.get_passage_loc(passage))
 		self.redraw()
 
@@ -71,19 +75,14 @@ class Game:
 		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
 
 	def play(self):
-		#checks:
-		if self.player.is_dead():
-			io.notify("You die... [more]")
-			io.notify("Just kidding, there is no [more]")
-			self.endgame(False)
 		if self.cur_level.turn_scheduler.is_new_turn():
 			self.turn_counter += 1
 
 		creature = self.cur_level.turn_scheduler.get()
-		if creature == self.player:
+		if self.is_player(creature):
 			self.player_act()
 		else:
-			self.ai.act(self.cur_level, creature, self.player.loc)
+			self.ai.act(self, self.cur_level, creature, self.player.loc)
 
 	def player_act(self):
 		i = 0
@@ -92,8 +91,24 @@ class Game:
 			took_action = self.user_input.get_and_act(self, self.cur_level, self.player)
 			if took_action:
 				i += 1
-			if i == 2:
+			if i == 1:
 				break
+
+	def creature_attack(self, level, attacker, defender):
+		attack_succeeds, damage = get_melee_attack(attacker.ar, attacker.get_damage_info(), defender.dr, defender.pv)
+		if attack_succeeds:
+			defender.receive_damage(damage)
+		died = defender.is_dead()
+		combat_message = get_combat_message(attack_succeeds, damage, died, map(self.is_player, (attacker, defender)), attacker.name, defender.name)
+		io.msg(combat_message)
+		if died:
+			self.creature_death(level, defender)
+
+	def creature_death(self, level, creature):
+		if self.is_player(creature):
+			io.notify("You die...")
+			self.endgame(False)
+		level.remove_creature(creature)
 
 	def endgame(self, ask=False, message=""):
 		io.msg(message)
