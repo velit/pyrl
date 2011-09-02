@@ -7,10 +7,9 @@ import const.debug as D
 from pio import io
 from char import Char
 from random import randrange, choice
-from generic_algorithms import bresenham, chebyshev_distance
 from creature import Creature
 from turn_scheduler import TurnScheduler
-from combat import get_melee_attack
+from generic_algorithms import bresenham, chebyshev, cross_product
 
 class Level:
 
@@ -46,9 +45,9 @@ class Level:
 
 	def _get_visible_char(self, loc):
 		if loc in self.creatures:
-			return self.creatures[loc].char
+			return self.get_creature(loc).char
 		else:
-			return self.tiles[loc].visible_char
+			return self.get_tile(loc).visible_char
 
 	def _get_loc(self, y, x):
 		return y * self.cols + x
@@ -64,19 +63,45 @@ class Level:
 		creature = Creature(mons_file)
 		self.add_creature(creature)
 
+	def _path_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
+		cost = self.distance_cost(start_loc, end_loc)
+		if D.CROSS:
+			coord_start = self.get_coord(start_loc)
+			coord_end = self.get_coord(end_loc)
+			coord_nudge = self.get_coord(nudge_towards_from_start_loc)
+			cost += cross_product(coord_start, coord_end, coord_nudge) / D.CROSS_MOD
+		return cost
+
+	def _pathing_neighbors(self, loc):
+		for direction in DIRS.ALL_DIRECTIONS:
+			neighbor_loc = self.get_relative_loc(loc, direction)
+			if self.is_tile_passable(neighbor_loc):
+				if direction in DIRS.DIAGONAL:
+					yield neighbor_loc, self.get_tile(loc).movement_cost * DIRS.DIAGONAL_MODIFIER
+				else:
+					yield neighbor_loc, self.get_tile(loc).movement_cost
+
 	def get_exit(self, loc):
-		return self.tiles[loc].exit_point
+		return self.get_tile(loc).exit_point
 
 	def get_coord(self, loc):
 		return loc // self.cols, loc % self.cols
 
-	def get_relative_loc(self, loc, direction):
+	def get_creature(self, loc):
+		return self.creatures[loc]
+
+	def get_tile(self, loc):
+		return self.tiles[loc]
+
+	def get_relative_loc(self, loc, direction, n=1):
 		dy, dx = DIRS.DELTA[direction]
-		if not self._legal_loc(loc, dy, dx):
-			msg = "Location {} of {},{} is out of bounds."
-			raise IndexError(msg.format(direction, *self.get_coord(loc)))
-		else:
-			return loc + self._get_loc(dy, dx)
+		for x in range(n):
+			if not self._legal_loc(loc, dy, dx):
+				msg = "Location {} of {},{} is out of bounds."
+				raise IndexError(msg.format(direction, *self.get_coord(loc)))
+			else:
+				loc += self._get_loc(dy, dx)
+		return loc
 
 	def get_loc_iter(self):
 		return range(len(self.tiles))
@@ -87,7 +112,7 @@ class Level:
 
 	def get_memory_data(self, location_set):
 		for loc in location_set:
-			yield loc // self.cols, loc % self.cols, self.tiles[loc].memory_char
+			yield loc // self.cols, loc % self.cols, self.get_tile(loc).memory_char
 
 	def get_passage_loc(self, passage):
 		if passage == CG.PASSAGE_RANDOM:
@@ -99,19 +124,19 @@ class Level:
 		return loc in self.creatures
 
 	def is_tile_passable(self, loc):
-		return self.tiles[loc].is_passable
+		return self.get_tile(loc).is_passable
 
 	def is_passable(self, loc):
 		if loc in self.creatures:
 			return False
 		else:
-			return self.tiles[loc].is_passable
+			return self.get_tile(loc).is_passable
 
 	def is_see_through(self, loc):
-		return self.tiles[loc].is_see_through
+		return self.get_tile(loc).is_see_through
 
 	def is_exit(self, loc):
-		return self.tiles[loc].exit_point is not None
+		return self.get_tile(loc).exit_point is not None
 
 	def pop_modified_locs(self):
 		mod_locs = self.modified_locations
@@ -126,48 +151,35 @@ class Level:
 		coordB = self.get_coord(loc2)
 		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
 
-	def look_information(self, loc):
+	def distance_cost(self, locA, locB):
+		coordA, coordB = self.get_coord(locA), self.get_coord(locB)
+		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, DIRS.DIAGONAL_MODIFIER)
 
+	def path(self, start_loc, goal_loc):
+		return path.path(start_loc, goal_loc, self._pathing_neighbors, self._path_heuristic, self.cols)
+
+	def look_information(self, loc):
 		if loc in self.visited_locations:
 			information = "{}x{} ".format(*self.get_coord(loc))
 			if self.has_creature(loc):
-				c = self.creatures[loc]
-				creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} dmg_bonus:{} dice:{} sides:{} "
-				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, c.dmg_bonus,
-						c.unarmed_dice, c.unarmed_sides)
-				information += "target:{}".format(c.last_target_loc if c.last_target_loc is None else self.get_coord(c.last_target_loc))
+				c = self.get_creature(loc)
+				creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{} "
+				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar,
+						*c.get_damage_info())
+				information += "target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
 			else:
-				information += self.tiles[loc].name
+				information += self.get_tile(loc).name
 			return information
 		else:
 			return "You don't know anything about this place."
 
-	def pathing_neighbors(self, loc):
+	def get_passable_locations(self, creature):
+		locations = []
 		for direction in DIRS.ALL_DIRECTIONS:
-			neighbor_loc = self.get_relative_loc(loc, direction)
-			if self.is_tile_passable(neighbor_loc):
-				if direction in DIRS.DIAGONAL:
-					yield neighbor_loc, int(round(self.tiles[loc].movement_cost * DIRS.DIAGONAL_MODIFIER))
-				else:
-					yield neighbor_loc, self.tiles[loc].movement_cost
-
-	def pathing_heuristic(self, locA, locB, cross_product_loc=None):
-		"""A* pathing heuristic."""
-		ay, ax = self.get_coord(locA)
-		by, bx = self.get_coord(locB)
-
-		orthogonal_steps, diagonal_steps = chebyshev_distance((ay, ax), (by, bx))
-		cost = CG.MOVEMENT_COST * (orthogonal_steps + diagonal_steps * DIRS.DIAGONAL_MODIFIER)
-
-		if cross_product_loc is not None:
-			cross_y, cross_x = self.get_coord(cross_product_loc)
-			cross_product = abs((ax - bx) * (cross_y - by) - (cross_x - bx) * (ay - by)) / 100
-			return cost + cross_product
-		else:
-			return cost
-
-	def path(self, start_loc, goal_loc):
-		return path.path(start_loc, goal_loc, self.pathing_neighbors, self.pathing_heuristic, self.cols)
+			loc = self.get_relative_loc(creature.loc, direction)
+			if self.is_passable(loc):
+				locations.append(loc)
+		return locations
 
 	def add_creature(self, creature, loc=None):
 		if loc is None:
@@ -177,8 +189,8 @@ class Level:
 		creature.loc = loc
 		self.turn_scheduler.add(creature)
 
-	def remove_creature(self, loc):
-		creature = self.creatures[loc]
+	def remove_creature(self, creature):
+		loc = creature.loc
 		del self.creatures[loc]
 		self.modified_locations.add(loc)
 		creature.loc = None
@@ -199,37 +211,13 @@ class Level:
 		return False
 
 	def creature_has_range(self, creature, target_loc):
-		orth, dia = chebyshev_distance(self.get_coord(creature.loc), self.get_coord(target_loc))
+		orth, dia = chebyshev(self.get_coord(creature.loc), self.get_coord(target_loc))
 		return orth + dia in (0, 1)
 
 	def creature_has_sight(self, creature, target_loc):
 		cy, cx = self.get_coord(creature.loc)
 		ty, tx = self.get_coord(target_loc)
-		#dy, dx = self.get_coord(max(creature.loc, target_loc) - min(creature.loc, target_loc))
 		if (cy - ty) ** 2 + (cx - tx) ** 2 <= creature.sight ** 2:
-		#if dy ** 2 + dx ** 2 <= creature.sight:
 			return self.check_los(creature.loc, target_loc)
 		else:
 			return False
-
-	def creature_attack(self, creature, target_loc):
-		target = self.creatures[target_loc]
-		attack_succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
-		if attack_succeeds:
-			dies = target.lose_hp(damage)
-			if dies:
-				self.creature_death(target)
-			return attack_succeeds, target.name, dies, damage
-		else:
-			return attack_succeeds, target.name, False, 0
-
-	def creature_death(self, creature):
-		self.remove_creature(creature.loc)
-
-	def get_passable_locations(self, creature):
-		locations = []
-		for direction in DIRS.ALL_DIRECTIONS:
-			loc = self.get_relative_loc(creature.loc, direction)
-			if self.is_passable(loc):
-				locations.append(loc)
-		return locations

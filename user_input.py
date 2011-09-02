@@ -66,20 +66,8 @@ def act_to_dir(game, level, creature, direction):
 	if level.move_creature(creature, target_loc):
 		return True
 	elif level.has_creature(target_loc):
-		attack_succeeds, name, dies, damage = level.creature_attack(creature, target_loc)
-		if attack_succeeds:
-			if damage > 0:
-				if dies:
-					io.msg("You hit the {} for {} damage and kill it.".format(name, damage))
-				else:
-					io.msg("You hit the {} for {} damage.".format(name, damage))
-			else:
-				if dies:
-					io.msg("You fail to hurt the {}. The {} suddenly collapses!".format(name, name))
-				else:
-					io.msg("You fail to hurt the {}.".format(name))
-		else:
-			io.msg("You miss the {}.".format(name))
+		target = level.get_creature(target_loc)
+		game.creature_attack(level, creature, target)
 		return True
 	else:
 		io.msg("You can't move there.")
@@ -119,7 +107,7 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def debug(game, level, creature):
-	c = io.getch()
+	c = io.getch_print("Avail cmds: vclbdhkp")
 	if c == ord('v'):
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
@@ -140,11 +128,10 @@ def debug(game, level, creature):
 		game.redraw()
 		io.msg("Reverse set to {}".format(game.flags.reverse))
 	elif c == ord('k'):
-		for loc in tuple(level.creatures):
-			if loc == creature.loc:
-				continue
-			else:
-				level.remove_creature(loc)
+		creature_list = list(level.creatures.values())
+		creature_list.remove(creature)
+		for i in creature_list:
+			level.remove_creature(i)
 		io.msg("Abrakadabra.")
 	elif c == ord('p'):
 		passage_up = level.get_passage_loc(CG.PASSAGE_UP)
@@ -170,6 +157,6 @@ def enter(game, level, creature, passage):
 			io.msg("This level doesn't seem to have a corresponding passage.")
 		else:
 			if not level.is_passable(new_loc):
-				level.remove_creature(new_loc)
+				level.remove_creature(level.get_creature(new_loc))
 			level.move_creature(game.player, new_loc)
 	return True

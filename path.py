@@ -2,10 +2,16 @@ import const.debug as D
 
 from heapq import heappush, heappop
 from pio import io
+from generic_algorithms import chebyshev
 
 
 def path(start_loc, goal_loc, neighbor_function, heuristic, cols):
 	return _iterate_path(_path(start_loc, goal_loc, neighbor_function, heuristic, cols), start_loc, goal_loc)
+
+
+def heuristic(coordA, coordB, default_movement_cost, diagonal_modifier):
+	orthogonal_steps, diagonal_steps = chebyshev(coordA, coordB)
+	return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
 
 
 def _path(start, goal, neighbors, heuristic, cols):

@@ -96,6 +96,10 @@ class _IO:
 		self.refresh()
 		return self.l.getch(*a, **k)
 
+	def getch_print(self, print_str):
+		self.msg(print_str)
+		return self.getch()
+
 	def notify(self, print_str=None, *a, **k):
 		if print_str is not None:
 			self.msg(print_str)
@@ -108,8 +112,11 @@ class _IO:
 			self.refresh()
 		return self.l.sel_getch(None, *a, **k)
 
-	def msg(self, *a, **k):
-		self.m.queue_msg(*a, **k)
+	def msg(self, *a):
+		if len(a) > 1:
+			self.m.queue_msg(a)
+		else:
+			self.m.queue_msg(*a)
 
 	def refresh(self):
 		self.m.update()
