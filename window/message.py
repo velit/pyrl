@@ -1,9 +1,9 @@
 import curses
+import textwrap
 
 import const.game as CG
 
-from window import Window
-from textwrap import TextWrapper
+from window.window import Window
 
 
 class MessageBar(Window):
@@ -15,10 +15,10 @@ class MessageBar(Window):
 		self.msgqueue = ""
 
 		#accommodate for printing the newline character
-		self.wrapper = TextWrapper(width=(self.cols))
+		self.wrapper = textwrap.TextWrapper(width=(self.cols))
 
 		#accommodate for the more_str if the messages continue on the next page
-		self.last_line_wrapper = TextWrapper(width=(self.cols - len(CG.MORE_STR) - 1))
+		self.last_line_wrapper = textwrap.TextWrapper(width=(self.cols - len(CG.MORE_STR) - 1))
 
 	def update(self):
 		self.print_queue()

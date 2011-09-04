@@ -1,4 +1,7 @@
 #!/bin/sh
 rm *.pyc
+rm const/*.pyc
 rm editor/*.pyc
+rm __pycache__/*.pyc
+rm window/*.pyc
 rm errors.err
