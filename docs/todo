@@ -1,0 +1,32 @@
+dungeon generator, poops out levels - doen
+dungeon switcher, contains dungeon structure, does switching - world module done - doen
+make editor bettah - doen
+make it so edit_attribute can delete dict values - doen
+put edit_attribute resolution paths into own functions - doen
+make edit_attribute - doen
+make level editor add passageway handles - doen
+move dungeon switching from game to own file - doen
+rename map_editor to tilemap_editor - doen
+add specific monsters and items and shit and monster templates - doen
+make rdg give tilemaps not maps - doen
+do templates (parameter objects) - doen as files
+tiles to tile_id - doen
+attack rating, defense rating, attack power, pv - doen
+remove map memory from map to a set somewhere else - doen
+level_window.draw to work - doen
+
+editor can edit the structure, define stuff - doen?
+split editor to generic functions and menus and specific functions - doen?
+consider making a tilemap that is inherently random - doen?
+window.getchar to window.getChar - doen?
+make weapons have arbitrary attributes like items do - doen?
+
+fix los - some day
+wizard/mana, warrior/stamina rogue/focus - some day
+
+do edge leaving and entering in levels
+redo WorldFile.get_level_monster_list
+make monsters swap places with other monsters if they're in the way
+do precise angle shadowcasting from roguebasin, they have examples
+make bresenham either symmetrical or include all versions
+move into an energy system -> fixes ai problems

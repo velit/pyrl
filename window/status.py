@@ -1,5 +1,5 @@
 import curses
-from window import Window
+from window.window import Window
 
 
 class StatusBar(Window):

@@ -2,10 +2,10 @@ import curses
 
 import const.game as CG
 
-from message_window import MessageBar
-from status_window import StatusBar
-from level_window import LevelWindow
-from window import Window
+from window.message import MessageBar
+from window.status import StatusBar
+from window.level import LevelWindow
+from window.window import Window
 from colors import init_colors
 
 
