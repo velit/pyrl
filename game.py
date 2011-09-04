@@ -2,6 +2,7 @@ import os
 import pickle
 
 import const.game as CG
+import const.creature_actions as CC
 
 from pio import io
 from player import Player
@@ -37,14 +38,16 @@ class Game:
 		return self.player is creature
 
 	def register_status_texts(self):
-		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format( *self.player.get_damage_info()))
+		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*self.player.get_damage_info()))
 		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.max_hp))
-		io.s.add_element("sight", "sight: ", lambda: self.player.sight)
+		io.s.add_element("sight", "SR: ", lambda: self.player.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("loc", "Loc: ", lambda: self.cur_level.world_loc)
+		io.s.add_element("loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
 		io.s.add_element("ar", "AR: ", lambda: self.player.ar)
 		io.s.add_element("dr", "DR: ", lambda: self.player.dr)
 		io.s.add_element("pv", "PV: ", lambda: self.player.pv)
+		io.s.add_element("speed", "SP: ", lambda: self.player.speed)
+		io.s.add_element("energy", "EN: ", lambda: self.player.energy)
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
@@ -76,11 +79,14 @@ class Game:
 
 	def play(self):
 		if self.cur_level.turn_scheduler.is_new_turn():
-			self.turn_counter += 1
+			pass
 
 		creature = self.cur_level.turn_scheduler.get()
+		creature.recover_energy()
 		if self.is_player(creature):
-			self.player_act()
+			if creature.has_energy_to_act():
+				self.player_act()
+				self.turn_counter += 1
 		else:
 			self.ai.act(self, self.cur_level, creature, self.player.loc)
 
@@ -94,15 +100,30 @@ class Game:
 			if i == 1:
 				break
 
-	def creature_attack(self, level, attacker, defender):
-		attack_succeeds, damage = get_melee_attack(attacker.ar, attacker.get_damage_info(), defender.dr, defender.pv)
-		if attack_succeeds:
-			defender.receive_damage(damage)
-		died = defender.is_dead()
-		combat_message = get_combat_message(attack_succeeds, damage, died, map(self.is_player, (attacker, defender)), attacker.name, defender.name)
-		io.msg(combat_message)
-		if died:
-			self.creature_death(level, defender)
+	def creature_move(self, level, creature, direction):
+		loc = level.get_relative_loc(creature.loc, direction)
+		if level.legal_loc(loc) and level.is_passable(loc) and creature.has_energy_to_act():
+			creature.update_energy(level.movement_cost(creature.loc, direction))
+			level.move_creature(creature, loc)
+			return True
+		else:
+			return False
+
+	def creature_attack(self, level, creature, target):
+		if creature.has_energy_to_act():
+			creature.update_energy_action(CC.ATTACK)
+			succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
+			if succeeds:
+				target.receive_damage(damage)
+			died = target.is_dead()
+			player_matrix = map(self.is_player, (creature, target))
+			msg = get_combat_message(succeeds, damage, died, player_matrix, creature.name, target.name)
+			io.msg(msg)
+			if died:
+				self.creature_death(level, target)
+			return True
+		else:
+			return False
 
 	def creature_death(self, level, creature):
 		if self.is_player(creature):

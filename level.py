@@ -52,9 +52,6 @@ class Level:
 	def _get_loc(self, y, x):
 		return y * self.cols + x
 
-	def _legal_loc(self, loc, dy=0, dx=0):
-		return 0 <= loc // self.cols + dy < self.rows and 0 <= loc % self.cols + dx < self.cols
-
 	def _spawn_random_creature(self):
 		creature = Creature(choice(self.creature_spawn_list))
 		self.add_creature(creature)
@@ -63,7 +60,7 @@ class Level:
 		creature = Creature(mons_file)
 		self.add_creature(creature)
 
-	def _path_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
+	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
 		cost = self.distance_cost(start_loc, end_loc)
 		if D.CROSS:
 			coord_start = self.get_coord(start_loc)
@@ -72,14 +69,17 @@ class Level:
 			cost += cross_product(coord_start, coord_end, coord_nudge) / D.CROSS_MOD
 		return cost
 
-	def _pathing_neighbors(self, loc):
+	def _a_star_neighbors(self, loc):
 		for direction in DIRS.ALL_DIRECTIONS:
 			neighbor_loc = self.get_relative_loc(loc, direction)
 			if self.is_tile_passable(neighbor_loc):
 				if direction in DIRS.DIAGONAL:
-					yield neighbor_loc, self.get_tile(loc).movement_cost * DIRS.DIAGONAL_MODIFIER
+					yield neighbor_loc, self.get_tile(loc).movement_cost * CG.DIAGONAL_MODIFIER
 				else:
 					yield neighbor_loc, self.get_tile(loc).movement_cost
+
+	def legal_loc(self, loc, dy=0, dx=0):
+		return 0 <= loc // self.cols + dy < self.rows and 0 <= loc % self.cols + dx < self.cols
 
 	def get_exit(self, loc):
 		return self.get_tile(loc).exit_point
@@ -96,7 +96,7 @@ class Level:
 	def get_relative_loc(self, loc, direction, n=1):
 		dy, dx = DIRS.DELTA[direction]
 		for x in range(n):
-			if not self._legal_loc(loc, dy, dx):
+			if not self.legal_loc(loc, dy, dx):
 				msg = "Location {} of {},{} is out of bounds."
 				raise IndexError(msg.format(direction, *self.get_coord(loc)))
 			else:
@@ -151,12 +151,19 @@ class Level:
 		coordB = self.get_coord(loc2)
 		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
 
-	def distance_cost(self, locA, locB):
+	def distance_heuristic(self, locA, locB):
 		coordA, coordB = self.get_coord(locA), self.get_coord(locB)
-		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, DIRS.DIAGONAL_MODIFIER)
+		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, CG.DIAGONAL_MODIFIER)
+
+	def movement_cost(self, start_loc, direction):
+		target_loc = self.get_relative_loc(start_loc, direction)
+		if direction in DIRS.ORTHOGONAL:
+			return self.get_tile(target_loc).movement_cost
+		elif direction in DIRS.DIAGONAL:
+			return self.get_tile(target_loc).movement_cost * CG.DIAGONAL_MODIFIER
 
 	def path(self, start_loc, goal_loc):
-		return path.path(start_loc, goal_loc, self._pathing_neighbors, self._path_heuristic, self.cols)
+		return path.path(start_loc, goal_loc, self._a_star_neighbors, self._a_star_heuristic, self.cols)
 
 	def look_information(self, loc):
 		if loc in self.visited_locations:
@@ -173,13 +180,13 @@ class Level:
 		else:
 			return "You don't know anything about this place."
 
-	def get_passable_locations(self, creature):
-		locations = []
+	def get_passable_directions(self, creature):
+		directions = []
 		for direction in DIRS.ALL_DIRECTIONS:
 			loc = self.get_relative_loc(creature.loc, direction)
 			if self.is_passable(loc):
-				locations.append(loc)
-		return locations
+				directions.append(direction)
+		return directions
 
 	def add_creature(self, creature, loc=None):
 		if loc is None:
@@ -196,19 +203,12 @@ class Level:
 		creature.loc = None
 		self.turn_scheduler.remove(creature)
 
-	def _move_creature(self, creature, new_loc):
+	def move_creature(self, creature, new_loc):
 		self.modified_locations.add(creature.loc)
 		self.modified_locations.add(new_loc)
 		del self.creatures[creature.loc]
 		self.creatures[new_loc] = creature
 		creature.loc = new_loc
-
-	def move_creature(self, creature, loc):
-		if self._legal_loc(loc):
-			if self.is_passable(loc):
-				self._move_creature(creature, loc)
-				return True
-		return False
 
 	def creature_has_range(self, creature, target_loc):
 		orth, dia = chebyshev(self.get_coord(creature.loc), self.get_coord(target_loc))

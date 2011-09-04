@@ -1,0 +1,2 @@
+MOVE = "move"
+ATTACK = "attack"

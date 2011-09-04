@@ -1,5 +1,7 @@
 from char import Char
 from const.slots import *
+import const.game as CG
+import const.creature_actions as CC
 
 
 class Creature:
@@ -10,6 +12,8 @@ class Creature:
 		self.loc = None
 		self.target_loc = None
 		self.target_dir = None
+
+		self.energy = 0
 
 		self.strength = 10
 		self.dexterity = 10
@@ -38,6 +42,21 @@ class Creature:
 	def is_dead(self):
 		return self.hp <= 0
 
+	def recover_energy(self):
+		self.energy += self.speed
+		if self.energy > 0:
+			self.energy = 0
+
+	def has_energy_to_act(self):
+		return self.energy >= 0
+
+	def update_energy(self, amount):
+		self.energy -= amount
+
+	def update_energy_action(self, action):
+		if action == CC.ATTACK:
+			self.energy -= self.attack_energy_cost
+
 	@property
 	def sight(self):
 		return 6 + (self.perception - 10) // 2
@@ -48,7 +67,7 @@ class Creature:
 
 	@property
 	def dmg_bonus(self):
-		return self.strength // 5
+		return self.strength // 5 + self.dexterity // 10
 
 	@property
 	def pv(self):
@@ -69,3 +88,11 @@ class Creature:
 	@property
 	def unarmed_sides(self):
 		return self.strength // 3 + self.dexterity // 6
+
+	@property
+	def speed(self):
+		return 93 + self.dexterity // 2 + self.strength // 5
+
+	@property
+	def attack_energy_cost(self):
+		return CG.ATTACK_COST
