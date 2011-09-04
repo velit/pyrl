@@ -1,7 +1,3 @@
-from math import sqrt
-
-DIAGONAL_MODIFIER = sqrt(2)
-
 SW = "southwest"
 SO = "south"
 SE = "southeast"

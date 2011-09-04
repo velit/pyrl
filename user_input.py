@@ -61,9 +61,10 @@ class UserInput:
 
 def act_to_dir(game, level, creature, direction):
 	if direction == DIRS.STOP:
+		creature.update_energy(CG.MOVEMENT_COST)
 		return True
 	target_loc = level.get_relative_loc(creature.loc, direction)
-	if level.move_creature(creature, target_loc):
+	if game.creature_move(level, creature, direction):
 		return True
 	elif level.has_creature(target_loc):
 		target = level.get_creature(target_loc)
