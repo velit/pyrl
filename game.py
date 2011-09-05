@@ -109,18 +109,25 @@ class Game:
 		else:
 			return False
 
-	def creature_attack(self, level, creature, target):
+	def creature_attack(self, level, creature, direction):
 		if creature.has_energy_to_act():
 			creature.update_energy_action(CC.ATTACK)
+			target_loc = level.get_relative_loc(creature.loc, direction)
+			if level.has_creature(target_loc):
+				target = level.get_creature(target_loc)
+			else:
+				target = level.get_tile(target_loc)
 			succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
-			if succeeds:
+			if damage:
 				target.receive_damage(damage)
-			died = target.is_dead()
+				died = target.is_dead()
+			else:
+				died = False
 			player_matrix = map(self.is_player, (creature, target))
 			msg = get_combat_message(succeeds, damage, died, player_matrix, creature.name, target.name)
-			io.msg(msg)
 			if died:
 				self.creature_death(level, target)
+			io.msg(msg)
 			return True
 		else:
 			return False

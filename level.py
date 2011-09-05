@@ -61,7 +61,7 @@ class Level:
 		self.add_creature(creature)
 
 	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
-		cost = self.distance_cost(start_loc, end_loc)
+		cost = self.distance_heuristic(start_loc, end_loc)
 		if D.CROSS:
 			coord_start = self.get_coord(start_loc)
 			coord_end = self.get_coord(end_loc)
@@ -70,7 +70,7 @@ class Level:
 		return cost
 
 	def _a_star_neighbors(self, loc):
-		for direction in DIRS.ALL_DIRECTIONS:
+		for direction in DIRS.ALL:
 			neighbor_loc = self.get_relative_loc(loc, direction)
 			if self.is_tile_passable(neighbor_loc):
 				if direction in DIRS.DIAGONAL:
@@ -94,7 +94,7 @@ class Level:
 		return self.tiles[loc]
 
 	def get_relative_loc(self, loc, direction, n=1):
-		dy, dx = DIRS.DELTA[direction]
+		dy, dx = direction
 		for x in range(n):
 			if not self.legal_loc(loc, dy, dx):
 				msg = "Location {} of {},{} is out of bounds."
@@ -182,7 +182,7 @@ class Level:
 
 	def get_passable_directions(self, creature):
 		directions = []
-		for direction in DIRS.ALL_DIRECTIONS:
+		for direction in DIRS.ALL:
 			loc = self.get_relative_loc(creature.loc, direction)
 			if self.is_passable(loc):
 				directions.append(direction)
@@ -210,9 +210,12 @@ class Level:
 		self.creatures[new_loc] = creature
 		creature.loc = new_loc
 
-	def creature_has_range(self, creature, target_loc):
-		orth, dia = chebyshev(self.get_coord(creature.loc), self.get_coord(target_loc))
-		return orth + dia in (0, 1)
+	def get_dir_if_valid(self, loc_origin, loc_target):
+		oy, ox = self.get_coord(loc_origin)
+		ty, tx = self.get_coord(loc_target)
+		vector = (ty - oy, tx - ox)
+		if vector in DIRS.ALL:
+			return vector
 
 	def creature_has_sight(self, creature, target_loc):
 		cy, cx = self.get_coord(creature.loc)
