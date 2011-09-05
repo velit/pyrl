@@ -11,8 +11,9 @@ class AI:
 		if loc is not None:
 			if level.creature_has_sight(creature, loc):
 				creature.target_loc = loc
-				if level.creature_has_range(creature, loc):
-					return self.attack(game, level, creature, loc)
+				direction = level.get_dir_if_valid(creature.loc, loc)
+				if direction is not None:
+					return game.creature_attack(level, creature, direction)
 				else:
 					return self.move_towards(game, level, creature, loc)
 			elif creature.target_loc is not None:
@@ -38,7 +39,3 @@ class AI:
 			return
 		dir_ = random.choice(directions)
 		game.creature_move(level, creature, dir_)
-
-	def attack(self, game, level, creature, target_loc):
-		target = level.get_creature(target_loc)
-		game.creature_attack(level, creature, target)

@@ -7,14 +7,14 @@ from const.tiles import UNKNOWN, FLOOR, WALL, ROCK, STAIRS_UP, STAIRS_DOWN
 tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
 	UNKNOWN: Tile("You have not seen this place yet",
 			Char(' '), Char(' '), False, False),
-	FLOOR: Tile("Dungeon floor", Char('.'), Char('.')),
-	ROCK: Tile("Dungeon rock", Char('#', "black"), Char('#', "black"),
+	FLOOR: Tile("dungeon floor", Char('.'), Char('.')),
+	ROCK: Tile("dungeon rock", Char('#', "black"), Char('#', "black"),
 			False, False),
-	WALL: Tile("Wall", Char('#', "brown"), Char('#', "black"),
+	WALL: Tile("wall", Char('#', "brown"), Char('#', "black"),
 			False, False),
-	STAIRS_DOWN: Tile("Down staircase", Char('>', "red"), Char('>'),
+	STAIRS_DOWN: Tile("down staircase", Char('>', "red"), Char('>'),
 			exit_point=CG.PASSAGE_DOWN),
-	STAIRS_UP: Tile("Up staircase", Char('<', "red"), Char('<'),
+	STAIRS_UP: Tile("up staircase", Char('<', "red"), Char('<'),
 			exit_point=CG.PASSAGE_UP),
 }
 

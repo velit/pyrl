@@ -14,3 +14,11 @@ class Tile:
 		self.is_see_through = is_see_through
 		self.movement_cost = movement_cost
 		self.exit_point = exit_point
+
+	@property
+	def dr(self):
+		return 0
+
+	@property
+	def pv(self):
+		return 100 if self.is_passable else 40

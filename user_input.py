@@ -7,30 +7,12 @@ import const.debug as D
 from pio import io
 from char import Char
 
-direction_keys = {
-	curses.KEY_DOWN: DIRS.SO,
-	curses.KEY_LEFT: DIRS.WE,
-	curses.KEY_RIGHT: DIRS.EA,
-	curses.KEY_UP: DIRS.NO,
-	ord('.'): DIRS.STOP,
-	ord('1'): DIRS.SW,
-	ord('2'): DIRS.SO,
-	ord('3'): DIRS.SE,
-	ord('4'): DIRS.WE,
-	ord('5'): DIRS.STOP,
-	ord('6'): DIRS.EA,
-	ord('7'): DIRS.NW,
-	ord('8'): DIRS.NO,
-	ord('9'): DIRS.NE,
-	ord('h'): DIRS.WE,
-	ord('i'): DIRS.NE,
-	ord('j'): DIRS.SO,
-	ord('k'): DIRS.NO,
-	ord('l'): DIRS.EA,
-	ord('m'): DIRS.SE,
-	ord('n'): DIRS.SW,
-	ord('u'): DIRS.NW,
-	}
+numpad_direction_keys = "123456789"
+alpha_direction_keys = "njmh.luki"
+direction_keys = tuple(map(ord, numpad_direction_keys + alpha_direction_keys))
+direction_values = (DIRS.SW, DIRS.SO, DIRS.SE, DIRS.WE, DIRS.STOP, DIRS.EA, DIRS.NW, DIRS.NO, DIRS.NE)
+
+direction_map = dict(zip(direction_keys, 2 * direction_values))
 
 class UserInput:
 	def __init__(self):
@@ -40,12 +22,13 @@ class UserInput:
 			ord('>'): ("enter", (CG.PASSAGE_DOWN, ), no_kwds),
 			ord('Q'): ("endgame", no_args, no_kwds),
 			ord('S'): ("savegame", no_args, no_kwds),
-			ord('d'): ("debug", no_args, no_kwds),
 			ord('L'): ("look", no_args, no_kwds),
 			ord('Z'): ("z_command", no_args, no_kwds),
+			ord('a'): ("attack", no_args, no_kwds),
+			ord('d'): ("debug", no_args, no_kwds),
 			ord('\x12'): ("redraw_view", no_args, no_kwds),
 		}
-		for key, value in direction_keys.items():
+		for key, value in direction_map.items():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
 	def get_and_act(self, game, level, creature):
@@ -67,8 +50,7 @@ def act_to_dir(game, level, creature, direction):
 	if game.creature_move(level, creature, direction):
 		return True
 	elif level.has_creature(target_loc):
-		target = level.get_creature(target_loc)
-		game.creature_attack(level, creature, target)
+		game.creature_attack(level, creature, direction)
 		return True
 	else:
 		io.msg("You can't move there.")
@@ -94,8 +76,8 @@ def look(game, level, creature):
 		c = io.getch(*level.get_coord(loc))
 		game.redraw()
 		direction = DIRS.STOP
-		if c in direction_keys:
-			direction = direction_keys[c]
+		if c in direction_map:
+			direction = direction_map[c]
 		elif c == ord('d'):
 			drawline_flag = not drawline_flag
 		elif c in map(ord, "QqzZ "):
@@ -106,6 +88,12 @@ def endgame(game, level, creature, *a, **k):
 
 def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
+
+def attack(game, level, creature):
+	c = io.sel_getch("Specify attack direction:", CG.DEFAULT | set(direction_keys))
+	if c in direction_map:
+		game.creature_attack(level, creature, direction_map[c])
+		return True
 
 def debug(game, level, creature):
 	c = io.getch_print("Avail cmds: vclbdhkp")
