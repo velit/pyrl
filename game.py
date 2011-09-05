@@ -140,6 +140,8 @@ class Game:
 
 	def _save(self):
 		save_path = os.path.join("data", "pyrl.svg")
+		if not os.path.exists(save_path):
+			os.mkdir("data")
 		with open(save_path, "wb") as f:
 			pickle.dump(self, f)
 		io.msg("Savegame file size: {} bytes".format(os.path.getsize(save_path)))
