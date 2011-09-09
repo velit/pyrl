@@ -181,12 +181,13 @@ class Level:
 			return "You don't know anything about this place."
 
 	def get_passable_directions(self, creature):
-		directions = []
 		for direction in DIRS.ALL:
 			loc = self.get_relative_loc(creature.loc, direction)
 			if self.is_passable(loc):
-				directions.append(direction)
-		return directions
+				yield direction
+
+	def get_passable_directions_closest_to_target(self, creature, target_loc):
+		pass#TODO
 
 	def add_creature(self, creature, loc=None):
 		if loc is None:
