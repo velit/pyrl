@@ -7,12 +7,12 @@ import const.debug as D
 from pio import io
 from char import Char
 
-numpad_direction_keys = "123456789"
-alpha_direction_keys = "njmh.luki"
-direction_keys = tuple(map(ord, numpad_direction_keys + alpha_direction_keys))
-direction_values = (DIRS.SW, DIRS.SO, DIRS.SE, DIRS.WE, DIRS.STOP, DIRS.EA, DIRS.NW, DIRS.NO, DIRS.NE)
+numpad_direction_keys = tuple(map(ord, "428657913"))
+alnum_direction_keys = tuple(map(ord, "hjkl.uinm"))
+arrow_keys = (curses.KEY_LEFT, curses.KEY_DOWN, curses.KEY_UP, curses.KEY_RIGHT)
+direction_keys = numpad_direction_keys + alnum_direction_keys + arrow_keys
 
-direction_map = dict(zip(direction_keys, 2 * direction_values))
+direction_map = dict(zip(direction_keys, 3 * DIRS.ALL))
 
 class UserInput:
 	def __init__(self):
