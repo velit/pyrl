@@ -47,7 +47,7 @@ class Game:
 		io.s.add_element("dr", "DR: ", lambda: self.player.dr)
 		io.s.add_element("pv", "PV: ", lambda: self.player.pv)
 		io.s.add_element("speed", "SP: ", lambda: self.player.speed)
-		io.s.add_element("energy", "EN: ", lambda: self.player.energy)
+		io.s.add_element("energy", "EN: ", lambda: self.player.last_action_energy)
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
@@ -101,10 +101,10 @@ class Game:
 				break
 
 	def creature_move(self, level, creature, direction):
-		loc = level.get_relative_loc(creature.loc, direction)
-		if level.legal_loc(loc) and level.is_passable(loc) and creature.has_energy_to_act():
-			creature.update_energy(level.movement_cost(creature.loc, direction))
-			level.move_creature(creature, loc)
+		if level.creature_can_move(creature, direction) and creature.has_energy_to_act():
+			target_loc = level.get_relative_loc(creature.loc, direction)
+			creature.update_energy(level.movement_cost(direction, target_loc))
+			level.move_creature(creature, target_loc)
 			return True
 		else:
 			return False
