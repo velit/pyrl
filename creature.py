@@ -55,7 +55,11 @@ class Creature:
 
 	def update_energy_action(self, action):
 		if action == CC.ATTACK:
-			self.energy -= self.attack_energy_cost
+			amount = self.attack_energy_cost
+		else:
+			assert False
+		self.energy -= amount
+		return amount
 
 	@property
 	def sight(self):

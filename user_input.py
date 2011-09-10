@@ -7,12 +7,30 @@ import const.debug as D
 from pio import io
 from char import Char
 
-numpad_direction_keys = tuple(map(ord, "428657913"))
-alnum_direction_keys = tuple(map(ord, "hjkl.uinm"))
-arrow_keys = (curses.KEY_LEFT, curses.KEY_DOWN, curses.KEY_UP, curses.KEY_RIGHT)
-direction_keys = numpad_direction_keys + alnum_direction_keys + arrow_keys
-
-direction_map = dict(zip(direction_keys, 3 * DIRS.ALL))
+direction_map = {
+		curses.KEY_LEFT: DIRS.WE,
+		curses.KEY_DOWN: DIRS.SO,
+		curses.KEY_UP: DIRS.NO,
+		curses.KEY_RIGHT: DIRS.EA,
+		ord('1'): DIRS.SW,
+		ord('2'): DIRS.SO,
+		ord('3'): DIRS.SE,
+		ord('4'): DIRS.WE,
+		ord('5'): DIRS.STOP,
+		ord('6'): DIRS.EA,
+		ord('7'): DIRS.NW,
+		ord('8'): DIRS.NO,
+		ord('9'): DIRS.NE,
+		ord('h'): DIRS.WE,
+		ord('j'): DIRS.SO,
+		ord('k'): DIRS.NO,
+		ord('l'): DIRS.EA,
+		ord('.'): DIRS.STOP,
+		ord('u'): DIRS.NW,
+		ord('i'): DIRS.NE,
+		ord('n'): DIRS.SW,
+		ord('m'): DIRS.SE,
+		}
 
 class UserInput:
 	def __init__(self):
@@ -43,9 +61,6 @@ class UserInput:
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def act_to_dir(game, level, creature, direction):
-	if direction == DIRS.STOP:
-		creature.update_energy(CG.MOVEMENT_COST)
-		return True
 	target_loc = level.get_relative_loc(creature.loc, direction)
 	if game.creature_move(level, creature, direction):
 		return True

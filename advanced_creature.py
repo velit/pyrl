@@ -11,6 +11,8 @@ class AdvancedCreature(Creature):
 		self.slots[BODY] = None
 		self.slots[FEET] = None
 
+		self.last_action_energy = 0
+
 		super().__init__(creature_file)
 
 	def get_damage_info(self):
@@ -32,6 +34,13 @@ class AdvancedCreature(Creature):
 
 	def get_item_stats(self, STAT):
 		return sum(item.stats[STAT] for item in self.slots.values() if item is not None and STAT in item.stats)
+
+	def update_energy(self, amount):
+		super().update_energy(amount)
+		self.last_action_energy = amount
+
+	def update_energy_action(self, action):
+		self.last_action_energy = super().update_energy_action(action)
 
 	@property
 	def sight(self):
