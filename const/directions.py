@@ -8,7 +8,7 @@ SW = (1, -1)
 SO = (1, 0)
 SE = (1, 1)
 
-ALL = (WE, SO, NO, EA, STOP, NW, NE, SW, SE)
+ALL = (WE, SO, NO, EA, NW, NE, SW, SE, STOP)
 
 DIAGONAL = (NW, NE, SW, SE)
 ORTHOGONAL = (NO, EA, SO, WE)
