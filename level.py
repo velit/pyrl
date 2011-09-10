@@ -34,6 +34,24 @@ class Level:
 		for x in range(CG.MONSTERS_PER_LEVEL):
 			self._spawn_random_creature()
 
+	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
+		cost = self.distance_heuristic(start_loc, end_loc)
+		if D.CROSS:
+			coord_start = self.get_coord(start_loc)
+			coord_end = self.get_coord(end_loc)
+			coord_nudge = self.get_coord(nudge_towards_from_start_loc)
+			cost += cross_product(coord_start, coord_end, coord_nudge) / D.CROSS_MOD
+		return cost
+
+	def _a_star_neighbors(self, loc):
+		for direction in DIRS.ALL:
+			neighbor_loc = self.get_relative_loc(loc, direction)
+			if self.get_tile(neighbor_loc).is_passable:
+				if direction in DIRS.DIAGONAL:
+					yield neighbor_loc, round(self.get_tile(loc).movement_cost * CG.DIAGONAL_MODIFIER)
+				else:
+					yield neighbor_loc, self.get_tile(loc).movement_cost
+
 	def _get_free_loc(self):
 		while True:
 			loc = self._get_random_loc()
@@ -60,26 +78,8 @@ class Level:
 		creature = Creature(mons_file)
 		self.add_creature(creature)
 
-	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
-		cost = self.distance_heuristic(start_loc, end_loc)
-		if D.CROSS:
-			coord_start = self.get_coord(start_loc)
-			coord_end = self.get_coord(end_loc)
-			coord_nudge = self.get_coord(nudge_towards_from_start_loc)
-			cost += cross_product(coord_start, coord_end, coord_nudge) / D.CROSS_MOD
-		return cost
-
-	def _a_star_neighbors(self, loc):
-		for direction in DIRS.ALL:
-			neighbor_loc = self.get_relative_loc(loc, direction)
-			if self.is_tile_passable(neighbor_loc):
-				if direction in DIRS.DIAGONAL:
-					yield neighbor_loc, self.get_tile(loc).movement_cost * CG.DIAGONAL_MODIFIER
-				else:
-					yield neighbor_loc, self.get_tile(loc).movement_cost
-
-	def legal_loc(self, loc, dy=0, dx=0):
-		return 0 <= loc // self.cols + dy < self.rows and 0 <= loc % self.cols + dx < self.cols
+	def legal_loc(self, loc, direction=(0,0)):
+		return 0 <= loc // self.cols + direction[0] < self.rows and 0 <= loc % self.cols + direction[1] < self.cols
 
 	def get_exit(self, loc):
 		return self.get_tile(loc).exit_point
@@ -93,15 +93,13 @@ class Level:
 	def get_tile(self, loc):
 		return self.tiles[loc]
 
-	def get_relative_loc(self, loc, direction, n=1):
-		dy, dx = direction
-		for x in range(n):
-			if not self.legal_loc(loc, dy, dx):
-				msg = "Location {} of {},{} is out of bounds."
-				raise IndexError(msg.format(direction, *self.get_coord(loc)))
-			else:
-				loc += self._get_loc(dy, dx)
-		return loc
+	def get_relative_loc(self, loc, direction):
+		return loc + self._get_loc(direction[0], direction[1])
+		#if not self.legal_loc(loc, direction):
+		#	msg = "Location {} of {},{} is out of bounds."
+		#	raise IndexError(msg.format(direction, *self.get_coord(loc)))
+		#else:
+		#	return loc + self._get_loc(direction[1], direction[0])
 
 	def get_loc_iter(self):
 		return range(len(self.tiles))
@@ -122,9 +120,6 @@ class Level:
 
 	def has_creature(self, loc):
 		return loc in self.creatures
-
-	def is_tile_passable(self, loc):
-		return self.get_tile(loc).is_passable
 
 	def is_passable(self, loc):
 		if loc in self.creatures:
@@ -155,12 +150,16 @@ class Level:
 		coordA, coordB = self.get_coord(locA), self.get_coord(locB)
 		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, CG.DIAGONAL_MODIFIER)
 
-	def movement_cost(self, start_loc, direction):
-		target_loc = self.get_relative_loc(start_loc, direction)
+	def movement_cost(self, direction, end_loc):
 		if direction in DIRS.ORTHOGONAL:
-			return self.get_tile(target_loc).movement_cost
+			value = self.get_tile(end_loc).movement_cost
 		elif direction in DIRS.DIAGONAL:
-			return self.get_tile(target_loc).movement_cost * CG.DIAGONAL_MODIFIER
+			value = round(self.get_tile(end_loc).movement_cost * CG.DIAGONAL_MODIFIER)
+		elif direction == DIRS.STOP:
+			value = CG.MOVEMENT_COST
+		else:
+			assert False
+		return value
 
 	def path(self, start_loc, goal_loc):
 		return path.path(start_loc, goal_loc, self._a_star_neighbors, self._a_star_heuristic, self.cols)
@@ -171,8 +170,7 @@ class Level:
 			if self.has_creature(loc):
 				c = self.get_creature(loc)
 				creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{} "
-				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar,
-						*c.get_damage_info())
+				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
 				information += "target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
 			else:
 				information += self.get_tile(loc).name
@@ -182,8 +180,7 @@ class Level:
 
 	def get_passable_directions(self, creature):
 		for direction in DIRS.ALL:
-			loc = self.get_relative_loc(creature.loc, direction)
-			if self.is_passable(loc):
+			if self.creature_can_move(creature, direction):
 				yield direction
 
 	def get_passable_directions_closest_to_target(self, creature, target_loc):
@@ -217,6 +214,15 @@ class Level:
 		vector = (ty - oy, tx - ox)
 		if vector in DIRS.ALL:
 			return vector
+
+	def creature_can_move(self, creature, direction):
+		if direction == DIRS.STOP:
+			return True
+		elif self.legal_loc(creature.loc, direction):
+			loc = self.get_relative_loc(creature.loc, direction)
+			return self.is_passable(loc)
+		else:
+			return False
 
 	def creature_has_sight(self, creature, target_loc):
 		cy, cx = self.get_coord(creature.loc)
