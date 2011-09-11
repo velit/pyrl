@@ -12,3 +12,25 @@ ALL = (WE, SO, NO, EA, NW, NE, SW, SE, STOP)
 
 DIAGONAL = (NW, NE, SW, SE)
 ORTHOGONAL = (NO, EA, SO, WE)
+
+rotate_clockwise = {
+		NW: NO,
+		NO: NE,
+		NE: EA,
+		EA: SE,
+		SE: SO,
+		SO: SW,
+		SW: WE,
+		WE: NW,
+		}
+
+rotate_counter_clockwise = {
+		NW: WE,
+		WE: SW,
+		SW: SO,
+		SO: SE,
+		SE: EA,
+		EA: NE,
+		NE: NO,
+		NO: NW,
+		}
