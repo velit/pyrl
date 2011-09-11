@@ -47,7 +47,7 @@ class Creature:
 		if self.energy > 0:
 			self.energy = 0
 
-	def has_energy_to_act(self):
+	def can_act(self):
 		return self.energy >= 0
 
 	def update_energy(self, amount):
@@ -60,6 +60,9 @@ class Creature:
 			assert False
 		self.energy -= amount
 		return amount
+
+	def is_idle(self):
+		return self.target_loc is None and self.target_dir is None
 
 	@property
 	def sight(self):

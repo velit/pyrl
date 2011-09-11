@@ -1,6 +1,7 @@
 import os
 import pickle
 
+import ai
 import const.game as CG
 import const.creature_actions as CC
 
@@ -8,7 +9,6 @@ from pio import io
 from player import Player
 from level import Level
 from user_input import UserInput
-from ai import AI
 from fov import get_light_set
 from world_file import WorldFile
 from debug_flags import Flags
@@ -22,7 +22,6 @@ class Game:
 
 		self.turn_counter = 0
 		self.user_input = UserInput()
-		self.ai = AI()
 		self.old_visibility = set()
 		self.levels = {}
 		self.world_file = WorldFile()
@@ -84,11 +83,11 @@ class Game:
 		creature = self.cur_level.turn_scheduler.get()
 		creature.recover_energy()
 		if self.is_player(creature):
-			if creature.has_energy_to_act():
+			if creature.can_act():
 				self.player_act()
 				self.turn_counter += 1
 		else:
-			self.ai.act(self, self.cur_level, creature, self.player.loc)
+			ai.act_towards(self, self.cur_level, creature, self.player.loc)
 
 	def player_act(self):
 		i = 0
@@ -101,7 +100,7 @@ class Game:
 				break
 
 	def creature_move(self, level, creature, direction):
-		if level.creature_can_move(creature, direction) and creature.has_energy_to_act():
+		if level.creature_can_move(creature, direction) and creature.can_act():
 			target_loc = level.get_relative_loc(creature.loc, direction)
 			creature.update_energy(level.movement_cost(direction, target_loc))
 			level.move_creature(creature, target_loc)
@@ -109,8 +108,17 @@ class Game:
 		else:
 			return False
 
+	def creature_swap_places(self, level, creature, direction):
+		target_loc = level.get_relative_loc(creature.loc, direction)
+		if creature.can_act() and level.has_creature(target_loc):
+			target_creature = level.get_creature(target_loc)
+			level.swap_creature(creature, target_creature)
+			return True
+		else:
+			return False
+
 	def creature_attack(self, level, creature, direction):
-		if creature.has_energy_to_act():
+		if creature.can_act():
 			creature.update_energy_action(CC.ATTACK)
 			target_loc = level.get_relative_loc(creature.loc, direction)
 			if level.has_creature(target_loc):

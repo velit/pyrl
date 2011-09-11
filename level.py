@@ -1,12 +1,12 @@
+import random
 import path
 import rdg
-import const.directions as DIRS
+import const.directions as dirs
 import const.game as CG
-import const.debug as D
+import const.debug as DEBUG
 
 from pio import io
 from char import Char
-from random import randrange, choice
 from creature import Creature
 from turn_scheduler import TurnScheduler
 from generic_algorithms import bresenham, chebyshev, cross_product
@@ -36,18 +36,18 @@ class Level:
 
 	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
 		cost = self.distance_heuristic(start_loc, end_loc)
-		if D.CROSS:
+		if DEBUG.CROSS:
 			coord_start = self.get_coord(start_loc)
 			coord_end = self.get_coord(end_loc)
 			coord_nudge = self.get_coord(nudge_towards_from_start_loc)
-			cost += cross_product(coord_start, coord_end, coord_nudge) / D.CROSS_MOD
+			cost += cross_product(coord_start, coord_end, coord_nudge) / DEBUG.CROSS_MOD
 		return cost
 
 	def _a_star_neighbors(self, loc):
-		for direction in DIRS.ALL:
+		for direction in dirs.ALL:
 			neighbor_loc = self.get_relative_loc(loc, direction)
 			if self.get_tile(neighbor_loc).is_passable:
-				if direction in DIRS.DIAGONAL:
+				if direction in dirs.DIAGONAL:
 					yield neighbor_loc, round(self.get_tile(loc).movement_cost * CG.DIAGONAL_MODIFIER)
 				else:
 					yield neighbor_loc, self.get_tile(loc).movement_cost
@@ -59,7 +59,7 @@ class Level:
 				return loc
 
 	def _get_random_loc(self):
-		return randrange(len(self.tiles))
+		return random.randrange(len(self.tiles))
 
 	def _get_visible_char(self, loc):
 		if loc in self.creatures:
@@ -71,7 +71,7 @@ class Level:
 		return y * self.cols + x
 
 	def _spawn_random_creature(self):
-		creature = Creature(choice(self.creature_spawn_list))
+		creature = Creature(random.choice(self.creature_spawn_list))
 		self.add_creature(creature)
 
 	def _spawn_predefined_creature(self, mons_file):
@@ -151,40 +151,66 @@ class Level:
 		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, CG.DIAGONAL_MODIFIER)
 
 	def movement_cost(self, direction, end_loc):
-		if direction in DIRS.ORTHOGONAL:
+		if direction in dirs.ORTHOGONAL:
 			value = self.get_tile(end_loc).movement_cost
-		elif direction in DIRS.DIAGONAL:
+		elif direction in dirs.DIAGONAL:
 			value = round(self.get_tile(end_loc).movement_cost * CG.DIAGONAL_MODIFIER)
-		elif direction == DIRS.STOP:
+		elif direction == dirs.STOP:
 			value = CG.MOVEMENT_COST
 		else:
-			assert False
+			raise Exception(direction)
 		return value
 
 	def path(self, start_loc, goal_loc):
 		return path.path(start_loc, goal_loc, self._a_star_neighbors, self._a_star_heuristic, self.cols)
 
 	def look_information(self, loc):
-		if loc in self.visited_locations:
-			information = "{}x{} ".format(*self.get_coord(loc))
-			if self.has_creature(loc):
-				c = self.get_creature(loc)
-				creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{} "
-				information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
-				information += "target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
-			else:
-				information += self.get_tile(loc).name
-			return information
+		#if loc in self.visited_locations:
+		information = "{}x{} ".format(*self.get_coord(loc))
+		if self.has_creature(loc):
+			c = self.get_creature(loc)
+			creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
+			information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
+			information += " target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
+			information += " direction:{}".format(c.target_dir)
 		else:
-			return "You don't know anything about this place."
+			information += self.get_tile(loc).name
+		return information
+		#else:
+		#	return "You don't know anything about this place."
 
 	def get_passable_directions(self, creature):
-		for direction in DIRS.ALL:
+		for direction in dirs.ALL:
 			if self.creature_can_move(creature, direction):
 				yield direction
 
-	def get_passable_directions_closest_to_target(self, creature, target_loc):
-		pass#TODO
+	def get_directions_closest_to_target(self, loc, target_loc):
+		Sy, Sx = self.get_coord(loc)
+		Ty, Tx = self.get_coord(target_loc)
+		Dy, Dx = Ty - Sy, Tx - Sx
+		Ay, Ax = abs(Dy), abs(Dx)
+		direction = (Dy // (Ay if Dy else 1), Dx // (Ax if Dx else 1))
+		if not direction in dirs.ALL:
+			io.msg(direction)
+		yield direction
+
+		if (Ay == Ax and random.random() < 0.5 or (0 < Dx < Dy) or (Dy < Dx < 0) or
+				(Ax > Ay and ((Dy < 0 < Dx) or (Dx < 0 < Dy)))):
+			first = dirs.rotate_clockwise
+			second = dirs.rotate_counter_clockwise
+		else:
+			first = dirs.rotate_counter_clockwise
+			second = dirs.rotate_clockwise
+		first_d = first[direction]
+		yield first_d
+		second_d = second[direction]
+		yield second_d
+		for x in range(2):
+			first_d = first[first_d]
+			yield first_d
+			second_d = second[second_d]
+			yield second_d
+		yield first[first_d]
 
 	def add_creature(self, creature, loc=None):
 		if loc is None:
@@ -208,15 +234,22 @@ class Level:
 		self.creatures[new_loc] = creature
 		creature.loc = new_loc
 
+	def swap_creature(self, creatureA, creatureB):
+		self.modified_locations.add(creatureA.loc)
+		self.modified_locations.add(creatureB.loc)
+		self.creatures[creatureA.loc] = creatureB
+		self.creatures[creatureB.loc] = creatureA
+		creatureA.loc, creatureB.loc = creatureB.loc, creatureA.loc
+
 	def get_dir_if_valid(self, loc_origin, loc_target):
 		oy, ox = self.get_coord(loc_origin)
 		ty, tx = self.get_coord(loc_target)
 		vector = (ty - oy, tx - ox)
-		if vector in DIRS.ALL:
+		if vector in dirs.ALL:
 			return vector
 
 	def creature_can_move(self, creature, direction):
-		if direction == DIRS.STOP:
+		if direction == dirs.STOP:
 			return True
 		elif self.legal_loc(creature.loc, direction):
 			loc = self.get_relative_loc(creature.loc, direction)

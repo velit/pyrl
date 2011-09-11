@@ -73,3 +73,7 @@ class AdvancedCreature(Creature):
 	@property
 	def unarmed_sides(self):
 		return super().unarmed_sides + self.get_item_stats(UNARMED_SIDES)
+
+	@property
+	def speed(self):
+		return super().speed ++ self.get_item_stats(SPEED)
