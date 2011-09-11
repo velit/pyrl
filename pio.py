@@ -1,6 +1,6 @@
 import curses
 
-import const.game as CG
+import const.game as GAME
 
 from window.message import MessageBar
 from window.status import StatusBar
@@ -32,8 +32,8 @@ io = Wrapper()
 
 class _IO:
 
-	def __init__(self, curs_window, msg_bar_size=CG.MSG_BAR_SIZE,
-				status_bar_size=CG.STATUS_BAR_SIZE):
+	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE,
+				status_bar_size=GAME.STATUS_BAR_SIZE):
 		self.w = curs_window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()

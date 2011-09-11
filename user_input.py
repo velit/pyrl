@@ -1,7 +1,7 @@
 import curses
 import sys
 import const.directions as DIRS
-import const.game as CG
+import const.game as GAME
 import const.debug as D
 
 from pio import io
@@ -36,8 +36,8 @@ class UserInput:
 	def __init__(self):
 		no_args, no_kwds = (), {}
 		self.actions = {
-			ord('<'): ("enter", (CG.PASSAGE_UP, ), no_kwds),
-			ord('>'): ("enter", (CG.PASSAGE_DOWN, ), no_kwds),
+			ord('<'): ("enter", (GAME.PASSAGE_UP, ), no_kwds),
+			ord('>'): ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
 			ord('Q'): ("endgame", no_args, no_kwds),
 			ord('S'): ("savegame", no_args, no_kwds),
 			ord('L'): ("look", no_args, no_kwds),
@@ -85,6 +85,7 @@ def look(game, level, creature):
 	while True:
 		loc = level.get_relative_loc(loc, direction)
 		io.msg(level.look_information(loc))
+		io.msg(level.distance_heuristic(creature.loc, loc))
 		if drawline_flag:
 			io.drawline(level.get_coord(creature.loc), level.get_coord(loc), Char("*", "yellow"))
 			io.msg("LoS: {}".format(level.check_los(creature.loc, loc)))
@@ -105,7 +106,7 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.sel_getch("Specify attack direction:", CG.DEFAULT | set(direction_keys))
+	c = io.sel_getch("Specify attack direction:", GAME.DEFAULT | set(direction_keys))
 	if c in direction_map:
 		game.creature_attack(level, creature, direction_map[c])
 		return True
@@ -120,8 +121,8 @@ def debug(game, level, creature):
 		D.CROSS = not D.CROSS
 		io.msg("Path heuristic cross set to {}".format(D.CROSS))
 	elif c == ord('l'):
-		CG.LEVEL_TYPE = "arena" if CG.LEVEL_TYPE == "dungeon" else "dungeon"
-		io.msg("Level type set to {}".format(CG.LEVEL_TYPE))
+		GAME.LEVEL_TYPE = "arena" if GAME.LEVEL_TYPE == "dungeon" else "dungeon"
+		io.msg("Level type set to {}".format(GAME.LEVEL_TYPE))
 	elif c == ord('b'):
 		io.draw_block((4,4))
 	elif c == ord('d'):
@@ -138,8 +139,8 @@ def debug(game, level, creature):
 			level.remove_creature(i)
 		io.msg("Abrakadabra.")
 	elif c == ord('p'):
-		passage_up = level.get_passage_loc(CG.PASSAGE_UP)
-		passage_down = level.get_passage_loc(CG.PASSAGE_DOWN)
+		passage_up = level.get_passage_loc(GAME.PASSAGE_UP)
+		passage_down = level.get_passage_loc(GAME.PASSAGE_DOWN)
 		io.draw_path((loc // level.cols, loc % level.cols) for loc in level.path(passage_up, passage_down))
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 256 else c))
@@ -152,7 +153,7 @@ def enter(game, level, creature, passage):
 	if level.is_exit(loc) and level.get_exit(loc) == passage:
 		try:
 			game.enter_passage(level.world_loc, level.get_exit(loc))
-		except CG.PyrlException:
+		except GAME.PyrlException:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:

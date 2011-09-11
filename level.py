@@ -2,7 +2,7 @@ import random
 import path
 import rdg
 import const.directions as dirs
-import const.game as CG
+import const.game as GAME
 import const.debug as DEBUG
 
 from pio import io
@@ -24,14 +24,14 @@ class Level:
 		self.danger_level = level_file.danger_level
 		self.passage_locations = level_file.passage_locations
 		if level_file.tilefile is None:
-			rdg.add_generated_tilefile(level_file, CG.LEVEL_TYPE)
+			rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
 		self.tiles = level_file.get_tilemap()
 		self.creature_spawn_list = creature_spawn_list #TODO:
 
 		for mons_file in level_file.monster_files:
 			self._spawn_predefined_creature(mons_file)
 
-		for x in range(CG.MONSTERS_PER_LEVEL):
+		for x in range(GAME.MONSTERS_PER_LEVEL):
 			self._spawn_random_creature()
 
 	def _a_star_heuristic(self, start_loc, end_loc, nudge_towards_from_start_loc):
@@ -48,7 +48,7 @@ class Level:
 			neighbor_loc = self.get_relative_loc(loc, direction)
 			if self.get_tile(neighbor_loc).is_passable:
 				if direction in dirs.DIAGONAL:
-					yield neighbor_loc, round(self.get_tile(loc).movement_cost * CG.DIAGONAL_MODIFIER)
+					yield neighbor_loc, round(self.get_tile(loc).movement_cost * GAME.DIAGONAL_MODIFIER)
 				else:
 					yield neighbor_loc, self.get_tile(loc).movement_cost
 
@@ -95,11 +95,6 @@ class Level:
 
 	def get_relative_loc(self, loc, direction):
 		return loc + self._get_loc(direction[0], direction[1])
-		#if not self.legal_loc(loc, direction):
-		#	msg = "Location {} of {},{} is out of bounds."
-		#	raise IndexError(msg.format(direction, *self.get_coord(loc)))
-		#else:
-		#	return loc + self._get_loc(direction[1], direction[0])
 
 	def get_loc_iter(self):
 		return range(len(self.tiles))
@@ -113,7 +108,7 @@ class Level:
 			yield loc // self.cols, loc % self.cols, self.get_tile(loc).memory_char
 
 	def get_passage_loc(self, passage):
-		if passage == CG.PASSAGE_RANDOM:
+		if passage == GAME.PASSAGE_RANDOM:
 			return self.get_free_loc()
 		else:
 			return self.passage_locations[passage]
@@ -148,15 +143,15 @@ class Level:
 
 	def distance_heuristic(self, locA, locB):
 		coordA, coordB = self.get_coord(locA), self.get_coord(locB)
-		return path.heuristic(coordA, coordB, CG.MOVEMENT_COST, CG.DIAGONAL_MODIFIER)
+		return round(path.heuristic(coordA, coordB, GAME.MOVEMENT_COST, GAME.DIAGONAL_MODIFIER))
 
 	def movement_cost(self, direction, end_loc):
 		if direction in dirs.ORTHOGONAL:
 			value = self.get_tile(end_loc).movement_cost
 		elif direction in dirs.DIAGONAL:
-			value = round(self.get_tile(end_loc).movement_cost * CG.DIAGONAL_MODIFIER)
+			value = round(self.get_tile(end_loc).movement_cost * GAME.DIAGONAL_MODIFIER)
 		elif direction == dirs.STOP:
-			value = CG.MOVEMENT_COST
+			value = GAME.MOVEMENT_COST
 		else:
 			raise Exception(direction)
 		return value
@@ -172,45 +167,13 @@ class Level:
 			creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
 			information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
 			information += " target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
-			information += " direction:{}".format(c.target_dir)
+			information += " direction:{}".format(c.chase_vector)
+			information += " continuation:{}".format(c.chase_continuation)
 		else:
 			information += self.get_tile(loc).name
 		return information
 		#else:
 		#	return "You don't know anything about this place."
-
-	def get_passable_directions(self, creature):
-		for direction in dirs.ALL:
-			if self.creature_can_move(creature, direction):
-				yield direction
-
-	def get_directions_closest_to_target(self, loc, target_loc):
-		Sy, Sx = self.get_coord(loc)
-		Ty, Tx = self.get_coord(target_loc)
-		Dy, Dx = Ty - Sy, Tx - Sx
-		Ay, Ax = abs(Dy), abs(Dx)
-		direction = (Dy // (Ay if Dy else 1), Dx // (Ax if Dx else 1))
-		if not direction in dirs.ALL:
-			io.msg(direction)
-		yield direction
-
-		if (Ay == Ax and random.random() < 0.5 or (0 < Dx < Dy) or (Dy < Dx < 0) or
-				(Ax > Ay and ((Dy < 0 < Dx) or (Dx < 0 < Dy)))):
-			first = dirs.rotate_clockwise
-			second = dirs.rotate_counter_clockwise
-		else:
-			first = dirs.rotate_counter_clockwise
-			second = dirs.rotate_clockwise
-		first_d = first[direction]
-		yield first_d
-		second_d = second[direction]
-		yield second_d
-		for x in range(2):
-			first_d = first[first_d]
-			yield first_d
-			second_d = second[second_d]
-			yield second_d
-		yield first[first_d]
 
 	def add_creature(self, creature, loc=None):
 		if loc is None:
@@ -241,12 +204,28 @@ class Level:
 		self.creatures[creatureB.loc] = creatureA
 		creatureA.loc, creatureB.loc = creatureB.loc, creatureA.loc
 
-	def get_dir_if_valid(self, loc_origin, loc_target):
+	def get_vector(self, loc_origin, loc_target):
 		oy, ox = self.get_coord(loc_origin)
 		ty, tx = self.get_coord(loc_target)
-		vector = (ty - oy, tx - ox)
-		if vector in dirs.ALL:
-			return vector
+		return (ty - oy, tx - ox)
+
+	def creature_is_swappable(self, loc):
+		try:
+			return self.get_creature(loc).is_idle()
+		except KeyError:
+			return False
+
+	def creature_can_reach(self, creature, target_loc):
+		if creature.loc == target_loc:
+			return True
+		else:
+			cy, cx = self.get_coord(creature.loc)
+			ty, tx = self.get_coord(target_loc)
+			vector = (cy - ty, cx - tx)
+			if vector in dirs.ALL:
+				return True
+			else:
+				return False
 
 	def creature_can_move(self, creature, direction):
 		if direction == dirs.STOP:
