@@ -29,7 +29,7 @@ def act_towards(game, level, creature, alert_loc):
 			else:
 				creature.target_dir = None
 		else:
-			pass#move_random(game, level, creature)
+			move_random(game, level, creature)
 
 
 def min_f(direction):
