@@ -42,6 +42,9 @@ class AdvancedCreature(Creature):
 	def update_energy_action(self, action):
 		self.last_action_energy = super().update_energy_action(action)
 
+	def is_idle(self):
+		return False
+
 	@property
 	def sight(self):
 		return super().sight + self.get_item_stats(SIGHT)

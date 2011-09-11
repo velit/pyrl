@@ -1,6 +1,6 @@
 from char import Char
 from const.slots import *
-import const.game as CG
+import const.game as GAME
 import const.creature_actions as CC
 
 
@@ -11,7 +11,8 @@ class Creature:
 		self.char = creature_file.char
 		self.loc = None
 		self.target_loc = None
-		self.target_dir = None
+		self.chase_vector = None
+		self.chase_continuation = None
 
 		self.energy = 0
 
@@ -19,7 +20,7 @@ class Creature:
 		self.dexterity = 10
 		self.toughness = 10
 		self.intelligence = 10
-		self.perception = 10
+		self.perception = 3
 
 		self.hp = self.max_hp
 
@@ -62,11 +63,11 @@ class Creature:
 		return amount
 
 	def is_idle(self):
-		return self.target_loc is None and self.target_dir is None
+		return self.target_loc is None and self.chase_vector is None
 
 	@property
 	def sight(self):
-		return 6 + (self.perception - 10) // 2
+		return int((2 * self.perception) ** 0.5 + 1)
 
 	@property
 	def max_hp(self):
@@ -102,4 +103,4 @@ class Creature:
 
 	@property
 	def attack_energy_cost(self):
-		return CG.ATTACK_COST
+		return GAME.ATTACK_COST

@@ -1,10 +1,10 @@
-import const.game as CG
+import const.game as GAME
 
 from tiles import gettile
 
 class LevelFile:
 
-	def __init__(self, danger_level=0, rows=CG.LEVEL_ROWS, cols=CG.LEVEL_COLS):
+	def __init__(self, danger_level=0, rows=GAME.LEVEL_ROWS, cols=GAME.LEVEL_COLS):
 		self.rows = rows
 		self.cols = cols
 		self.danger_level = danger_level

@@ -2,7 +2,7 @@ import os
 import pickle
 
 import ai
-import const.game as CG
+import const.game as GAME
 import const.creature_actions as CC
 
 from pio import io
@@ -28,8 +28,8 @@ class Game:
 		self.player = Player()
 		self.flags = Flags()
 
-		self.init_new_level(CG.FIRST_LEVEL)
-		self.cur_level = self.levels[CG.FIRST_LEVEL]
+		self.init_new_level(GAME.FIRST_LEVEL)
+		self.cur_level = self.levels[GAME.FIRST_LEVEL]
 		self.cur_level.add_creature(self.player)
 		self.register_status_texts()
 
@@ -50,14 +50,14 @@ class Game:
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
-		if instruction == CG.SET_LEVEL:
+		if instruction == GAME.SET_LEVEL:
 			self.change_level((d, i))
 		else:
 			d, i = self.cur_level.world_loc
-			if instruction == CG.PREVIOUS_LEVEL:
-				self.change_level((d, i - 1), CG.PASSAGE_DOWN)
-			elif instruction == CG.NEXT_LEVEL:
-				self.change_level((d, i + 1), CG.PASSAGE_UP)
+			if instruction == GAME.PREVIOUS_LEVEL:
+				self.change_level((d, i - 1), GAME.PASSAGE_DOWN)
+			elif instruction == GAME.NEXT_LEVEL:
+				self.change_level((d, i + 1), GAME.PASSAGE_UP)
 
 	def change_level(self, world_loc, passage):
 		old_level = self.cur_level
@@ -87,7 +87,7 @@ class Game:
 				self.player_act()
 				self.turn_counter += 1
 		else:
-			ai.act_towards(self, self.cur_level, creature, self.player.loc)
+			ai.act_alert(self, self.cur_level, creature, self.player.loc)
 
 	def player_act(self):
 		i = 0
@@ -108,10 +108,13 @@ class Game:
 		else:
 			return False
 
-	def creature_swap_places(self, level, creature, direction):
+	def creature_swap(self, level, creature, direction):
 		target_loc = level.get_relative_loc(creature.loc, direction)
-		if creature.can_act() and level.has_creature(target_loc):
+		if creature.can_act() and level.creature_is_swappable(target_loc):
 			target_creature = level.get_creature(target_loc)
+			energy_cost = level.movement_cost(direction, target_loc)
+			creature.update_energy(energy_cost)
+			target_creature.update_energy(energy_cost)
 			level.swap_creature(creature, target_creature)
 			return True
 		else:
@@ -150,7 +153,7 @@ class Game:
 		io.msg(message)
 		if not ask:
 			exit()
-		if io.sel_getch("Do you wish to end the game? [y/N]") in CG.YES:
+		if io.sel_getch("Do you wish to end the game? [y/N]") in GAME.YES:
 			exit()
 
 	def _save(self):
@@ -164,7 +167,7 @@ class Game:
 	def savegame(self, ask=False):
 		if not ask:
 			self._save()
-		elif io.sel_getch("Do you wish to save the game? [y/N]") in CG.YES:
+		elif io.sel_getch("Do you wish to save the game? [y/N]") in GAME.YES:
 			self._save()
 
 	def draw(self):
