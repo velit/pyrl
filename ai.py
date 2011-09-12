@@ -35,7 +35,7 @@ def act_alert(game, level, creature, alert_loc):
 		if creature.target_loc is not None:
 			move_towards(game, level, creature, creature.target_loc)
 		else:
-			pass#move_random(game, level, creature)
+			move_random(game, level, creature)
 
 
 def move_towards(game, level, creature, target_loc):
@@ -62,7 +62,6 @@ def move_towards(game, level, creature, target_loc):
 		game.creature_swap(level, creature, best_direction)
 	else:
 		assert False
-	return level.distance_heuristic(creature.loc, target_loc) - best_cost
 
 
 def move_random(game, level, creature):

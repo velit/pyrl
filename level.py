@@ -141,7 +141,8 @@ class Level:
 	def check_los(self, loc1, loc2):
 		coordA = self.get_coord(loc1)
 		coordB = self.get_coord(loc2)
-		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
+		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB)) or \
+				all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordB, coordA))
 
 	def get_last_pathable_loc(self, loc_start, loc_end):
 		last = loc_start
@@ -149,6 +150,8 @@ class Level:
 		for loc in (self._get_loc(*coord) for coord in bresenham(to_coord(loc_start), to_coord(loc_end))):
 			if self.is_pathable(loc):
 				last = loc
+			else:
+				break
 		return last
 
 	def distance_heuristic(self, locA, locB):
