@@ -2,6 +2,7 @@ import random
 import const.directions as DIRS
 import const.game as GAME
 import const.creature_actions as ACTIONS
+from generic_algorithms import resize_vector_to_len
 
 
 def act_alert(game, level, creature, alert_loc):
@@ -19,14 +20,17 @@ def act_alert(game, level, creature, alert_loc):
 
 	# creature actions
 	elif creature.can_act():
+		# chasing
 		if creature.target_loc == creature.loc:
 			creature.target_loc = None
-		if creature.chase_vector is not None:
-			chase_loc = level.get_relative_loc(creature.loc, creature.chase_vector)
-			if level.get_tile(chase_loc).is_passable:
-				creature.target_loc = chase_loc
-			else:
-				creature.chase_vector = None
+			if creature.chase_vector is not None:
+				creature.chase_vector = resize_vector_to_len(creature.chase_vector, creature.sight)
+				overarching_target = level.get_relative_loc(creature.loc, creature.chase_vector)
+				target_loc = level.get_last_pathable_loc(creature.loc, overarching_target)
+				if creature.loc != target_loc:
+					creature.target_loc = target_loc
+				else:
+					creature.chase_vector = None
 
 		if creature.target_loc is not None:
 			move_towards(game, level, creature, creature.target_loc)

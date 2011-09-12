@@ -48,8 +48,20 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1315156351" done="1315815381">
+        move into an energy system - ai problems
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1315776610">
         make creatures stop chasing
+    </note>
+    <note priority="veryhigh" time="1315848070">
+        make a generic status bar print that splits correctly
+    </note>
+    <note priority="veryhigh" time="1315856518">
+        fix bresenham fuck shit cunt
     </note>
     <note priority="high" time="1315174479">
         improve on the energy system
@@ -68,12 +80,6 @@
     </note>
     <note priority="medium" time="1315156342">
         make bresenham either symmetrical or include all versions
-    </note>
-    <note priority="medium" time="1315156351" done="1315815381">
-        move into an energy system - ai problems
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="low" time="1315155829">
         fix los

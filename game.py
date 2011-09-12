@@ -31,22 +31,25 @@ class Game:
 		self.init_new_level(GAME.FIRST_LEVEL)
 		self.cur_level = self.levels[GAME.FIRST_LEVEL]
 		self.cur_level.add_creature(self.player)
-		self.register_status_texts()
+		self.register_status_texts(self.player)
 
 	def is_player(self, creature):
 		return self.player is creature
 
-	def register_status_texts(self):
-		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*self.player.get_damage_info()))
-		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(self.player.hp, self.player.max_hp))
-		io.s.add_element("sight", "SR: ", lambda: self.player.sight)
+	def register_status_texts(self, creature):
+		#io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+		#io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
+		io.s.add_element("sight", "SR: ", lambda: creature.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
-		io.s.add_element("ar", "AR: ", lambda: self.player.ar)
-		io.s.add_element("dr", "DR: ", lambda: self.player.dr)
-		io.s.add_element("pv", "PV: ", lambda: self.player.pv)
-		io.s.add_element("speed", "SP: ", lambda: self.player.speed)
-		io.s.add_element("energy", "EN: ", lambda: self.player.last_action_energy)
+		#io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
+		#io.s.add_element("ar", "AR: ", lambda: creature.ar)
+		#io.s.add_element("dr", "DR: ", lambda: creature.dr)
+		#io.s.add_element("pv", "PV: ", lambda: creature.pv)
+		io.s.add_element("speed", "SP: ", lambda: creature.speed)
+		io.s.add_element("coord", "Loc: ", lambda: self.cur_level.get_coord(creature.loc))
+		io.s.add_element("target", "TA: ", lambda: creature.target_loc if creature.target_loc is None else
+				self.cur_level.get_coord(creature.target_loc))
+		io.s.add_element("chase_vector", "CV: ", lambda: creature.chase_vector)
 	
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)

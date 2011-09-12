@@ -12,7 +12,6 @@ class Creature:
 		self.loc = None
 		self.target_loc = None
 		self.chase_vector = None
-		self.chase_continuation = None
 
 		self.energy = 0
 
@@ -20,7 +19,7 @@ class Creature:
 		self.dexterity = 10
 		self.toughness = 10
 		self.intelligence = 10
-		self.perception = 3
+		self.perception = 5
 
 		self.hp = self.max_hp
 
