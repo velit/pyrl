@@ -69,8 +69,11 @@
     <note priority="medium" time="1315156342">
         make bresenham either symmetrical or include all versions
     </note>
-    <note priority="medium" time="1315156351">
+    <note priority="medium" time="1315156351" done="1315815381">
         move into an energy system - ai problems
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="low" time="1315155829">
         fix los
