@@ -1,46 +1,24 @@
 import fractions
 
+
 def bresenham(coord_a, coord_b, includelast=True):
 	(ay, ax), (by, bx) = coord_a, coord_b
 	steep = abs(bx - ax) > abs(by - ay)
 	if steep:
 		ay, ax = ax, ay
 		by, bx = bx, by
-	if ay > by:
-		ay, by = by, ay
-		ax, bx = bx, ax
-	deltay = by - ay
+	deltay = abs(by - ay)
 	deltax = abs(bx - ax)
-	error = deltay / 2
+	error = deltay // 2
 	x = ax
 	xstep = 1 if ax < bx else -1
-	for y in range(ay, by + includelast):
+	y_range = range(ay, by + includelast) if ay < by else range(by, ay + includelast)[::-1]
+	for y in y_range:
 		yield (x, y) if steep else (y, x)
 		error -= deltax
 		if error < 0:
 			x += xstep
 			error += deltay
-
-
-def bresenham_y(coordA, coordB):
-	(y0, x0), (y1, x1) = coordA, coordB
-	dx = abs(x1-x0)
-	dy = abs(y1-y0)
-	sx = 1 if x0 < x1 else -1
-	sy = 1 if y0 < y1 else -1
-	err = dx - dy
-
-	while True:
-		yield y0, x0
-		if x0 == x1 and y0 == y1:
-			break
-		e2 = 2 * err
-		if e2 > -dy:
-			err = err - dy
-			x0 = x0 + sx
-		if e2 < dx:
-			err = err + dx
-			y0 = y0 + sy
 
 
 def chebyshev(coordA, coordB):

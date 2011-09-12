@@ -100,7 +100,8 @@ def look(game, level, creature):
 			for coord in bresenham(level.get_coord(creature.loc), level.get_coord(loc)):
 				io.msg(coord)
 		elif c == ord('s'):
-			game.register_status_texts(level.get_creature(loc))
+			if level.has_creature(loc):
+				game.register_status_texts(level.get_creature(loc))
 		elif c in map(ord, "QqzZ "):
 			break
 

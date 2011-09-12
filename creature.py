@@ -19,7 +19,7 @@ class Creature:
 		self.dexterity = 10
 		self.toughness = 10
 		self.intelligence = 10
-		self.perception = 5
+		self.perception = 10
 
 		self.hp = self.max_hp
 
