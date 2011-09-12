@@ -2,7 +2,7 @@ import curses
 import menu
 import menu_h
 import colors
-import const.game as CG
+import const.game as GAME
 
 from textwrap import wrap
 
@@ -48,9 +48,9 @@ class Window:
 		return self.w.getyx()
 
 	def notify(self, print_str=None):
-		return self.sel_getch(print_str, char_list=CG.DEFAULT)
+		return self.sel_getch(print_str, char_list=GAME.DEFAULT)
 
-	def sel_getch(self, print_str=None, char_list=CG.ALL):
+	def sel_getch(self, print_str=None, char_list=GAME.ALL):
 		if print_str is not None:
 			self.clear_and_print(print_str)
 		c = self.getch()
@@ -65,7 +65,7 @@ class Window:
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)
 		curses.echo()
-		return_str = self.w.getstr().decode(CG.ENCODING)
+		return_str = self.w.getstr().decode(GAME.ENCODING)
 		curses.noecho()
 		return return_str
 

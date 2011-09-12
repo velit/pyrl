@@ -65,7 +65,7 @@ class _IO:
 		self.l.drawlos(*a, **k)
 
 	def drawline(self, *a, **k):
-		self.l.drawline(*a, **k)
+		self.l.draw_line(*a, **k)
 
 	def getbool(self, *a, **k):
 		return_data =  self.m.getbool(*a, **k)
@@ -100,11 +100,13 @@ class _IO:
 		self.msg(print_str)
 		return self.getch()
 
-	def notify(self, print_str=None, *a, **k):
-		if print_str is not None:
-			self.msg(print_str)
-			self.refresh()
-		return self.l.notify(None, *a, **k)
+	def notify(self, *a):
+		if len(a) > 1:
+			self.msg(a)
+		else:
+			self.msg(*a)
+		self.refresh()
+		return self.l.sel_getch(char_list=GAME.DEFAULT)
 
 	def sel_getch(self, print_str=None, *a, **k):
 		if print_str is not None:

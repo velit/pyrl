@@ -40,7 +40,7 @@ class UserInput:
 			ord('>'): ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
 			ord('Q'): ("endgame", no_args, no_kwds),
 			ord('S'): ("savegame", no_args, no_kwds),
-			ord('L'): ("look", no_args, no_kwds),
+			ord('q'): ("look", no_args, no_kwds),
 			ord('Z'): ("z_command", no_args, no_kwds),
 			ord('a'): ("attack", no_args, no_kwds),
 			ord('d'): ("debug", no_args, no_kwds),
@@ -85,7 +85,6 @@ def look(game, level, creature):
 	while True:
 		loc = level.get_relative_loc(loc, direction)
 		io.msg(level.look_information(loc))
-		io.msg(level.distance_heuristic(creature.loc, loc))
 		if drawline_flag:
 			io.drawline(level.get_coord(creature.loc), level.get_coord(loc), Char("*", "yellow"))
 			io.msg("LoS: {}".format(level.check_los(creature.loc, loc)))
@@ -96,6 +95,12 @@ def look(game, level, creature):
 			direction = direction_map[c]
 		elif c == ord('d'):
 			drawline_flag = not drawline_flag
+		elif c == ord('b'):
+			from generic_algorithms import bresenham
+			for coord in bresenham(level.get_coord(creature.loc), level.get_coord(loc)):
+				io.msg(coord)
+		elif c == ord('s'):
+			game.register_status_texts(level.get_creature(loc))
 		elif c in map(ord, "QqzZ "):
 			break
 

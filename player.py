@@ -10,7 +10,7 @@ def Player():
 	monster_file = MonsterFile("tappi", Char('@', "blue"), 0, 0)
 	player = AdvancedCreature(monster_file)
 
-	armor_stats = {PV: 4, DR: 70, SPEED: 100}
+	armor_stats = {PV: 4, AR:100, DR: 170, SPEED: 100}
 	player.equip(Item(armor_stats), BODY)
 
 	weapon = Weapon(1, 8, 20)

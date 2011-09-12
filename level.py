@@ -5,7 +5,6 @@ import const.directions as dirs
 import const.game as GAME
 import const.debug as DEBUG
 
-from pio import io
 from char import Char
 from creature import Creature
 from turn_scheduler import TurnScheduler
@@ -122,6 +121,9 @@ class Level:
 		else:
 			return self.get_tile(loc).is_passable
 
+	def is_pathable(self, loc):
+		return self.get_tile(loc).is_passable
+
 	def is_see_through(self, loc):
 		return self.get_tile(loc).is_see_through
 
@@ -140,6 +142,14 @@ class Level:
 		coordA = self.get_coord(loc1)
 		coordB = self.get_coord(loc2)
 		return all(self.is_see_through(self._get_loc(y, x)) for y, x in bresenham(coordA, coordB))
+
+	def get_last_pathable_loc(self, loc_start, loc_end):
+		last = loc_start
+		to_coord = self.get_coord
+		for loc in (self._get_loc(*coord) for coord in bresenham(to_coord(loc_start), to_coord(loc_end))):
+			if self.is_pathable(loc):
+				last = loc
+		return last
 
 	def distance_heuristic(self, locA, locB):
 		coordA, coordB = self.get_coord(locA), self.get_coord(locB)
@@ -168,7 +178,6 @@ class Level:
 			information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
 			information += " target:{}".format(c.target_loc if c.target_loc is None else self.get_coord(c.target_loc))
 			information += " direction:{}".format(c.chase_vector)
-			information += " continuation:{}".format(c.chase_continuation)
 		else:
 			information += self.get_tile(loc).name
 		return information
