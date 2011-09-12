@@ -21,17 +21,15 @@ def act_alert(game, level, creature, alert_loc):
 	elif creature.can_act():
 		if creature.target_loc == creature.loc:
 			creature.target_loc = None
-		if creature.chase_continuation is not None and creature.chase_continuation < 0:
-			creature.chase_vector = None
-			creature.chase_continuation = None
+		if creature.chase_vector is not None:
+			chase_loc = level.get_relative_loc(creature.loc, creature.chase_vector)
+			if level.get_tile(chase_loc).is_passable:
+				creature.target_loc = chase_loc
+			else:
+				creature.chase_vector = None
 
 		if creature.target_loc is not None:
 			move_towards(game, level, creature, creature.target_loc)
-		elif creature.chase_vector is not None:
-			if creature.chase_continuation is None:
-				creature.chase_continuation = 5000
-			vector_loc = level.get_relative_loc(creature.loc, creature.chase_vector)
-			creature.chase_continuation += move_towards(game, level, creature, vector_loc)
 		else:
 			pass#move_random(game, level, creature)
 
