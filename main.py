@@ -1,17 +1,20 @@
 import pickle
 import os
 import const.game as GAME
-from game import Game
-from pio import init_io_module, io
+
+from pio import init_io_module
 
 
 def curses_inited_main(w, options):
 	init_io_module(w)
+	from pio import io
 
 	if io.rows < GAME.MIN_SCREEN_ROWS or io.cols < GAME.MIN_SCREEN_COLS:
 		message = "Current screen size {}x{} is too small. Needs to be at least {}x{}"
 		io.notify(message.format(io.cols, io.rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS))
 		exit()
+
+	from game import Game
 
 	if options.load:
 		game = load("pyrl.svg")
