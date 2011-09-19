@@ -11,29 +11,12 @@ from colors import init_colors
 
 def init_io_module(*a, **k):
 	init_colors()
-	Wrapper._inst = _IO(*a, **k)
+	global io
+	io = IO(*a, **k)
 
+class IO:
 
-class Wrapper:
-	_inst = None
-
-	def __getattr__(self, name):
-		return getattr(self._inst, name)
-
-	def __setattr__(self, name, value):
-		return setattr(self._inst, name, value)
-
-	def __delattr__(self, name):
-		return delattr(self._inst, name, value)
-
-
-io = Wrapper()
-
-
-class _IO:
-
-	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE,
-				status_bar_size=GAME.STATUS_BAR_SIZE):
+	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
 		self.w = curs_window
 		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()
