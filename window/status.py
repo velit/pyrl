@@ -1,4 +1,3 @@
-import curses
 from window.window import Window
 
 

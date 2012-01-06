@@ -22,7 +22,7 @@ class LevelFile:
 	def get_tile_from_coord(self, y, x):
 		return gettile(self.get_tile_id(y, x), self.tile_dict)
 
-	def get_tile_fromloc(self, loc):
+	def get_tile_from_loc(self, loc):
 		return gettile(self.tilefile[loc], self.tile_dict)
 
 	def get_tilemap(self):

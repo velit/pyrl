@@ -1,4 +1,3 @@
-from char import Char
 from const.slots import *
 import const.game as GAME
 import const.creature_actions as CC
@@ -9,8 +8,8 @@ class Creature:
 	def __init__(self, creature_file):
 		self.name = creature_file.name
 		self.char = creature_file.char
-		self.loc = None
-		self.target_loc = None
+		self.coord = None
+		self.target_coord = None
 		self.chase_vector = None
 
 		self.energy = 0
@@ -62,7 +61,7 @@ class Creature:
 		return amount
 
 	def is_idle(self):
-		return self.target_loc is None and self.chase_vector is None
+		return self.target_coord is None and self.chase_vector is None
 
 	@property
 	def sight(self):

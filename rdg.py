@@ -1,6 +1,6 @@
 import const.game as GAME
 
-from random import randrange as rr, random as rand, choice
+from random import randrange as rr, random as rand
 from const.tiles import WALL as W
 from const.tiles import ROCK as R
 from const.tiles import FLOOR as F
@@ -42,7 +42,7 @@ def add_staircase_up(level_file):
 			break
 
 	level_file.set_tile_id(y, x, US)
-	level_file.passage_locations[GAME.PASSAGE_UP] = level_file.getloc(y, x)
+	level_file.passage_locations[GAME.PASSAGE_UP] = y, x
 
 def add_staircase_down(level_file):
 	while True:
@@ -53,7 +53,7 @@ def add_staircase_down(level_file):
 			break
 
 	level_file.set_tile_id(y, x, DS)
-	level_file.passage_locations[GAME.PASSAGE_DOWN] = level_file.getloc(y, x)
+	level_file.passage_locations[GAME.PASSAGE_DOWN] = y, x
 
 def _init_tilemap(level_file):
 	level_file.tilefile = [R for x in range(level_file.rows * level_file.cols)]

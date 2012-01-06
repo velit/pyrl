@@ -4,8 +4,6 @@ import menu_h
 import colors
 import const.game as GAME
 
-from textwrap import wrap
-
 
 class Window:
 
