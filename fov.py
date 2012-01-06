@@ -4,11 +4,11 @@ _mult = ((1, 0, 0, -1, -1, 0, 0, 1),
 		(0, 1, 1, 0, 0, -1, -1, 0),
 		(1, 0, 0, 1, -1, 0, 0, -1))
 
-def get_light_set(visibility_func, coord, sight, cols):
+def get_light_set(visibility_func, coord, sight):
 	y, x = coord
-	light_set = {y * cols + x}
+	light_set = {(y, x)}
 	for oct in range(8):
-		_shadow_cast(light_set, visibility_func, cols, y, x, 1, 1.0, 0.0, sight,
+		_shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight,
 				_mult[0][oct], _mult[1][oct], _mult[2][oct], _mult[3][oct])
 	return light_set
 
@@ -16,7 +16,7 @@ def get_light_set(visibility_func, coord, sight, cols):
 # Copyright 2001
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
 
-def _shadow_cast(light_set, visibility_func, cols, cy, cx, row, start, end, r, xx, xy, yx, yy):
+def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy, yx, yy):
 	"""Recursive lightcasting function"""
 	if start < end:
 		return
@@ -38,20 +38,20 @@ def _shadow_cast(light_set, visibility_func, cols, cy, cx, row, start, end, r, x
 			else:
 				# Our light beam is touching this square; light it:
 				if dx * dx + dy * dy <= radius_squared:
-					light_set.add(Y * cols + X)
+					light_set.add((Y, X))
 				if blocked:
 					# we're scanning a row of blocked squares:
-					if not visibility_func(Y * cols + X):
+					if not visibility_func((Y, X)):
 						new_start = r_slope
 						continue
 					else:
 						blocked = False
 						start = new_start
 				else:
-					if not visibility_func(Y * cols + X) and j < r:
+					if not visibility_func((Y, X)) and j < r:
 						# This is a blocking square, start a child scan:
 						blocked = True
-						_shadow_cast(light_set, visibility_func, cols, cy, cx, j + 1, start, l_slope, r, xx, xy, yx, yy)
+						_shadow_cast(light_set, visibility_func, cy, cx, j + 1, start, l_slope, r, xx, xy, yx, yy)
 						new_start = r_slope
 		# Row is scanned; do next row unless last square was blocked:
 		if blocked:

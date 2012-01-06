@@ -1,6 +1,4 @@
-import curses
 import textwrap
-import const.game as CG
 from window.window import Window
 
 

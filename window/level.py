@@ -1,9 +1,6 @@
-import curses
-import colors
 from char import Char
 from window.window import Window
 from generic_algorithms import bresenham
-from tiles import gettile
 
 
 class LevelWindow(Window):
@@ -14,7 +11,7 @@ class LevelWindow(Window):
 
 	def draw(self, char_payload_iterator, reverse=False):
 		reverse_str = "r" if reverse else ""
-		for y, x, (symbol, color) in char_payload_iterator:
+		for (y, x), (symbol, color) in char_payload_iterator:
 			self.addch(y, x, (symbol, color + reverse_str))
 
 	def draw_char(self, coord, char):

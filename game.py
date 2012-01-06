@@ -41,16 +41,15 @@ class Game:
 		#io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
 		io.s.add_element("sight", "SR: ", lambda: creature.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		#io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
+		io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
 		#io.s.add_element("ar", "AR: ", lambda: creature.ar)
 		#io.s.add_element("dr", "DR: ", lambda: creature.dr)
 		#io.s.add_element("pv", "PV: ", lambda: creature.pv)
 		io.s.add_element("speed", "SP: ", lambda: creature.speed)
-		io.s.add_element("coord", "Loc: ", lambda: self.cur_level.get_coord(creature.loc))
-		io.s.add_element("target", "TA: ", lambda: creature.target_loc if creature.target_loc is None else
-				self.cur_level.get_coord(creature.target_loc))
+		io.s.add_element("coord", "Loc: ", lambda: creature.coord)
+		io.s.add_element("target", "TA: ", lambda: creature.target_coord)
 		io.s.add_element("chase_vector", "CV: ", lambda: creature.chase_vector)
-	
+
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
 		if instruction == GAME.SET_LEVEL:
@@ -70,7 +69,7 @@ class Game:
 			self.init_new_level(world_loc)
 			self.cur_level = self.levels[world_loc]
 		old_level.remove_creature(self.player)
-		self.cur_level.add_creature(self.player, self.cur_level.get_passage_loc(passage))
+		self.cur_level.add_creature(self.player, self.cur_level.get_passage_coord(passage))
 		self.redraw()
 
 	def init_new_level(self, world_loc):
@@ -90,7 +89,7 @@ class Game:
 				self.player_act()
 				self.turn_counter += 1
 		else:
-			ai.act_alert(self, self.cur_level, creature, self.player.loc)
+			ai.act_alert(self, self.cur_level, creature, self.player.coord)
 
 	def player_act(self):
 		i = 0
@@ -104,18 +103,18 @@ class Game:
 
 	def creature_move(self, level, creature, direction):
 		if level.creature_can_move(creature, direction) and creature.can_act():
-			target_loc = level.get_relative_loc(creature.loc, direction)
-			creature.update_energy(level.movement_cost(direction, target_loc))
-			level.move_creature(creature, target_loc)
+			target_coord = level.get_relative_coord(creature.coord, direction)
+			creature.update_energy(level.movement_cost(direction, target_coord))
+			level.move_creature(creature, target_coord)
 			return True
 		else:
 			return False
 
 	def creature_swap(self, level, creature, direction):
-		target_loc = level.get_relative_loc(creature.loc, direction)
-		if creature.can_act() and level.creature_is_swappable(target_loc):
-			target_creature = level.get_creature(target_loc)
-			energy_cost = level.movement_cost(direction, target_loc)
+		target_coord = level.get_relative_coord(creature.coord, direction)
+		if creature.can_act() and level.creature_is_swappable(target_coord):
+			target_creature = level.get_creature(target_coord)
+			energy_cost = level.movement_cost(direction, target_coord)
 			creature.update_energy(energy_cost)
 			target_creature.update_energy(energy_cost)
 			level.swap_creature(creature, target_creature)
@@ -126,11 +125,11 @@ class Game:
 	def creature_attack(self, level, creature, direction):
 		if creature.can_act():
 			creature.update_energy_action(CC.ATTACK)
-			target_loc = level.get_relative_loc(creature.loc, direction)
-			if level.has_creature(target_loc):
-				target = level.get_creature(target_loc)
+			target_coord = level.get_relative_coord(creature.coord, direction)
+			if level.has_creature(target_coord):
+				target = level.get_creature(target_coord)
 			else:
-				target = level.get_tile(target_loc)
+				target = level.get_tile(target_coord)
 			succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
 			if damage:
 				target.receive_damage(damage)
@@ -184,13 +183,13 @@ class Game:
 		level, creature = self.cur_level, self.player
 		self.redraw_view(level, creature)
 		if self.flags.show_map:
-			io.draw(level.get_visible_data(level.get_loc_iter()))
+			io.draw(level.get_visible_data(level.get_coord_iter()))
 
 	def update_view(self, level, creature):
 		old = self.old_visibility
-		new = get_light_set(level.is_see_through, level.get_coord(creature.loc), creature.sight, level.cols)
-		mod = level.pop_modified_locs()
-		level.update_visited_locs(new - old)
+		new = get_light_set(level.is_see_through, creature.coord, creature.sight)
+		mod = level.pop_modified_locations()
+		level.update_visited_locations(new - old)
 
 		out_of_sight_memory_data = level.get_memory_data(old - new)
 		io.draw(out_of_sight_memory_data)

@@ -5,8 +5,8 @@ from pio import io
 from generic_algorithms import chebyshev
 
 
-def path(start_loc, goal_loc, neighbor_function, heuristic, cols):
-	return _iterate_path(_path(start_loc, goal_loc, neighbor_function, heuristic, cols), start_loc, goal_loc)
+def path(start_coord, goal_coord, neighbor_function, heuristic):
+	return _iterate_path(_path(start_coord, goal_coord, neighbor_function, heuristic), start_coord, goal_coord)
 
 
 def heuristic(coordA, coordB, default_movement_cost, diagonal_modifier):
@@ -14,7 +14,7 @@ def heuristic(coordA, coordB, default_movement_cost, diagonal_modifier):
 	return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
 
 
-def _path(start, goal, neighbors, heuristic, cols):
+def _path(start, goal, neighbors, heuristic):
 	if start == goal:
 		return goal
 	g = {}
@@ -34,7 +34,7 @@ def _path(start, goal, neighbors, heuristic, cols):
 		if s in closedset:
 			continue
 		if D.PATH and s != start:
-			io.draw_char((s // cols, s % cols), ('+', "light_bluer"))
+			io.draw_char(s, ('+', "light_bluer"))
 		if D.PATH == 2:
 			io.msg(str((g[s] + h[s], g[s], h[s])))
 		if D.PATH == 2:
@@ -51,7 +51,7 @@ def _path(start, goal, neighbors, heuristic, cols):
 			h[n] = heuristic(n, goal, start)
 			heappush(openprio, (g[n] + h[n], n))
 			if D.PATH and n != goal:
-				io.draw_char((n // cols, n % cols), ('?', "redr"))
+				io.draw_char(n, ('?', "redr"))
 			openmember.add(n)
 
 	return came_from

@@ -30,7 +30,7 @@ direction_map = {
 		ord('i'): DIRS.NE,
 		ord('n'): DIRS.SW,
 		ord('m'): DIRS.SE,
-		}
+}
 
 class UserInput:
 	def __init__(self):
@@ -50,7 +50,7 @@ class UserInput:
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
 	def get_and_act(self, game, level, creature):
-		c = io.getch(*level.get_coord(creature.loc))
+		c = io.getch(*creature.coord)
 		if c in self.actions:
 			return self.execute_action(game, level, creature, self.actions[c])
 		else:
@@ -61,10 +61,10 @@ class UserInput:
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def act_to_dir(game, level, creature, direction):
-	target_loc = level.get_relative_loc(creature.loc, direction)
+	target_coord = level.get_relative_coord(creature.coord, direction)
 	if game.creature_move(level, creature, direction):
 		return True
-	elif level.has_creature(target_loc):
+	elif level.has_creature(target_coord):
 		game.creature_attack(level, creature, direction)
 		return True
 	else:
@@ -79,16 +79,16 @@ def z_command(game, level, creature):
 		game.savegame(ask=False)
 
 def look(game, level, creature):
-	loc = creature.loc
+	coord = creature.coord
 	drawline_flag = False
 	direction = DIRS.STOP
 	while True:
-		loc = level.get_relative_loc(loc, direction)
-		io.msg(level.look_information(loc))
+		coord = level.get_relative_coord(coord, direction)
+		io.msg(level.look_information(coord))
 		if drawline_flag:
-			io.drawline(level.get_coord(creature.loc), level.get_coord(loc), Char("*", "yellow"))
-			io.msg("LoS: {}".format(level.check_los(creature.loc, loc)))
-		c = io.getch(*level.get_coord(loc))
+			io.drawline(level.get_coord(creature.coord), coord, Char("*", "yellow"))
+			io.msg("LoS: {}".format(level.check_los(creature.coord, coord)))
+		c = io.getch(*coord)
 		game.redraw()
 		direction = DIRS.STOP
 		if c in direction_map:
@@ -97,11 +97,11 @@ def look(game, level, creature):
 			drawline_flag = not drawline_flag
 		elif c == ord('b'):
 			from generic_algorithms import bresenham
-			for coord in bresenham(level.get_coord(creature.loc), level.get_coord(loc)):
+			for coord in bresenham(level.get_coord(creature.coord), coord):
 				io.msg(coord)
 		elif c == ord('s'):
-			if level.has_creature(loc):
-				game.register_status_texts(level.get_creature(loc))
+			if level.has_creature(coord):
+				game.register_status_texts(level.get_creature(coord))
 		elif c in map(ord, "QqzZ "):
 			break
 
@@ -145,9 +145,9 @@ def debug(game, level, creature):
 			level.remove_creature(i)
 		io.msg("Abrakadabra.")
 	elif c == ord('p'):
-		passage_up = level.get_passage_loc(GAME.PASSAGE_UP)
-		passage_down = level.get_passage_loc(GAME.PASSAGE_DOWN)
-		io.draw_path((loc // level.cols, loc % level.cols) for loc in level.path(passage_up, passage_down))
+		passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
+		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
+		io.draw_path(level.path(passage_up, passage_down))
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 256 else c))
 
@@ -155,19 +155,19 @@ def redraw_view(game, level, creature):
 	game.redraw()
 
 def enter(game, level, creature, passage):
-	loc = game.player.loc
-	if level.is_exit(loc) and level.get_exit(loc) == passage:
+	coord = game.player.coord
+	if level.is_exit(coord) and level.get_exit(coord) == passage:
 		try:
-			game.enter_passage(level.world_loc, level.get_exit(loc))
+			game.enter_passage(level.world_loc, level.get_exit(coord))
 		except GAME.PyrlException:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:
-			new_loc = level.get_passage_loc(passage)
+			new_coord = level.get_passage_coord(passage)
 		except KeyError:
 			io.msg("This level doesn't seem to have a corresponding passage.")
 		else:
-			if not level.is_passable(new_loc):
-				level.remove_creature(level.get_creature(new_loc))
-			level.move_creature(game.player, new_loc)
+			if not level.is_passable(new_coord):
+				level.remove_creature(level.get_creature(new_coord))
+			level.move_creature(game.player, new_coord)
 	return True
