@@ -129,7 +129,7 @@ class Game:
 			if level.has_creature(target_coord):
 				target = level.get_creature(target_coord)
 			else:
-				target = level.get_tile(target_coord)
+				target = level.tiles[target_coord]
 			succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
 			if damage:
 				target.receive_damage(damage)

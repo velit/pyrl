@@ -69,6 +69,9 @@
     <note priority="veryhigh" time="1315707472">
         make an inventory
     </note>
+    <note priority="veryhigh" time="1325884405">
+        fugitive diff opens all files
+    </note>
     <note priority="high" time="1315155829">
         fix sight checking
     </note>
