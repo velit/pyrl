@@ -25,11 +25,15 @@ class LevelFile:
 	def get_tile_from_loc(self, loc):
 		return gettile(self.tilefile[loc], self.tile_dict)
 
-	def get_tilemap(self):
-		return [gettile(key, self.tile_dict) for key in self.tilefile]
+	def tilemap(self):
+		for key in self.tilefile:
+			yield gettile(key, self.tile_dict)
 
 	def add_monster_file(self, monster):
 		self.monster_files.append(monster)
 
 	def getloc(self, y, x):
 		return y * self.cols + x
+
+	def use_map_generator(self):
+		return self.tilefile is None

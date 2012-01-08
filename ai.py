@@ -1,19 +1,19 @@
 import random
 import const.directions as DIRS
 import const.creature_actions as ACTIONS
-from generic_algorithms import resize_vector_to_len
+from generic_algorithms import resize_vector_to_len, get_vector
 
 
 def act_alert(game, level, creature, alert_coord):
 	# creature seeing actions
 	if level.creature_has_sight(creature, alert_coord):
 		if creature.target_coord is not None and creature.target_coord != alert_coord:
-			creature.chase_vector = level.get_vector(creature.target_coord, alert_coord)
+			creature.chase_vector = get_vector(creature.target_coord, alert_coord)
 		creature.target_coord = alert_coord
 
 		if creature.can_act():
 			if level.creature_can_reach(creature, alert_coord):
-				game.creature_attack(level, creature, level.get_vector(creature.coord, creature.target_coord))
+				game.creature_attack(level, creature, get_vector(creature.coord, creature.target_coord))
 			else:
 				move_towards(game, level, creature, alert_coord)
 
