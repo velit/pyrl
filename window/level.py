@@ -1,5 +1,5 @@
 from char import Char
-from window.window import Window
+from .window import Window
 from generic_algorithms import bresenham
 
 

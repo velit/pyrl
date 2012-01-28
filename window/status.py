@@ -1,4 +1,4 @@
-from window.window import Window
+from .window import Window
 
 
 class StatusBar(Window):

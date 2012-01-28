@@ -23,7 +23,7 @@ class Window:
 		symbol, color = char
 		if (y, x) == (self.rows - 1, self.cols - 1):
 			try:
-				self.w.addch(y, x, symbol, colors.CURSES_COLOR[color])
+				self.w.addch(y, x, symbol.encode("ascii"), colors.CURSES_COLOR[color])
 			except curses.error:
 				pass
 			# Writing to the last cell of a window raises an exception because
@@ -31,7 +31,7 @@ class Window:
 			# the only way to write to the last cell in the current wrapper
 			# according to my knowledge
 		else:
-			self.w.addch(y, x, symbol, colors.CURSES_COLOR[color])
+			self.w.addch(y, x, symbol.encode("ascii"), colors.CURSES_COLOR[color])
 
 	def getch(self, *a, **k):
 		return self.w.getch(*a, **k)
