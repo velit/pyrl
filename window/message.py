@@ -1,5 +1,5 @@
 import textwrap
-from window.window import Window
+from .window import Window
 
 
 MORE_STR = " (more)"
