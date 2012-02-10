@@ -1,13 +1,13 @@
 from char import Char
-from .window import Window
+from .pyrl_window import PyrlWindow
 from generic_algorithms import bresenham
 
 
-class LevelWindow(Window):
+class LevelWindow(PyrlWindow):
 	"""Handles the level display"""
 
-	def __init__(self, window):
-		super().__init__(window)
+	def __init__(self, concrete_window):
+		super().__init__(concrete_window)
 
 	def draw(self, char_payload_iterator, reverse=False):
 		reverse_str = "r" if reverse else ""

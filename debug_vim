@@ -2,4 +2,6 @@
 ./pyrl.py 2>errors.err
 if [ -s errors.err ]; then
 	cat errors.err
+else
+	rm errors.err
 fi

@@ -1,15 +1,15 @@
 import textwrap
-from .window import Window
+from .pyrl_window import PyrlWindow
 
 
 MORE_STR = " (more)"
 
 
-class MessageBar(Window):
+class MessageBar(PyrlWindow):
 	"""Handles the messaging bar system."""
 
-	def __init__(self, window):
-		super().__init__(window)
+	def __init__(self, concrete_window):
+		super().__init__(concrete_window)
 
 		self.msgqueue = ""
 
@@ -19,9 +19,9 @@ class MessageBar(Window):
 		#accommodate for the more_str if the messages continue on the next page
 		self.last_line_wrapper = textwrap.TextWrapper(width=(self.cols - len(MORE_STR) - 1))
 
-	def update(self):
+	def prepare_flush(self):
 		self.print_queue()
-		Window.update(self)
+		super().prepare_flush()
 
 	def queue_msg(self, obj):
 		msg = str(obj)
@@ -36,11 +36,11 @@ class MessageBar(Window):
 		while True:
 			if cur_line < self.rows - 1:
 				if len(msg) <= self.cols:
-					self.w.addstr(cur_line, 0, msg)
+					self.mvaddstr(cur_line, 0, msg)
 					break
 				else:
 					a = self.wrapper.wrap(msg)
-					self.w.addstr(cur_line, 0, a[0])
+					self.w.mvaddstr(cur_line, 0, a[0])
 					msg = " ".join(a[1:])
 					cur_line += 1
 			elif cur_line == self.rows - 1:

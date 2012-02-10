@@ -1,12 +1,12 @@
-from .window import Window
+from .pyrl_window import PyrlWindow
 
 
-class StatusBar(Window):
+class StatusBar(PyrlWindow):
 	"""Handles the status bar system."""
 
-	def __init__(self, window):
-		super().__init__(window)
-		self.lines, self.width = self.w.getmaxyx()
+	def __init__(self, concrete_window):
+		super().__init__(concrete_window)
+
 		self.elements = {}
 		self.addcount = 0
 
@@ -23,7 +23,7 @@ class StatusBar(Window):
 	def update(self):
 		self.clear()
 		self.print_elements()
-		Window.update(self)
+		self._concrete_window.update()
 
 	def print_elements(self):
 		for priority, string, value in sorted(self.elements.values()):

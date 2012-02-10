@@ -2,10 +2,11 @@ import curses
 
 import const.game as GAME
 
+from window.curses_window import CursesWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
-from window.window import Window
+from window.pyrl_window import PyrlWindow
 from colors import init_colors
 
 
@@ -18,16 +19,15 @@ class IO:
 
 	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
 		self.w = curs_window
-		self.w.keypad(1)
 		self.rows, self.cols = self.w.getmaxyx()
 
 		self.level_rows = self.rows - msg_bar_size - status_bar_size
 		self.level_cols = self.cols
 
-		self.m = MessageBar(self.w.derwin(msg_bar_size, 0, 0, 0))
-		self.s = StatusBar(self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0))
-		self.l = LevelWindow(self.w.derwin(self.level_rows, 0, msg_bar_size, 0))
-		self.a = Window(self.w)
+		self.m = MessageBar(CursesWindow(self.w.derwin(msg_bar_size, 0, 0, 0)))
+		self.s = StatusBar(CursesWindow(self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0)))
+		self.l = LevelWindow(CursesWindow(self.w.derwin(self.level_rows, 0, msg_bar_size, 0)))
+		self.a = PyrlWindow(CursesWindow(self.w))
 
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
@@ -75,9 +75,9 @@ class IO:
 		self.refresh()
 		return return_data
 
-	def getch(self, *a, **k):
+	def getch(self, coord=()):
 		self.refresh()
-		return self.l.getch(*a, **k)
+		return self.l.getch(coord)
 
 	def getch_print(self, print_str):
 		self.msg(print_str)
@@ -103,10 +103,13 @@ class IO:
 		else:
 			self.m.queue_msg(*a)
 
+	def move(self, *a, **k):
+		return self.l.move(*a, **k)
+
 	def refresh(self):
-		self.m.update()
-		self.s.update()
-		self.l.update()
+		self.m.prepare_flush()
+		self.s.prepare_flush()
+		self.l.prepare_flush()
 		curses.doupdate()
 
 	def draw_star(self, *a, **k):
