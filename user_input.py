@@ -50,7 +50,7 @@ class UserInput:
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
 	def get_and_act(self, game, level, creature):
-		c = io.getch(*creature.coord)
+		c = io.getch(creature.coord)
 		if c in self.actions:
 			return self.execute_action(game, level, creature, self.actions[c])
 		else:

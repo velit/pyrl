@@ -6,10 +6,44 @@ import const.game as GAME
 class PyrlWindow:
 
 	def __init__(self, concrete_window):
-		self._concrete_window = concrete_window
+		self._w = concrete_window
+		self.rows, self.cols = self.get_dimensions()
 
-	def __getattr__(self, name):
-		return getattr(self._concrete_window, name)
+
+	# Proxy functions
+
+	def addch(self, y, x, char):
+		self._w.addch(y, x, char)
+
+	def mvaddstr(self, y, x, string, color=None):
+		self._w.mvaddstr(y, x, string, color)
+
+	def addstr(self, string, color=None):
+		self._w.addstr(string, color)
+
+	def clear(self):
+		self._w.clear()
+
+	def prepare_flush(self):
+		self._w.prepare_flush()
+
+	def flush(self):
+		self._w.flush()
+
+	def move(self, y, x):
+		self._w.move(y, x)
+
+	def getch(self, coord=()):
+		return self._w.getch(coord)
+
+	def get_cursor_pos(self):
+		return self._w.get_cursor_pos()
+
+	def get_dimensions(self):
+		return self._w.get_dimensions()
+
+
+	# PyrlWindow added functions
 
 	def notify(self, print_str=None):
 		return self.sel_getch(print_str, char_list=GAME.DEFAULT)

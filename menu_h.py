@@ -20,14 +20,14 @@ def _print_menu(io, w, r):
 			s = word
 			col = "normal"
 		if len(s) > io.cols - x:
-			y, x = io.gety() + 1, a[_first_r(r)][1]
+			y, x = io.getyx()[0] + 1, a[_first_r(r)][1]
 		a.append((y, x))
 		try:
 			io.addstr(y, x, s, col)
-			if io.getx() != io.cols - 1:
-				io.move(io.gety(), io.getx() + 1)
+			if io.getyx()[1] != io.cols - 1:
+				io.move(io.getyx()[0], io.getyx()[1] + 1)
 			else:
-				io.move(io.gety() + 1, a[_first_r(r)][1])
+				io.move(io.getyx()[0] + 1, a[_first_r(r)][1])
 		except curses.error:
 			pass
 	return a
