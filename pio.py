@@ -2,12 +2,11 @@ import curses
 
 import const.game as GAME
 
-from window.curses_window import CursesWindow
+from window.pyrl_window import PyrlWindow
+from window.curses_window import CursesWindow, init_colors
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
-from window.pyrl_window import PyrlWindow
-from colors import init_colors
 
 
 def init_io_module(*a, **k):
@@ -110,7 +109,7 @@ class IO:
 		self.m.prepare_flush()
 		self.s.prepare_flush()
 		self.l.prepare_flush()
-		curses.doupdate()
+		self.a.flush()
 
 	def draw_star(self, *a, **k):
 		self.l.draw_star(*a, **k)
