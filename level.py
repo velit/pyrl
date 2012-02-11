@@ -1,3 +1,4 @@
+from __future__ import division
 import random
 import path
 import rdg
@@ -26,7 +27,7 @@ class TileStructure(list):
 		return list.__delitem__(self, coord[0] * self.cols + coord[1])
 
 
-class Level:
+class Level(object):
 
 	def __init__(self, world_loc, level_file, creature_spawn_list):
 		self.modified_locations = set()
@@ -44,7 +45,7 @@ class Level:
 		for mons_file in level_file.monster_files:
 			self._spawn_predefined_creature(mons_file)
 
-		for x in range(GAME.MONSTERS_PER_LEVEL):
+		for x in xrange(GAME.MONSTERS_PER_LEVEL):
 			self._spawn_random_creature()
 
 	# nudge_coord nudges towards a line between this and start_coord
@@ -100,8 +101,8 @@ class Level:
 		return coord[0] + direction[0], coord[1] + direction[1]
 
 	def get_coord_iter(self):
-		for y in range(self.tiles.rows):
-			for x in range(self.tiles.cols):
+		for y in xrange(self.tiles.rows):
+			for x in xrange(self.tiles.cols):
 				yield y, x
 
 	def get_visible_data(self, location_set):
@@ -176,13 +177,13 @@ class Level:
 
 	def look_information(self, coord):
 		#if coord in self.visited_locations:
-		information = "{}x{} ".format(coord)
+		information = u"{}x{} ".format(coord)
 		if self.has_creature(coord):
 			c = self.get_creature(coord)
-			creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
+			creature_stats = u"{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
 			information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
-			information += " target:{}".format(coord)
-			information += " direction:{}".format(c.chase_vector)
+			information += u" target:{}".format(coord)
+			information += u" direction:{}".format(c.chase_vector)
 		else:
 			information += self.tiles[coord].name
 		return information

@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import os
 import pickle
 
@@ -13,12 +14,14 @@ from fov import get_light_set
 from world_file import WorldFile
 from debug_flags import Flags
 from combat import get_melee_attack, get_combat_message
+from itertools import imap
+from io import open
 
 
-class Game:
+class Game(object):
 
 	def __init__(self):
-		"""pyrl; Python roguelike by Tapani Kiiskinen"""
+		u"""pyrl; Python roguelike by Tapani Kiiskinen"""
 
 		self.turn_counter = 0
 		self.user_input = UserInput()
@@ -39,16 +42,16 @@ class Game:
 	def register_status_texts(self, creature):
 		#io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
 		#io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-		io.s.add_element("sight", "SR: ", lambda: creature.sight)
-		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
+		io.s.add_element(u"sight", u"SR: ", lambda: creature.sight)
+		io.s.add_element(u"turns", u"TC: ", lambda: self.turn_counter)
+		io.s.add_element(u"world_loc", u"Loc: ", lambda: u"{}/{}".format(*self.cur_level.world_loc))
 		#io.s.add_element("ar", "AR: ", lambda: creature.ar)
 		#io.s.add_element("dr", "DR: ", lambda: creature.dr)
 		#io.s.add_element("pv", "PV: ", lambda: creature.pv)
-		io.s.add_element("speed", "SP: ", lambda: creature.speed)
-		io.s.add_element("coord", "Loc: ", lambda: creature.coord)
-		io.s.add_element("target", "TA: ", lambda: creature.target_coord)
-		io.s.add_element("chase_vector", "CV: ", lambda: creature.chase_vector)
+		io.s.add_element(u"speed", u"SP: ", lambda: creature.speed)
+		io.s.add_element(u"coord", u"Loc: ", lambda: creature.coord)
+		io.s.add_element(u"target", u"TA: ", lambda: creature.target_coord)
+		io.s.add_element(u"chase_vector", u"CV: ", lambda: creature.chase_vector)
 
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
@@ -136,7 +139,7 @@ class Game:
 				died = target.is_dead()
 			else:
 				died = False
-			player_matrix = map(self.is_player, (creature, target))
+			player_matrix = imap(self.is_player, (creature, target))
 			msg = get_combat_message(succeeds, damage, died, player_matrix, creature.name, target.name)
 			if died:
 				self.creature_death(level, target)
@@ -147,29 +150,29 @@ class Game:
 
 	def creature_death(self, level, creature):
 		if self.is_player(creature):
-			io.notify("You die...")
+			io.notify(u"You die...")
 			self.endgame(False)
 		level.remove_creature(creature)
 
-	def endgame(self, ask=False, message=""):
+	def endgame(self, ask=False, message=u""):
 		io.msg(message)
 		if not ask:
 			exit()
-		if io.sel_getch("Do you wish to end the game? [y/N]") in GAME.YES:
+		if io.sel_getch(u"Do you wish to end the game? [y/N]") in GAME.YES:
 			exit()
 
 	def _save(self):
-		save_path = os.path.join("data", "pyrl.svg")
+		save_path = os.path.join(u"data", u"pyrl.svg")
 		if not os.path.exists(save_path):
-			os.mkdir("data")
-		with open(save_path, "wb") as f:
+			os.mkdir(u"data")
+		with open(save_path, u"wb") as f:
 			pickle.dump(self, f)
-		io.msg("Savegame file size: {} bytes".format(os.path.getsize(save_path)))
+		io.msg(u"Savegame file size: {} bytes".format(os.path.getsize(save_path)))
 
 	def savegame(self, ask=False):
 		if not ask:
 			self._save()
-		elif io.sel_getch("Do you wish to save the game? [y/N]") in GAME.YES:
+		elif io.sel_getch(u"Do you wish to save the game? [y/N]") in GAME.YES:
 			self._save()
 
 	def draw(self):

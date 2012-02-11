@@ -2,7 +2,7 @@ import const.game as GAME
 
 from tiles import gettile
 
-class LevelFile:
+class LevelFile(object):
 
 	def __init__(self, danger_level=0, rows=GAME.LEVEL_ROWS, cols=GAME.LEVEL_COLS):
 		self.rows = rows

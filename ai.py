@@ -64,7 +64,7 @@ def move_towards(game, level, creature, target_coord):
 
 
 def move_random(game, level, creature):
-	for x in range(len(DIRS.ALL)):
+	for x in xrange(len(DIRS.ALL)):
 		direction = random.choice(DIRS.ALL)
 		if game.creature_move(level, creature, direction):
 			return

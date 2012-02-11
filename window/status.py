@@ -2,7 +2,7 @@ from .pyrl_window import PyrlWindow
 
 
 class StatusBar(PyrlWindow):
-	"""Handles the status bar system."""
+	u"""Handles the status bar system."""
 
 	def __init__(self, concrete_window):
 		PyrlWindow.__init__(self, concrete_window)
@@ -27,4 +27,4 @@ class StatusBar(PyrlWindow):
 
 	def print_elements(self):
 		for priority, string, value in sorted(self.elements.values()):
-			self.addstr(string + "[" + str(value()) + "] ")
+			self.addstr(string + u"[" + unicode(value()) + u"] ")

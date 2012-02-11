@@ -13,7 +13,7 @@ class AdvancedCreature(Creature):
 
 		self.last_action_energy = 0
 
-		super().__init__(creature_file)
+		super(self.__class__, self).__init__(creature_file)
 
 	def get_damage_info(self):
 		if self.slots[HANDS] is not None:
@@ -36,47 +36,47 @@ class AdvancedCreature(Creature):
 		return sum(item.stats[STAT] for item in self.slots.values() if item is not None and STAT in item.stats)
 
 	def update_energy(self, amount):
-		super().update_energy(amount)
+		super(self.__class__, self).update_energy(amount)
 		self.last_action_energy = amount
 
 	def update_energy_action(self, action):
-		self.last_action_energy = super().update_energy_action(action)
+		self.last_action_energy = super(self.__class__, self).update_energy_action(action)
 
 	def is_idle(self):
 		return False
 
 	@property
 	def sight(self):
-		return super().sight + self.get_item_stats(SIGHT)
+		return super(self.__class__, self).sight + self.get_item_stats(SIGHT)
 
 	@property
 	def max_hp(self):
-		return super().max_hp + self.get_item_stats(MAX_HP)
+		return super(self.__class__, self).max_hp + self.get_item_stats(MAX_HP)
 
 	@property
 	def dmg_bonus(self):
-		return super().dmg_bonus + self.get_item_stats(DMG_BONUS)
+		return super(self.__class__, self).dmg_bonus + self.get_item_stats(DMG_BONUS)
 
 	@property
 	def pv(self):
-		return super().pv + self.get_item_stats(PV)
+		return super(self.__class__, self).pv + self.get_item_stats(PV)
 
 	@property
 	def ar(self):
-		return super().ar + self.get_item_stats(AR)
+		return super(self.__class__, self).ar + self.get_item_stats(AR)
 
 	@property
 	def dr(self):
-		return super().dr + self.get_item_stats(DR)
+		return super(self.__class__, self).dr + self.get_item_stats(DR)
 
 	@property
 	def unarmed_dice(self):
-		return super().unarmed_dice + self.get_item_stats(UNARMED_DICE)
+		return super(self.__class__, self).unarmed_dice + self.get_item_stats(UNARMED_DICE)
 
 	@property
 	def unarmed_sides(self):
-		return super().unarmed_sides + self.get_item_stats(UNARMED_SIDES)
+		return super(self.__class__, self).unarmed_sides + self.get_item_stats(UNARMED_SIDES)
 
 	@property
 	def speed(self):
-		return super().speed ++ self.get_item_stats(SPEED)
+		return super(self.__class__, self).speed ++ self.get_item_stats(SPEED)

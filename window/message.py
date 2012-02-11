@@ -2,16 +2,16 @@ import textwrap
 from .pyrl_window import PyrlWindow
 
 
-MORE_STR = " (more)"
+MORE_STR = u" (more)"
 
 
 class MessageBar(PyrlWindow):
-	"""Handles the messaging bar system."""
+	u"""Handles the messaging bar system."""
 
 	def __init__(self, concrete_window):
 		PyrlWindow.__init__(self, concrete_window)
 
-		self.msgqueue = ""
+		self.msgqueue = u""
 
 		#accommodate for printing the newline character
 		self.wrapper = textwrap.TextWrapper(width=(self.cols))
@@ -24,9 +24,9 @@ class MessageBar(PyrlWindow):
 		PyrlWindow.prepare_flush(self)
 
 	def queue_msg(self, obj):
-		msg = str(obj)
+		msg = unicode(obj)
 		if len(msg) > 0:
-			self.msgqueue += msg + " "
+			self.msgqueue += msg + u" "
 
 	def print_queue(self):
 		self.clear()
@@ -41,7 +41,7 @@ class MessageBar(PyrlWindow):
 				else:
 					a = self.wrapper.wrap(msg)
 					self.w.mvaddstr(cur_line, 0, a[0])
-					msg = " ".join(a[1:])
+					msg = u" ".join(a[1:])
 					cur_line += 1
 			elif cur_line == self.rows - 1:
 				if len(msg) < self.cols:
@@ -51,9 +51,9 @@ class MessageBar(PyrlWindow):
 					a = self.last_line_wrapper.wrap(msg)
 					self.w.addstr(cur_line, 0, a[0] + MORE_STR)
 					if not skip_all:
-						if self.notify() == ord('\n'):
+						if self.notify() == ord(u'\n'):
 							skip_all = True
-					msg = " ".join(a[1:])
+					msg = u" ".join(a[1:])
 					cur_line = 0
 					self.clear()
-		self.msgqueue = ""
+		self.msgqueue = u""

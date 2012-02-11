@@ -34,9 +34,9 @@ def _path(start, goal, neighbors, heuristic):
 		if s in closedset:
 			continue
 		if D.PATH and s != start:
-			io.draw_char(s, ('+', "light_bluer"))
+			io.draw_char(s, (u'+', u"light_bluer"))
 		if D.PATH == 2:
-			io.msg(str((g[s] + h[s], g[s], h[s])))
+			io.msg(unicode((g[s] + h[s], g[s], h[s])))
 		if D.PATH == 2:
 			io.getch()
 		openmember.remove(s)
@@ -51,14 +51,14 @@ def _path(start, goal, neighbors, heuristic):
 			h[n] = heuristic(n, goal, start)
 			heappush(openprio, (g[n] + h[n], n))
 			if D.PATH and n != goal:
-				io.draw_char(n, ('?', "redr"))
+				io.draw_char(n, (u'?', u"redr"))
 			openmember.add(n)
 
 	return came_from
 
 
 def _iterate_path(path, start, goal):
-	"""Iterates the path structure returned by _path()."""
+	u"""Iterates the path structure returned by _path()."""
 	cur = goal
 	while cur != start:
 		cur = path[cur]

@@ -18,7 +18,7 @@ def _print_menu(io, w, r):
 			col = word.color
 		else:
 			s = word
-			col = "normal"
+			col = u"normal"
 		if len(s) > io.cols - x:
 			y, x = io.getyx()[0] + 1, a[_first_r(r)][1]
 		a.append((y, x))
@@ -45,11 +45,11 @@ def _update_ui(io, w, r, a):
 	sw = _roll_sw(sw, w, r)
 	while True:
 		c = _hilight_and_getch(io, sw, w, a)
-		if c in (curses.KEY_RIGHT, ord('l')):
+		if c in (curses.KEY_RIGHT, ord(u'l')):
 			sw = _roll_sw(sw, w, r, 1)
-		elif c in (curses.KEY_LEFT, ord('h')):
+		elif c in (curses.KEY_LEFT, ord(u'h')):
 			sw = _roll_sw(sw, w, r, -1)
-		elif c == ord('\n') or c == ord('>'):
+		elif c == ord(u'\n') or c == ord(u'>'):
 			curses.curs_set(1)
 			return r[sw]
 
@@ -67,9 +67,9 @@ def _print_menu_word(io, sw, w, a, r):
 		s = w[sw].symbol
 		col = w[sw].color
 	else:
-		s = str(w[sw])
-		col = "normal"
-	r = "r" if r else ""
+		s = unicode(w[sw])
+		col = u"normal"
+	r = u"r" if r else u""
 	try:
 		io.addstr(y, x, s, col + r)
 	except curses.error:

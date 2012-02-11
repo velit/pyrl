@@ -1,4 +1,5 @@
 from const.generated_level_types import DUNGEON as LEVEL_TYPE_DUNGEON, ARENA as LEVEL_TYPE_ARENA
+from itertools import imap
 
 OPTIMIZATION = True
 
@@ -17,32 +18,32 @@ MOVEMENT_COST = 1000
 ATTACK_COST = 1000
 DIAGONAL_MODIFIER = 2 ** 0.5
 
-LEVEL_TYPE = "dungeon"
+LEVEL_TYPE = u"dungeon"
 
 MONSTERS_PER_LEVEL = 100
 LEVELS_PER_DUNGEON = 100
 
-ENCODING = "utf-8"
+ENCODING = u"utf-8"
 
-SET_LEVEL = "set-level"
-NEXT_LEVEL = "next-level"
-PREVIOUS_LEVEL = "previous-level"
+SET_LEVEL = u"set-level"
+NEXT_LEVEL = u"next-level"
+PREVIOUS_LEVEL = u"previous-level"
 UP = (PREVIOUS_LEVEL, None, None)
 DOWN = (NEXT_LEVEL, None, None)
 
-DUNGEON = "dungeon"
+DUNGEON = u"dungeon"
 FIRST_LEVEL = (DUNGEON, 0)
 
-PASSAGE_UP = "an exit going up"
-PASSAGE_DOWN = "an exit going down"
-PASSAGE_RANDOM = "random entry point"
+PASSAGE_UP = u"an exit going up"
+PASSAGE_DOWN = u"an exit going down"
+PASSAGE_RANDOM = u"random entry point"
 
-YES = set(map(ord, "yY"))
-NO = set(map(ord, "nN"))
-DEFAULT = set(map(ord, " zZ\n"))
+YES = set(imap(ord, u"yY"))
+NO = set(imap(ord, u"nN"))
+DEFAULT = set(imap(ord, u" zZ\n"))
 YES_D = YES | DEFAULT
 NO_D = NO | DEFAULT
 ALL = YES | NO | DEFAULT
-MOVES = set(map(ord, "123456790."))
+MOVES = set(imap(ord, u"123456790."))
 
 class PyrlException(Exception): pass

@@ -2,10 +2,10 @@ import const.game as GAME
 from char import Char
 
 
-class Tile:
-	"""The actual floor of a square."""
+class Tile(object):
+	u"""The actual floor of a square."""
 
-	def __init__(self, name="floor", visible=Char(), mem=Char(), is_passable=True,
+	def __init__(self, name=u"floor", visible=Char(), mem=Char(), is_passable=True,
 				is_see_through=True, movement_cost=GAME.MOVEMENT_COST, exit_point=None):
 		self.name = name
 		self.visible_char = visible

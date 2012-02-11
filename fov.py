@@ -1,4 +1,5 @@
 # Multipliers for transforming coordinates to other octants:
+from __future__ import division
 _mult = ((1, 0, 0, -1, -1, 0, 0, 1),
 		(0, 1, -1, 0, 0, -1, 1, 0),
 		(0, 1, 1, 0, 0, -1, -1, 0),
@@ -6,8 +7,8 @@ _mult = ((1, 0, 0, -1, -1, 0, 0, 1),
 
 def get_light_set(visibility_func, coord, sight):
 	y, x = coord
-	light_set = {(y, x)}
-	for oct in range(8):
+	light_set = set([(y, x)])
+	for oct in xrange(8):
 		_shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight,
 				_mult[0][oct], _mult[1][oct], _mult[2][oct], _mult[3][oct])
 	return light_set
@@ -17,11 +18,11 @@ def get_light_set(visibility_func, coord, sight):
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
 
 def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy, yx, yy):
-	"""Recursive lightcasting function"""
+	u"""Recursive lightcasting function"""
 	if start < end:
 		return
 	radius_squared = r * r
-	for j in range(row, r + 1):
+	for j in xrange(row, r + 1):
 		dx, dy = 0 - 1 - j, 0 - j
 		blocked = False
 		while dx <= 0:
