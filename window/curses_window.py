@@ -61,17 +61,14 @@ class CursesWindow():
 			# the automatic cursor move to the next cell is illegal. insch avoids
 			# this but it can only be used on the last cell because it moves the line
 
-	def addstr(self, string, color=None):
-		if color is not None:
-			self.w.addstr(string, CURSES_COLOR[color])
-		else:
-			self.w.addstr(string)
-
-	def mvaddstr(self, y, x, string, color=None):
+	def addstr(self, y, x, string, color=None):
 		if color is not None:
 			self.w.addstr(y, x, string, CURSES_COLOR[color])
 		else:
 			self.w.addstr(y, x, string)
+
+	def getch(self):
+		return self.w.getch()
 
 	def clear(self):
 		self.w.erase()
@@ -83,17 +80,14 @@ class CursesWindow():
 	def flush(self):
 		curses.doupdate()
 
+	def get_dimensions(self):
+		return self.w.getmaxyx()
+
 	def move(self, y, x):
 		self.w.move(y, x)
 
-	def getch(self, coord=()):
-		return self.w.getch(*coord)
-
 	def get_cursor_pos(self):
 		return self.w.getyx()
-
-	def get_dimensions(self):
-		return self.w.getmaxyx()
 
 	def _getstr(self, print_str=None):
 		self.clear_and_print(print_str)

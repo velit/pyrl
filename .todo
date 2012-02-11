@@ -66,6 +66,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1328209961" done="1328922468">
+        Fix look command (Q)
+        <comment>
+            done, one coord to *coord, and one vice versa
+        </comment>
+    </note>
     <note priority="medium" time="1315156351" done="1315815381">
         move into an energy system - ai problems
         <comment>
@@ -84,12 +90,6 @@
     <note priority="high" time="1315862158">
         make move_random better
     </note>
-    <note priority="high" time="1328209961" done="1328922468">
-        Fix look command (Q)
-        <comment>
-            done, one coord to *coord, and one vice versa
-        </comment>
-    </note>
     <note priority="high" time="1328904614">
         split sel_getch to ask_question and such
     </note>
@@ -104,6 +104,9 @@
     </note>
     <note priority="medium" time="1315156342">
         make bresenham either symmetrical or include all versions
+    </note>
+    <note priority="medium" time="1328966088">
+        change MessageBar line wrapper to one without last_line_wrapper
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus

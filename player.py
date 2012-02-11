@@ -7,7 +7,7 @@ from const.slots import *
 
 
 def Player():
-	monster_file = MonsterFile(u"tappi", Char(u'@', u"blue"), 0, 0)
+	monster_file = MonsterFile(u"tappi", Char(u'@', u"white"), 0, 0)
 	player = AdvancedCreature(monster_file)
 
 	armor_stats = {PV: 4, AR:100, DR: 170, SPEED: 100}
