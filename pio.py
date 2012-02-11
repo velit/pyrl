@@ -14,7 +14,7 @@ def init_io_module(*a, **k):
 	global io
 	io = IO(*a, **k)
 
-class IO:
+class IO(object):
 
 	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
 		self.w = curs_window
@@ -123,6 +123,6 @@ class IO:
 	def draw_path(self, iterator):
 		curses.curs_set(0)
 		for x in iterator:
-			self.draw_block(x, "green")
+			self.draw_block(x, u"green")
 		self.getch()
 		curses.curs_set(1)

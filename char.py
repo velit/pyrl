@@ -1,5 +1,5 @@
-def Char(symbol=" ", color="normal"):
+def Char(symbol=u" ", color=u"normal"):
 	if len(symbol) == 1:
 		return (symbol, color)
 	else:
-		raise ValueError("Must be one character long: {}".format(symbol))
+		raise ValueError(u"Must be one character long: {}".format(symbol))

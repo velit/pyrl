@@ -3,7 +3,7 @@ import const.game as GAME
 import const.creature_actions as CC
 
 
-class Creature:
+class Creature(object):
 
 	def __init__(self, creature_file):
 		self.name = creature_file.name

@@ -8,7 +8,7 @@ from dice import dice_roll
 #types.add = "boots"
 
 
-class Item:
+class Item(object):
 	def __init__(self, stats=()):
 		#self.type = _type
 		#self.equippable = equippable

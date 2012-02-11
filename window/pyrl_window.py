@@ -3,7 +3,7 @@ import menu_h
 import const.game as GAME
 
 
-class PyrlWindow:
+class PyrlWindow(object):
 
 	def __init__(self, concrete_window):
 		self._w = concrete_window

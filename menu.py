@@ -13,14 +13,14 @@ def _get_len(obj):
 	try:
 		return len(obj)
 	except TypeError:
-		return len(str(obj))
+		return len(unicode(obj))
 
 
 def _get_indent(lines, column=0):
 	indt = 0
 	# if any line has second words, find out indentation level
 	for l in lines:
-		if not isinstance(l, str):
+		if not isinstance(l, unicode):
 			try:
 				o = l[column]
 				indt = max(indt, _get_len(o) + 1)
@@ -33,7 +33,7 @@ def _get_indent(lines, column=0):
 def _print_menu(io, indt, lines):
 	curses.curs_set(0)
 	io.clear()
-	for y in range(len(lines)):
+	for y in xrange(len(lines)):
 		_print_menu_line(io, y, indt, lines)
 
 
@@ -41,9 +41,9 @@ def _update_ui(io, start_line, indt, lines, line_ignores):
 	i = _roll_index(start_line, lines, line_ignores)
 	while True:
 		ch = _hilight_and_getch(io, i, indt, lines)
-		if ch in (curses.KEY_DOWN, ord('j')):
+		if ch in (curses.KEY_DOWN, ord(u'j')):
 			i = _roll_index(i, lines, line_ignores, 1)
-		elif ch in (curses.KEY_UP, ord('k')):
+		elif ch in (curses.KEY_UP, ord(u'k')):
 			i = _roll_index(i, lines, line_ignores, -1)
 		else:
 			curses.curs_set(1)
@@ -74,17 +74,17 @@ def _roll_index(start_line, lines, ignores, add=0):
 def _print_menu_line(io, line_i, indt, lines, reverse_color=False):
 	i = line_i
 	line = lines[i]
-	if not isinstance(line, str) and isinstance(lines, Sequence):
+	if not isinstance(line, unicode) and isinstance(lines, Sequence):
 		ln = _get_len(line[0])
 		_print_menu_word(io, i, 0, line[0], reverse_color)
-		_print_menu_word(io, i, ln, " " * (indt - ln), reverse_color)
+		_print_menu_word(io, i, ln, u" " * (indt - ln), reverse_color)
 		_print_menu_word(io, i, indt, line[1], reverse_color)
 	else:
 		_print_menu_word(io, i, 0, line, reverse_color)
 
 
 def _print_menu_word(io, y, x, word, reverse_color):
-	r = "r" if reverse_color else ""
+	r = u"r" if reverse_color else u""
 	if isinstance(word, Char):
 		try:
 			io.addstr(y, x, word.symbol, word.color + r)
@@ -92,6 +92,6 @@ def _print_menu_word(io, y, x, word, reverse_color):
 			pass
 	else:
 		try:
-			io.addstr(y, x, str(word), "normal" + r)
+			io.addstr(y, x, unicode(word), u"normal" + r)
 		except curses.error:
 			pass

@@ -1,2 +1,2 @@
-DUNGEON = "dungeon"
-ARENA = "arena"
+DUNGEON = u"dungeon"
+ARENA = u"arena"

@@ -4,7 +4,7 @@ from char import Char
 from level_file import LevelFile
 from monster_file import MonsterFile, monster_files
 
-class WorldFile:
+class WorldFile(object):
 
 	def __init__(self):
 		self.level_files = {}
@@ -13,10 +13,10 @@ class WorldFile:
 		self.global_monster_files = []
 
 		self.add_dungeon(GAME.DUNGEON)
-		for x in range(GAME.LEVELS_PER_DUNGEON):
+		for x in xrange(GAME.LEVELS_PER_DUNGEON):
 			self.add_level_file(GAME.DUNGEON)
 		d0 = self.get_level_file((GAME.DUNGEON, 0))
-		d0.add_monster_file(MonsterFile("The Crone", Char('@', "purple")))
+		d0.add_monster_file(MonsterFile(u"The Crone", Char(u'@', u"purple")))
 
 		for m in monster_files:
 			self.add_monster_file(m)
@@ -37,13 +37,13 @@ class WorldFile:
 		try:
 			return self.level_files[world_loc]
 		except KeyError:
-			raise GAME.PyrlException("Nonexistant level key: {}".format(world_loc))
+			raise GAME.PyrlException(u"Nonexistant level key: {}".format(world_loc))
 
 	def pop_level_file(self, world_loc):
 		try:
 			level_file = self.level_files[world_loc]
 		except KeyError:
-			raise GAME.PyrlException("Nonexistant level key: {}".format(world_loc))
+			raise GAME.PyrlException(u"Nonexistant level key: {}".format(world_loc))
 		else:
 			del self.level_files[world_loc]
 			return level_file
