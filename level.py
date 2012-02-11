@@ -12,18 +12,18 @@ from generic_algorithms import bresenham, cross_product, get_vector
 
 class TileStructure(list):
 	def __init__(self, level_file):
-		super().__init__(level_file.tilemap())
+		list.__init__(self, level_file.tilemap())
 		self.rows = level_file.rows
 		self.cols = level_file.cols
 
 	def __getitem__(self, coord):
-		return super().__getitem__(coord[0] * self.cols + coord[1])
+		return list.__getitem__(self, coord[0] * self.cols + coord[1])
 
 	def __setitem__(self, coord, value):
-		return super().__setitem__(coord[0] * self.cols + coord[1], value)
+		return list.__setitem__(self, coord[0] * self.cols + coord[1], value)
 
 	def __delitem__(self, coord):
-		return super().__delitem__(coord[0] * self.cols + coord[1])
+		return list.__delitem__(self, coord[0] * self.cols + coord[1])
 
 
 class Level:
