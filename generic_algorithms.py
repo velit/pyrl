@@ -41,8 +41,8 @@ def minimize_vector(vector):
 	gcd = abs(fractions.gcd(a, b))
 	return a // gcd, b // gcd
 
-def get_vector(coordA, coordB):
-	return coordA[0] - coordB[0], coordA[1] - coordB[1]
+def get_vector(origin, target):
+	return target[0] - origin[0], target[1] - origin[1]
 
 def resize_vector_to_len(vector, length):
 	a, b = vector
