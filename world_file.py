@@ -1,4 +1,5 @@
 import const.game as GAME
+import const.colors as COLOR
 
 from char import Char
 from level_file import LevelFile
@@ -16,7 +17,7 @@ class WorldFile(object):
 		for x in xrange(GAME.LEVELS_PER_DUNGEON):
 			self.add_level_file(GAME.DUNGEON)
 		d0 = self.get_level_file((GAME.DUNGEON, 0))
-		d0.add_monster_file(MonsterFile(u"The Crone", Char(u'@', u"purple")))
+		d0.add_monster_file(MonsterFile(u"The Crone", Char(u'@', COLOR.PURPLE)))
 
 		for m in monster_files:
 			self.add_monster_file(m)
