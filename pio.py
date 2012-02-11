@@ -1,6 +1,7 @@
 import curses
 
 import const.game as GAME
+import const.colors as COLOR
 
 from window.pyrl_window import PyrlWindow
 from window.curses_window import CursesWindow, init_curses_wrapper_window_module
@@ -82,5 +83,5 @@ class IO(object):
 
 	def draw_path(self, iterator):
 		for x in iterator:
-			self.draw_block(x, u"green")
+			self.draw_block(x, COLOR.GREEN)
 		self.getch()
