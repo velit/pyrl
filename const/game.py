@@ -1,4 +1,3 @@
-from const.generated_level_types import DUNGEON as LEVEL_TYPE_DUNGEON, ARENA as LEVEL_TYPE_ARENA
 from itertools import imap
 
 OPTIMIZATION = True

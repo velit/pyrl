@@ -22,7 +22,7 @@ rotate_clockwise = {
 		SO: SW,
 		SW: WE,
 		WE: NW,
-		}
+}
 
 rotate_counter_clockwise = {
 		NW: WE,
@@ -33,4 +33,4 @@ rotate_counter_clockwise = {
 		EA: NE,
 		NE: NO,
 		NO: NW,
-		}
+}
