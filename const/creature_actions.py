@@ -1,3 +1,3 @@
-MOVE = u"move"
-ATTACK = u"attack"
-SWAP = u"swap"
+MOVE = u"MOVE"
+ATTACK = u"ATTACK"
+SWAP = u"SWAP"

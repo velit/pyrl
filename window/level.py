@@ -1,6 +1,7 @@
 from char import Char
 from .pyrl_window import PyrlWindow
 from generic_algorithms import bresenham
+from const.colors import GREEN, BLUE, YELLOW, MAKE_REVERSE
 
 
 class LevelWindow(PyrlWindow):
@@ -10,7 +11,7 @@ class LevelWindow(PyrlWindow):
 		PyrlWindow.__init__(self, concrete_window)
 
 	def draw(self, char_payload_iterator, reverse=False):
-		reverse_str = u"r" if reverse else u""
+		reverse_str = MAKE_REVERSE if reverse else u""
 		for (y, x), (symbol, color) in char_payload_iterator:
 			self.addch(y, x, (symbol, color + reverse_str))
 
@@ -18,16 +19,16 @@ class LevelWindow(PyrlWindow):
 		y, x = coord
 		self.addch(y, x, char)
 
-	def draw_star(self, coord, col=u"green"):
+	def draw_star(self, coord, col=GREEN):
 		y, x = coord
 		char = Char(u"*", col)
 		self.addch(y, x, char)
 
-	def draw_block(self, coord, col=u"blue"):
+	def draw_block(self, coord, col=BLUE):
 		y, x = coord
-		char = Char(u" ", col + u"r")
+		char = Char(u" ", col + MAKE_REVERSE)
 		self.addch(y, x, char)
 
-	def draw_line(self, coordA, coordB, char=Char(u'*', u"yellow")):
+	def draw_line(self, coordA, coordB, char=Char(u'*', YELLOW)):
 		for y, x in bresenham(coordA, coordB):
 			self.addch(y, x, char)

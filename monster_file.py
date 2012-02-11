@@ -1,7 +1,8 @@
 from char import Char
+from const.colors import GREEN, BROWN, RED, YELLOW
 
 class MonsterFile(object):
-	def __init__(self, name=u"kobold", char=Char(u'k', u"green"),
+	def __init__(self, name=u"kobold", char=Char(u'k', GREEN),
 			speciation_lvl=0, extinction_lvl=0):
 		self.name = name
 		self.char = char
@@ -10,11 +11,11 @@ class MonsterFile(object):
 
 
 monster_files = (
-	MonsterFile(u"kobold", Char(u'k', u"green"), -3, 0),
-	MonsterFile(u"goblin", Char(u'g', u"green"), -2, 0),
-	MonsterFile(u"giant bat", Char(u'B', u"brown"), -3, 0),
-	MonsterFile(u"orc", Char(u'o', u"green"), -1, 0),
-	MonsterFile(u"giant worm", Char(u'w', u"brown"), 0, 0),
-	MonsterFile(u"fire imp", Char(u'I', u"red"), 3, 0),
-	MonsterFile(u"moloch", Char(u'&', u"yellow"), 18, 0),
+	MonsterFile(u"kobold", Char(u'k', GREEN), -3, 0),
+	MonsterFile(u"goblin", Char(u'g', GREEN), -2, 0),
+	MonsterFile(u"giant bat", Char(u'B', BROWN), -3, 0),
+	MonsterFile(u"orc", Char(u'o', GREEN), -1, 0),
+	MonsterFile(u"giant worm", Char(u'w', BROWN), 0, 0),
+	MonsterFile(u"fire imp", Char(u'I', RED), 3, 0),
+	MonsterFile(u"moloch", Char(u'&', YELLOW), 18, 0),
 )

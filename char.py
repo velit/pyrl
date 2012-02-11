@@ -1,4 +1,6 @@
-def Char(symbol=u" ", color=u"normal"):
+from const.colors import NORMAL
+
+def Char(symbol=u" ", color=NORMAL):
 	if len(symbol) == 1:
 		return (symbol, color)
 	else:
