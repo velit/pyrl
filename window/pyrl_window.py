@@ -33,8 +33,8 @@ class PyrlWindow(object):
 	def get_dimensions(self):
 		return self._w.get_dimensions()
 
-	def subwindow(self, y, x, nlines, ncols):
-		return self._w.subwindow(y, x, nlines, ncols)
+	def subwindow(self, nlines, ncols, y=None, x=None):
+		return self._w.subwindow(nlines, ncols, y, x)
 
 
 	# PyrlWindow added functions

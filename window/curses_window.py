@@ -1,14 +1,16 @@
-import curses
 import const.game as GAME
 import const.keys as KEY
 import const.colors as COLOR
+import curses
 
 from itertools import imap
 
 CURSES_COLOR = {}
 CURSES_KEYS = {}
 
-def init_curses_wrapper_window_module():
+def init_module():
+	curses.curs_set(0)
+
 	c = CURSES_COLOR
 	k = CURSES_KEYS
 	for x in xrange(7):
@@ -52,7 +54,7 @@ def init_curses_wrapper_window_module():
 	k[curses.KEY_DOWN] = KEY.DOWN
 
 
-class CursesWindow():
+class CursesWindow(object):
 
 	def __init__(self, derwin):
 		self.w = derwin
@@ -100,7 +102,7 @@ class CursesWindow():
 	def get_dimensions(self):
 		return self.w.getmaxyx()
 
-	def subwindow(self, y, x, nlines, ncols):
+	def subwindow(self, nlines, ncols, y, x):
 		return self.w.derwin(nlines, ncols, y, x)
 
 	def move(self, y, x):
