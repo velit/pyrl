@@ -1,4 +1,5 @@
-import const.debug as D
+import const.debug as DEBUG
+import const.colors as COLOR
 
 from heapq import heappush, heappop
 from pio import io
@@ -33,11 +34,11 @@ def _path(start, goal, neighbors, heuristic):
 		s = heappop(openprio)[1]
 		if s in closedset:
 			continue
-		if D.PATH and s != start:
-			io.draw_char(s, (u'+', u"light_bluer"))
-		if D.PATH == 2:
+		if DEBUG.PATH and s != start:
+			io.draw_char(s, (u'+', COLOR.LIGHT_BLUE))
+		if DEBUG.PATH == 2:
 			io.msg(unicode((g[s] + h[s], g[s], h[s])))
-		if D.PATH == 2:
+		if DEBUG.PATH == 2:
 			io.getch()
 		openmember.remove(s)
 		closedset.add(s)
@@ -50,8 +51,8 @@ def _path(start, goal, neighbors, heuristic):
 			g[n] = g[s] + cost
 			h[n] = heuristic(n, goal, start)
 			heappush(openprio, (g[n] + h[n], n))
-			if D.PATH and n != goal:
-				io.draw_char(n, (u'?', u"redr"))
+			if DEBUG.PATH and n != goal:
+				io.draw_char(n, (u'?', COLOR.RED + COLOR.MAKE_REVERSE))
 			openmember.add(n)
 
 	return came_from

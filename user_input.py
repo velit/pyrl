@@ -4,10 +4,11 @@ import const.directions as DIR
 import const.game as GAME
 import const.debug as DEBUG
 import const.colors as COLOR
+import const.generated_level_types as LEVEL_TYPE
+
 
 from pio import io
 from char import Char
-from itertools import imap
 
 direction_map = {
 		KEY.LEFT: DIR.WE,
@@ -129,7 +130,7 @@ def debug(game, level, creature):
 		DEBUG.CROSS = not DEBUG.CROSS
 		io.msg(u"Path heuristic cross set to {}".format(DEBUG.CROSS))
 	elif c == u'l':
-		GAME.LEVEL_TYPE = u"arena" if GAME.LEVEL_TYPE == u"dungeon" else u"dungeon"
+		GAME.LEVEL_TYPE = LEVEL_TYPE.ARENA if GAME.LEVEL_TYPE == LEVEL_TYPE.DUNGEON else LEVEL_TYPE.DUNGEON
 		io.msg(u"Level type set to {}".format(GAME.LEVEL_TYPE))
 	elif c == u'b':
 		io.draw_block((4,4))
