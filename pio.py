@@ -13,6 +13,7 @@ def init_io_module(*a, **k):
 	init_colors()
 	global io
 	io = IO(*a, **k)
+	curses.curs_set(0)
 
 class IO(object):
 
@@ -31,52 +32,15 @@ class IO(object):
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
 
-	def clearlos(self, *a, **k):
-		self.l.clearlos(*a, **k)
-
 	def draw(self, *a, **k):
 		self.l.draw(*a, **k)
-
-	def draw_menu(self, *a, **k):
-		return self.l.draw_menu(*a, **k)
-
-	def draw_h_menu(self, *a, **k):
-		return self.m.draw_h_menu(*a, **k)
-
-	def drawlos(self, *a, **k):
-		self.l.drawlos(*a, **k)
 
 	def drawline(self, *a, **k):
 		self.l.draw_line(*a, **k)
 
-	def getbool(self, *a, **k):
-		return_data =  self.m.getbool(*a, **k)
+	def getch(self):
 		self.refresh()
-		return return_data
-
-	def getchar(self, *a, **k):
-		return_data =  self.m.getchar(*a, **k)
-		self.refresh()
-		return return_data
-
-	def getcolor(self, *a, **k):
-		return_data =  self.m.getcolor(*a, **k)
-		self.refresh()
-		return return_data
-
-	def getint(self, *a, **k):
-		return_data =  self.m.getint(*a, **k)
-		self.refresh()
-		return return_data
-
-	def getstr(self, *a, **k):
-		return_data =  self.m.getstr(*a, **k)
-		self.refresh()
-		return return_data
-
-	def getch(self, coord=()):
-		self.refresh()
-		return self.l.getch(coord)
+		return self.l.getch()
 
 	def getch_print(self, print_str):
 		self.msg(print_str)
@@ -102,9 +66,6 @@ class IO(object):
 		else:
 			self.m.queue_msg(*a)
 
-	def move(self, *a, **k):
-		return self.l.move(*a, **k)
-
 	def refresh(self):
 		self.m.prepare_flush()
 		self.s.prepare_flush()
@@ -121,8 +82,6 @@ class IO(object):
 		self.l.draw_char(*a, **k)
 
 	def draw_path(self, iterator):
-		curses.curs_set(0)
 		for x in iterator:
 			self.draw_block(x, u"green")
 		self.getch()
-		curses.curs_set(1)
