@@ -18,12 +18,6 @@ class PyrlWindow(object):
 	def addstr(self, y, x, string, color=None):
 		self._w.addstr(y, x, string, color)
 
-	def getch(self):
-		return self._w.getch()
-
-	def get_dimensions(self):
-		return self._w.get_dimensions()
-
 	def clear(self):
 		self._w.clear()
 
@@ -32,6 +26,15 @@ class PyrlWindow(object):
 
 	def flush(self):
 		self._w.flush()
+
+	def getch(self):
+		return self._w.getch()
+
+	def get_dimensions(self):
+		return self._w.get_dimensions()
+
+	def subwindow(self, y, x, nlines, ncols):
+		return self._w.subwindow(y, x, nlines, ncols)
 
 
 	# PyrlWindow added functions

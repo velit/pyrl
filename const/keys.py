@@ -1,0 +1,4 @@
+LEFT = u"KEY_LEFT"
+DOWN = u"KEY_DOWN"
+UP = u"KEY_UP"
+RIGHT = u"KEY_RIGHT"

@@ -56,6 +56,7 @@ class CursesWindow():
 
 	def __init__(self, derwin):
 		self.w = derwin
+		self.w.keypad(True)
 		self.rows, self.cols = self.w.getmaxyx()
 
 	def addch(self, y, x, char):
@@ -71,25 +72,20 @@ class CursesWindow():
 
 	def addstr(self, y, x, string, color=None):
 		if color is not None:
-			self.w.addstr(y, x, string, CURSES_COLOR[color])
+			self.w.addstr(y, x, string.encode(u"ascii"), CURSES_COLOR[color])
 		else:
-			self.w.addstr(y, x, string)
+			self.w.addstr(y, x, string.encode(u"ascii"))
 
 	def getch(self):
 		ch = self.w.getch()
-		try:
-			key = chr(ch)
-			return key
-
-		except ValueError:
-			pass
-
 		if ch in CURSES_KEYS:
 			return CURSES_KEYS[ch]
 		else:
-			return ch
-
-		return self.w.getch()
+			try:
+				key = chr(ch)
+				return key
+			except ValueError:
+				return ch
 
 	def clear(self):
 		self.w.erase()
@@ -103,6 +99,9 @@ class CursesWindow():
 
 	def get_dimensions(self):
 		return self.w.getmaxyx()
+
+	def subwindow(self, y, x, nlines, ncols):
+		return self.w.derwin(nlines, ncols, y, x)
 
 	def move(self, y, x):
 		self.w.move(y, x)

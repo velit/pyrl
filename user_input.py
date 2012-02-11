@@ -3,6 +3,7 @@ import const.keys as KEY
 import const.directions as DIR
 import const.game as GAME
 import const.debug as DEBUG
+import const.colors as COLOR
 
 from pio import io
 from char import Char
@@ -55,7 +56,7 @@ class UserInput(object):
 		if c in self.actions:
 			return self.execute_action(game, level, creature, self.actions[c])
 		else:
-			io.msg(u"Undefined key: {}".format(unichr(c) if 0 < c < 256 else c))
+			io.msg("Undefined key: {}".format(chr(c) if 0 < c < 128 else c))
 
 	def execute_action(self, game, level, creature, act):
 		function, args, keywords = act
@@ -87,23 +88,23 @@ def look(game, level, creature):
 		coord = level.get_relative_coord(coord, direction)
 		io.msg(level.look_information(coord))
 		if drawline_flag:
-			io.drawline(level.get_coord(creature.coord), coord, Char(u"*", u"yellow"))
+			io.drawline(level.get_coord(creature.coord), coord, Char(u"*", COLOR.YELLOW))
 			io.msg(u"LoS: {}".format(level.check_los(creature.coord, coord)))
-		c = io.getch(coord)
+		c = io.getch()
 		game.redraw()
 		direction = DIR.STOP
 		if c in direction_map:
 			direction = direction_map[c]
-		elif c == ord(u'd'):
+		elif c == u'd':
 			drawline_flag = not drawline_flag
-		elif c == ord(u'b'):
+		elif c == u'b':
 			from generic_algorithms import bresenham
 			for coord in bresenham(level.get_coord(creature.coord), coord):
 				io.msg(coord)
-		elif c == ord(u's'):
+		elif c == u's':
 			if level.has_creature(coord):
 				game.register_status_texts(level.get_creature(coord))
-		elif c in imap(ord, u"QqzZ "):
+		elif c in u"QqzZ ":
 			break
 
 def endgame(game, level, creature, *a, **k):
@@ -120,37 +121,37 @@ def attack(game, level, creature):
 
 def debug(game, level, creature):
 	c = io.getch_print(u"Avail cmds: vclbdhkp")
-	if c == ord(u'v'):
+	if c == u'v':
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
 		io.msg(u"Show map set to {}".format(game.flags.show_map))
-	elif c == ord(u'c'):
+	elif c == u'c':
 		DEBUG.CROSS = not DEBUG.CROSS
 		io.msg(u"Path heuristic cross set to {}".format(DEBUG.CROSS))
-	elif c == ord(u'l'):
+	elif c == u'l':
 		GAME.LEVEL_TYPE = u"arena" if GAME.LEVEL_TYPE == u"dungeon" else u"dungeon"
 		io.msg(u"Level type set to {}".format(GAME.LEVEL_TYPE))
-	elif c == ord(u'b'):
+	elif c == u'b':
 		io.draw_block((4,4))
-	elif c == ord(u'd'):
+	elif c == u'd':
 		DEBUG.PATH = not DEBUG.PATH
 		io.msg(u"Path debug set to {}".format(DEBUG.PATH))
-	elif c == ord(u'h'):
+	elif c == u'h':
 		game.flags.reverse = not game.flags.reverse
 		game.redraw()
 		io.msg(u"Reverse set to {}".format(game.flags.reverse))
-	elif c == ord(u'k'):
+	elif c == u'k':
 		creature_list = level.creatures.values()
 		creature_list.remove(creature)
 		for i in creature_list:
 			level.remove_creature(i)
 		io.msg(u"Abrakadabra.")
-	elif c == ord(u'p'):
+	elif c == u'p':
 		passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(passage_up, passage_down))
 	else:
-		io.msg(u"Undefined debug key: {}".format(unichr(c) if 0 < c < 256 else c))
+		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
 
 def redraw_view(game, level, creature):
 	game.redraw()

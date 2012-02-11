@@ -48,6 +48,12 @@
             use difftool and :Gdiff
         </comment>
     </note>
+    <note priority="high" time="1315155829" done="1328980645">
+        fix sight checking
+        <comment>
+            los checking is done both ways
+        </comment>
+    </note>
     <note priority="high" time="1315156363" done="1315174433">
         move into an energy system -&gt; fixes ai problems
         <comment>
@@ -59,6 +65,12 @@
                 umm done i guess
             </comment>
         </note>
+    </note>
+    <note priority="high" time="1315174479" done="1328980660">
+        improve on the energy system
+        <comment>
+            fixed a bug that caused 10x redundant computation
+        </comment>
     </note>
     <note priority="high" time="1315582982" done="1315658620">
         change direction keys to straight up dict definition
@@ -72,26 +84,44 @@
             done, one coord to *coord, and one vice versa
         </comment>
     </note>
+    <note priority="medium" time="1315156342" done="1328980611">
+        make bresenham either symmetrical or include all versions
+        <comment>
+            los check is done both ways
+        </comment>
+    </note>
     <note priority="medium" time="1315156351" done="1315815381">
         move into an energy system - ai problems
         <comment>
             done
         </comment>
     </note>
+    <note priority="medium" time="1328966088" done="1328980587">
+        change MessageBar line wrapper to one without last_line_wrapper
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="low" time="1315848070" done="1328980741">
+        make a generic status bar print that splits correctly
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="verylow" time="1315155792" done="1328980726">
+        window.getchar to window.getChar
+        <comment>
+            currently not even implemented
+        </comment>
+    </note>
     <note priority="veryhigh" time="1315707472">
         make an inventory
     </note>
-    <note priority="high" time="1315155829">
-        fix sight checking
-    </note>
-    <note priority="high" time="1315174479">
-        improve on the energy system
-    </note>
-    <note priority="high" time="1315862158">
-        make move_random better
-    </note>
     <note priority="high" time="1328904614">
         split sel_getch to ask_question and such
+    </note>
+    <note priority="high" time="1328980271">
+        Switch from unicode strings to bytes
     </note>
     <note priority="medium" time="1315155859">
         do edge leaving and entering in levels
@@ -99,14 +129,8 @@
     <note priority="medium" time="1315155877">
         redo WorldFile.get_level_monster_list
     </note>
-    <note priority="medium" time="1315156331">
-        do precise angle shadowcasting from roguebasin, they have examples
-    </note>
-    <note priority="medium" time="1315156342">
-        make bresenham either symmetrical or include all versions
-    </note>
-    <note priority="medium" time="1328966088">
-        change MessageBar line wrapper to one without last_line_wrapper
+    <note priority="medium" time="1315862158">
+        make move_random better
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus
@@ -114,10 +138,7 @@
     <note priority="low" time="1315691945">
         make tiles.py as json loaded
     </note>
-    <note priority="low" time="1315848070">
-        make a generic status bar print that splits correctly
-    </note>
-    <note priority="verylow" time="1315155792">
-        window.getchar to window.getChar
+    <note priority="verylow" time="1315156331">
+        do precise angle shadowcasting from roguebasin, they have examples
     </note>
 </todo>

@@ -18,16 +18,15 @@ def init_io_module(*a, **k):
 class IO(object):
 
 	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
-		self.w = curs_window
-		self.rows, self.cols = self.w.getmaxyx()
+		self.a = PyrlWindow(CursesWindow(curs_window))
+		self.rows, self.cols = self.a.get_dimensions()
 
 		self.level_rows = self.rows - msg_bar_size - status_bar_size
 		self.level_cols = self.cols
 
-		self.m = MessageBar(CursesWindow(self.w.derwin(msg_bar_size, 0, 0, 0)))
-		self.s = StatusBar(CursesWindow(self.w.derwin(status_bar_size, 0, self.rows - status_bar_size, 0)))
-		self.l = LevelWindow(CursesWindow(self.w.derwin(self.level_rows, 0, msg_bar_size, 0)))
-		self.a = PyrlWindow(CursesWindow(self.w))
+		self.m = MessageBar(CursesWindow(self.a.subwindow(0, 0, msg_bar_size, self.cols)))
+		self.l = LevelWindow(CursesWindow(self.a.subwindow(msg_bar_size, 0, self.level_rows, self.cols)))
+		self.s = StatusBar(CursesWindow(self.a.subwindow(self.rows - status_bar_size, 0, status_bar_size, self.cols)))
 
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
