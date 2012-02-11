@@ -5,7 +5,7 @@ class StatusBar(PyrlWindow):
 	"""Handles the status bar system."""
 
 	def __init__(self, concrete_window):
-		super().__init__(concrete_window)
+		PyrlWindow.__init__(self, concrete_window)
 
 		self.elements = {}
 		self.addcount = 0
@@ -20,11 +20,11 @@ class StatusBar(PyrlWindow):
 	def del_element(self, handle):
 		del self.elements[handle]
 
-	def update(self):
+	def prepare_flush(self):
 		self.clear()
 		self.print_elements()
-		self._concrete_window.update()
+		PyrlWindow.prepare_flush(self)
 
 	def print_elements(self):
 		for priority, string, value in sorted(self.elements.values()):
-			self.w.addstr(string + "[" + str(value()) + "] ")
+			self.addstr(string + "[" + str(value()) + "] ")

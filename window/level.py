@@ -7,7 +7,7 @@ class LevelWindow(PyrlWindow):
 	"""Handles the level display"""
 
 	def __init__(self, concrete_window):
-		super().__init__(concrete_window)
+		PyrlWindow.__init__(self, concrete_window)
 
 	def draw(self, char_payload_iterator, reverse=False):
 		reverse_str = "r" if reverse else ""
