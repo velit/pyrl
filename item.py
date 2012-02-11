@@ -20,7 +20,7 @@ class Weapon(Item):
 		self.dice = dice
 		self.sides = sides
 		self.addition = addition
-		super().__init__(stats)
+		Item.__init__(self, stats)
 
 	def roll(self):
 		return dice_roll(self.dice, self.sides, self.addition)
