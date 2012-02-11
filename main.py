@@ -3,14 +3,24 @@ import pickle
 import os
 import const.game as GAME
 
-from pio import init_io_module
 from io import open
+from pio import init_global_io
 
 
 def curses_inited_main(w, options):
-	init_io_module(w)
-	from pio import io
+	import window.curses_window as curses_window
+	curses_window.init_module()
+	init_global_io(curses_window.CursesWindow, w)
+	start(options)
 
+def tcod_main(options):
+	import window.tcod_window as tcod_window
+	tcod_window.init_module()
+	init_global_io(tcod_window.TCODWindow, None)
+	start(options)
+
+def start(options):
+	from pio import io
 	if io.rows < GAME.MIN_SCREEN_ROWS or io.cols < GAME.MIN_SCREEN_COLS:
 		message = u"Current screen size {}x{} is too small. Needs to be at least {}x{}"
 		io.notify(message.format(io.cols, io.rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS))
@@ -27,7 +37,6 @@ def curses_inited_main(w, options):
 
 	while True:
 		game.play()
-
 
 def load(name):
 	with open(os.path.join(u"data", name), u"rb") as f:

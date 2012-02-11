@@ -1,33 +1,28 @@
-import curses
-
 import const.game as GAME
 import const.colors as COLOR
 
 from window.pyrl_window import PyrlWindow
-from window.curses_window import CursesWindow, init_curses_wrapper_window_module
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
 
 
-def init_io_module(*a, **k):
-	init_curses_wrapper_window_module()
+def init_global_io(*a, **k):
 	global io
 	io = IO(*a, **k)
-	curses.curs_set(0)
 
 class IO(object):
 
-	def __init__(self, curs_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
-		self.a = PyrlWindow(CursesWindow(curs_window))
+	def __init__(self, WindowImplementation, root_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
+		self.a = PyrlWindow(WindowImplementation(root_window))
 		self.rows, self.cols = self.a.get_dimensions()
 
 		self.level_rows = self.rows - msg_bar_size - status_bar_size
 		self.level_cols = self.cols
 
-		self.m = MessageBar(CursesWindow(self.a.subwindow(0, 0, msg_bar_size, self.cols)))
-		self.l = LevelWindow(CursesWindow(self.a.subwindow(msg_bar_size, 0, self.level_rows, self.cols)))
-		self.s = StatusBar(CursesWindow(self.a.subwindow(self.rows - status_bar_size, 0, status_bar_size, self.cols)))
+		self.m = MessageBar(WindowImplementation(self.a.subwindow(msg_bar_size, self.cols, 0, 0)))
+		self.l = LevelWindow(WindowImplementation(self.a.subwindow(self.level_rows, self.cols, msg_bar_size, 0)))
+		self.s = StatusBar(WindowImplementation(self.a.subwindow(status_bar_size, self.cols, self.rows - status_bar_size, 0)))
 
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)

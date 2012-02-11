@@ -151,6 +151,8 @@ def debug(game, level, creature):
 		passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(passage_up, passage_down))
+	elif c == u'r':
+		raise Exception(io.a._w.subwindow_blit_args)
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
 
