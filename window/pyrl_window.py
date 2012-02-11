@@ -1,5 +1,3 @@
-import menu
-import menu_h
 import const.game as GAME
 
 
@@ -50,9 +48,3 @@ class PyrlWindow(object):
 		while c not in char_list:
 			c = self.getch()
 		return c
-
-	def draw_menu(self, *a, **k):
-		return menu.draw(self, *a, **k)
-
-	def draw_h_menu(self, *a, **k):
-		return menu_h.draw(self, *a, **k)

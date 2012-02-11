@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import curses
 import argparse
 import cProfile
 import main
@@ -18,4 +17,5 @@ if options.libtcod:
 elif options.profile:
 	cProfile.run(u"curses.wrapper(main.curses_inited_main, options)", u"profiler_data")
 else:
+	import curses
 	curses.wrapper(main.curses_inited_main, options)
