@@ -177,7 +177,7 @@ class Level(object):
 
 	def look_information(self, coord):
 		#if coord in self.visited_locations:
-		information = u"{}x{} ".format(coord)
+		information = u"{}x{} ".format(*coord)
 		if self.has_creature(coord):
 			c = self.get_creature(coord)
 			creature_stats = u"{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"

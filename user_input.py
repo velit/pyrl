@@ -89,7 +89,7 @@ def look(game, level, creature):
 		if drawline_flag:
 			io.drawline(level.get_coord(creature.coord), coord, Char(u"*", u"yellow"))
 			io.msg(u"LoS: {}".format(level.check_los(creature.coord, coord)))
-		c = io.getch(*coord)
+		c = io.getch(coord)
 		game.redraw()
 		direction = DIRS.STOP
 		if c in direction_map:
