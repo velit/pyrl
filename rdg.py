@@ -1,4 +1,5 @@
 import const.game as GAME
+import const.generated_level_types as LEVEL_TYPE
 
 from random import randrange as rr, random as rand
 from const.tiles import WALL as W
@@ -8,17 +9,17 @@ from const.tiles import STAIRS_UP as US
 from const.tiles import STAIRS_DOWN as DS
 
 
-def add_generated_tilefile(level_file, type=u"arena"):
+def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
 	_init_tilemap(level_file)
 
-	if type == u"dungeon":
+	if level_type == LEVEL_TYPE.DUNGEON:
 		_make_initial_room(level_file)
 		for x in xrange(2000):
 			if rand() < 0.50:
 				_attempt_corridor(level_file)
 			else:
 				_attempt_room(level_file)
-	elif type == u"arena":
+	elif level_type == LEVEL_TYPE.ARENA:
 		_make_room(level_file, 0, 0, level_file.rows, level_file.cols)
 
 	add_staircase_up(level_file)

@@ -3,14 +3,14 @@ import curses
 import const.game as GAME
 
 from window.pyrl_window import PyrlWindow
-from window.curses_window import CursesWindow, init_colors
+from window.curses_window import CursesWindow, init_curses_wrapper_window_module
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
 
 
 def init_io_module(*a, **k):
-	init_colors()
+	init_curses_wrapper_window_module()
 	global io
 	io = IO(*a, **k)
 	curses.curs_set(0)

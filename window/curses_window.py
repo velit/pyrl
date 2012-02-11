@@ -1,47 +1,55 @@
 import curses
 import const.game as GAME
+import const.keys as KEY
+import const.colors as COLOR
 
-from const.colors import *
 from itertools import imap
 
 CURSES_COLOR = {}
+CURSES_KEYS = {}
 
-def init_colors():
-	d = CURSES_COLOR
+def init_curses_wrapper_window_module():
+	c = CURSES_COLOR
+	k = CURSES_KEYS
 	for x in xrange(7):
 		curses.init_pair(x + 1, x, 0)
 
-	d[GRAY] = curses.color_pair(0)
-	d[BLACK_ON_BLACK] = curses.color_pair(1)
-	d[RED] = curses.color_pair(2)
-	d[GREEN] = curses.color_pair(3)
-	d[BROWN] = curses.color_pair(4)
-	d[BLUE] = curses.color_pair(5)
-	d[PURPLE] = curses.color_pair(6)
-	d[CYAN] = curses.color_pair(7)
+	c[COLOR.GRAY] = curses.color_pair(0)
+	c[COLOR.BLACK_ON_BLACK] = curses.color_pair(1)
+	c[COLOR.RED] = curses.color_pair(2)
+	c[COLOR.GREEN] = curses.color_pair(3)
+	c[COLOR.BROWN] = curses.color_pair(4)
+	c[COLOR.BLUE] = curses.color_pair(5)
+	c[COLOR.PURPLE] = curses.color_pair(6)
+	c[COLOR.CYAN] = curses.color_pair(7)
 
-	d[WHITE] = curses.color_pair(0) | curses.A_BOLD
-	d[BLACK] = curses.color_pair(1) | curses.A_BOLD
-	d[LIGHT_RED] = curses.color_pair(2) | curses.A_BOLD
-	d[LIGHT_GREEN] = curses.color_pair(3) | curses.A_BOLD
-	d[YELLOW] = curses.color_pair(4) | curses.A_BOLD
-	d[LIGHT_BLUE] = curses.color_pair(5) | curses.A_BOLD
-	d[LIGHT_PURPLE] = curses.color_pair(6) | curses.A_BOLD
-	d[LIGHT_CYAN] = curses.color_pair(7) | curses.A_BOLD
+	c[COLOR.WHITE] = curses.color_pair(0) | curses.A_BOLD
+	c[COLOR.BLACK] = curses.color_pair(1) | curses.A_BOLD
+	c[COLOR.LIGHT_RED] = curses.color_pair(2) | curses.A_BOLD
+	c[COLOR.LIGHT_GREEN] = curses.color_pair(3) | curses.A_BOLD
+	c[COLOR.YELLOW] = curses.color_pair(4) | curses.A_BOLD
+	c[COLOR.LIGHT_BLUE] = curses.color_pair(5) | curses.A_BOLD
+	c[COLOR.LIGHT_PURPLE] = curses.color_pair(6) | curses.A_BOLD
+	c[COLOR.LIGHT_CYAN] = curses.color_pair(7) | curses.A_BOLD
 
-	d[NORMAL] = curses.A_NORMAL
+	c[COLOR.NORMAL] = curses.A_NORMAL
 
 	_temp = {}
-	for key, value in d.items():
-		_temp[key + MAKE_REVERSE] = value | curses.A_REVERSE
-	d.update(_temp)
+	for key, value in c.iteritems():
+		_temp[key + COLOR.MAKE_REVERSE] = value | curses.A_REVERSE
+	c.update(_temp)
 
-	d[BLINK] = curses.A_BLINK
-	d[BOLD] = curses.A_BOLD
-	d[DIM] = curses.A_DIM
-	d[REVERSE] = curses.A_REVERSE
-	d[STANDOUT] = curses.A_STANDOUT
-	d[UNDERLINE] = curses.A_UNDERLINE
+	c[COLOR.BLINK] = curses.A_BLINK
+	c[COLOR.BOLD] = curses.A_BOLD
+	c[COLOR.DIM] = curses.A_DIM
+	c[COLOR.REVERSE] = curses.A_REVERSE
+	c[COLOR.STANDOUT] = curses.A_STANDOUT
+	c[COLOR.UNDERLINE] = curses.A_UNDERLINE
+
+	k[curses.KEY_LEFT] = KEY.LEFT
+	k[curses.KEY_RIGHT] = KEY.RIGHT 
+	k[curses.KEY_UP] = KEY.UP
+	k[curses.KEY_DOWN] = KEY.DOWN
 
 
 class CursesWindow():
@@ -68,6 +76,19 @@ class CursesWindow():
 			self.w.addstr(y, x, string)
 
 	def getch(self):
+		ch = self.w.getch()
+		try:
+			key = chr(ch)
+			return key
+
+		except ValueError:
+			pass
+
+		if ch in CURSES_KEYS:
+			return CURSES_KEYS[ch]
+		else:
+			return ch
+
 		return self.w.getch()
 
 	def clear(self):

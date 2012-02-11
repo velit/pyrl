@@ -1,51 +1,51 @@
-import curses
 import sys
-import const.directions as DIRS
+import const.keys as KEY
+import const.directions as DIR
 import const.game as GAME
-import const.debug as D
+import const.debug as DEBUG
 
 from pio import io
 from char import Char
 from itertools import imap
 
 direction_map = {
-		curses.KEY_LEFT: DIRS.WE,
-		curses.KEY_DOWN: DIRS.SO,
-		curses.KEY_UP: DIRS.NO,
-		curses.KEY_RIGHT: DIRS.EA,
-		ord(u'1'): DIRS.SW,
-		ord(u'2'): DIRS.SO,
-		ord(u'3'): DIRS.SE,
-		ord(u'4'): DIRS.WE,
-		ord(u'5'): DIRS.STOP,
-		ord(u'6'): DIRS.EA,
-		ord(u'7'): DIRS.NW,
-		ord(u'8'): DIRS.NO,
-		ord(u'9'): DIRS.NE,
-		ord(u'h'): DIRS.WE,
-		ord(u'j'): DIRS.SO,
-		ord(u'k'): DIRS.NO,
-		ord(u'l'): DIRS.EA,
-		ord(u'.'): DIRS.STOP,
-		ord(u'u'): DIRS.NW,
-		ord(u'i'): DIRS.NE,
-		ord(u'n'): DIRS.SW,
-		ord(u'm'): DIRS.SE,
+		KEY.LEFT: DIR.WE,
+		KEY.DOWN: DIR.SO,
+		KEY.UP: DIR.NO,
+		KEY.RIGHT: DIR.EA,
+		u'1': DIR.SW,
+		u'2': DIR.SO,
+		u'3': DIR.SE,
+		u'4': DIR.WE,
+		u'5': DIR.STOP,
+		u'6': DIR.EA,
+		u'7': DIR.NW,
+		u'8': DIR.NO,
+		u'9': DIR.NE,
+		u'h': DIR.WE,
+		u'j': DIR.SO,
+		u'k': DIR.NO,
+		u'l': DIR.EA,
+		u'.': DIR.STOP,
+		u'u': DIR.NW,
+		u'i': DIR.NE,
+		u'n': DIR.SW,
+		u'm': DIR.SE,
 }
 
 class UserInput(object):
 	def __init__(self):
 		no_args, no_kwds = (), {}
 		self.actions = {
-			ord(u'<'): (u"enter", (GAME.PASSAGE_UP, ), no_kwds),
-			ord(u'>'): (u"enter", (GAME.PASSAGE_DOWN, ), no_kwds),
-			ord(u'Q'): (u"endgame", no_args, no_kwds),
-			ord(u'S'): (u"savegame", no_args, no_kwds),
-			ord(u'q'): (u"look", no_args, no_kwds),
-			ord(u'Z'): (u"z_command", no_args, no_kwds),
-			ord(u'a'): (u"attack", no_args, no_kwds),
-			ord(u'd'): (u"debug", no_args, no_kwds),
-			ord(u'\x12'): (u"redraw_view", no_args, no_kwds),
+			u'<': (u"enter", (GAME.PASSAGE_UP, ), no_kwds),
+			u'>': (u"enter", (GAME.PASSAGE_DOWN, ), no_kwds),
+			u'Q': (u"endgame", no_args, no_kwds),
+			u'S': (u"savegame", no_args, no_kwds),
+			u'q': (u"look", no_args, no_kwds),
+			u'Z': (u"z_command", no_args, no_kwds),
+			u'a': (u"attack", no_args, no_kwds),
+			u'd': (u"debug", no_args, no_kwds),
+			u'\x12': (u"redraw_view", no_args, no_kwds),
 		}
 		for key, value in direction_map.items():
 			self.actions[key] = (u"act_to_dir", (value, ), no_kwds)
@@ -82,7 +82,7 @@ def z_command(game, level, creature):
 def look(game, level, creature):
 	coord = creature.coord
 	drawline_flag = False
-	direction = DIRS.STOP
+	direction = DIR.STOP
 	while True:
 		coord = level.get_relative_coord(coord, direction)
 		io.msg(level.look_information(coord))
@@ -91,7 +91,7 @@ def look(game, level, creature):
 			io.msg(u"LoS: {}".format(level.check_los(creature.coord, coord)))
 		c = io.getch(coord)
 		game.redraw()
-		direction = DIRS.STOP
+		direction = DIR.STOP
 		if c in direction_map:
 			direction = direction_map[c]
 		elif c == ord(u'd'):
@@ -113,7 +113,7 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.sel_getch(u"Specify attack direction:", GAME.DEFAULT | set(direction_keys))
+	c = io.sel_getch(u"Specify attack direction:", GAME.DEFAULT | set(direction_map.keys()))
 	if c in direction_map:
 		game.creature_attack(level, creature, direction_map[c])
 		return True
@@ -125,22 +125,22 @@ def debug(game, level, creature):
 		game.redraw()
 		io.msg(u"Show map set to {}".format(game.flags.show_map))
 	elif c == ord(u'c'):
-		D.CROSS = not D.CROSS
-		io.msg(u"Path heuristic cross set to {}".format(D.CROSS))
+		DEBUG.CROSS = not DEBUG.CROSS
+		io.msg(u"Path heuristic cross set to {}".format(DEBUG.CROSS))
 	elif c == ord(u'l'):
 		GAME.LEVEL_TYPE = u"arena" if GAME.LEVEL_TYPE == u"dungeon" else u"dungeon"
 		io.msg(u"Level type set to {}".format(GAME.LEVEL_TYPE))
 	elif c == ord(u'b'):
 		io.draw_block((4,4))
 	elif c == ord(u'd'):
-		D.PATH = not D.PATH
-		io.msg(u"Path debug set to {}".format(D.PATH))
+		DEBUG.PATH = not DEBUG.PATH
+		io.msg(u"Path debug set to {}".format(DEBUG.PATH))
 	elif c == ord(u'h'):
 		game.flags.reverse = not game.flags.reverse
 		game.redraw()
 		io.msg(u"Reverse set to {}".format(game.flags.reverse))
 	elif c == ord(u'k'):
-		creature_list = list(level.creatures.values())
+		creature_list = level.creatures.values()
 		creature_list.remove(creature)
 		for i in creature_list:
 			level.remove_creature(i)
