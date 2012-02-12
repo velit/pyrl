@@ -1,7 +1,15 @@
 #!/bin/sh
-rm *.pyc
-rm const/*.pyc
-rm editor/*.pyc
-rm __pycache__/*.pyc
-rm window/*.pyc
+
+rm    *.pyc
+rm    __pycache__/*.pyc
+rmdir __pycache__/
+
+rm    const/*.pyc
+rm    const/__pycache__/*.pyc
+rmdir const/__pycache__/
+
+rm    window/*.pyc
+rm    window/__pycache__/*.pyc
+rmdir window/__pycache__/
+
 rm errors.err
