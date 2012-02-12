@@ -11,33 +11,33 @@ def get_melee_attack(ar, damage_info, dr, pv):
 
 def get_combat_message(attack_succeeds, damage, dies, personity, attacker_name=None, defender_name=None):
 	subject_is_player, object_is_player = personity
-	message = u""
+	message = ""
 	if subject_is_player:
-		A = u"You"
-		s = u""
-		s2 = u""
+		A = "You"
+		s = ""
+		s2 = ""
 	else:
-		A = u"The {}".format(attacker_name)
-		s = u"s"
-		s2 = u"es"
+		A = "The {}".format(attacker_name)
+		s = "s"
+		s2 = "es"
 	if object_is_player:
-		t = u"you"
-		i = u"you"
+		t = "you"
+		i = "you"
 	else:
-		t = u"the {}".format(defender_name)
-		i = u"it"
+		t = "the {}".format(defender_name)
+		i = "it"
 	if subject_is_player and object_is_player:
-		t = u"yourself"
-		i = u"yourself"
-		mv = u"trying to hit "
+		t = "yourself"
+		i = "yourself"
+		mv = "trying to hit "
 	else:
-		mv = u""
+		mv = ""
 
 	if damage:
-		message += u"{} hit{} {} for {} damage".format(A, s, t, damage)
-		message += u" and kill{} {}.".format(s, i) if dies else u"."
+		message += "{} hit{} {} for {} damage".format(A, s, t, damage)
+		message += " and kill{} {}.".format(s, i) if dies else "."
 	elif attack_succeeds:
-		message += u"{} fail{} to hurt {}.".format(A, s, t)
+		message += "{} fail{} to hurt {}.".format(A, s, t)
 	else:
-		message += u"{} miss{} {}{}.".format(A, s2, mv, t)
+		message += "{} miss{} {}{}.".format(A, s2, mv, t)
 	return message

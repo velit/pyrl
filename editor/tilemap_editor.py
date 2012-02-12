@@ -17,14 +17,14 @@ class TileMapEditor():
 		self.x = 0
 		self.my = self.tilemap.rows-1
 		self.mx = self.tilemap.cols-1
-		self.t = u"f"
+		self.t = "f"
 		self.funs = (self.point, self.rectangle, self.fill, self.randomize)
 		self.f = self.point
 		self.selected_tile = None
-		io.s.add_element(u"t", u"Tile: ", lambda:
+		io.s.add_element("t", "Tile: ", lambda:
 				gettile(self.t, self.tilemap.tile_dict).ch_visible.symbol)
-		io.s.add_element(u"f", u"Function: ", lambda: self.f.__name__)
-		io.s.add_element(u"k", u"Keys: ", lambda: u"tyf")
+		io.s.add_element("f", "Function: ", lambda: self.f.__name__)
+		io.s.add_element("k", "Keys: ", lambda: "tyf")
 		self.actions()
 
 		self.edit()
@@ -38,18 +38,18 @@ class TileMapEditor():
 		a[curses.KEY_LEFT] = self.move_cursor, W
 		a[curses.KEY_RIGHT] = self.move_cursor, E
 		a[curses.KEY_UP] = self.move_cursor, N
-		a[ord(u'.')] = self.move_cursor, STOP
-		a[ord(u'1')] = self.move_cursor, SW
-		a[ord(u'2')] = self.move_cursor, S
-		a[ord(u'3')] = self.move_cursor, SE
-		a[ord(u'4')] = self.move_cursor, W
-		a[ord(u'5')] = self.move_cursor, STOP
-		a[ord(u'6')] = self.move_cursor, E
-		a[ord(u'7')] = self.move_cursor, NW
-		a[ord(u'8')] = self.move_cursor, N
-		a[ord(u'9')] = self.move_cursor, NE
-		a[ord(u'S')] = self.main.save,
-		a[ord(u'Q')] = self.main.safe_exit,
+		a[ord('.')] = self.move_cursor, STOP
+		a[ord('1')] = self.move_cursor, SW
+		a[ord('2')] = self.move_cursor, S
+		a[ord('3')] = self.move_cursor, SE
+		a[ord('4')] = self.move_cursor, W
+		a[ord('5')] = self.move_cursor, STOP
+		a[ord('6')] = self.move_cursor, E
+		a[ord('7')] = self.move_cursor, NW
+		a[ord('8')] = self.move_cursor, N
+		a[ord('9')] = self.move_cursor, NE
+		a[ord('S')] = self.main.save,
+		a[ord('Q')] = self.main.safe_exit,
 
 		self.actions = a
 
@@ -73,30 +73,30 @@ class TileMapEditor():
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])
-			elif ch in tuple(imap(ord, u"B<")):
+			elif ch in tuple(imap(ord, "B<")):
 				return
-			elif ch == ord(u'\n'):
+			elif ch == ord('\n'):
 				self.f()
 				t = self.tilemap.gettile(self.y, self.x)
 				if t.exit_point is not None:
 					self.tilemap.entrance_locs[t.exit_point] = (self.y, self.x)
 				self.main.modified = True
-			elif ch in tuple(imap(ord, u"tT")):
-				w = [u"Pick a tile:"]
+			elif ch in tuple(imap(ord, "tT")):
+				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(tiles):
 					w.append(key)
 					r.append(key)
 				self.t = io.draw_h_menu(w, r)
-			elif ch in (ord(u'y'), ord(u'Y')):
-				w = [u"Pick a tile:"]
+			elif ch in (ord('y'), ord('Y')):
+				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(self.tilemap.tile_dict):
 					w.append(key)
 					r.append(key)
 				self.t = io.draw_h_menu(w, r)
-			elif ch in (ord(u'f'), ord(u'F')):
-				w = [u"Pick a function:"]
+			elif ch in (ord('f'), ord('F')):
+				w = ["Pick a function:"]
 				r = [None]
 				for f in self.funs:
 					w.append(f.__name__)

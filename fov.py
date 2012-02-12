@@ -18,7 +18,7 @@ def get_light_set(visibility_func, coord, sight):
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
 
 def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy, yx, yy):
-	u"""Recursive lightcasting function"""
+	"""Recursive lightcasting function"""
 	if start < end:
 		return
 	radius_squared = r * r

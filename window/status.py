@@ -3,7 +3,7 @@ from .pyrl_window import PyrlWindow
 
 
 class StatusBar(PyrlWindow):
-	u"""Handles the status bar system."""
+	"""Handles the status bar system."""
 
 	def __init__(self, concrete_window):
 		PyrlWindow.__init__(self, concrete_window)
@@ -21,7 +21,7 @@ class StatusBar(PyrlWindow):
 		PyrlWindow.prepare_flush(self)
 
 	def print_elements(self):
-		status_string = " ".join(u"{}[{}]".format(string, unicode(getter())) for string, getter in self.elements)
+		status_string = " ".join("{}[{}]".format(string, str(getter())) for string, getter in self.elements)
 		lines = self.wrapper.wrap(status_string)
 		for i, line in enumerate(lines):
 			self.addstr(i, 0, line)
