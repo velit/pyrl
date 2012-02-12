@@ -6,17 +6,16 @@ import const.game as GAME
 from io import open
 from pio import init_global_io
 
-
 def curses_inited_main(w, options):
 	import window.curses_window as curses_window
 	curses_window.init_module()
-	init_global_io(curses_window.CursesWindow, w)
+	init_global_io(curses_window, w)
 	start(options)
 
 def tcod_main(options):
 	import window.tcod_window as tcod_window
 	tcod_window.init_module()
-	init_global_io(tcod_window.TCODWindow, None)
+	init_global_io(tcod_window, 0)
 	start(options)
 
 def start(options):

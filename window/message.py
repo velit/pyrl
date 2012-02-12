@@ -1,4 +1,5 @@
 import textwrap
+import pio as io
 from .pyrl_window import PyrlWindow
 from const.colors import GREEN
 
@@ -8,8 +9,8 @@ MORE_STR_LEN = 3
 class MessageBar(PyrlWindow):
 	"""Handles the messaging bar system."""
 
-	def __init__(self, concrete_window):
-		PyrlWindow.__init__(self, concrete_window)
+	def __init__(self, *a, **k):
+		PyrlWindow.__init__(self, *a, **k)
 
 		self.msgqueue = []
 		self.wrap = textwrap.TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
@@ -36,7 +37,7 @@ class MessageBar(PyrlWindow):
 				self.addch(1, self.cols - 2, ("R", GREEN))
 				self.addch(1, self.cols - 1, ("E", GREEN))
 
-				if self.notify() == ord('\n'):
+				if io.notify() == ord('\n'):
 					skip = True
 					break
 

@@ -56,56 +56,47 @@ def init_module():
 	i.add(libtcod.KEY_CONTROL)
 	i.add(libtcod.KEY_ALT)
 
+def init_handle(handle):
+	libtcod.console_set_default_background(handle, libtcod.black)
+	libtcod.console_set_default_foreground(handle, libtcod.white)
 
-class TCODWindow(object):
+def addch(handle, y, x, char):
+	symbol, color = char
+	libtcod.console_put_char_ex(handle, x, y, symbol, TCOD_COLOR[color], libtcod.black)
 
-	def __init__(self, offscreen_handler):
-		self.w = offscreen_handler
-		self.rows, self.cols = self.get_dimensions()
-		libtcod.console_set_default_background(self.w, libtcod.black)
-		libtcod.console_set_default_foreground(self.w, libtcod.white)
-		
-		self.subwindow_blit_args = []
+def addstr(handle, y, x, string, color=None):
+	if color is None:
+		libtcod.console_print(handle, x, y, string)
+	else:
+		raise NotImplemented("Not yet implemented")
 
-	def addch(self, y, x, char):
-		symbol, color = char
-		libtcod.console_put_char_ex(self.w, x, y, symbol, TCOD_COLOR[color], libtcod.black)
+def getch(handle=None):
+	while True:
+		key = libtcod.console_wait_for_keypress(False)
 
-	def addstr(self, y, x, string, color=None):
-		if color is None:
-			libtcod.console_print(self.w, x, y, string)
-			#self.getch()
-			#raise Exception(string)
-		else:
-			raise NotImplemented
+		if key.c != 0:
+			return chr(key.c)
+		elif key.vk in TCOD_KEYS:
+			return TCOD_KEYS[key.vk]
+		elif key.vk not in TCOD_IGNORE_KEYS:
+			return key.vk
 
-	def getch(self):
-		while True:
-			key = libtcod.console_wait_for_keypress(False)
+def clear(handle):
+	libtcod.console_clear(handle)
 
-			if key.c != 0:
-				return chr(key.c)
-			elif key.vk in TCOD_KEYS:
-				return TCOD_KEYS[key.vk]
-			elif key.vk not in TCOD_IGNORE_KEYS:
-				return key.vk
+def blit(blit_args):
+	libtcod.console_blit(*blit_args)
 
-	def clear(self):
-		libtcod.console_clear(self.w)
+def prepare_flush(handle):
+	raise NotImplementedError("Use blit(blit_data) !")
+	rows, cols = get_dimensions(handle)
+	libtcod.console_blit(handle, 0, 0, cols, rows, 0, 0, 0, 1.0, 1.0)
 
-	def prepare_flush(self):
-		pass
+def flush():
+	libtcod.console_flush()
 
-	def flush(self):
-		for args in self.subwindow_blit_args:
-			libtcod.console_blit(*args)
-		libtcod.console_flush()
+def get_dimensions(handle):
+	return libtcod.console_get_height(handle), libtcod.console_get_width(handle)
 
-	def get_dimensions(self):
-		return libtcod.console_get_height(self.w), libtcod.console_get_width(self.w)
-
-	def subwindow(self, nlines, ncols, y, x):
-		console = libtcod.console_new(ncols, nlines)
-		assert console != 0
-		self.subwindow_blit_args.append((console, 0, 0, ncols, nlines, self.w, x, y, 1.0, 1.0))
-		return console
+def subwindow(handle, rows, cols, y, x):
+	return libtcod.console_new(cols, rows)

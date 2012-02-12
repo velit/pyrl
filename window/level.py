@@ -7,8 +7,8 @@ from const.colors import GREEN, BLUE, YELLOW, MAKE_REVERSE
 class LevelWindow(PyrlWindow):
 	"""Handles the level display"""
 
-	def __init__(self, concrete_window):
-		PyrlWindow.__init__(self, concrete_window)
+	def __init__(self, *a, **k):
+		PyrlWindow.__init__(self, *a, **k)
 
 	def draw(self, char_payload_iterator, reverse=False):
 		reverse_str = MAKE_REVERSE if reverse else ""
