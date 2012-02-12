@@ -35,7 +35,7 @@ def start(options):
 
 	if options.load:
 		game = load("pyrl.svg")
-		game.register_status_texts()
+		game.register_status_texts(game.player)
 		game.redraw()
 	else:
 		game = Game()

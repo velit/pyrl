@@ -84,6 +84,12 @@
             done, one coord to *coord, and one vice versa
         </comment>
     </note>
+    <note priority="high" time="1328980271" done="1329073270">
+        Switch from unicode strings to bytes
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315156342" done="1328980611">
         make bresenham either symmetrical or include all versions
         <comment>
@@ -117,11 +123,14 @@
     <note priority="veryhigh" time="1315707472">
         make an inventory
     </note>
-    <note priority="high" time="1328904614">
+    <note priority="high" time="1328904614" done="1329073277">
         split sel_getch to ask_question and such
+        <comment>
+            done
+        </comment>
     </note>
-    <note priority="high" time="1328980271">
-        Switch from unicode strings to bytes
+    <note priority="high" time="1329073265">
+        Make a walk mode
     </note>
     <note priority="medium" time="1315155859">
         do edge leaving and entering in levels
