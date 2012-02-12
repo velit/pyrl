@@ -162,8 +162,9 @@ class Game(object):
 			exit()
 
 	def _save(self):
+		folder_path = os.path.join("data")
 		save_path = os.path.join("data", "pyrl.svg")
-		if not os.path.exists(save_path):
+		if not os.path.exists(folder_path):
 			os.mkdir("data")
 		with open(save_path, "wb") as f:
 			pickle.dump(self, f)
