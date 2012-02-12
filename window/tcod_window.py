@@ -69,12 +69,12 @@ class TCODWindow(object):
 
 	def addch(self, y, x, char):
 		symbol, color = char
-		libtcod.console_put_char_ex(self.w, x, y, symbol.encode(u"ascii"),
+		libtcod.console_put_char_ex(self.w, x, y, symbol.encode("ascii"),
 				TCOD_COLOR[color], libtcod.black)
 
 	def addstr(self, y, x, string, color=None):
 		if color is None:
-			libtcod.console_print(self.w, x, y, string.encode(u"ascii"))
+			libtcod.console_print(self.w, x, y, string.encode("ascii"))
 			#self.getch()
 			#raise Exception(string)
 		else:

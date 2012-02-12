@@ -6,7 +6,7 @@ from const.colors import GREEN
 MORE_STR_LEN = 3
 
 class MessageBar(PyrlWindow):
-	u"""Handles the messaging bar system."""
+	"""Handles the messaging bar system."""
 
 	def __init__(self, concrete_window):
 		PyrlWindow.__init__(self, concrete_window)
@@ -21,7 +21,7 @@ class MessageBar(PyrlWindow):
 		PyrlWindow.prepare_flush(self)
 
 	def queue_msg(self, obj):
-		self.msgqueue.append(unicode(obj))
+		self.msgqueue.append(str(obj))
 
 	def print_queue(self):
 		skip = False
@@ -31,12 +31,12 @@ class MessageBar(PyrlWindow):
 			self.addstr(i % self.rows, 0, line)
 
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-				self.addch(0, self.cols - 2, (u"M", GREEN))
-				self.addch(0, self.cols - 1, (u"O", GREEN))
-				self.addch(1, self.cols - 2, (u"R", GREEN))
-				self.addch(1, self.cols - 1, (u"E", GREEN))
+				self.addch(0, self.cols - 2, ("M", GREEN))
+				self.addch(0, self.cols - 1, ("O", GREEN))
+				self.addch(1, self.cols - 2, ("R", GREEN))
+				self.addch(1, self.cols - 1, ("E", GREEN))
 
-				if self.notify() == ord(u'\n'):
+				if self.notify() == ord('\n'):
 					skip = True
 					break
 

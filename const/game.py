@@ -25,27 +25,27 @@ LEVELS_PER_DUNGEON = 100
 
 GAME_NAME = "pyrl"
 
-ENCODING = u"utf-8"
+ENCODING = "utf-8"
 
-SET_LEVEL = u"set-level"
-NEXT_LEVEL = u"next-level"
-PREVIOUS_LEVEL = u"previous-level"
+SET_LEVEL = "set-level"
+NEXT_LEVEL = "next-level"
+PREVIOUS_LEVEL = "previous-level"
 UP = (PREVIOUS_LEVEL, None, None)
 DOWN = (NEXT_LEVEL, None, None)
 
-DUNGEON = u"dungeon"
+DUNGEON = "dungeon"
 FIRST_LEVEL = (DUNGEON, 0)
 
-PASSAGE_UP = u"an exit going up"
-PASSAGE_DOWN = u"an exit going down"
-PASSAGE_RANDOM = u"random entry point"
+PASSAGE_UP = "an exit going up"
+PASSAGE_DOWN = "an exit going down"
+PASSAGE_RANDOM = "random entry point"
 
-YES = set(imap(ord, u"yY"))
-NO = set(imap(ord, u"nN"))
-DEFAULT = set(imap(ord, u" zZ\n"))
+YES = set(imap(ord, "yY"))
+NO = set(imap(ord, "nN"))
+DEFAULT = set(imap(ord, " zZ\n"))
 YES_D = YES | DEFAULT
 NO_D = NO | DEFAULT
 ALL = YES | NO | DEFAULT
-MOVES = set(imap(ord, u"123456790."))
+MOVES = set(imap(ord, "123456790."))
 
 class PyrlException(Exception): pass

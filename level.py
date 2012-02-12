@@ -177,13 +177,13 @@ class Level(object):
 
 	def look_information(self, coord):
 		#if coord in self.visited_locations:
-		information = u"{}x{} ".format(*coord)
+		information = "{}x{} ".format(*coord)
 		if self.has_creature(coord):
 			c = self.get_creature(coord)
-			creature_stats = u"{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
+			creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
 			information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
-			information += u" target:{}".format(coord)
-			information += u" direction:{}".format(c.chase_vector)
+			information += " target:{}".format(coord)
+			information += " direction:{}".format(c.chase_vector)
 		else:
 			information += self.tiles[coord].name
 		return information

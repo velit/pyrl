@@ -81,18 +81,18 @@ def _get_wall_coord(level_file):
 def _is_wall(level_file, y, x):
 	g = level_file.get_tile_id
 	if y in (0, level_file.rows - 1) or x in (0, level_file.cols - 1):
-		return False, u""
+		return False, ""
 	if g(y - 1, x) == W and g(y + 1, x) == W:
 		if g(y, x - 1) == F and g(y, x + 1) == R:
-			return True, u"right"
+			return True, "right"
 		elif g(y, x - 1) == R and g(y, x + 1) == F:
-			return True, u"left"
+			return True, "left"
 	elif g(y, x - 1) == W and g(y, x + 1) == W:
 		if g(y - 1, x) == F and g(y + 1, x) == R:
-			return True, u"down"
+			return True, "down"
 		elif g(y - 1, x) == R and g(y + 1, x) == F:
-			return True, u"up"
-	return False, u""
+			return True, "up"
+	return False, ""
 
 def _rect_diggable(level_file, y0, x0, height, width):
 	if y0 < 0 or x0 < 0 or y0 + height >= level_file.rows \
@@ -110,16 +110,16 @@ def _attempt_room(level_file):
 	height, width = rr(5, 11), rr(7, 14)
 	ypos, xpos = rr(height-2), rr(width-2)
 
-	if dir == u"left":
+	if dir == "left":
 		y = y0 - 1 - ypos
 		x = x0 - width + 1
-	elif dir == u"right":
+	elif dir == "right":
 		y = y0 - 1 - ypos
 		x = x0
-	elif dir == u"up":
+	elif dir == "up":
 		y = y0 - height + 1
 		x = x0 - 1 - xpos
-	elif dir == u"down":
+	elif dir == "down":
 		y = y0
 		x = x0 - 1 - xpos
 
@@ -146,34 +146,34 @@ def _turn_rock_to_wall(level_file):
 def _attempt_corridor(level_file):
 	y, x, dir = _get_wall_coord(level_file)
 	len = rr(7, 20)
-	if dir == u"up" and _rect_diggable(level_file, y - len, x - 1, len, 3) or \
-			dir == u"down" and _rect_diggable(level_file, y + 1, x - 1, len, 3) or \
-			dir == u"left" and _rect_diggable(level_file, y - 1, x - len, 3, len) or \
-			dir == u"right" and _rect_diggable(level_file, y - 1, x + 1, 3, len):
+	if dir == "up" and _rect_diggable(level_file, y - len, x - 1, len, 3) or \
+			dir == "down" and _rect_diggable(level_file, y + 1, x - 1, len, 3) or \
+			dir == "left" and _rect_diggable(level_file, y - 1, x - len, 3, len) or \
+			dir == "right" and _rect_diggable(level_file, y - 1, x + 1, 3, len):
 		_make_corridor(level_file, y, x, dir, len)
 		return True
 
 def _make_corridor(level_file, y0, x0, dir, len):
-	if dir in (u"up", u"down"):
+	if dir in ("up", "down"):
 		fhei = whei = len
 		fwid = 1
 		wwid = 3
 		fx = x0
 		wx = x0-1
-		if dir == u"up":
+		if dir == "up":
 			fy = y0 - len + 1
 			wy = fy - 1
 		else:
 			fy = y0
 			wy = fy + 1
 
-	elif dir in (u"left", u"right"):
+	elif dir in ("left", "right"):
 		fwid = wwid = len
 		fhei = 1
 		whei = 3
 		fy = y0
 		wy = y0-1
-		if dir == u"left":
+		if dir == "left":
 			fx = x0 - len + 1
 			wx = fx - 1
 		else:

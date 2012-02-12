@@ -6,16 +6,16 @@ from const.colors import BLACK, BROWN, RED
 
 
 tiles = { #TODO: tallenna jsonina ja loadaa gameen/editoriin erikseen
-	UNKNOWN: Tile(u"You have not seen this place yet",
-			Char(u' '), Char(u' '), False, False),
-	FLOOR: Tile(u"dungeon floor", Char(u'.'), Char(u'.')),
-	ROCK: Tile(u"dungeon rock", Char(u'#', BLACK), Char(u'#', BLACK),
+	UNKNOWN: Tile("You have not seen this place yet",
+			Char(' '), Char(' '), False, False),
+	FLOOR: Tile("dungeon floor", Char('.'), Char('.')),
+	ROCK: Tile("dungeon rock", Char('#', BLACK), Char('#', BLACK),
 			False, False),
-	WALL: Tile(u"wall", Char(u'#', BROWN), Char(u'#', BLACK),
+	WALL: Tile("wall", Char('#', BROWN), Char('#', BLACK),
 			False, False),
-	STAIRS_DOWN: Tile(u"down staircase", Char(u'>', RED), Char(u'>'),
+	STAIRS_DOWN: Tile("down staircase", Char('>', RED), Char('>'),
 			exit_point=GAME.PASSAGE_DOWN),
-	STAIRS_UP: Tile(u"up staircase", Char(u'<', RED), Char(u'<'),
+	STAIRS_UP: Tile("up staircase", Char('<', RED), Char('<'),
 			exit_point=GAME.PASSAGE_UP),
 }
 
@@ -26,4 +26,4 @@ def gettile(handle, tile_dict=None):
 	elif handle in tiles:
 		return tiles[handle]
 	else:
-		raise KeyError(u"Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))
+		raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))

@@ -64,9 +64,9 @@ class CursesWindow(object):
 	def addch(self, y, x, char):
 		symbol, color = char
 		if y != self.rows - 1 or x != self.cols - 1:
-			self.w.addch(y, x, symbol.encode(u"ascii"), CURSES_COLOR[color])
+			self.w.addch(y, x, symbol.encode("ascii"), CURSES_COLOR[color])
 		else:
-			self.w.insch(y, x, symbol.encode(u"ascii"), CURSES_COLOR[color])
+			self.w.insch(y, x, symbol.encode("ascii"), CURSES_COLOR[color])
 
 			# Writing to the last cell of a window raises an exception because
 			# the automatic cursor move to the next cell is illegal. insch avoids
@@ -74,9 +74,9 @@ class CursesWindow(object):
 
 	def addstr(self, y, x, string, color=None):
 		if color is not None:
-			self.w.addstr(y, x, string.encode(u"ascii"), CURSES_COLOR[color])
+			self.w.addstr(y, x, string.encode("ascii"), CURSES_COLOR[color])
 		else:
-			self.w.addstr(y, x, string.encode(u"ascii"))
+			self.w.addstr(y, x, string.encode("ascii"))
 
 	def getch(self):
 		ch = self.w.getch()
@@ -120,43 +120,43 @@ class CursesWindow(object):
 
 	def getbool(self, print_str=None, default=False):
 		while True:
-			input = self.sel_getch(print_str + u" [T/F]: ",
-					list(imap(ord, u"01fFtT\n")))
-			if input in list(imap(ord, u"0fF")):
+			input = self.sel_getch(print_str + " [T/F]: ",
+					list(imap(ord, "01fFtT\n")))
+			if input in list(imap(ord, "0fF")):
 				return False
-			elif input in list(imap(ord, u"1tT")):
+			elif input in list(imap(ord, "1tT")):
 				return True
 			else:
 				return default
 
-	def getchar(self, print_str=None, default=u"."):
+	def getchar(self, print_str=None, default="."):
 		while True:
-			input = self._getstr(print_str + u" [char]: ")
-			if input == u"":
+			input = self._getstr(print_str + " [char]: ")
+			if input == "":
 				return default
 			elif len(input) == 1:
 				return input
 
-	def getcolor(self, print_str=None, default=u"normal"):
+	def getcolor(self, print_str=None, default="normal"):
 		while True:
 			#TODO: might want to change to getch?
-			input = self._getstr(print_str + u"[white/normal/black/red/green/"
-										u"yellow/blue/purple/cyan/light_*]: ")
-			if input == u"":
+			input = self._getstr(print_str + "[white/normal/black/red/green/"
+										"yellow/blue/purple/cyan/light_*]: ")
+			if input == "":
 				return default
 			elif input in CURSES_COLOR:
 				return input
 
 	def getint(self, print_str=None, default=0):
 		while True:
-			input = self._getstr(print_str + u" [int]: ")
-			if input == u"":
+			input = self._getstr(print_str + " [int]: ")
+			if input == "":
 				return default
 			try:
 				return int(input)
 			except ValueError:
 				pass
 
-	def getstr(self, print_str=None, default=u""):
-		str_ = self._getstr(print_str + u" [str]: ")
-		return str_ if str_ != u"" else default
+	def getstr(self, print_str=None, default=""):
+		str_ = self._getstr(print_str + " [str]: ")
+		return str_ if str_ != "" else default

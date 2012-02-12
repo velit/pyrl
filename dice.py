@@ -4,10 +4,10 @@ from random import randrange
 
 
 class Dice(object):
-	u"""An xDy dice object, has roll."""
+	"""An xDy dice object, has roll."""
 
 	if GAME.OPTIMIZATION:
-		__slots__ = (u"num", u"sides", u"addition")
+		__slots__ = ("num", "sides", "addition")
 
 	def __init__(self, num=1, sides=6, addition=0):
 		self.num = num
