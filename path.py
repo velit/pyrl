@@ -52,7 +52,7 @@ def _path(start, goal, neighbors, heuristic):
 			h[n] = heuristic(n, goal, start)
 			heappush(openprio, (g[n] + h[n], n))
 			if DEBUG.PATH and n != goal:
-				io.draw_char(n, ('?', COLOR.RED + COLOR.MAKE_REVERSE))
+				io.draw_char(n, ('?', COLOR.YELLOW))
 			openmember.add(n)
 
 	return came_from

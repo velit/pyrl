@@ -1,12 +1,18 @@
 #!/bin/bash
-./pyrl.py 2>errors.err
-if [ -s errors.err ]; then
-	cat errors.err
+
+if [ $# -eq 0 ]; then
+	./pyrl.py 2> errors.err
 else
-	./sdlpyrl.py 2>errors.err
-	if [ -s errors.err ]; then
+	./$1 2> errors.err
+fi
+
+if [ -s errors.err ]; then
+	if [ $# -eq 2 ]; then
 		cat errors.err
 	else
+		vim -q errors.err
 		rm errors.err
 	fi
+else
+	rm errors.err
 fi

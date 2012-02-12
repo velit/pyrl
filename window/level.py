@@ -26,7 +26,8 @@ class LevelWindow(PyrlWindow):
 
 	def draw_block(self, coord, col=BLUE):
 		y, x = coord
-		char = Char(" ", col + MAKE_REVERSE)
+
+		char = (chr(176), col)
 		self.addch(y, x, char)
 
 	def draw_line(self, coordA, coordB, char=Char('*', YELLOW)):
