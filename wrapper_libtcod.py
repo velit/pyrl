@@ -73,10 +73,12 @@ def addstr(handle, y, x, string, color=None):
 def getch(handle=None):
 	while True:
 		key = libtcod.console_wait_for_keypress(False)
-
-		if key.c != 0:
-			if key.c == ord('c') and key.lctrl or key.rctrl:
-				raise KeyboardInterrupt
+		
+		if key.vk == libtcod.KEY_ENTER and key.lalt:
+			toggle_fullscreen()
+		elif key.c == ord('c') and key.lctrl or key.rctrl:
+			raise KeyboardInterrupt
+		elif key.c != 0:
 			return chr(key.c)
 		elif key.vk in TCOD_KEYS:
 			return TCOD_KEYS[key.vk]
@@ -102,3 +104,9 @@ def get_dimensions(handle):
 
 def subwindow(handle, rows, cols, y, x):
 	return libtcod.console_new(cols, rows)
+	
+def toggle_fullscreen():
+	if libtcod.console_is_fullscreen():
+		libtcod.console_set_fullscreen(False)
+	else:
+		libtcod.console_set_fullscreen(True)
