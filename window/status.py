@@ -5,8 +5,8 @@ from .pyrl_window import PyrlWindow
 class StatusBar(PyrlWindow):
 	"""Handles the status bar system."""
 
-	def __init__(self, concrete_window):
-		PyrlWindow.__init__(self, concrete_window)
+	def __init__(self, *a, **k):
+		PyrlWindow.__init__(self, *a, **k)
 
 		self.elements = []
 		self.wrapper = textwrap.TextWrapper(width=self.cols)
