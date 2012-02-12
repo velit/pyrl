@@ -2,7 +2,6 @@ from __future__ import with_statement
 import curses
 import pickle as pickle
 import shutil
-import sys
 
 from os import path
 from pio import io
@@ -11,21 +10,20 @@ from tile import Tile
 from tiles import tiles
 from char import Char
 from templates import MapTemplate, LevelTemplate
-from const.game import YES, NO, DEFAULT, SET_LEVEL
+from const.game import YES, SET_LEVEL
 from editor.tilemap_editor import TileMapEditor
-from itertools import imap
 from io import open
 
 # key sets
-_A = tuple(imap(ord, "aA"))
-_D = tuple(imap(ord, "dD"))
-_E = tuple(imap(ord, "eE"))
-_M = tuple(imap(ord, "mM"))
-_P = tuple(imap(ord, "pP"))
-_S = tuple(imap(ord, "sS"))
-_T = tuple(imap(ord, "tT"))
-_V = tuple(imap(ord, "vV"))
-_SELECT = tuple(imap(ord, ">\n"))
+_A = tuple("aA")
+_D = tuple("dD")
+_E = tuple("eE")
+_M = tuple("mM")
+_P = tuple("pP")
+_S = tuple("sS")
+_T = tuple("tT")
+_V = tuple("vV")
+_SELECT = tuple(">\n")
 _DEL = (curses.KEY_DC, )
 _INSERT = (curses.KEY_IC, )
 _HOME = (curses.KEY_HOME, )
@@ -336,16 +334,16 @@ class Editor():
 	def modify_attribute_type(self, dict_, key):
 		c = io.sel_getch(
 				"Select new type: [B]ool, [S]tring, [I]nt, [C]har, [N]one",
-				tuple(imap(ord, "BbSsIiCcNn")))
-		if c in tuple(imap(ord, "bB")):
+				tuple("BbSsIiCcNn"))
+		if c in tuple("bB"):
 			dict_[key] = bool()
-		elif c in tuple(imap(ord, "sS")):
+		elif c in tuple("sS"):
 			dict_[key] = str()
-		elif c in tuple(imap(ord, "iI")):
+		elif c in tuple("iI"):
 			dict_[key] = int()
-		elif c in tuple(imap(ord, "cC")):
+		elif c in tuple("cC"):
 			dict_[key] = Char()
-		elif c in tuple(imap(ord, "nN")):
+		elif c in tuple("nN"):
 			dict_[key] = None
 		else:
 			return
