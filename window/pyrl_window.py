@@ -28,6 +28,10 @@ class PyrlWindow(object):
 	def flush(self):
 		self.cursor_lib.flush()
 
+	def refresh(self):
+		PyrlWindow.prepare_flush(self)
+		self.flush()
+
 	def getch(self):
 		return self.cursor_lib.getch(self.handle)
 

@@ -4,22 +4,28 @@ import os
 import const.game as GAME
 
 from io import open
-from pio import init_global_io
+import input_output
 
 def curses_inited_main(w, options):
-	import window.curses_window as curses_window
-	curses_window.init_module()
-	init_global_io(curses_window, w)
+	import wrapper_curses
+
+	wrapper_curses.init()
+
+	input_output.io = input_output.Front(wrapper_curses, w)
+
 	start(options)
 
 def tcod_main(options):
-	import window.tcod_window as tcod_window
-	tcod_window.init_module()
-	init_global_io(tcod_window, 0)
+	import wrapper_libtcod
+
+	wrapper_libtcod.init()
+
+	input_output.io = input_output.Front(wrapper_libtcod, 0)
+
 	start(options)
 
 def start(options):
-	from pio import io
+	from input_output import io
 	if io.rows < GAME.MIN_SCREEN_ROWS or io.cols < GAME.MIN_SCREEN_COLS:
 		message = "Current screen size {}x{} is too small. Needs to be at least {}x{}"
 		io.notify(message.format(io.cols, io.rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS))

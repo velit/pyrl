@@ -6,7 +6,7 @@ import ai
 import const.game as GAME
 import const.creature_actions as CC
 
-from pio import io
+from input_output import io
 from player import Player
 from level import Level
 from user_input import UserInput
@@ -158,7 +158,7 @@ class Game(object):
 		io.msg(message)
 		if not ask:
 			exit()
-		if io.sel_getch("Do you wish to end the game? [y/N]") in GAME.YES:
+		if io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
 			exit()
 
 	def _save(self):
@@ -172,7 +172,7 @@ class Game(object):
 	def savegame(self, ask=False):
 		if not ask:
 			self._save()
-		elif io.sel_getch("Do you wish to save the game? [y/N]") in GAME.YES:
+		elif io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
 			self._save()
 
 	def draw(self):

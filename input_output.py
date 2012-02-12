@@ -1,4 +1,5 @@
 import const.game as GAME
+import const.keys as KEY
 import const.colors as COLOR
 
 from window.pyrl_window import PyrlWindow
@@ -7,11 +8,7 @@ from window.status import StatusBar
 from window.level import LevelWindow
 
 
-def init_global_io(*a, **k):
-	global io
-	io = IO(*a, **k)
-
-class IO(object):
+class Front(object):
 
 	def __init__(self, cursor_lib, root_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
 		self.a = PyrlWindow(cursor_lib, root_window)
@@ -32,21 +29,22 @@ class IO(object):
 		self.msg(print_str)
 		return self.getch()
 
-	def selective_getch(self, char_list=GAME.ALL):
+	def selective_getch(self, char_seq):
 		while True:
 			c = self.getch()
-			if c in char_list:
-				return 
+			if c in char_seq:
+				return c
+
+	def ask(self, string, char_seq=KEY.GROUP_ALL):
+		self.msg(string)
+		return self.selective_getch(char_seq)
 
 	def notify(self, *a):
 		self.msg(*a)
-		return self.selective_getch(char_list=GAME.DEFAULT)
+		return self.selective_getch(KEY.GROUP_ALL)
 
 	def msg(self, *a):
-		if len(a) > 1:
-			self.m.queue_msg(a)
-		else:
-			self.m.queue_msg(*a)
+		self.m.queue_msg(*a)
 
 	def refresh(self):
 		self.m.prepare_flush()

@@ -7,7 +7,7 @@ TCOD_COLOR = {}
 TCOD_KEYS = {}
 TCOD_IGNORE_KEYS = set()
 
-def init_module():
+def init():
 	libtcod.console_set_custom_font("terminal10x18_gs_ro.png",
 			libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
 	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME, False)
@@ -75,6 +75,8 @@ def getch(handle=None):
 		key = libtcod.console_wait_for_keypress(False)
 
 		if key.c != 0:
+			if key.c == ord('c') and key.lctrl or key.rctrl:
+				raise KeyboardInterrupt
 			return chr(key.c)
 		elif key.vk in TCOD_KEYS:
 			return TCOD_KEYS[key.vk]

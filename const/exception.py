@@ -1,1 +1,0 @@
-class PyrlException(Exception): pass
