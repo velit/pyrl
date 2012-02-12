@@ -5,6 +5,7 @@ import libtcodpy as libtcod
 
 TCOD_COLOR = {}
 TCOD_KEYS = {}
+TCOD_IGNORE_KEYS = set()
 
 def init_module():
 	libtcod.console_set_custom_font("terminal10x18_gs_ro.png",
@@ -12,6 +13,7 @@ def init_module():
 	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME, False)
 	c = TCOD_COLOR
 	k = TCOD_KEYS
+	i = TCOD_IGNORE_KEYS
 
 	c[COLOR.GRAY] = libtcod.light_gray
 	c[COLOR.BLACK_ON_BLACK] = libtcod.black
@@ -50,6 +52,10 @@ def init_module():
 	k[libtcod.KEY_UP] = KEY.UP
 	k[libtcod.KEY_DOWN] = KEY.DOWN
 
+	i.add(libtcod.KEY_SHIFT)
+	i.add(libtcod.KEY_CONTROL)
+	i.add(libtcod.KEY_ALT)
+
 
 class TCODWindow(object):
 
@@ -75,14 +81,15 @@ class TCODWindow(object):
 			raise NotImplemented
 
 	def getch(self):
-		key = libtcod.console_wait_for_keypress(False)
+		while True:
+			key = libtcod.console_wait_for_keypress(True)
 
-		if key.c != 0:
-			return chr(key.c)
-		elif key.vk in TCOD_KEYS:
-			return TCOD_KEYS[key.vk]
-		else:
-			return key.vk
+			if key.c != 0:
+				return chr(key.c)
+			elif key.vk in TCOD_KEYS:
+				return TCOD_KEYS[key.vk]
+			elif key.vk not in TCOD_IGNORE_KEYS:
+				return key.vk
 
 	def clear(self):
 		libtcod.console_clear(self.w)
