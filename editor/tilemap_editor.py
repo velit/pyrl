@@ -3,9 +3,7 @@ import curses
 from random import random
 from pio import io
 from tiles import tiles, gettile
-from map import Map
 from const.directions import *
-from itertools import imap
 
 
 class TileMapEditor():
@@ -73,7 +71,7 @@ class TileMapEditor():
 			ch = io.getch(self.y, self.x)
 			if ch in self.actions:
 				self.actions[ch][0](*self.actions[ch][1:])
-			elif ch in tuple(imap(ord, "B<")):
+			elif ch in tuple("B<"):
 				return
 			elif ch == ord('\n'):
 				self.f()
@@ -81,7 +79,7 @@ class TileMapEditor():
 				if t.exit_point is not None:
 					self.tilemap.entrance_locs[t.exit_point] = (self.y, self.x)
 				self.main.modified = True
-			elif ch in tuple(imap(ord, "tT")):
+			elif ch in tuple("tT"):
 				w = ["Pick a tile:"]
 				r = [None]
 				for key in sorted(tiles):

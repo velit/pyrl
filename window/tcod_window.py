@@ -69,12 +69,11 @@ class TCODWindow(object):
 
 	def addch(self, y, x, char):
 		symbol, color = char
-		libtcod.console_put_char_ex(self.w, x, y, symbol.encode("ascii"),
-				TCOD_COLOR[color], libtcod.black)
+		libtcod.console_put_char_ex(self.w, x, y, symbol, TCOD_COLOR[color], libtcod.black)
 
 	def addstr(self, y, x, string, color=None):
 		if color is None:
-			libtcod.console_print(self.w, x, y, string.encode("ascii"))
+			libtcod.console_print(self.w, x, y, string)
 			#self.getch()
 			#raise Exception(string)
 		else:
@@ -82,7 +81,7 @@ class TCODWindow(object):
 
 	def getch(self):
 		while True:
-			key = libtcod.console_wait_for_keypress(True)
+			key = libtcod.console_wait_for_keypress(False)
 
 			if key.c != 0:
 				return chr(key.c)

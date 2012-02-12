@@ -3,8 +3,6 @@ import const.keys as KEY
 import const.colors as COLOR
 import curses
 
-from itertools import imap
-
 CURSES_COLOR = {}
 CURSES_KEYS = {}
 
@@ -64,9 +62,9 @@ class CursesWindow(object):
 	def addch(self, y, x, char):
 		symbol, color = char
 		if y != self.rows - 1 or x != self.cols - 1:
-			self.w.addch(y, x, symbol.encode("ascii"), CURSES_COLOR[color])
+			self.w.addch(y, x, symbol, CURSES_COLOR[color])
 		else:
-			self.w.insch(y, x, symbol.encode("ascii"), CURSES_COLOR[color])
+			self.w.insch(y, x, symbol, CURSES_COLOR[color])
 
 			# Writing to the last cell of a window raises an exception because
 			# the automatic cursor move to the next cell is illegal. insch avoids
@@ -74,9 +72,9 @@ class CursesWindow(object):
 
 	def addstr(self, y, x, string, color=None):
 		if color is not None:
-			self.w.addstr(y, x, string.encode("ascii"), CURSES_COLOR[color])
+			self.w.addstr(y, x, string, CURSES_COLOR[color])
 		else:
-			self.w.addstr(y, x, string.encode("ascii"))
+			self.w.addstr(y, x, string)
 
 	def getch(self):
 		ch = self.w.getch()
@@ -121,10 +119,10 @@ class CursesWindow(object):
 	def getbool(self, print_str=None, default=False):
 		while True:
 			input = self.sel_getch(print_str + " [T/F]: ",
-					list(imap(ord, "01fFtT\n")))
-			if input in list(imap(ord, "0fF")):
+					list("01fFtT\n"))
+			if input in list("0fF"):
 				return False
-			elif input in list(imap(ord, "1tT")):
+			elif input in list("1tT"):
 				return True
 			else:
 				return default
