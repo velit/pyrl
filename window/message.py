@@ -1,10 +1,10 @@
 import textwrap
-import pio as io
+import const.keys as KEY
 from .pyrl_window import PyrlWindow
 from const.colors import GREEN
 
 
-MORE_STR_LEN = 3
+MORE_STR_LEN = 2
 
 class MessageBar(PyrlWindow):
 	"""Handles the messaging bar system."""
@@ -21,8 +21,15 @@ class MessageBar(PyrlWindow):
 		self.msgqueue = []
 		PyrlWindow.prepare_flush(self)
 
-	def queue_msg(self, obj):
-		self.msgqueue.append(str(obj))
+	def queue_msg(self, *args):
+		for obj in args:
+			self.msgqueue.append(str(obj))
+
+	def _selective_getch(self, char_seq):
+		while True:
+			c = self.getch()
+			if c in char_seq:
+				return c
 
 	def print_queue(self):
 		skip = False
@@ -32,12 +39,10 @@ class MessageBar(PyrlWindow):
 			self.addstr(i % self.rows, 0, line)
 
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-				self.addch(0, self.cols - 2, ("M", GREEN))
-				self.addch(0, self.cols - 1, ("O", GREEN))
-				self.addch(1, self.cols - 2, ("R", GREEN))
-				self.addch(1, self.cols - 1, ("E", GREEN))
+				self.addch(self.rows - 1, self.cols - 1, ("M", GREEN))
 
-				if io.notify() == ord('\n'):
+				self.refresh()
+				if self._selective_getch(KEY.GROUP_DEFAULT) in "\n\r":
 					skip = True
 					break
 

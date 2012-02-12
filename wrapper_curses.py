@@ -5,7 +5,7 @@ import curses
 CURSES_COLOR = {}
 CURSES_KEYS = {}
 
-def init_module():
+def init():
 	curses.curs_set(0)
 
 	c = CURSES_COLOR

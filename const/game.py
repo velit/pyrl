@@ -39,12 +39,6 @@ PASSAGE_UP = "an exit going up"
 PASSAGE_DOWN = "an exit going down"
 PASSAGE_RANDOM = "random entry point"
 
-YES = set("yY")
-NO = set("nN")
-DEFAULT = set(" zZ\n")
-YES_D = YES | DEFAULT
-NO_D = NO | DEFAULT
-ALL = YES | NO | DEFAULT
 MOVES = set("123456790.")
 
 class PyrlException(Exception): pass

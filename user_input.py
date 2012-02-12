@@ -7,7 +7,7 @@ import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
 
 
-from pio import io
+from input_output import io
 from char import Char
 
 direction_map = {
@@ -115,10 +115,31 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.sel_getch("Specify attack direction:", GAME.DEFAULT | set(direction_map.keys()))
+	c = io.ask("Specify attack direction:", GAME.DEFAULT | set(direction_map.iterkeys()))
 	if c in direction_map:
 		game.creature_attack(level, creature, direction_map[c])
 		return True
+
+def redraw_view(game, level, creature):
+	game.redraw()
+
+def enter(game, level, creature, passage):
+	coord = game.player.coord
+	if level.is_exit(coord) and level.get_exit(coord) == passage:
+		try:
+			game.enter_passage(level.world_loc, level.get_exit(coord))
+		except GAME.PyrlException:
+			io.msg("This passage doesn't seem to lead anywhere.")
+	else:
+		try:
+			new_coord = level.get_passage_coord(passage)
+		except KeyError:
+			io.msg("This level doesn't seem to have a corresponding passage.")
+		else:
+			if not level.is_passable(new_coord):
+				level.remove_creature(level.get_creature(new_coord))
+			level.move_creature(game.player, new_coord)
+	return True
 
 def debug(game, level, creature):
 	c = io.getch_print("Avail cmds: vclbdhkp")
@@ -154,57 +175,7 @@ def debug(game, level, creature):
 	elif c == 'r':
 		io.msg(io.notify("penis"))
 	elif c == 'm':
-		io.msg("""Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
-varius massa enim, id fermentum erat. Lorem ipsum dolor sit amet, consectetur
-adipiscing elit. In et enim ut nibh rutrum suscipit. Aenean a lacus eget justo
-dignissim tempus. Nunc venenatis congue erat vel adipiscing. Nam nulla felis,
-accumsan eu sagittis aliquet, fermentum at tortor. Suspendisse tortor risus,
-dapibus quis porta vel, mattis sit amet libero. Morbi vel metus eget metus
-ultricies ultrices placerat ac sapien. Lorem ipsum dolor sit amet, consectetur
-adipiscing elit.  Nulla urna erat, lacinia vitae pellentesque et, accumsan eget
-ante. Sed commodo molestie ipsum, a mattis sapien malesuada at. Integer et
-lorem magna. Sed nec erat orci. Donec id elementum elit. In hac habitasse
-platea dictumst. Duis id nisi ut felis convallis blandit id sit amet magna. Nam
-feugiat erat eget velit ullamcorper varius. Nunc tellus massa, fermentum eu
-aliquet non, fermentum a quam.  Pellentesque turpis erat, aliquam at feugiat
-in, congue nec urna. Nulla ut turpis dapibus metus blandit faucibus.
-Suspendisse potenti. Proin facilisis massa vitae purus dignissim quis dapibus
-eros gravida. Vivamus ac sapien ante, ut euismod nunc. Pellentesque faucibus
-neque at tortor malesuada eu commodo nisl vehicula. Vivamus eu odio ut est
-egestas luctus. Duis orci magna, tincidunt id suscipit id, consectetur sodales
-nisl. Etiam justo lorem, molestie sit amet rutrum eget, consequat mattis magna.
-Fusce eros est, tincidunt id consequat id, scelerisque ac sapien.  Donec lacus
-leo, adipiscing et vulputate in, pulvinar vitae sem. Suspendisse sem augue,
-adipiscing vitae tempor sit amet, egestas a neque. Donec nibh mauris, rutrum
-vitae dictum in, adipiscing in magna. Duis fringilla sem vel nisl tempus
-dignissim. Fusce vel felis ipsum. Sed risus ipsum, iaculis a mollis vel,
-viverra in nisi. Suspendisse est tellus, aliquet et vulputate vel, iaculis
-egestas nulla.  Praesent sed tortor sed neque varius consequat. Quisque
-interdum facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis
-nisi id molestie. Aenean rutrum elementum mauris, vitae venenatis tellus semper
-et. Proin eu nisl ligula. Maecenas dui mi, varius eget adipiscing quis, commodo
-et libero.""")
+		io.msg("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam varius massa enim, id fermentum erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et enim ut nibh rutrum suscipit. Aenean a lacus eget justo dignissim tempus. Nunc venenatis congue erat vel adipiscing. Nam nulla felis, accumsan eu sagittis aliquet, fermentum at tortor. Suspendisse tortor risus, dapibus quis porta vel, mattis sit amet libero. Morbi vel metus eget metus ultricies ultrices placerat ac sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Nulla urna erat, lacinia vitae pellentesque et, accumsan eget ante. Sed commodo molestie ipsum, a mattis sapien malesuada at. Integer et lorem magna. Sed nec erat orci. Donec id elementum elit. In hac habitasse platea dictumst. Duis id nisi ut felis convallis blandit id sit amet magna. Nam feugiat erat eget velit ullamcorper varius. Nunc tellus massa, fermentum eu aliquet non, fermentum a quam.  Pellentesque turpis erat, aliquam at feugiat in, congue nec urna. Nulla ut turpis dapibus metus blandit faucibus.  Suspendisse potenti. Proin facilisis massa vitae purus dignissim quis dapibus eros gravida. Vivamus ac sapien ante, ut euismod nunc. Pellentesque faucibus neque at tortor malesuada eu commodo nisl vehicula. Vivamus eu odio ut est egestas luctus. Duis orci magna, tincidunt id suscipit id, consectetur sodales nisl. Etiam justo lorem, molestie sit amet rutrum eget, consequat mattis magna.  Fusce eros est, tincidunt id consequat id, scelerisque ac sapien.  Donec lacus leo, adipiscing et vulputate in, pulvinar vitae sem. Suspendisse sem augue, adipiscing vitae tempor sit amet, egestas a neque. Donec nibh mauris, rutrum vitae dictum in, adipiscing in magna. Duis fringilla sem vel nisl tempus dignissim. Fusce vel felis ipsum. Sed risus ipsum, iaculis a mollis vel, viverra in nisi. Suspendisse est tellus, aliquet et vulputate vel, iaculis egestas nulla.  Praesent sed tortor sed neque varius consequat. Quisque interdum facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis nisi id molestie. Aenean rutrum elementum mauris, vitae venenatis tellus semper et. Proin eu nisl ligula. Maecenas dui mi, varius eget adipiscing quis, commodo et libero.")
 
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
-
-def redraw_view(game, level, creature):
-	game.redraw()
-
-def enter(game, level, creature, passage):
-	coord = game.player.coord
-	if level.is_exit(coord) and level.get_exit(coord) == passage:
-		try:
-			game.enter_passage(level.world_loc, level.get_exit(coord))
-		except GAME.PyrlException:
-			io.msg("This passage doesn't seem to lead anywhere.")
-	else:
-		try:
-			new_coord = level.get_passage_coord(passage)
-		except KeyError:
-			io.msg("This level doesn't seem to have a corresponding passage.")
-		else:
-			if not level.is_passable(new_coord):
-				level.remove_creature(level.get_creature(new_coord))
-			level.move_creature(game.player, new_coord)
-	return True
