@@ -24,6 +24,7 @@ LEVELS_PER_DUNGEON = 100
 
 GAME_NAME = "pyrl"
 DATA_FOLDER = "data"
+SAVE_FILE_COMPRESSION_LEVEL = 6 # valid i€[1,9]
 
 ENCODING = "utf-8"
 
