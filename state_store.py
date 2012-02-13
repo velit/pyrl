@@ -26,5 +26,5 @@ def save(obj, save_name):
 	save_size = os.path.getsize(save_path)
 	uncompressed = len(state_string)
 
-	msg_str = "Savegame file size: {}B uncompressed and {}B compressed with a {:.2%} ratio"
+	msg_str = "Savegame file size: {:,} bytes uncompressed and {:,} bytes compressed with a {:.2%} ratio"
 	return msg_str.format(uncompressed, save_size, uncompressed/save_size)
