@@ -10,7 +10,8 @@ TCOD_IGNORE_KEYS = set()
 def init():
 	libtcod.console_set_custom_font("terminal10x18_gs_ro.png",
 			libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
-	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME, False)
+	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME,
+			False, libtcod.RENDERER_SDL)
 	c = TCOD_COLOR
 	k = TCOD_KEYS
 	i = TCOD_IGNORE_KEYS
