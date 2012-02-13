@@ -11,11 +11,18 @@ def load(save_name):
 	return pickle.loads(zlib.decompress(state_string))
 
 def save(obj, save_name):
-	state_string = pickle.dumps(obj)
-	compressed_state = zlib.compress(state_string, 6)
+	if not os.path.exists(GAME.DATA_FOLDER):
+		os.mkdir(GAME.DATA_FOLDER)
+
 	save_path = os.path.join(GAME.DATA_FOLDER, save_name)
-	with open(save_path, "wb") as f:
-		f.write(compressed_state)
+	state_string = pickle.dumps(obj)
+	compressed_state = zlib.compress(state_string, GAME.SAVE_FILE_COMPRESSION_LEVEL)
+	try:
+		with open(save_path, "wb") as f:
+			f.write(compressed_state)
+	except IOError as e:
+		return str(e)
+
 	save_size = os.path.getsize(save_path)
 	uncompressed = len(state_string)
 
