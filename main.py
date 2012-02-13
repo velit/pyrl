@@ -1,10 +1,6 @@
-from __future__ import with_statement
-import pickle
-import os
 import const.game as GAME
-
-from io import open
 import input_output
+import state_store
 
 def curses_inited_main(w, options):
 	import wrapper_curses
@@ -25,7 +21,7 @@ def tcod_main(options):
 	start(options)
 
 def start(options):
-	from input_output import io
+	io = input_output.io
 	if io.rows < GAME.MIN_SCREEN_ROWS or io.cols < GAME.MIN_SCREEN_COLS:
 		message = "Current screen size {}x{} is too small. Needs to be at least {}x{}"
 		io.notify(message.format(io.cols, io.rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS))
@@ -44,5 +40,4 @@ def start(options):
 		game.play()
 
 def load(name):
-	with open(os.path.join("data", name), "rb") as f:
-		return pickle.load(f)
+	return state_store.load(name)
