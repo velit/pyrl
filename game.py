@@ -1,10 +1,7 @@
-from __future__ import with_statement
-import os
-import pickle
-
 import ai
 import const.game as GAME
 import const.creature_actions as CC
+import state_store
 
 from input_output import io
 from player import Player
@@ -15,7 +12,6 @@ from world_file import WorldFile
 from debug_flags import Flags
 from combat import get_melee_attack, get_combat_message
 from itertools import imap
-from io import open
 
 
 class Game(object):
@@ -161,20 +157,11 @@ class Game(object):
 		if io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
 			exit()
 
-	def _save(self):
-		folder_path = os.path.join("data")
-		save_path = os.path.join("data", "pyrl.svg")
-		if not os.path.exists(folder_path):
-			os.mkdir("data")
-		with open(save_path, "wb") as f:
-			pickle.dump(self, f)
-		io.msg("Savegame file size: {} bytes".format(os.path.getsize(save_path)))
-
 	def savegame(self, ask=False):
-		if not ask:
-			self._save()
-		elif io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
-			self._save()
+		if not ask or io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
+			io.msg("Saving...")
+			io.refresh()
+			io.msg(state_store.save(self, "pyrl.svg"))
 
 	def draw(self):
 		level, creature = self.cur_level, self.player

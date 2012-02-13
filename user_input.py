@@ -115,7 +115,7 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.ask("Specify attack direction:", GAME.DEFAULT | set(direction_map.iterkeys()))
+	c = io.ask("Specify attack direction:", KEY.GROUP_DEFAULT | set(direction_map.iterkeys()))
 	if c in direction_map:
 		game.creature_attack(level, creature, direction_map[c])
 		return True
