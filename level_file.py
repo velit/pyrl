@@ -11,6 +11,7 @@ class LevelFile(object):
 		self.passage_locations = {}
 		self.monster_files = []
 		self.tilefile = None
+		self.static = False
 		self.tile_dict = {}
 
 	def get_tile_id(self, y, x):
@@ -36,4 +37,4 @@ class LevelFile(object):
 		return y * self.cols + x
 
 	def use_map_generator(self):
-		return self.tilefile is None
+		return not self.static

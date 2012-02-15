@@ -10,10 +10,11 @@ from const.tiles import STAIRS_DOWN as DS
 
 
 def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
-	_init_tilemap(level_file)
-
 	if level_type == LEVEL_TYPE.DUNGEON:
-		_make_initial_room(level_file)
+		if level_file.tilefile is None:
+			_init_tilemap(level_file)
+			_make_initial_room(level_file)
+
 		for x in xrange(2000):
 			if rand() < 0.50:
 				_attempt_corridor(level_file)
