@@ -142,7 +142,7 @@ def enter(game, level, creature, passage):
 	return True
 
 def debug(game, level, creature):
-	c = io.getch_print("Avail cmds: vclbdhkp")
+	c = io.getch_print("Avail cmds: vclbdhkpor")
 	if c == 'v':
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
@@ -156,8 +156,16 @@ def debug(game, level, creature):
 	elif c == 'b':
 		io.draw_block((4,4))
 	elif c == 'd':
-		DEBUG.PATH = not DEBUG.PATH
-		io.msg("Path debug set to {}".format(DEBUG.PATH))
+		if not DEBUG.PATH:
+			DEBUG.PATH = True
+			io.msg("Path debug set")
+		elif not DEBUG.PATH_STEP:
+			DEBUG.PATH_STEP = True
+			io.msg("Path debug and stepping set")
+		else:
+			DEBUG.PATH = False
+			DEBUG.PATH_STEP = False
+			io.msg("Path debug unset")
 	elif c == 'h':
 		game.flags.reverse = not game.flags.reverse
 		game.redraw()
@@ -168,6 +176,9 @@ def debug(game, level, creature):
 		for i in creature_list:
 			level.remove_creature(i)
 		io.msg("Abrakadabra.")
+	elif c == 'o':
+		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
+		io.draw_path(level.path(creature.coord, passage_down))
 	elif c == 'p':
 		passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
