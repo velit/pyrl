@@ -1,3 +1,4 @@
+import const.debug as DEBUG
 import const.game as GAME
 import const.keys as KEY
 import const.colors as COLOR
@@ -73,4 +74,5 @@ class Front(object):
 	def draw_path(self, iterator):
 		for x in iterator:
 			self.draw_block(x, COLOR.GREEN)
-		self.getch()
+			if DEBUG.PATH_STEP: self.getch()
+		if not DEBUG.PATH_STEP: self.getch()
