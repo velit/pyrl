@@ -64,6 +64,12 @@ def draw(handle, char_payload_sequence):
 	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
 		f(handle, x, y, symbol, COLOR_LOOKUP[fg], COLOR_LOOKUP[bg])
 
+def draw_reverse(handle, char_payload_sequence):
+	f = libtcod.console_put_char_ex
+	COLOR_LOOKUP = TCOD_COLOR
+	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+		f(handle, x, y, symbol, COLOR_LOOKUP[bg], COLOR_LOOKUP[fg])
+
 def getch(handle=None):
 	while True:
 		key = libtcod.console_wait_for_keypress(False)

@@ -60,11 +60,10 @@ def addch(window, y, x, char):
 	try:
 		window.addch(y, x, symbol, CURSES_COLOR[color])
 	except curses.error:
-		if y!= maxY or x != maxX:
+		if y != maxY - 1 or x != maxX - 1:
 			raise
-
-		# Writing to the last cell of a window raises an exception because
-		# the automatic cursor move to the next cell is illegal.
+	# Writing to the last cell of a window raises an exception because
+	# the automatic cursor move to the next cell is illegal.
 
 def addstr(window, y, x, string, color=None):
 	if color is not None:
@@ -80,7 +79,18 @@ def draw(window, char_payload_sequence):
 		try:
 			f(y, x, symbol, COLOR_LOOKUP[color])
 		except curses.error:
-			if y != maxY or x != maxX:
+			if y != maxY - 1 or x != maxX - 1:
+				raise
+
+def draw_reverse(window, char_payload_sequence):
+	maxY, maxX = window.getmaxyx()
+	f = window.addch
+	COLOR_LOOKUP = CURSES_COLOR
+	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+		try:
+			f(y, x, symbol, COLOR_LOOKUP[bg, fg])
+		except curses.error:
+			if y != maxY - 1 or x != maxX - 1:
 				raise
 
 def getch(window):

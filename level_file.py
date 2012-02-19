@@ -1,6 +1,15 @@
 import const.game as GAME
+import const.tiles as TILE
 
-from tiles import gettile
+
+def gettile(handle, tile_dict=None):
+	if tile_dict is not None and handle in tile_dict:
+		return tile_dict[handle]
+	elif handle in TILE.tiles:
+		return TILE.tiles[handle]
+	else:
+		raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))
+
 
 class LevelFile(object):
 
