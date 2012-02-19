@@ -2,54 +2,54 @@ import const.keys as KEY
 import const.colors as COLOR
 import curses
 
-CURSES_COLOR = {}
-CURSES_KEYS = {}
+CURSES_KEYS = {
+	curses.KEY_LEFT: KEY.LEFT,
+	curses.KEY_RIGHT: KEY.RIGHT,
+	curses.KEY_UP: KEY.UP,
+	curses.KEY_DOWN: KEY.DOWN,
+}
+
+CURSES_ATTR = {
+	COLOR.BASE_BLACK: curses.COLOR_BLACK,
+	COLOR.BASE_RED: curses.COLOR_RED,
+	COLOR.BASE_GREEN: curses.COLOR_GREEN,
+	COLOR.BASE_BROWN: curses.COLOR_YELLOW,
+	COLOR.BASE_BLUE: curses.COLOR_BLUE,
+	COLOR.BASE_PURPLE: curses.COLOR_MAGENTA,
+	COLOR.BASE_CYAN: curses.COLOR_CYAN,
+	COLOR.BASE_GREY: curses.COLOR_WHITE,
+
+	COLOR.BASE_DARK: curses.COLOR_BLACK + 8,
+	COLOR.BASE_LIGHT_RED: curses.COLOR_RED + 8,
+	COLOR.BASE_LIGHT_GREEN: curses.COLOR_GREEN + 8,
+	COLOR.BASE_YELLOW: curses.COLOR_YELLOW + 8,
+	COLOR.BASE_LIGHT_BLUE: curses.COLOR_BLUE + 8,
+	COLOR.BASE_LIGHT_PURPLE: curses.COLOR_MAGENTA + 8,
+	COLOR.BASE_LIGHT_CYAN: curses.COLOR_CYAN + 8,
+	COLOR.BASE_WHITE: curses.COLOR_WHITE + 8,
+}
+
+class CursesColorDict(dict):
+	def __init__(self):
+		dict.__init__(self)
+		self.pair_nr = 0
+
+	def __getitem__(self, key):
+		try:
+			return dict.__getitem__(self, key)
+		except KeyError:
+			fg, bg = key
+			self.pair_nr += 1
+			curses.init_pair(self.pair_nr, CURSES_ATTR[fg], CURSES_ATTR[bg])
+			color_pair = curses.color_pair(self.pair_nr)
+			self[key] = color_pair
+			return color_pair
+
+CURSES_COLOR = CursesColorDict()
+
 
 def init():
 	curses.curs_set(0)
-
-	c = CURSES_COLOR
-	k = CURSES_KEYS
-	for x in xrange(7):
-		curses.init_pair(x + 1, x, 0)
-
-	c[COLOR.GRAY] = curses.color_pair(0)
-	c[COLOR.BLACK_ON_BLACK] = curses.color_pair(1)
-	c[COLOR.RED] = curses.color_pair(2)
-	c[COLOR.GREEN] = curses.color_pair(3)
-	c[COLOR.BROWN] = curses.color_pair(4)
-	c[COLOR.BLUE] = curses.color_pair(5)
-	c[COLOR.PURPLE] = curses.color_pair(6)
-	c[COLOR.CYAN] = curses.color_pair(7)
-
-	c[COLOR.WHITE] = curses.color_pair(0) | curses.A_BOLD
-	c[COLOR.BLACK] = curses.color_pair(1) | curses.A_BOLD
-	c[COLOR.LIGHT_RED] = curses.color_pair(2) | curses.A_BOLD
-	c[COLOR.LIGHT_GREEN] = curses.color_pair(3) | curses.A_BOLD
-	c[COLOR.YELLOW] = curses.color_pair(4) | curses.A_BOLD
-	c[COLOR.LIGHT_BLUE] = curses.color_pair(5) | curses.A_BOLD
-	c[COLOR.LIGHT_PURPLE] = curses.color_pair(6) | curses.A_BOLD
-	c[COLOR.LIGHT_CYAN] = curses.color_pair(7) | curses.A_BOLD
-
-	c[COLOR.NORMAL] = curses.A_NORMAL
-
-	_temp = {}
-	for key, value in c.iteritems():
-		_temp[key + COLOR.MAKE_REVERSE] = value | curses.A_REVERSE
-	c.update(_temp)
-
-	c[COLOR.BLINK] = curses.A_BLINK
-	c[COLOR.BOLD] = curses.A_BOLD
-	c[COLOR.DIM] = curses.A_DIM
-	c[COLOR.REVERSE] = curses.A_REVERSE
-	c[COLOR.STANDOUT] = curses.A_STANDOUT
-	c[COLOR.UNDERLINE] = curses.A_UNDERLINE
-
-	k[curses.KEY_LEFT] = KEY.LEFT
-	k[curses.KEY_RIGHT] = KEY.RIGHT 
-	k[curses.KEY_UP] = KEY.UP
-	k[curses.KEY_DOWN] = KEY.DOWN
-
 
 def init_handle(window):
 	window.keypad(True)

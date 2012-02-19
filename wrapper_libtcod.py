@@ -3,67 +3,54 @@ import const.colors as COLOR
 import const.game as GAME
 import libtcodpy as libtcod
 
-TCOD_COLOR = {}
-TCOD_KEYS = {}
-TCOD_IGNORE_KEYS = set()
+TCOD_COLOR = {
+	COLOR.BASE_BLACK: libtcod.black,
+	COLOR.BASE_RED: libtcod.red,
+	COLOR.BASE_GREEN: libtcod.green,
+	COLOR.BASE_BROWN: libtcod.Color(150, 75, 0),
+	COLOR.BASE_BLUE: libtcod.blue,
+	COLOR.BASE_PURPLE: libtcod.purple,
+	COLOR.BASE_CYAN: libtcod.cyan,
+	COLOR.BASE_GREY: libtcod.light_gray,
+
+	COLOR.BASE_DARK: libtcod.darkest_grey,
+	COLOR.BASE_LIGHT_RED: libtcod.light_red,
+	COLOR.BASE_LIGHT_GREEN: libtcod.light_green,
+	COLOR.BASE_YELLOW: libtcod.yellow,
+	COLOR.BASE_LIGHT_BLUE: libtcod.light_blue,
+	COLOR.BASE_LIGHT_PURPLE: libtcod.light_purple,
+	COLOR.BASE_LIGHT_CYAN: libtcod.light_cyan,
+	COLOR.BASE_WHITE: libtcod.white,
+
+	COLOR.NORMAL: libtcod.white,
+}
+
+TCOD_KEYS = {
+	libtcod.KEY_LEFT: KEY.LEFT,
+	libtcod.KEY_RIGHT: KEY.RIGHT,
+	libtcod.KEY_UP: KEY.UP,
+	libtcod.KEY_DOWN: KEY.DOWN,
+}
+
+TCOD_IGNORE_KEYS = set([
+	libtcod.KEY_SHIFT,
+	libtcod.KEY_CONTROL,
+	libtcod.KEY_ALT,
+])
 
 def init():
 	libtcod.console_set_custom_font("terminal10x18_gs_ro.png",
 			libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
 	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME,
 			False, libtcod.RENDERER_SDL)
-	c = TCOD_COLOR
-	k = TCOD_KEYS
-	i = TCOD_IGNORE_KEYS
-
-	c[COLOR.GRAY] = libtcod.light_gray
-	c[COLOR.BLACK_ON_BLACK] = libtcod.black
-	c[COLOR.RED] = libtcod.red
-	c[COLOR.GREEN] = libtcod.green
-	c[COLOR.BROWN] = libtcod.Color(150, 75, 0)
-	c[COLOR.BLUE] = libtcod.blue
-	c[COLOR.PURPLE] = libtcod.purple
-	c[COLOR.CYAN] = libtcod.cyan
-
-	c[COLOR.WHITE] = libtcod.white
-	c[COLOR.BLACK] = libtcod.darkest_grey
-	c[COLOR.LIGHT_RED] = libtcod.light_red
-	c[COLOR.LIGHT_GREEN] = libtcod.light_green
-	c[COLOR.YELLOW] = libtcod.yellow
-	c[COLOR.LIGHT_BLUE] = libtcod.light_blue
-	c[COLOR.LIGHT_PURPLE] = libtcod.light_purple
-	c[COLOR.LIGHT_CYAN] = libtcod.light_cyan
-
-	c[COLOR.NORMAL] = libtcod.white
-
-	_temp = {}
-	for key, value in c.iteritems():
-		_temp[key + COLOR.MAKE_REVERSE] = value
-	c.update(_temp)
-
-	c[COLOR.BLINK] = libtcod.white
-	c[COLOR.BOLD] = libtcod.white
-	c[COLOR.DIM] = libtcod.white
-	c[COLOR.REVERSE] = libtcod.white
-	c[COLOR.STANDOUT] = libtcod.white
-	c[COLOR.UNDERLINE] = libtcod.white
-
-	k[libtcod.KEY_LEFT] = KEY.LEFT
-	k[libtcod.KEY_RIGHT] = KEY.RIGHT 
-	k[libtcod.KEY_UP] = KEY.UP
-	k[libtcod.KEY_DOWN] = KEY.DOWN
-
-	i.add(libtcod.KEY_SHIFT)
-	i.add(libtcod.KEY_CONTROL)
-	i.add(libtcod.KEY_ALT)
 
 def init_handle(handle):
 	libtcod.console_set_default_background(handle, libtcod.black)
 	libtcod.console_set_default_foreground(handle, libtcod.white)
 
 def addch(handle, y, x, char):
-	symbol, color = char
-	libtcod.console_put_char_ex(handle, x, y, symbol, TCOD_COLOR[color], libtcod.black)
+	symbol, (fg, bg) = char
+	libtcod.console_put_char_ex(handle, x, y, symbol, TCOD_COLOR[fg], TCOD_COLOR[bg])
 
 def addstr(handle, y, x, string, color=None):
 	if color is None:

@@ -106,12 +106,12 @@ class Level(object):
 				yield y, x
 
 	def get_visible_data(self, location_set):
-		for coord in location_set:
-			yield coord, self._get_visible_char(coord)
+		for (y, x) in location_set:
+			yield y, x, self._get_visible_char((y, x))
 
 	def get_memory_data(self, location_set):
-		for coord in location_set:
-			yield coord, self.tiles[coord].memory_char
+		for (y, x) in location_set:
+			yield y, x, self.tiles[y, x].memory_char
 
 	def get_passage_coord(self, passage):
 		if passage == GAME.PASSAGE_RANDOM:
