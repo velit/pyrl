@@ -1,7 +1,7 @@
 from const.tiles import ROCK as R
 import const.game as GAME
 import const.colors as COLOR
-from const.maps import first as MAP, translator
+from const.maps import first as MAP
 
 from char import Char
 from level_file import LevelFile
@@ -20,11 +20,10 @@ class WorldFile(object):
 			self.add_level_file(GAME.DUNGEON)
 		d0 = self.get_level_file((GAME.DUNGEON, 0))
 		d0.add_monster_file(MonsterFile("The Crone", Char('@', COLOR.PURPLE)))
-		self.tilefile = [R for x in xrange(self.rows * self.cols)]
+		d0.tilefile = [R for x in xrange(d0.rows * d0.cols)]
 		for y, line in enumerate(MAP):
-			for x, char in line:
-				self.tilefile[y * self.cols + x] = char
-
+			for x, char in enumerate(line):
+				d0.tilefile[y * d0.cols + x] = char
 
 		for m in monster_files:
 			self.add_monster_file(m)
