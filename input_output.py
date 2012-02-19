@@ -56,11 +56,17 @@ class Front(object):
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
 
-	def draw(self, *a, **k):
-		self.l.draw(*a, **k)
+	def draw(self, character_data_sequence, reverse=False):
+		if not reverse:
+			self.l.draw(character_data_sequence)
+		else:
+			self.l.draw_reverse(character_data_sequence)
 
-	def draw_char(self, *a, **k):
-		self.l.draw_char(*a, **k)
+	def draw_char(self, coord, char):
+		self.l.draw_char(coord, char)
+
+	def draw_reverse_char(self, coord, char):
+		self.l.draw_reverse_char(coord, char)
 
 	def drawline(self, *a, **k):
 		self.l.draw_line(*a, **k)
