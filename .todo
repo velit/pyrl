@@ -135,6 +135,9 @@
     <note priority="veryhigh" time="1315707472">
         make an inventory
     </note>
+    <note priority="veryhigh" time="1329664393">
+        Fix map coordinate boundaries (add checks and shit)
+    </note>
     <note priority="high" time="1329073265">
         Make a walk mode
     </note>
@@ -144,20 +147,26 @@
     <note priority="high" time="1329170052">
         Make tcod version exit when you close the window
     </note>
-    <note priority="medium" time="1315155859">
-        do edge leaving and entering in levels
+    <note priority="high" time="1329647500">
+        Make a getstring method
     </note>
     <note priority="medium" time="1315155877">
         redo WorldFile.get_level_monster_list
     </note>
-    <note priority="medium" time="1315862158">
-        make move_random better
+    <note priority="medium" time="1329647460">
+        Make an interactive debug mode
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus
     </note>
+    <note priority="low" time="1315155859">
+        do edge leaving and entering in levels
+    </note>
     <note priority="low" time="1315691945">
         make tiles.py as json loaded
+    </note>
+    <note priority="low" time="1315862158">
+        make move_random better
     </note>
     <note priority="verylow" time="1315156331">
         do precise angle shadowcasting from roguebasin, they have examples

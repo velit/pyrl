@@ -6,7 +6,7 @@ class Tile(object):
 	"""The actual floor of a square."""
 
 	def __init__(self, name="floor", visible=Char(), mem=Char(), is_passable=True,
-				is_see_through=True, movement_cost=GAME.MOVEMENT_COST, exit_point=None):
+				is_see_through=True, exit_point=None, movement_cost=GAME.MOVEMENT_COST):
 		self.name = name
 		self.visible_char = visible
 		self.memory_char = mem
