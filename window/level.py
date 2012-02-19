@@ -10,14 +10,6 @@ class LevelWindow(PyrlWindow):
 	def __init__(self, *a, **k):
 		PyrlWindow.__init__(self, *a, **k)
 
-	def draw(self, char_payload_sequence):
-		for payload in char_payload_sequence:
-			self.addch(*payload)
-
-	def draw_reverse(self, char_payload_sequence):
-		for y, x, (symbol, color) in char_payload_sequence:
-			self.addch(y, x, (symbol, color[::-1]))
-
 	def draw_char(self, coord, char):
 		y, x = coord
 		self.addch(y, x, char)

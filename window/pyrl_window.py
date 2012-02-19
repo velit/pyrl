@@ -7,12 +7,19 @@ class PyrlWindow(object):
 		self.cursor_lib.init_handle(self.h)
 		self.blit_args = blit_args
 
-	# Proxy functions
 	def addch(self, y, x, char):
 		self.cursor_lib.addch(self.h, y, x, char)
 
 	def addstr(self, y, x, string, color=None):
 		self.cursor_lib.addstr(self.h, y, x, string, color)
+
+	def draw(self, char_payload_sequence):
+		self.cursor_lib.draw(self.h, char_payload_sequence)
+
+	def draw_reverse(self, char_payload_sequence):
+		self.cursor_lib.draw_reverse(self.h, char_payload_sequence)
+		for y, x, (symbol, color) in char_payload_sequence:
+			self.addch(y, x, (symbol, color[::-1]))
 
 	def clear(self):
 		self.cursor_lib.clear(self.h)

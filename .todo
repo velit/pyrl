@@ -141,8 +141,11 @@
     <note priority="high" time="1329073265">
         Make a walk mode
     </note>
-    <note priority="high" time="1329077436">
+    <note priority="high" time="1329077436" done="1329680964">
         Add more robust color representation
+        <comment>
+            Donesies
+        </comment>
     </note>
     <note priority="high" time="1329170052">
         Make tcod version exit when you close the window

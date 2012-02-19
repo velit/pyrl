@@ -21,6 +21,7 @@ def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
 			else:
 				_attempt_room(level_file)
 	elif level_type == LEVEL_TYPE.ARENA:
+		_init_tilemap(level_file)
 		_make_room(level_file, 0, 0, level_file.rows, level_file.cols)
 
 	add_staircase_up(level_file)

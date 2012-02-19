@@ -57,20 +57,31 @@ def init_handle(window):
 def addch(window, y, x, char):
 	symbol, color = char
 	maxY, maxX = window.getmaxyx()
-	if y != maxY - 1 or x != maxX - 1:
+	try:
 		window.addch(y, x, symbol, CURSES_COLOR[color])
-	else:
-		window.insch(y, x, symbol, CURSES_COLOR[color])
+	except curses.error:
+		if y!= maxY or x != maxX:
+			raise
 
 		# Writing to the last cell of a window raises an exception because
-		# the automatic cursor move to the next cell is illegal. insch avoids
-		# this but it can only be used on the last cell because it moves the line
+		# the automatic cursor move to the next cell is illegal.
 
 def addstr(window, y, x, string, color=None):
 	if color is not None:
 		window.addstr(y, x, string, CURSES_COLOR[color])
 	else:
 		window.addstr(y, x, string)
+
+def draw(window, char_payload_sequence):
+	maxY, maxX = window.getmaxyx()
+	f = window.addch
+	COLOR_LOOKUP = CURSES_COLOR
+	for y, x, (symbol, color) in char_payload_sequence:
+		try:
+			f(y, x, symbol, COLOR_LOOKUP[color])
+		except curses.error:
+			if y != maxY or x != maxX:
+				raise
 
 def getch(window):
 	ch = window.getch()
