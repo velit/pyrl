@@ -58,6 +58,12 @@ def addstr(handle, y, x, string, color=None):
 	else:
 		raise NotImplemented("Not yet implemented")
 
+def draw(handle, char_payload_sequence):
+	f = libtcod.console_put_char_ex
+	COLOR_LOOKUP = TCOD_COLOR
+	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+		f(handle, x, y, symbol, COLOR_LOOKUP[fg], COLOR_LOOKUP[bg])
+
 def getch(handle=None):
 	while True:
 		key = libtcod.console_wait_for_keypress(False)
