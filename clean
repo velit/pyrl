@@ -1,14 +1,18 @@
 #!/bin/sh
 
 rm    *.pyc
+rm    .*.swp
 rm    __pycache__/*.pyc
 rmdir __pycache__/
 
 rm    const/*.pyc
+rm    const/.*.swp
 rm    const/__pycache__/*.pyc
 rmdir const/__pycache__/
 
+
 rm    window/*.pyc
+rm    window/.*.swp
 rm    window/__pycache__/*.pyc
 rmdir window/__pycache__/
 

@@ -13,7 +13,7 @@ def gettile(handle, tile_dict=None):
 
 class LevelFile(object):
 
-	def __init__(self, danger_level=0, rows=GAME.LEVEL_ROWS, cols=GAME.LEVEL_COLS):
+	def __init__(self, danger_level=0, rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
 		self.rows = rows
 		self.cols = cols
 		self.danger_level = danger_level
