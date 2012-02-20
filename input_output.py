@@ -11,16 +11,18 @@ from window.level import LevelWindow
 
 class Front(object):
 
-	def __init__(self, cursor_lib, root_window, msg_bar_size=GAME.MSG_BAR_SIZE, status_bar_size=GAME.STATUS_BAR_SIZE):
+	def __init__(self, cursor_lib, root_window):
+
 		self.a = PyrlWindow(cursor_lib, root_window)
 		self.rows, self.cols = self.a.get_dimensions()
 
-		self.level_rows = self.rows - msg_bar_size - status_bar_size
-		self.level_cols = self.cols
-
-		self.m = self.a.SubWindow(MessageBar, msg_bar_size, self.cols, 0, 0)
-		self.l = self.a.SubWindow(LevelWindow, self.level_rows, self.cols, msg_bar_size, 0)
-		self.s = self.a.SubWindow(StatusBar, status_bar_size, self.cols, status_bar_size + self.level_rows, 0)
+		self.m = self.a.SubWindow(MessageBar,
+				GAME.MSG_BAR_HEIGHT, GAME.LEVEL_WIDTH, 0, 0)
+		self.l = self.a.SubWindow(LevelWindow,
+				GAME.LEVEL_HEIGHT, GAME.LEVEL_WIDTH, GAME.MSG_BAR_HEIGHT, 0)
+		self.s = self.a.SubWindow(StatusBar,
+				GAME.STATUS_BAR_HEIGHT, GAME.LEVEL_WIDTH,
+				GAME.MSG_BAR_HEIGHT + GAME.LEVEL_HEIGHT, 0)
 
 	def getch(self):
 		self.refresh()
