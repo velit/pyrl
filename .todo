@@ -96,6 +96,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1329077436" done="1329680964">
+        Add more robust color representation
+        <comment>
+            Donesies
+        </comment>
+    </note>
     <note priority="high" time="1329118706" done="1329161315">
         Compress the saves with an external algorithm
         <comment>
@@ -132,6 +138,12 @@
             currently not even implemented
         </comment>
     </note>
+    <note priority="verylow" time="1315156331" done="1329944223">
+        do precise angle shadowcasting from roguebasin, they have examples
+        <comment>
+            Not gonna do, gonna do something else
+        </comment>
+    </note>
     <note priority="veryhigh" time="1315707472">
         make an inventory
     </note>
@@ -141,17 +153,14 @@
     <note priority="high" time="1329073265">
         Make a walk mode
     </note>
-    <note priority="high" time="1329077436" done="1329680964">
-        Add more robust color representation
-        <comment>
-            Donesies
-        </comment>
-    </note>
     <note priority="high" time="1329170052">
         Make tcod version exit when you close the window
     </note>
     <note priority="high" time="1329647500">
         Make a getstring method
+    </note>
+    <note priority="high" time="1329944242">
+        Profile some fov algorithms and pick one
     </note>
     <note priority="medium" time="1315155877">
         redo WorldFile.get_level_monster_list
@@ -170,8 +179,5 @@
     </note>
     <note priority="low" time="1315862158">
         make move_random better
-    </note>
-    <note priority="verylow" time="1315156331">
-        do precise angle shadowcasting from roguebasin, they have examples
     </note>
 </todo>

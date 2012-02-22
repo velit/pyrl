@@ -23,15 +23,18 @@ def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy,
 		return
 	radius_squared = r * r
 	for j in xrange(row, r + 1):
-		dx, dy = 0 - 1 - j, 0 - j
+		dx = -j - 1
+		dy = -j
 		blocked = False
 		while dx <= 0:
 			dx += 1
 			# Translate the dx, dy coordinates into map coordinates:
-			X, Y = cx + dx * xx + dy * xy, cy + dx * yx + dy * yy
+			X = cx + dx * xx + dy * xy
+			Y = cy + dx * yx + dy * yy
 			# l_slope and r_slope store the slopes of the left and right
 			# extremities of the square we're considering:
-			l_slope, r_slope = (dx - 0.5) / (dy + 0.5), (dx + 0.5) / (dy - 0.5)
+			l_slope = (dx - 0.5) / (dy + 0.5)
+			r_slope = (dx + 0.5) / (dy - 0.5)
 			if start < r_slope:
 				continue
 			elif end > l_slope:

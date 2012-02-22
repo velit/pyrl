@@ -2,7 +2,7 @@ from __future__ import division
 import random
 import path
 import rdg
-import const.directions as dirs
+import const.directions as DIRS
 import const.game as GAME
 import const.debug as DEBUG
 
@@ -56,10 +56,10 @@ class Level(object):
 		return cost
 
 	def _a_star_neighbors(self, coord):
-		for direction in dirs.ALL:
+		for direction in DIRS.ALL:
 			neighbor_coord = self.get_relative_coord(coord, direction)
 			if self.tiles[neighbor_coord].is_passable:
-				if direction in dirs.DIAGONAL:
+				if direction in DIRS.DIAGONAL:
 					yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
 				else:
 					yield neighbor_coord, self.tiles[coord].movement_cost
@@ -88,8 +88,7 @@ class Level(object):
 		self.add_creature(creature)
 
 	def legal_coord(self, coord, direction=(0,0)):
-		y, x = coord
-		return (0 <= (y + direction[0]) < self.tiles.rows) and (0 <= (x + direction[1]) < self.tiles.cols)
+		return (0 <= (coord[0] + direction[0]) < self.tiles.rows) and (0 <= (coord[1] + direction[1]) < self.tiles.cols)
 
 	def get_exit(self, coord):
 		return self.tiles[coord].exit_point
@@ -162,11 +161,11 @@ class Level(object):
 		return round(path.heuristic(coordA, coordB, GAME.MOVEMENT_COST, GAME.DIAGONAL_MODIFIER))
 
 	def movement_cost(self, direction, end_coord):
-		if direction in dirs.ORTHOGONAL:
+		if direction in DIRS.ORTHOGONAL:
 			value = self.tiles[end_coord].movement_cost
-		elif direction in dirs.DIAGONAL:
+		elif direction in DIRS.DIAGONAL:
 			value = round(self.tiles[end_coord].movement_cost * GAME.DIAGONAL_MODIFIER)
-		elif direction == dirs.STOP:
+		elif direction == DIRS.STOP:
 			value = GAME.MOVEMENT_COST
 		else:
 			raise GAME.PyrlException("Invalid direction: {}".format(direction))
@@ -230,13 +229,13 @@ class Level(object):
 			return True
 		else:
 			vector = get_vector(creature.coord, target_coord)
-			if vector in dirs.ALL:
+			if vector in DIRS.ALL:
 				return True
 			else:
 				return False
 
 	def creature_can_move(self, creature, direction):
-		if direction == dirs.STOP:
+		if direction == DIRS.STOP:
 			return True
 		elif self.legal_coord(creature.coord, direction):
 			coord = self.get_relative_coord(creature.coord, direction)
