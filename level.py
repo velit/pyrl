@@ -37,7 +37,7 @@ class Level(object):
 		self.world_loc = world_loc
 		self.danger_level = level_file.danger_level
 		self.passage_locations = level_file.passage_locations
-		if level_file.use_map_generator():
+		if not level_file.static:
 			rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
 		self.tiles = TileStructure(level_file)
 		self.creature_spawn_list = creature_spawn_list #TODO:

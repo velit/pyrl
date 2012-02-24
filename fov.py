@@ -13,8 +13,7 @@ def get_light_set(visibility_func, coord, sight):
 				_mult[0][oct], _mult[1][oct], _mult[2][oct], _mult[3][oct])
 	return light_set
 
-# Algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
-# Copyright 2001
+# Based on an algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
 
 def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy, yx, yy):
