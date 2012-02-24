@@ -1,12 +1,11 @@
 import const.game as GAME
 import const.generated_level_types as LEVEL_TYPE
+import const.tiles as TILE
 
 from random import randrange as rr, random as rand
 from const.tiles import WALL as W
 from const.tiles import ROCK as R
 from const.tiles import FLOOR as F
-from const.tiles import STAIRS_UP as US
-from const.tiles import STAIRS_DOWN as DS
 
 
 def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
@@ -24,8 +23,10 @@ def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
 		_init_tilemap(level_file)
 		_make_room(level_file, 0, 0, level_file.rows, level_file.cols)
 
-	add_staircase_up(level_file)
-	add_staircase_down(level_file)
+	if GAME.PASSAGE_UP not in level_file.passage_locations:
+		add_passageway(level_file, GAME.PASSAGE_UP, TILE.STAIRS_UP)
+	if GAME.PASSAGE_DOWN not in level_file.passage_locations:
+		add_passageway(level_file, GAME.PASSAGE_DOWN, TILE.STAIRS_DOWN)
 
 def get_free_coord(level_file):
 	while True:
@@ -36,7 +37,7 @@ def get_free_coord(level_file):
 def get_random_coord(level_file):
 	return rr(level_file.rows), rr(level_file.cols)
 
-def add_staircase_up(level_file):
+def add_passageway(level_file, passage, passage_tile_id):
 	while True:
 		y, x = get_free_coord(level_file)
 		g = level_file.get_tile_id
@@ -44,19 +45,8 @@ def add_staircase_up(level_file):
 				and g(y, x - 1) == F and g(y, x + 1) == F and g(y, x) == F:
 			break
 
-	level_file.set_tile_id(y, x, US)
-	level_file.passage_locations[GAME.PASSAGE_UP] = y, x
-
-def add_staircase_down(level_file):
-	while True:
-		y, x = get_free_coord(level_file)
-		g = level_file.get_tile_id
-		if g(y - 1, x) == F and g(y + 1, x) == F and \
-				g(y, x - 1) == F and g(y, x + 1) == F and g(y, x) == F:
-			break
-
-	level_file.set_tile_id(y, x, DS)
-	level_file.passage_locations[GAME.PASSAGE_DOWN] = y, x
+	level_file.set_tile_id(y, x, passage_tile_id)
+	level_file.passage_locations[passage] = y, x
 
 def _init_tilemap(level_file):
 	level_file.tilefile = [R for x in xrange(level_file.rows * level_file.cols)]

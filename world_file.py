@@ -1,7 +1,6 @@
-from const.tiles import ROCK as R
 import const.game as GAME
 import const.colors as COLOR
-from const.maps import first as MAP
+import const.maps as MAP
 
 from char import Char
 from level_file import LevelFile
@@ -16,14 +15,9 @@ class WorldFile(object):
 		self.global_monster_files = []
 
 		self.add_dungeon(GAME.DUNGEON)
-		for x in xrange(GAME.LEVELS_PER_DUNGEON):
-			self.add_level_file(GAME.DUNGEON)
-		d0 = self.get_level_file((GAME.DUNGEON, 0))
-		d0.add_monster_file(MonsterFile("The Crone", Char('@', COLOR.PURPLE)))
-		d0.tilefile = [R for x in xrange(d0.rows * d0.cols)]
-		for y, line in enumerate(MAP):
-			for x, char in enumerate(line):
-				d0.tilefile[y * d0.cols + x] = char
+		self.add_level(GAME.DUNGEON, MAP.L0)
+		for x in xrange(GAME.LEVELS_PER_DUNGEON - 1):
+			self.add_level(GAME.DUNGEON)
 
 		for m in monster_files:
 			self.add_monster_file(m)
@@ -32,12 +26,16 @@ class WorldFile(object):
 		self.global_monster_files.append(monster_file)
 
 	def add_dungeon(self, dungeon_key):
-		self.dungeon_lengths[dungeon_key] = 0
+		self.dungeon_lengths[dungeon_key] = 1
 
-	def add_level_file(self, dungeon_key):
+	def add_level(self, dungeon_key, level_file=None):
 		level_i = self.dungeon_lengths[dungeon_key]
-		self.level_files[dungeon_key, level_i] = LevelFile(level_i)
-		self.level_passageways[dungeon_key, level_i] = {GAME.PASSAGE_UP: GAME.UP, GAME.PASSAGE_DOWN: GAME.DOWN}
+		if level_file is None:
+			self.level_files[dungeon_key, level_i] = LevelFile(level_i)
+		else:
+			self.level_files[dungeon_key, level_i] = level_file
+		self.level_passageways[dungeon_key, level_i] = {GAME.PASSAGE_UP: GAME.UP,
+				GAME.PASSAGE_DOWN: GAME.DOWN}
 		self.dungeon_lengths[dungeon_key] += 1
 
 	def get_level_file(self, world_loc):

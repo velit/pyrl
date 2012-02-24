@@ -13,14 +13,15 @@ def gettile(handle, tile_dict=None):
 
 class LevelFile(object):
 
-	def __init__(self, danger_level=0, rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
+	def __init__(self, danger_level=0, static=False, tilefile=None,
+				rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
+		self.danger_level = danger_level
+		self.tilefile = tilefile
+		self.static = static
 		self.rows = rows
 		self.cols = cols
-		self.danger_level = danger_level
 		self.passage_locations = {}
 		self.monster_files = []
-		self.tilefile = None
-		self.static = False
 		self.tile_dict = {}
 
 	def get_tile_id(self, y, x):
@@ -44,6 +45,3 @@ class LevelFile(object):
 
 	def getloc(self, y, x):
 		return y * self.cols + x
-
-	def use_map_generator(self):
-		return not self.static

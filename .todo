@@ -150,6 +150,9 @@
     <note priority="veryhigh" time="1329664393">
         Fix map coordinate boundaries (add checks and shit)
     </note>
+    <note priority="veryhigh" time="1330120000">
+        Make rdg work with plain walls and add dungeon rock after rdg
+    </note>
     <note priority="high" time="1329073265">
         Make a walk mode
     </note>
