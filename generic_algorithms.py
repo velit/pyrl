@@ -2,7 +2,26 @@ from __future__ import division
 import fractions
 
 
-def bresenham(coord_a, coord_b, includelast=True):
+def bresenham(coord_a, coord_b):
+	(ay, ax), (by, bx) = coord_a, coord_b
+	dx = abs(bx - ax)
+	dy = abs(by - ay)
+	sx = 1 if ax < bx else -1
+	sy = 1 if ay < by else -1
+	err = dx - dy
+	while True:
+		yield ay, ax
+		if ax == bx and ay == by:
+			break
+		e2 = 2 * err
+		if e2 > -dy:
+			err = err - dy
+			ax = ax + sx
+		if e2 < dx:
+			err = err + dx
+			ay = ay + sy
+
+def bresenham_old(coord_a, coord_b, includelast=True):
 	(ay, ax), (by, bx) = coord_a, coord_b
 	steep = abs(bx - ax) > abs(by - ay)
 	if steep:

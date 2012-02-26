@@ -47,6 +47,8 @@ class UserInput(object):
 			'Z': ("z_command", no_args, no_kwds),
 			'a': ("attack", no_args, no_kwds),
 			'd': ("debug", no_args, no_kwds),
+			'+': ("sight_change", (1, ), no_kwds),
+			'-': ("sight_change", (-1, ), no_kwds),
 			'\x12': ("redraw_view", no_args, no_kwds),
 		}
 		for key, value in direction_map.items():
@@ -90,9 +92,12 @@ def look(game, level, creature):
 		io.msg(level.look_information(coord))
 		if drawline_flag:
 			io.drawline(creature.coord, coord, Char("*", COLOR.YELLOW))
+			io.drawline(coord, creature.coord, Char("*", COLOR.YELLOW))
 			io.msg("LoS: {}".format(level.check_los(creature.coord, coord)))
 		if coord != creature.coord:
-			io.draw_reverse_char(coord, level._get_visible_char(coord))
+			char = level._get_visible_char(coord)
+			char = char[0], (COLOR.BASE_BLACK, COLOR.BASE_GREEN)
+			io.draw_char(coord, char)
 			io.draw_reverse_char(creature.coord, level._get_visible_char(creature.coord))
 		c = io.getch()
 		game.redraw()
@@ -144,8 +149,13 @@ def enter(game, level, creature, passage):
 			level.move_creature(game.player, new_coord)
 	return True
 
+def sight_change(game, level, creature, amount):
+	from const.slots import BODY
+	from const.stats import SIGHT
+	creature.slots[BODY].stats[SIGHT] += amount
+
 def debug(game, level, creature):
-	c = io.getch_print("Avail cmds: vclbdhkpors")
+	c = io.getch_print("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
@@ -182,10 +192,12 @@ def debug(game, level, creature):
 	elif c == 'o':
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(creature.coord, passage_down))
+		game.redraw()
 	elif c == 'p':
 		passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(passage_up, passage_down))
+		game.redraw()
 	elif c == 's':
 		import code
 		code.interact(local=locals())
@@ -210,6 +222,30 @@ def debug(game, level, creature):
 			io.l.h.addch("H", curses.color_pair(x) | curses.A_REVERSE | curses.A_BOLD)
 		io.l.h.addch("\n")
 		io.l.h.getch()
+	elif c == '+':
+		from const.slots import BODY
+		from const.stats import SIGHT
+		creature.slots[BODY].stats[SIGHT] += 1
+		while True:
+			c2 = io.getch_print("[+-]")
+			if c2 == "+":
+				creature.slots[BODY].stats[SIGHT] += 1
+			elif c2 == "-":
+				creature.slots[BODY].stats[SIGHT] -= 1
+			else:
+				break
+	elif c == '-':
+		from const.slots import BODY
+		from const.stats import SIGHT
+		creature.slots[BODY].stats[SIGHT] -= 1
+		while True:
+			c2 = io.getch_print("[+-]")
+			if c2 == "+":
+				creature.slots[BODY].stats[SIGHT] += 1
+			elif c2 == "-":
+				creature.slots[BODY].stats[SIGHT] -= 1
+			else:
+				break
 	elif c == 'm':
 		io.msg("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam varius massa enim, id fermentum erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et enim ut nibh rutrum suscipit. Aenean a lacus eget justo dignissim tempus. Nunc venenatis congue erat vel adipiscing. Nam nulla felis, accumsan eu sagittis aliquet, fermentum at tortor. Suspendisse tortor risus, dapibus quis porta vel, mattis sit amet libero. Morbi vel metus eget metus ultricies ultrices placerat ac sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Nulla urna erat, lacinia vitae pellentesque et, accumsan eget ante. Sed commodo molestie ipsum, a mattis sapien malesuada at. Integer et lorem magna. Sed nec erat orci. Donec id elementum elit. In hac habitasse platea dictumst. Duis id nisi ut felis convallis blandit id sit amet magna. Nam feugiat erat eget velit ullamcorper varius. Nunc tellus massa, fermentum eu aliquet non, fermentum a quam.  Pellentesque turpis erat, aliquam at feugiat in, congue nec urna. Nulla ut turpis dapibus metus blandit faucibus.  Suspendisse potenti. Proin facilisis massa vitae purus dignissim quis dapibus eros gravida. Vivamus ac sapien ante, ut euismod nunc. Pellentesque faucibus neque at tortor malesuada eu commodo nisl vehicula. Vivamus eu odio ut est egestas luctus. Duis orci magna, tincidunt id suscipit id, consectetur sodales nisl. Etiam justo lorem, molestie sit amet rutrum eget, consequat mattis magna.  Fusce eros est, tincidunt id consequat id, scelerisque ac sapien.  Donec lacus leo, adipiscing et vulputate in, pulvinar vitae sem. Suspendisse sem augue, adipiscing vitae tempor sit amet, egestas a neque. Donec nibh mauris, rutrum vitae dictum in, adipiscing in magna. Duis fringilla sem vel nisl tempus dignissim. Fusce vel felis ipsum. Sed risus ipsum, iaculis a mollis vel, viverra in nisi. Suspendisse est tellus, aliquet et vulputate vel, iaculis egestas nulla.  Praesent sed tortor sed neque varius consequat. Quisque interdum facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis nisi id molestie. Aenean rutrum elementum mauris, vitae venenatis tellus semper et. Proin eu nisl ligula. Maecenas dui mi, varius eget adipiscing quis, commodo et libero.")
 
