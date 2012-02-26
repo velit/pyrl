@@ -2,15 +2,17 @@ import ai
 import const.game as GAME
 import const.creature_actions as CC
 import state_store
+import rdg
 
 from input_output import io
 from player import Player
 from level import Level
 from user_input import UserInput
-from fov import get_light_set
 from world_file import WorldFile
 from debug_flags import Flags
+from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
+from generic_algorithms import add_vector
 from itertools import imap
 
 
@@ -29,7 +31,7 @@ class Game(object):
 
 		self.init_new_level(GAME.FIRST_LEVEL)
 		self.cur_level = self.levels[GAME.FIRST_LEVEL]
-		self.cur_level.add_creature(self.player)
+		self.cur_level.add_creature(self.player, self.cur_level.get_passage_coord(GAME.PASSAGE_UP))
 		self.register_status_texts(self.player)
 
 	def is_player(self, creature):
@@ -73,9 +75,9 @@ class Game(object):
 
 	def init_new_level(self, world_loc):
 		level_file = self.world_file.pop_level_file(world_loc)
-		danger_level = level_file.danger_level
-		level_monster_list = self.world_file.get_level_monster_list(danger_level)
-		self.levels[world_loc] = Level(world_loc, level_file, level_monster_list)
+		if not level_file.static_level:
+			rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
+		self.levels[world_loc] = Level(world_loc, level_file)
 
 	def play(self):
 		if self.cur_level.turn_scheduler.is_new_turn():
@@ -102,7 +104,7 @@ class Game(object):
 
 	def creature_move(self, level, creature, direction):
 		if level.creature_can_move(creature, direction) and creature.can_act():
-			target_coord = level.get_relative_coord(creature.coord, direction)
+			target_coord = add_vector(creature.coord, direction)
 			creature.update_energy(level.movement_cost(direction, target_coord))
 			level.move_creature(creature, target_coord)
 			return True
@@ -110,7 +112,7 @@ class Game(object):
 			return False
 
 	def creature_swap(self, level, creature, direction):
-		target_coord = level.get_relative_coord(creature.coord, direction)
+		target_coord = add_vector(creature.coord, direction)
 		if creature.can_act() and level.creature_is_swappable(target_coord):
 			target_creature = level.get_creature(target_coord)
 			energy_cost = level.movement_cost(direction, target_coord)
@@ -124,7 +126,7 @@ class Game(object):
 	def creature_attack(self, level, creature, direction):
 		if creature.can_act():
 			creature.update_energy_action(CC.ATTACK)
-			target_coord = level.get_relative_coord(creature.coord, direction)
+			target_coord = add_vector(creature.coord, direction)
 			if level.has_creature(target_coord):
 				target = level.get_creature(target_coord)
 			else:

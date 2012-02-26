@@ -1,21 +1,18 @@
 from __future__ import division
 import random
 import path
-import rdg
 import const.directions as DIRS
 import const.game as GAME
 import const.debug as DEBUG
 
 from creature import Creature
 from turn_scheduler import TurnScheduler
-from generic_algorithms import bresenham, cross_product, get_vector
+from generic_algorithms import bresenham, cross_product, get_vector, add_vector
 
 
 class TileStructure(list):
-	def __init__(self, level_file):
-		list.__init__(self, level_file.tilemap())
-		self.rows = level_file.rows
-		self.cols = level_file.cols
+	def _set_cols(self, cols):
+		self.cols = cols
 
 	def __getitem__(self, coord):
 		return list.__getitem__(self, coord[0] * self.cols + coord[1])
@@ -29,24 +26,26 @@ class TileStructure(list):
 
 class Level(object):
 
-	def __init__(self, world_loc, level_file, creature_spawn_list):
+	def __init__(self, world_loc, level_file):
+		self.world_loc = world_loc
+		self.rows = level_file.rows
+		self.cols = level_file.cols
+		self.danger_level = level_file.danger_level
+		self.passage_locations = level_file.passage_locations
+		self.tiles = TileStructure(level_file.tilemap())
+		self.tiles._set_cols(self.cols)
 		self.modified_locations = set()
 		self.visited_locations = set()
 		self.turn_scheduler = TurnScheduler()
 		self.creatures = {}
-		self.world_loc = world_loc
-		self.danger_level = level_file.danger_level
-		self.passage_locations = level_file.passage_locations
-		if not level_file.static:
-			rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
-		self.tiles = TileStructure(level_file)
-		self.creature_spawn_list = creature_spawn_list #TODO:
 
-		for mons_file in level_file.monster_files:
-			self._spawn_predefined_creature(mons_file)
+		for monster_file in level_file.static_monster_files:
+			self._spawn_predefined_creature(monster_file)
 
-		for x in xrange(GAME.MONSTERS_PER_LEVEL):
-			self._spawn_random_creature()
+		if level_file.use_dynamic_monsters:
+			self.creature_spawn_list = level_file.get_dynamic_monster_spawn_list()
+			for x in xrange(GAME.MONSTERS_PER_LEVEL):
+				self._spawn_random_creature()
 
 	# nudge_coord nudges towards a line between this and start_coord
 	def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
@@ -57,7 +56,7 @@ class Level(object):
 
 	def _a_star_neighbors(self, coord):
 		for direction in DIRS.ALL:
-			neighbor_coord = self.get_relative_coord(coord, direction)
+			neighbor_coord = add_vector(coord, direction)
 			if self.tiles[neighbor_coord].is_passable:
 				if direction in DIRS.DIAGONAL:
 					yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
@@ -71,7 +70,7 @@ class Level(object):
 				return coord
 
 	def _get_random_coord(self):
-		return random.randrange(self.tiles.rows), random.randrange(self.tiles.cols)
+		return random.randrange(self.rows), random.randrange(self.cols)
 
 	def _get_visible_char(self, coord):
 		if coord in self.creatures:
@@ -80,15 +79,15 @@ class Level(object):
 			return self.tiles[coord].visible_char
 
 	def _spawn_random_creature(self):
-		creature = Creature(random.choice(self.creature_spawn_list))
-		self.add_creature(creature)
+		monster_file = random.choice(self.creature_spawn_list)
+		self.add_creature(Creature(monster_file))
 
 	def _spawn_predefined_creature(self, mons_file):
 		creature = Creature(mons_file)
 		self.add_creature(creature)
 
 	def legal_coord(self, coord, direction=(0,0)):
-		return (0 <= (coord[0] + direction[0]) < self.tiles.rows) and (0 <= (coord[1] + direction[1]) < self.tiles.cols)
+		return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
 
 	def get_exit(self, coord):
 		return self.tiles[coord].exit_point
@@ -96,12 +95,9 @@ class Level(object):
 	def get_creature(self, coord):
 		return self.creatures[coord]
 
-	def get_relative_coord(self, coord, direction):
-		return coord[0] + direction[0], coord[1] + direction[1]
-
 	def get_coord_iter(self):
-		for y in xrange(self.tiles.rows):
-			for x in xrange(self.tiles.cols):
+		for y in xrange(self.rows):
+			for x in xrange(self.cols):
 				yield y, x
 
 	def get_visible_data(self, location_set):
@@ -238,7 +234,7 @@ class Level(object):
 		if direction == DIRS.STOP:
 			return True
 		elif self.legal_coord(creature.coord, direction):
-			coord = self.get_relative_coord(creature.coord, direction)
+			coord = add_vector(creature.coord, direction)
 			return self.is_passable(coord)
 		else:
 			return False

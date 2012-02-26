@@ -1,7 +1,19 @@
 import const.game as GAME
-from level_file import LevelFile
+import const.colors as COLOR
 
-L0_tilefile = list(
+from level_file import LevelFile
+from monster_file import MonsterFile
+from char import Char
+
+L0 = LevelFile(
+		danger_level=1,
+		static_level=True,
+		use_dynamic_monsters=False,
+)
+
+#L0.add_monster_file(MonsterFile("The Crone", Char('@', COLOR.PURPLE)))
+
+L0.tilefile = list(
 "################################################################################################"
 "##.####################################.........................######..................########"
 "##.#...............................####......######################################.....########"
@@ -28,7 +40,7 @@ L0_tilefile = list(
 "####################################.....................................................#######"
 "################################################################################################"
 "################################################################################################")
-L0 = LevelFile(danger_level=1, static=True, tilefile=L0_tilefile)
+L0.add_walls()
 L0.passage_locations[GAME.PASSAGE_UP] = (15, 21)
 L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
 

@@ -5,8 +5,8 @@ from const.colors import DARK, BROWN, RED, WHITE, GREEN
 
 UNKNOWN = " "
 FLOOR = "."
-WALL = "#"
-ROCK = "r"
+WALL = "w"
+ROCK = "#"
 STAIRS_UP = "<"
 STAIRS_DOWN = ">"
 

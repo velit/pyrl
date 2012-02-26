@@ -13,6 +13,8 @@ def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
 		if level_file.tilefile is None:
 			_init_tilemap(level_file)
 			_make_initial_room(level_file)
+		else:
+			level_file.add_walls()
 
 		for x in xrange(2000):
 			if rand() < 0.50:
