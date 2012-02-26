@@ -9,6 +9,7 @@ SO = (1, 0)
 SE = (1, 1)
 
 ALL = (WE, SO, NO, EA, NW, NE, SW, SE, STOP)
+ALL_MINUS_STOP = (WE, SO, NO, EA, NW, NE, SW, SE)
 
 DIAGONAL = (NW, NE, SW, SE)
 ORTHOGONAL = (NO, EA, SO, WE)

@@ -1,10 +1,7 @@
 import const.game as GAME
-import const.colors as COLOR
 import const.maps as MAP
 
-from char import Char
 from level_file import LevelFile
-from monster_file import MonsterFile, monster_files
 
 class WorldFile(object):
 
@@ -12,18 +9,11 @@ class WorldFile(object):
 		self.level_files = {}
 		self.level_passageways = {}
 		self.dungeon_lengths = {}
-		self.global_monster_files = []
 
 		self.add_dungeon(GAME.DUNGEON)
 		self.add_level(GAME.DUNGEON, MAP.L0)
 		for x in xrange(GAME.LEVELS_PER_DUNGEON - 1):
 			self.add_level(GAME.DUNGEON)
-
-		for m in monster_files:
-			self.add_monster_file(m)
-
-	def add_monster_file(self, monster_file):
-		self.global_monster_files.append(monster_file)
 
 	def add_dungeon(self, dungeon_key):
 		self.dungeon_lengths[dungeon_key] = 1
@@ -55,13 +45,3 @@ class WorldFile(object):
 
 	def get_passage_info(self, world_loc, passage):
 		return self.level_passageways[world_loc][passage]
-
-	def get_level_monster_list(self, danger_level):
-		level_monster_list = []
-		for mt in self.global_monster_files:
-			start = mt.speciation_lvl
-			stop = mt.extinction_lvl
-			if start <= danger_level:
-				weight_coeff = danger_level - mt.speciation_lvl
-				level_monster_list.extend([mt]*weight_coeff)
-		return level_monster_list

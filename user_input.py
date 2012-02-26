@@ -6,7 +6,7 @@ import const.debug as DEBUG
 import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
 
-
+from generic_algorithms import add_vector
 from input_output import io
 from char import Char
 
@@ -64,7 +64,7 @@ class UserInput(object):
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def act_to_dir(game, level, creature, direction):
-	target_coord = level.get_relative_coord(creature.coord, direction)
+	target_coord = add_vector(creature.coord, direction)
 	if game.creature_move(level, creature, direction):
 		return True
 	elif level.has_creature(target_coord):
@@ -86,7 +86,7 @@ def look(game, level, creature):
 	drawline_flag = False
 	direction = DIR.STOP
 	while True:
-		coord = level.get_relative_coord(coord, direction)
+		coord = add_vector(coord, direction)
 		io.msg(level.look_information(coord))
 		if drawline_flag:
 			io.drawline(creature.coord, coord, Char("*", COLOR.YELLOW))

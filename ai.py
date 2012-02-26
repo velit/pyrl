@@ -1,7 +1,7 @@
 import random
 import const.directions as DIRS
 import const.creature_actions as ACTIONS
-from generic_algorithms import resize_vector_to_len, get_vector
+from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 
 def act_alert(game, level, creature, alert_coord):
@@ -24,7 +24,7 @@ def act_alert(game, level, creature, alert_coord):
 			creature.target_coord = None
 			if creature.chase_vector is not None:
 				creature.chase_vector = resize_vector_to_len(creature.chase_vector, creature.sight)
-				overarching_target = level.get_relative_coord(creature.coord, creature.chase_vector)
+				overarching_target = add_vector(creature.coord, creature.chase_vector)
 				target_coord = level.get_last_pathable_coord(creature.coord, overarching_target)
 				if creature.coord != target_coord:
 					creature.target_coord = target_coord
@@ -42,7 +42,7 @@ def move_towards(game, level, creature, target_coord):
 	best_direction = DIRS.STOP
 	best_cost = None
 	for direction in DIRS.ALL:
-		coord = level.get_relative_coord(creature.coord, direction)
+		coord = add_vector(creature.coord, direction)
 		if level.is_passable(coord):
 			action = ACTIONS.MOVE
 		elif level.creature_is_swappable(coord):
