@@ -1,22 +1,26 @@
 # Multipliers for transforming coordinates to other octants:
 from __future__ import division
-_mult = ((1, 0, 0, -1, -1, 0, 0, 1),
+_mult = (
+		(1, 0, 0, -1, -1, 0, 0, 1),
 		(0, 1, -1, 0, 0, -1, 1, 0),
 		(0, 1, 1, 0, 0, -1, -1, 0),
-		(1, 0, 0, 1, -1, 0, 0, -1))
+		(1, 0, 0, 1, -1, 0, 0, -1),
+)
 
-def get_light_set(visibility_func, coord, sight):
+def get_light_set(visibility_func, coord, sight, max_rows, max_cols):
 	y, x = coord
-	light_set = set([(y, x)])
-	for oct in xrange(8):
-		_shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight,
-				_mult[0][oct], _mult[1][oct], _mult[2][oct], _mult[3][oct])
+	light_set = set()
+	if sight > 0:
+		light_set.add(coord)
+	for octant in xrange(8):
+		_shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
+				_mult[0][octant], _mult[1][octant], _mult[2][octant], _mult[3][octant])
 	return light_set
 
 # Based on an algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
 
-def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy, yx, yy):
+def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, max_rows, max_cols, xx, xy, yx, yy):
 	"""Recursive lightcasting function"""
 	if start < end:
 		return
@@ -30,32 +34,36 @@ def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, xx, xy,
 			# Translate the dx, dy coordinates into map coordinates:
 			X = cx + dx * xx + dy * xy
 			Y = cy + dx * yx + dy * yy
-			# l_slope and r_slope store the slopes of the left and right
-			# extremities of the square we're considering:
-			l_slope = (dx - 0.5) / (dy + 0.5)
-			r_slope = (dx + 0.5) / (dy - 0.5)
-			if start < r_slope:
-				continue
-			elif end > l_slope:
-				break
-			else:
-				# Our light beam is touching this square; light it:
-				if dx * dx + dy * dy <= radius_squared:
-					light_set.add((Y, X))
-				if blocked:
-					# we're scanning a row of blocked squares:
-					if not visibility_func((Y, X)):
-						new_start = r_slope
-						continue
+
+			# Don't try to compute outside of the map
+			if 0 <= Y < max_rows and 0 <= X < max_cols:
+				# l_slope and r_slope store the slopes of the left and right
+				# extremities of the square we're considering:
+				l_slope = (dx - 0.5) / (dy + 0.5)
+				r_slope = (dx + 0.5) / (dy - 0.5)
+
+				if end > l_slope:
+					break
+				if start >= r_slope:
+					# Our light beam is touching this square; light it:
+					if dx * dx + dy * dy <= radius_squared:
+						light_set.add((Y, X))
+
+					if blocked:
+						# we're scanning a row of blocked squares:
+						if not visibility_func((Y, X)):
+							new_start = r_slope
+						else:
+							blocked = False
+							start = new_start
 					else:
-						blocked = False
-						start = new_start
-				else:
-					if not visibility_func((Y, X)) and j < r:
-						# This is a blocking square, start a child scan:
-						blocked = True
-						_shadow_cast(light_set, visibility_func, cy, cx, j + 1, start, l_slope, r, xx, xy, yx, yy)
-						new_start = r_slope
+						if not visibility_func((Y, X)) and j < r:
+							# This is a blocking square, start a child scan:
+							blocked = True
+							_shadow_cast(light_set, visibility_func, cy, cx, j + 1, start, l_slope, r,
+									max_rows, max_cols, xx, xy, yx, yy)
+							new_start = r_slope
+
 		# Row is scanned; do next row unless last square was blocked:
 		if blocked:
 			break

@@ -57,7 +57,7 @@ class Level(object):
 	def _a_star_neighbors(self, coord):
 		for direction in DIRS.ALL:
 			neighbor_coord = add_vector(coord, direction)
-			if self.tiles[neighbor_coord].is_passable:
+			if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
 				if direction in DIRS.DIAGONAL:
 					yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
 				else:

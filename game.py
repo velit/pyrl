@@ -10,6 +10,7 @@ from level import Level
 from user_input import UserInput
 from world_file import WorldFile
 from debug_flags import Flags
+#from fov_bresenham import get_light_set
 from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
 from generic_algorithms import add_vector
@@ -180,7 +181,7 @@ class Game(object):
 
 	def update_view(self, level, creature):
 		old = self.old_visibility
-		new = get_light_set(level.is_see_through, creature.coord, creature.sight)
+		new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
 		mod = level.pop_modified_locations()
 		level.update_visited_locations(new - old)
 
