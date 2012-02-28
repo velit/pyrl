@@ -1,5 +1,4 @@
 import const.debug as DEBUG
-import const.game as GAME
 import const.keys as KEY
 import const.colors as COLOR
 
@@ -7,22 +6,23 @@ from window.pyrl_window import PyrlWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
+from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
 
 class Front(object):
 
 	def __init__(self, cursor_lib, root_window):
-
 		self.a = PyrlWindow(cursor_lib, root_window)
-		self.rows, self.cols = self.a.get_dimensions()
 
-		self.m = self.a.SubWindow(MessageBar,
-				GAME.MSG_BAR_HEIGHT, GAME.LEVEL_WIDTH, 0, 0)
-		self.l = self.a.SubWindow(LevelWindow,
-				GAME.LEVEL_HEIGHT, GAME.LEVEL_WIDTH, GAME.MSG_BAR_HEIGHT, 0)
-		self.s = self.a.SubWindow(StatusBar,
-				GAME.STATUS_BAR_HEIGHT, GAME.LEVEL_WIDTH,
-				GAME.MSG_BAR_HEIGHT + GAME.LEVEL_HEIGHT, 0)
+		mh, mb = self.a.sub_handle(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
+		lh, lb = self.a.sub_handle(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
+		sh, sb = self.a.sub_handle(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
+
+		self.m = MessageBar(cursor_lib, mh, mb)
+		self.l = LevelWindow(cursor_lib, lh, lb)
+		self.s = StatusBar(cursor_lib, sh, sb)
+
+		self.rows, self.cols = self.a.get_dimensions()
 
 	def getch(self):
 		self.refresh()
@@ -50,9 +50,9 @@ class Front(object):
 		self.m.queue_msg(*a)
 
 	def refresh(self):
-		self.m.prepare_flush()
-		self.l.prepare_flush()
-		self.s.prepare_flush()
+		self.m.update()
+		self.l.update()
+		self.s.update()
 		self.a.flush()
 
 	def clear_level_buffer(self, *a, **k):

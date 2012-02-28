@@ -94,13 +94,9 @@ def getch(handle=None):
 def clear(handle):
 	libtcod.console_clear(handle)
 
-def blit(blit_args):
-	libtcod.console_blit(*blit_args)
-
-def prepare_flush(handle):
-	raise NotImplementedError("Use blit(blit_data) !")
-	rows, cols = get_dimensions(handle)
-	libtcod.console_blit(handle, 0, 0, cols, rows, 0, 0, 0, 1.0, 1.0)
+def blit(handle, blit_args):
+	if blit_args is not None:
+		libtcod.console_blit(*blit_args)
 
 def flush():
 	libtcod.console_flush()
@@ -108,8 +104,18 @@ def flush():
 def get_dimensions(handle):
 	return libtcod.console_get_height(handle), libtcod.console_get_width(handle)
 
-def subwindow(handle, rows, cols, y, x):
-	return libtcod.console_new(cols, rows)
+def subwindow_handle(parent_handle, child_rows, child_cols, parent_offset_y, parent_offset_x):
+	child_handle = libtcod.console_new(child_cols, child_rows)
+
+	blit_args = (
+			child_handle,                     # blitted window
+			0, 0, child_cols, child_rows,     # the area of new window that will be blitted
+			parent_handle,                    # target of the blit
+			parent_offset_x, parent_offset_y, # where to blit in target
+			1.0, 1.0                          # transparency
+	)
+
+	return child_handle, blit_args
 	
 def toggle_fullscreen():
 	if libtcod.console_is_fullscreen():

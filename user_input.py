@@ -209,7 +209,11 @@ def debug(game, level, creature):
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		pass
+		io.a.clear()
+		io.a.addstr(10, 10, "penis penis penis penis penis")
+		io.a.refresh()
+		io.a.getch()
+		game.redraw()
 	elif c == '+':
 		from const.slots import BODY
 		from const.stats import SIGHT
