@@ -171,6 +171,9 @@
     <note priority="veryhigh" time="1315707472">
         Make an inventory
     </note>
+    <note priority="veryhigh" time="1330390746">
+        Add libtcod colors for stuff i just did for ncurses
+    </note>
     <note priority="high" time="1329073265">
         Make a walk mode
     </note>

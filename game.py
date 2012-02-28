@@ -24,7 +24,7 @@ class Game(object):
 
 		self.turn_counter = 0
 		self.user_input = UserInput()
-		self.old_visibility = set()
+		self.current_vision = set()
 		self.levels = {}
 		self.world_file = WorldFile()
 		self.player = Player()
@@ -34,6 +34,7 @@ class Game(object):
 		self.cur_level = self.levels[GAME.FIRST_LEVEL]
 		self.cur_level.add_creature(self.player, self.cur_level.get_passage_coord(GAME.PASSAGE_UP))
 		self.register_status_texts(self.player)
+		self.vision_cache = None
 
 	def is_player(self, creature):
 		return self.player is creature
@@ -81,17 +82,21 @@ class Game(object):
 		self.levels[world_loc] = Level(world_loc, level_file)
 
 	def play(self):
-		if self.cur_level.turn_scheduler.is_new_turn():
-			pass
+		try:
+			if self.cur_level.turn_scheduler.is_new_turn():
+				pass
 
-		creature = self.cur_level.turn_scheduler.get()
-		creature.recover_energy()
-		if self.is_player(creature):
-			if creature.can_act():
-				self.player_act()
-				self.turn_counter += 1
-		else:
-			ai.act_alert(self, self.cur_level, creature, self.player.coord)
+			creature = self.cur_level.turn_scheduler.get()
+			creature.recover_energy()
+			if self.is_player(creature):
+				if creature.can_act():
+					self.player_act()
+					self.turn_counter += 1
+			else:
+				ai.act_alert(self, self.cur_level, creature, self.player.coord)
+		except Exception as e:
+			a,b,c,d = e
+			io.msg(e)
 
 	def player_act(self):
 		i = 0
@@ -168,19 +173,19 @@ class Game(object):
 
 	def draw(self):
 		level, creature = self.cur_level, self.player
-		self.update_view(level, creature)
 		if self.flags.show_map:
-			self.redraw()
+			io.draw(level.get_wallhack_data(level.get_coord_iter()))
+		self.update_view(level, creature)
 
 	def redraw(self):
 		io.clear_level_buffer()
 		level, creature = self.cur_level, self.player
-		self.redraw_view(level, creature)
 		if self.flags.show_map:
-			io.draw(level.get_visible_data(level.get_coord_iter()))
+			io.draw(level.get_wallhack_data(level.get_coord_iter()))
+		self.redraw_view(level)
 
 	def update_view(self, level, creature):
-		old = self.old_visibility
+		old = self.current_vision if not self.flags.show_map else set()
 		new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
 		mod = level.pop_modified_locations()
 		level.update_visited_locations(new - old)
@@ -191,10 +196,10 @@ class Game(object):
 		new_visible_data = level.get_visible_data(new - (old - mod))
 		io.draw(new_visible_data, self.flags.reverse)
 
-		self.old_visibility = new
+		self.current_vision = new
 
-	def redraw_view(self, level, creature):
-		self.old_visibility.clear()
+	def redraw_view(self, level):
 		memory_data = level.get_memory_data(level.visited_locations)
 		io.draw(memory_data)
-		self.update_view(level, creature)
+		vision_data = level.get_visible_data(self.current_vision)
+		io.draw(vision_data, self.flags.reverse)

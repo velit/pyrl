@@ -78,6 +78,12 @@ class Level(object):
 		else:
 			return self.tiles[coord].visible_char
 
+	def _get_memory_char(self, coord):
+		if coord in self.creatures:
+			return self.get_creature(coord).char
+		else:
+			return self.tiles[coord].memory_char
+
 	def _spawn_random_creature(self):
 		monster_file = random.choice(self.creature_spawn_list)
 		self.add_creature(Creature(monster_file))
@@ -103,6 +109,10 @@ class Level(object):
 	def get_visible_data(self, location_set):
 		for (y, x) in location_set:
 			yield y, x, self._get_visible_char((y, x))
+
+	def get_wallhack_data(self, location_set):
+		for (y, x) in location_set:
+			yield y, x, self._get_memory_char((y, x))
 
 	def get_memory_data(self, location_set):
 		for (y, x) in location_set:
@@ -188,6 +198,9 @@ class Level(object):
 	def add_creature(self, creature, coord=None):
 		if coord is None:
 			coord = self._get_free_coord()
+		elif coord in self.creatures:
+			blocking_creature = self.creatures[coord]
+			self.move_creature(blocking_creature, self._get_free_coord())
 		self.creatures[coord] = creature
 		self.modified_locations.add(coord)
 		creature.coord = coord
