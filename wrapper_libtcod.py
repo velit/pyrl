@@ -5,24 +5,30 @@ import libtcodpy as libtcod
 
 TCOD_COLOR = {
 	COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),
-	COLOR.BASE_RED: libtcod.Color(187, 0, 0),
-	COLOR.BASE_GREEN: libtcod.Color(0, 187, 0),
+	COLOR.BASE_RED: libtcod.Color(175, 0, 0),
+	COLOR.BASE_GREEN: libtcod.Color(0, 175, 0),
+	COLOR.BASE_BLUE: libtcod.Color(0, 0, 175),
+	COLOR.BASE_PURPLE: libtcod.Color(175, 0, 175),
+	COLOR.BASE_CYAN: libtcod.Color(0, 175, 175),
+	COLOR.BASE_YELLOW: libtcod.Color(255, 255, 95),
 	COLOR.BASE_BROWN: libtcod.Color(150, 75, 0),
-	COLOR.BASE_BLUE: libtcod.Color(0, 0, 187),
-	COLOR.BASE_PURPLE: libtcod.Color(187, 0, 187),
-	COLOR.BASE_CYAN: libtcod.Color(0, 187, 187),
 
-	COLOR.BASE_DARK: libtcod.Color(85, 85, 85),
-	COLOR.BASE_LIGHT_RED: libtcod.Color(255, 85, 85),
-	COLOR.BASE_LIGHT_GREEN: libtcod.Color(85, 255, 85),
-	COLOR.BASE_LIGHT_BLUE: libtcod.Color(85, 85, 255),
-	COLOR.BASE_YELLOW: libtcod.Color(255, 255, 85),
-	COLOR.BASE_LIGHT_PURPLE: libtcod.Color(255, 85, 255),
-	COLOR.BASE_LIGHT_CYAN: libtcod.Color(85, 255, 255),
+	COLOR.BASE_LIGHT_RED: libtcod.Color(255, 95, 95),
+	COLOR.BASE_LIGHT_GREEN: libtcod.Color(95, 255, 95),
+	COLOR.BASE_LIGHT_BLUE: libtcod.Color(95, 95, 255),
+	COLOR.BASE_LIGHT_PURPLE: libtcod.Color(255, 95, 255),
+	COLOR.BASE_LIGHT_CYAN: libtcod.Color(95, 255, 255),
+
 	COLOR.BASE_WHITE: libtcod.Color(255, 255, 255),
-
-	COLOR.BASE_GREY: libtcod.Color(187, 187, 187),
-	COLOR.NORMAL: libtcod.Color(187, 187, 187),
+	COLOR.BASE_LIGHT: libtcod.Color(218, 218, 218),
+	COLOR.BASE_NORMAL: libtcod.Color(187, 187, 187),
+	COLOR.BASE_LIGHT_GRAY: libtcod.Color(168, 168, 168),
+	COLOR.BASE_GRAY: libtcod.Color(138, 138, 138),
+	COLOR.BASE_DARK_GRAY: libtcod.Color(108, 108, 108),
+	COLOR.BASE_DARK: libtcod.Color(78, 78, 78),
+	COLOR.BASE_DARKER: libtcod.Color(48, 48, 48),
+	COLOR.BASE_DARKEST: libtcod.Color(20, 20, 20),
+	COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),
 }
 
 TCOD_KEYS = {
