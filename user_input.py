@@ -207,21 +207,7 @@ def debug(game, level, creature):
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		import curses
-		io.l.h.move(0, 0)
-		def f(stat):
-			for x in range(24):
-				io.l.h.addch("H", curses.color_pair(x) | stat)
-			io.l.h.addch("\n")
-		stat_list = [curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM,
-				curses.A_NORMAL, curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE]
-		f(curses.A_REVERSE)
-		for x in range(8):
-			io.l.h.addch("H", curses.color_pair(x) | curses.A_REVERSE)
-		for x in range(8):
-			io.l.h.addch("H", curses.color_pair(x) | curses.A_REVERSE | curses.A_BOLD)
-		io.l.h.addch("\n")
-		io.l.h.getch()
+		pass
 	elif c == '+':
 		from const.slots import BODY
 		from const.stats import SIGHT

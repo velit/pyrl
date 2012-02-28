@@ -4,25 +4,25 @@ import const.game as GAME
 import libtcodpy as libtcod
 
 TCOD_COLOR = {
-	COLOR.BASE_BLACK: libtcod.black,
-	COLOR.BASE_RED: libtcod.red,
-	COLOR.BASE_GREEN: libtcod.green,
+	COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),
+	COLOR.BASE_RED: libtcod.Color(187, 0, 0),
+	COLOR.BASE_GREEN: libtcod.Color(0, 187, 0),
 	COLOR.BASE_BROWN: libtcod.Color(150, 75, 0),
-	COLOR.BASE_BLUE: libtcod.blue,
-	COLOR.BASE_PURPLE: libtcod.purple,
-	COLOR.BASE_CYAN: libtcod.cyan,
-	COLOR.BASE_GREY: libtcod.light_gray,
+	COLOR.BASE_BLUE: libtcod.Color(0, 0, 187),
+	COLOR.BASE_PURPLE: libtcod.Color(187, 0, 187),
+	COLOR.BASE_CYAN: libtcod.Color(0, 187, 187),
 
-	COLOR.BASE_DARK: libtcod.darkest_grey,
-	COLOR.BASE_LIGHT_RED: libtcod.light_red,
-	COLOR.BASE_LIGHT_GREEN: libtcod.light_green,
-	COLOR.BASE_YELLOW: libtcod.yellow,
-	COLOR.BASE_LIGHT_BLUE: libtcod.light_blue,
-	COLOR.BASE_LIGHT_PURPLE: libtcod.light_purple,
-	COLOR.BASE_LIGHT_CYAN: libtcod.light_cyan,
-	COLOR.BASE_WHITE: libtcod.white,
+	COLOR.BASE_DARK: libtcod.Color(85, 85, 85),
+	COLOR.BASE_LIGHT_RED: libtcod.Color(255, 85, 85),
+	COLOR.BASE_LIGHT_GREEN: libtcod.Color(85, 255, 85),
+	COLOR.BASE_LIGHT_BLUE: libtcod.Color(85, 85, 255),
+	COLOR.BASE_YELLOW: libtcod.Color(255, 255, 85),
+	COLOR.BASE_LIGHT_PURPLE: libtcod.Color(255, 85, 255),
+	COLOR.BASE_LIGHT_CYAN: libtcod.Color(85, 255, 255),
+	COLOR.BASE_WHITE: libtcod.Color(255, 255, 255),
 
-	COLOR.NORMAL: libtcod.white,
+	COLOR.BASE_GREY: libtcod.Color(187, 187, 187),
+	COLOR.NORMAL: libtcod.Color(187, 187, 187),
 }
 
 TCOD_KEYS = {
