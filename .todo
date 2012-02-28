@@ -60,6 +60,12 @@
             donesies
         </comment>
     </note>
+    <note priority="veryhigh" time="1330390746" done="1330392347">
+        Add libtcod colors for stuff i just did for ncurses
+        <comment>
+            done, that didn't take long
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -169,13 +175,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make an inventory
-    </note>
-    <note priority="veryhigh" time="1330390746" done="1330392347">
-        Add libtcod colors for stuff i just did for ncurses
-        <comment>
-            done, that didn't take long
-        </comment>
+        Make an inventory, item.py plugin which calls io item menu drawing
     </note>
     <note priority="high" time="1329073265">
         Make a walk mode

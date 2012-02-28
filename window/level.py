@@ -10,6 +10,9 @@ class LevelWindow(PyrlWindow):
 	def __init__(self, *a, **k):
 		PyrlWindow.__init__(self, *a, **k)
 
+	def update(self):
+		self.blit()
+
 	def draw_char(self, coord, char):
 		y, x = coord
 		self.addch(y, x, char)

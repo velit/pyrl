@@ -9,16 +9,20 @@ class StatusBar(PyrlWindow):
 		PyrlWindow.__init__(self, *a, **k)
 
 		self.elements = []
+		self.modified = False
 		self.wrapper = textwrap.TextWrapper(width=self.cols)
+
+	def update(self):
+		if self.modified:
+			self.elements.sort()
+			self.modified = False
+		self.clear()
+		self.print_elements()
+		self.blit()
 
 	def add_element(self, handle, string, getter):
 		self.elements.append((string, getter))
-
-	def prepare_flush(self):
-		self.elements.sort()
-		self.clear()
-		self.print_elements()
-		PyrlWindow.prepare_flush(self)
+		self.modified = True
 
 	def print_elements(self):
 		status_string = " ".join("{}[{}]".format(string, str(getter())) for string, getter in self.elements)

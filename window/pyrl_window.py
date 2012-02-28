@@ -24,29 +24,22 @@ class PyrlWindow(object):
 	def clear(self):
 		self.cursor_lib.clear(self.h)
 
-	def prepare_flush(self):
-		if self.blit_args is None:
-			self.cursor_lib.prepare_flush(self.h)
-		else:
-			self.cursor_lib.blit(self.blit_args)
-
-	def flush(self):
-		self.cursor_lib.flush()
-
-	def refresh(self):
-		PyrlWindow.prepare_flush(self)
-		self.flush()
-
 	def getch(self):
 		return self.cursor_lib.getch(self.h)
 
 	def get_dimensions(self):
 		return self.cursor_lib.get_dimensions(self.h)
 
-	def SubWindow(self, WindowType, rows, cols, offset_y, offset_x):
-		new_handle = self.cursor_lib.subwindow(self.h, rows, cols, offset_y, offset_x)
-		if hasattr(self.cursor_lib, "blit"):
-			blit_args = (new_handle, 0, 0, cols, rows, self.h, offset_x, offset_y, 1.0, 1.0)
-		else:
-			blit_args = None
-		return WindowType(self.cursor_lib, new_handle, blit_args)
+	def blit(self):
+		self.cursor_lib.blit(self.h, self.blit_args)
+
+	def flush(self):
+		self.cursor_lib.flush()
+
+	def refresh(self):
+		self.blit()
+		self.flush()
+
+	def sub_handle(self, rows, cols, offset_y, offset_x):
+		new_handle, blit_args = self.cursor_lib.subwindow_handle(self.h, rows, cols, offset_y, offset_x)
+		return new_handle, blit_args

@@ -15,11 +15,11 @@ class MessageBar(PyrlWindow):
 		self.msgqueue = []
 		self.wrap = textwrap.TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
 
-	def prepare_flush(self):
+	def update(self):
 		self.clear()
 		self.print_queue()
 		self.msgqueue = []
-		PyrlWindow.prepare_flush(self)
+		self.blit()
 
 	def queue_msg(self, *args):
 		for obj in args:

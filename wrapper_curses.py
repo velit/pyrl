@@ -185,7 +185,7 @@ def clear(window):
 	window.erase()
 	window.move(0, 0)
 
-def prepare_flush(window):
+def blit(window, blit_args):
 	window.noutrefresh()
 
 def flush():
@@ -194,8 +194,9 @@ def flush():
 def get_dimensions(window):
 	return window.getmaxyx()
 
-def subwindow(window, rows, cols, y, x):
-	return window.derwin(rows, cols, y, x)
+def subwindow_handle(parent_window, child_rows, child_cols, parent_offset_y, parent_offset_x):
+	# ncurses doesn't use blitting
+	return parent_window.derwin(child_rows, child_cols, parent_offset_y, parent_offset_x), None
 
 def move(window, y, x):
 	window.move(y, x)
