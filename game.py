@@ -82,21 +82,17 @@ class Game(object):
 		self.levels[world_loc] = Level(world_loc, level_file)
 
 	def play(self):
-		try:
-			if self.cur_level.turn_scheduler.is_new_turn():
-				pass
+		if self.cur_level.turn_scheduler.is_new_turn():
+			pass
 
-			creature = self.cur_level.turn_scheduler.get()
-			creature.recover_energy()
-			if self.is_player(creature):
-				if creature.can_act():
-					self.player_act()
-					self.turn_counter += 1
-			else:
-				ai.act_alert(self, self.cur_level, creature, self.player.coord)
-		except Exception as e:
-			a,b,c,d = e
-			io.msg(e)
+		creature = self.cur_level.turn_scheduler.get()
+		creature.recover_energy()
+		if self.is_player(creature):
+			if creature.can_act():
+				self.player_act()
+				self.turn_counter += 1
+		else:
+			ai.act_alert(self, self.cur_level, creature, self.player.coord)
 
 	def player_act(self):
 		i = 0

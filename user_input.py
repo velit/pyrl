@@ -88,7 +88,9 @@ def look(game, level, creature):
 	drawline_flag = False
 	direction = DIR.STOP
 	while True:
-		coord = add_vector(coord, direction)
+		new_coord = add_vector(coord, direction)
+		if level.legal_coord(new_coord):
+			coord = new_coord
 		io.msg(level.look_information(coord))
 		if drawline_flag:
 			io.drawline(creature.coord, coord, Char("*", COLOR.YELLOW))

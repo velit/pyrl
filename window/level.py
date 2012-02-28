@@ -24,10 +24,10 @@ class LevelWindow(PyrlWindow):
 		char = Char("*", col)
 		self.addch(y, x, char)
 
-	def draw_block(self, coord, col=COLOR.BLUE):
+	def draw_block(self, coord, col=COLOR.BASE_BLUE):
 		y, x = coord
 
-		char = (chr(176), col)
+		char = (" ", (COLOR.BASE_BLACK, col))
 		self.addch(y, x, char)
 
 	def draw_line(self, coordA, coordB, char=Char('*', COLOR.YELLOW), includeFirst=False):

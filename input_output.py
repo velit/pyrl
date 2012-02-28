@@ -81,6 +81,6 @@ class Front(object):
 
 	def draw_path(self, iterator):
 		for x in iterator:
-			self.draw_block(x, COLOR.GREEN)
+			self.draw_block(x, COLOR.BASE_GREEN)
 			if DEBUG.PATH_STEP: self.getch()
 		if not DEBUG.PATH_STEP: self.getch()
