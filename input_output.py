@@ -8,10 +8,17 @@ from window.status import StatusBar
 from window.level import LevelWindow
 from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
+cursor_lib = None
+
+def init(_cursor_lib, root_window):
+	global cursor_lib
+	global io
+	cursor_lib = _cursor_lib
+	io = Front(root_window)
 
 class Front(object):
 
-	def __init__(self, cursor_lib, root_window):
+	def __init__(self, root_window):
 		self.a = PyrlWindow(cursor_lib, root_window)
 
 		mh, mb = self.a.sub_handle(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
@@ -55,6 +62,11 @@ class Front(object):
 		self.s.update()
 		self.a.flush()
 
+	def clear(self):
+		self.m.clear()
+		self.l.clear()
+		self.s.clear()
+
 	def clear_level_buffer(self, *a, **k):
 		self.l.clear(*a, **k)
 
@@ -84,3 +96,6 @@ class Front(object):
 			self.draw_block(x, COLOR.BASE_GREEN)
 			if DEBUG.PATH_STEP: self.getch()
 		if not DEBUG.PATH_STEP: self.getch()
+
+	def suspend(self):
+		self.a.suspend()

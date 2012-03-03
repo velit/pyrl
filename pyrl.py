@@ -14,7 +14,8 @@ options = parser.parse_args()
 try:
 	import curses
 except ImportError:
-	print("Couldn't import curses. Try the libtcod version with ./tcodpyrl.py")
+	print("Couldn't import curses. Try running tcodpyrl.py")
+	exit()
 
 if options.profile:
 	cProfile.run("curses.wrapper(main.curses_inited_main, options)", "profiler_data")

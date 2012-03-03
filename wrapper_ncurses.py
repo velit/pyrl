@@ -1,6 +1,7 @@
 import const.keys as KEY
 import const.colors as COLOR
 import curses
+import curses.ascii
 
 class Curses256ColorDict(dict):
 	def __init__(self, CURSES_ATTR):
@@ -54,13 +55,36 @@ def init():
 	global CURSES_KEYS
 
 	curses.curs_set(0)
-
+	curses.nonl()
 
 	CURSES_KEYS = {
+		curses.ascii.CR: KEY.ENTER,
 		curses.KEY_LEFT: KEY.LEFT,
 		curses.KEY_RIGHT: KEY.RIGHT,
 		curses.KEY_UP: KEY.UP,
 		curses.KEY_DOWN: KEY.DOWN,
+		curses.KEY_HOME: KEY.HOME,
+		curses.KEY_END: KEY.END,
+		curses.KEY_NPAGE: KEY.PAGE_UP,
+		curses.KEY_PPAGE: KEY.PAGE_DN,
+		curses.KEY_IC: KEY.INSERT,
+		curses.KEY_DC: KEY.DELETE,
+		curses.KEY_B2: KEY.NUMPAD_MIDDLE,
+		curses.KEY_BACKSPACE: KEY.BACKSPACE,
+		curses.KEY_FIND: KEY.HOME,
+		curses.KEY_SELECT: KEY.END,
+		curses.KEY_F1: KEY.F1,
+		curses.KEY_F2: KEY.F2,
+		curses.KEY_F3: KEY.F3,
+		curses.KEY_F4: KEY.F4,
+		curses.KEY_F5: KEY.F5,
+		curses.KEY_F6: KEY.F6,
+		curses.KEY_F7: KEY.F7,
+		curses.KEY_F8: KEY.F8,
+		curses.KEY_F9: KEY.F9,
+		curses.KEY_F10: KEY.F10,
+		curses.KEY_F11: KEY.F11,
+		curses.KEY_F12: KEY.F12,
 	}
 
 	if curses.COLORS == 256:
@@ -174,16 +198,20 @@ def getch(window):
 	ch = window.getch()
 	if ch in CURSES_KEYS:
 		return CURSES_KEYS[ch]
-	else:
-		try:
-			key = chr(ch)
-			return key
-		except ValueError:
-			return ch
+	elif ch in curses.__dict__.values():
+		for key, value in curses.__dict__.iteritems():
+			if value == ch: #TODO TEMPORARY
+				raise Exception("New key found! {} {}".format(key, value))
+	elif ch == 27:
+		window.timeout(0)
+		second_ch = window.getch()
+		window.nodelay(False)
+		if second_ch != curses.ERR:
+			ch = curses.ascii.alt(second_ch)
+	return curses.ascii.unctrl(ch)
 
 def clear(window):
-	window.erase()
-	window.move(0, 0)
+	window.clear()
 
 def blit(window, blit_args):
 	window.noutrefresh()
@@ -197,6 +225,9 @@ def get_dimensions(window):
 def subwindow_handle(parent_window, child_rows, child_cols, parent_offset_y, parent_offset_x):
 	# ncurses doesn't use blitting
 	return parent_window.derwin(child_rows, child_cols, parent_offset_y, parent_offset_x), None
+
+def suspend(window):
+	curses.endwin()
 
 def move(window, y, x):
 	window.move(y, x)
