@@ -174,7 +174,7 @@ class Game(object):
 		self.update_view(level, creature)
 
 	def redraw(self):
-		io.clear_level_buffer()
+		io.clear()
 		level, creature = self.cur_level, self.player
 		if self.flags.show_map:
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))

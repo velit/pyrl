@@ -43,3 +43,6 @@ class PyrlWindow(object):
 	def sub_handle(self, rows, cols, offset_y, offset_x):
 		new_handle, blit_args = self.cursor_lib.subwindow_handle(self.h, rows, cols, offset_y, offset_x)
 		return new_handle, blit_args
+
+	def suspend(self):
+		self.cursor_lib.suspend(self.h)

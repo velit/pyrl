@@ -122,3 +122,6 @@ def toggle_fullscreen():
 		libtcod.console_set_fullscreen(False)
 	else:
 		libtcod.console_set_fullscreen(True)
+
+def suspend(handle):
+	pass

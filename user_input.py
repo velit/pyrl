@@ -1,10 +1,14 @@
 import sys
+import code
+
 import const.keys as KEY
 import const.directions as DIR
 import const.game as GAME
 import const.debug as DEBUG
 import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
+import const.slots as SLOT
+import const.stats as STAT
 
 from generic_algorithms import add_vector
 from input_output import io
@@ -15,24 +19,24 @@ direction_map = {
 		KEY.DOWN: DIR.SO,
 		KEY.UP: DIR.NO,
 		KEY.RIGHT: DIR.EA,
-		'1': DIR.SW,
-		'2': DIR.SO,
-		'3': DIR.SE,
-		'4': DIR.WE,
-		'5': DIR.STOP,
-		'6': DIR.EA,
-		'7': DIR.NW,
-		'8': DIR.NO,
-		'9': DIR.NE,
+		#'1': DIR.SW,
+		#'2': DIR.SO,
+		#'3': DIR.SE,
+		#'4': DIR.WE,
+		#'5': DIR.STOP,
+		#'6': DIR.EA,
+		#'7': DIR.NW,
+		#'8': DIR.NO,
+		#'9': DIR.NE,
 		'h': DIR.WE,
 		'j': DIR.SO,
 		'k': DIR.NO,
 		'l': DIR.EA,
 		'.': DIR.STOP,
-		'u': DIR.NW,
-		'i': DIR.NE,
-		'n': DIR.SW,
-		'm': DIR.SE,
+		'y': DIR.NW,
+		'u': DIR.NE,
+		'b': DIR.SW,
+		'n': DIR.SE,
 }
 
 class UserInput(object):
@@ -49,7 +53,8 @@ class UserInput(object):
 			'd': ("debug", no_args, no_kwds),
 			'+': ("sight_change", (1, ), no_kwds),
 			'-': ("sight_change", (-1, ), no_kwds),
-			'\x12': ("redraw_view", no_args, no_kwds),
+			'^r': ("redraw_view", no_args, no_kwds),
+			'p': ("print_history", no_args, no_kwds),
 		}
 		for key, value in direction_map.items():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
@@ -59,7 +64,7 @@ class UserInput(object):
 		if c in self.actions:
 			return self.execute_action(game, level, creature, self.actions[c])
 		else:
-			io.msg("Undefined key: {}".format(chr(c) if 0 < c < 128 else c))
+			io.msg("Undefined key: {}".format(str(c)))
 
 	def execute_action(self, game, level, creature, act):
 		function, args, keywords = act
@@ -156,6 +161,9 @@ def sight_change(game, level, creature, amount):
 	from const.stats import SIGHT
 	creature.slots[BODY].stats[SIGHT] += amount
 
+def print_history(game, level, creature):
+	io.m.print_history()
+
 def debug(game, level, creature):
 	c = io.getch_print("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
@@ -201,7 +209,7 @@ def debug(game, level, creature):
 		io.draw_path(level.path(passage_up, passage_down))
 		game.redraw()
 	elif c == 's':
-		import code
+		io.suspend()
 		code.interact(local=locals())
 	elif c == 'e':
 		import curses
@@ -215,31 +223,26 @@ def debug(game, level, creature):
 		io.a.getch()
 		game.redraw()
 	elif c == '+':
-		from const.slots import BODY
-		from const.stats import SIGHT
-		creature.slots[BODY].stats[SIGHT] += 1
+		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 		while True:
 			c2 = io.getch_print("[+-]")
 			if c2 == "+":
-				creature.slots[BODY].stats[SIGHT] += 1
+				creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 			elif c2 == "-":
-				creature.slots[BODY].stats[SIGHT] -= 1
+				creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
 			else:
 				break
 	elif c == '-':
-		from const.slots import BODY
-		from const.stats import SIGHT
-		creature.slots[BODY].stats[SIGHT] -= 1
+		creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
 		while True:
 			c2 = io.getch_print("[+-]")
 			if c2 == "+":
-				creature.slots[BODY].stats[SIGHT] += 1
+				creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 			elif c2 == "-":
-				creature.slots[BODY].stats[SIGHT] -= 1
+				creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
 			else:
 				break
 	elif c == 'm':
 		io.msg("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam varius massa enim, id fermentum erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et enim ut nibh rutrum suscipit. Aenean a lacus eget justo dignissim tempus. Nunc venenatis congue erat vel adipiscing. Nam nulla felis, accumsan eu sagittis aliquet, fermentum at tortor. Suspendisse tortor risus, dapibus quis porta vel, mattis sit amet libero. Morbi vel metus eget metus ultricies ultrices placerat ac sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Nulla urna erat, lacinia vitae pellentesque et, accumsan eget ante. Sed commodo molestie ipsum, a mattis sapien malesuada at. Integer et lorem magna. Sed nec erat orci. Donec id elementum elit. In hac habitasse platea dictumst. Duis id nisi ut felis convallis blandit id sit amet magna. Nam feugiat erat eget velit ullamcorper varius. Nunc tellus massa, fermentum eu aliquet non, fermentum a quam.  Pellentesque turpis erat, aliquam at feugiat in, congue nec urna. Nulla ut turpis dapibus metus blandit faucibus.  Suspendisse potenti. Proin facilisis massa vitae purus dignissim quis dapibus eros gravida. Vivamus ac sapien ante, ut euismod nunc. Pellentesque faucibus neque at tortor malesuada eu commodo nisl vehicula. Vivamus eu odio ut est egestas luctus. Duis orci magna, tincidunt id suscipit id, consectetur sodales nisl. Etiam justo lorem, molestie sit amet rutrum eget, consequat mattis magna.  Fusce eros est, tincidunt id consequat id, scelerisque ac sapien.  Donec lacus leo, adipiscing et vulputate in, pulvinar vitae sem. Suspendisse sem augue, adipiscing vitae tempor sit amet, egestas a neque. Donec nibh mauris, rutrum vitae dictum in, adipiscing in magna. Duis fringilla sem vel nisl tempus dignissim. Fusce vel felis ipsum. Sed risus ipsum, iaculis a mollis vel, viverra in nisi. Suspendisse est tellus, aliquet et vulputate vel, iaculis egestas nulla.  Praesent sed tortor sed neque varius consequat. Quisque interdum facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis nisi id molestie. Aenean rutrum elementum mauris, vitae venenatis tellus semper et. Proin eu nisl ligula. Maecenas dui mi, varius eget adipiscing quis, commodo et libero.")
-
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
