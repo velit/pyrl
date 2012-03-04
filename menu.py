@@ -32,7 +32,7 @@ def _get_indent(lines, column=0):
 
 def _print_menu(io, indt, lines):
 	curses.curs_set(0)
-	io.clear()
+	io.erase()
 	for y in xrange(len(lines)):
 		_print_menu_line(io, y, indt, lines)
 

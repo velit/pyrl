@@ -59,20 +59,27 @@ def init():
 
 	CURSES_KEYS = {
 		curses.ascii.CR: KEY.ENTER,
-		curses.KEY_LEFT: KEY.LEFT,
-		curses.KEY_RIGHT: KEY.RIGHT,
+		curses.ascii.TAB: KEY.TAB,
+		curses.ascii.SP: KEY.SPACE,
 		curses.KEY_UP: KEY.UP,
 		curses.KEY_DOWN: KEY.DOWN,
+		curses.KEY_LEFT: KEY.LEFT,
+		curses.KEY_RIGHT: KEY.RIGHT,
 		curses.KEY_HOME: KEY.HOME,
 		curses.KEY_END: KEY.END,
-		curses.KEY_NPAGE: KEY.PAGE_UP,
-		curses.KEY_PPAGE: KEY.PAGE_DN,
+		curses.KEY_NPAGE: KEY.PAGE_DOWN,
+		curses.KEY_PPAGE: KEY.PAGE_UP,
+		curses.KEY_A1: KEY.NUMPAD_7,
+		curses.KEY_A3: KEY.NUMPAD_9,
+		curses.KEY_B2: KEY.NUMPAD_5,
+		curses.KEY_C1: KEY.NUMPAD_1,
+		curses.KEY_C3: KEY.NUMPAD_3,
 		curses.KEY_IC: KEY.INSERT,
 		curses.KEY_DC: KEY.DELETE,
-		curses.KEY_B2: KEY.NUMPAD_MIDDLE,
 		curses.KEY_BACKSPACE: KEY.BACKSPACE,
 		curses.KEY_FIND: KEY.HOME,
 		curses.KEY_SELECT: KEY.END,
+		curses.KEY_BTAB: KEY.SHIFT_TAB,
 		curses.KEY_F1: KEY.F1,
 		curses.KEY_F2: KEY.F2,
 		curses.KEY_F3: KEY.F3,
@@ -130,6 +137,9 @@ def init():
 			COLOR.BASE_PURPLE: curses.COLOR_MAGENTA,
 			COLOR.BASE_CYAN: curses.COLOR_CYAN,
 			COLOR.BASE_GRAY: curses.COLOR_WHITE,
+
+			COLOR.BASE_DARK_BLUE: curses.COLOR_BLUE,
+			COLOR.BASE_DARK_BROWN: curses.COLOR_YELLOW,
 
 			COLOR.BASE_LIGHT_RED: curses.COLOR_RED,
 			COLOR.BASE_LIGHT_GREEN: curses.COLOR_GREEN,
@@ -198,20 +208,23 @@ def getch(window):
 	ch = window.getch()
 	if ch in CURSES_KEYS:
 		return CURSES_KEYS[ch]
-	elif ch in curses.__dict__.values():
-		for key, value in curses.__dict__.iteritems():
-			if value == ch: #TODO TEMPORARY
-				raise Exception("New key found! {} {}".format(key, value))
-	elif ch == 27:
+	elif ch == curses.ascii.ESC:
 		window.timeout(0)
 		second_ch = window.getch()
 		window.nodelay(False)
 		if second_ch != curses.ERR:
 			ch = curses.ascii.alt(second_ch)
-	return curses.ascii.unctrl(ch)
+	ch = curses.ascii.unctrl(ch)
+	if '^' in ch:
+		return ch.lower()
+	else:
+		return ch
 
 def clear(window):
 	window.clear()
+
+def erase(window):
+	window.erase()
 
 def blit(window, blit_args):
 	window.noutrefresh()

@@ -132,6 +132,18 @@
             current was good enough
         </comment>
     </note>
+    <note priority="high" time="1330724823" done="1330828705">
+        Add non-ncurses specific special keys (ctrl, shift, alt, alt-gr)
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1330821445" done="1330828719">
+        Add tcod key support
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -175,7 +187,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make an inventory, item.py plugin which calls io item menu drawing
+        Make an inventory, inventory.py module which calls io inventory menu drawing
     </note>
     <note priority="high" time="1329073265">
         Make a walk mode
@@ -183,14 +195,17 @@
     <note priority="high" time="1329170052">
         Make tcod version exit when you close the window
     </note>
-    <note priority="high" time="1330724823">
-        Add non-ncurses specific special keys (ctrl, shift, alt, alt-gr)
+    <note priority="high" time="1330821261">
+        Make ncurses version manage resizing of window
     </note>
     <note priority="medium" time="1315691945">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
     </note>
-    <note priority="medium" time="1329647460">
+    <note priority="medium" time="1329647460" done="1330828781">
         Make an interactive debug mode
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="medium" time="1329647500">
         Make a getstring method

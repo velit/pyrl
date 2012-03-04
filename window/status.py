@@ -16,7 +16,7 @@ class StatusBar(PyrlWindow):
 		if self.modified:
 			self.elements.sort()
 			self.modified = False
-		self.clear()
+		self.erase()
 		self.print_elements()
 		self.blit()
 

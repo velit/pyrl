@@ -32,10 +32,42 @@ TCOD_COLOR = {
 }
 
 TCOD_KEYS = {
+	libtcod.KEY_ENTER: KEY.ENTER,
+	libtcod.KEY_TAB: KEY.TAB,
+	libtcod.KEY_SPACE: KEY.SPACE,
 	libtcod.KEY_LEFT: KEY.LEFT,
 	libtcod.KEY_RIGHT: KEY.RIGHT,
 	libtcod.KEY_UP: KEY.UP,
 	libtcod.KEY_DOWN: KEY.DOWN,
+	libtcod.KEY_HOME: KEY.HOME,
+	libtcod.KEY_END: KEY.END,
+	libtcod.KEY_PAGEDOWN: KEY.PAGE_DOWN,
+	libtcod.KEY_PAGEUP: KEY.PAGE_UP,
+	libtcod.KEY_INSERT: KEY.INSERT,
+	libtcod.KEY_DELETE: KEY.DELETE,
+	libtcod.KEY_BACKSPACE: KEY.BACKSPACE,
+	libtcod.KEY_F1: KEY.F1,
+	libtcod.KEY_F2: KEY.F2,
+	libtcod.KEY_F3: KEY.F3,
+	libtcod.KEY_F4: KEY.F4,
+	libtcod.KEY_F5: KEY.F5,
+	libtcod.KEY_F6: KEY.F6,
+	libtcod.KEY_F7: KEY.F7,
+	libtcod.KEY_F8: KEY.F8,
+	libtcod.KEY_F9: KEY.F9,
+	libtcod.KEY_F10: KEY.F10,
+	libtcod.KEY_F11: KEY.F11,
+	libtcod.KEY_F12: KEY.F12,
+	libtcod.KEY_KP0: KEY.NUMPAD_0,
+	libtcod.KEY_KP1: KEY.NUMPAD_1,
+	libtcod.KEY_KP2: KEY.NUMPAD_2,
+	libtcod.KEY_KP3: KEY.NUMPAD_3,
+	libtcod.KEY_KP4: KEY.NUMPAD_4,
+	libtcod.KEY_KP5: KEY.NUMPAD_5,
+	libtcod.KEY_KP6: KEY.NUMPAD_6,
+	libtcod.KEY_KP7: KEY.NUMPAD_7,
+	libtcod.KEY_KP8: KEY.NUMPAD_8,
+	libtcod.KEY_KP9: KEY.NUMPAD_9,
 }
 
 TCOD_IGNORE_KEYS = set([
@@ -80,18 +112,24 @@ def getch(handle=None):
 	while True:
 		key = libtcod.console_wait_for_keypress(False)
 		
-		if key.vk == libtcod.KEY_ENTER and key.lalt:
-			toggle_fullscreen()
-		elif key.c == ord('c') and key.lctrl or key.rctrl:
+		if key.c == ord('c') and key.lctrl or key.rctrl:
 			raise KeyboardInterrupt
-		elif key.c != 0:
-			return chr(key.c)
 		elif key.vk in TCOD_KEYS:
 			return TCOD_KEYS[key.vk]
+		elif key.c != 0:
+			ch = chr(key.c)
+			if key.lctrl or key.rctrl:
+				ch = "^" + ch
+			if key.lalt or key.ralt:
+				ch = "!" + ch
+			return ch
 		elif key.vk not in TCOD_IGNORE_KEYS:
 			return key.vk
 
 def clear(handle):
+	libtcod.console_clear(handle)
+
+def erase(handle):
 	libtcod.console_clear(handle)
 
 def blit(handle, blit_args):
