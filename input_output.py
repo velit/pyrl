@@ -62,13 +62,18 @@ class Front(object):
 		self.s.update()
 		self.a.flush()
 
+	def erase(self):
+		self.m.erase()
+		self.l.erase()
+		self.s.erase()
+
 	def clear(self):
 		self.m.clear()
 		self.l.clear()
 		self.s.clear()
 
-	def clear_level_buffer(self, *a, **k):
-		self.l.clear(*a, **k)
+	def erase_level_buffer(self, *a, **k):
+		self.l.erase(*a, **k)
 
 	def draw(self, character_data_sequence, reverse=False):
 		if not reverse:

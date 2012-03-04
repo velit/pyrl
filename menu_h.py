@@ -9,7 +9,7 @@ def draw(io, words, returns):
 
 def _print_menu(io, w, r):
 	curses.curs_set(0)
-	io.clear()
+	io.erase()
 	a = []
 	for word in w:
 		y, x = io.getyx()

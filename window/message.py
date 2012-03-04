@@ -22,7 +22,7 @@ class MessageBar(PyrlWindow):
 			self.history.append(self.msgqueue)
 			self.msgqueue = []
 		else:
-			self.clear()
+			self.erase()
 		self.blit()
 
 	def queue_msg(self, *args):
@@ -38,7 +38,7 @@ class MessageBar(PyrlWindow):
 	def print_event(self, event):
 		skip = False
 		lines = self.wrap(" ".join(event))
-		self.clear()
+		self.erase()
 		for i, line in enumerate(lines):
 			self.addstr(i % self.rows, 0, line)
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
@@ -47,9 +47,9 @@ class MessageBar(PyrlWindow):
 				if self._selective_getch() == KEY.ENTER:
 					skip = True
 					break
-				self.clear()
+				self.erase()
 		if skip:
-			self.clear()
+			self.erase()
 			for i in range(self.rows):
 				self.addstr(i, 0, lines[i - self.rows])
 

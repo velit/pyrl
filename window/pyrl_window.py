@@ -21,8 +21,12 @@ class PyrlWindow(object):
 		for y, x, (symbol, color) in char_payload_sequence:
 			self.addch(y, x, (symbol, color[::-1]))
 
+	# clear is stronger than erase, on ncurses it causes a full refresh
 	def clear(self):
 		self.cursor_lib.clear(self.h)
+
+	def erase(self):
+		self.cursor_lib.erase(self.h)
 
 	def getch(self):
 		return self.cursor_lib.getch(self.h)

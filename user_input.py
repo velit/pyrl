@@ -15,19 +15,23 @@ from input_output import io
 from char import Char
 
 direction_map = {
-		KEY.LEFT: DIR.WE,
-		KEY.DOWN: DIR.SO,
 		KEY.UP: DIR.NO,
+		KEY.DOWN: DIR.SO,
+		KEY.LEFT: DIR.WE,
 		KEY.RIGHT: DIR.EA,
-		#'1': DIR.SW,
-		#'2': DIR.SO,
-		#'3': DIR.SE,
-		#'4': DIR.WE,
-		#'5': DIR.STOP,
-		#'6': DIR.EA,
-		#'7': DIR.NW,
-		#'8': DIR.NO,
-		#'9': DIR.NE,
+		KEY.END: DIR.SW,
+		KEY.HOME: DIR.NW,
+		KEY.PAGE_UP: DIR.NE,
+		KEY.PAGE_DOWN: DIR.SE,
+		KEY.NUMPAD_1: DIR.SW,
+		KEY.NUMPAD_2: DIR.SO,
+		KEY.NUMPAD_3: DIR.SE,
+		KEY.NUMPAD_4: DIR.WE,
+		KEY.NUMPAD_5: DIR.STOP,
+		KEY.NUMPAD_6: DIR.EA,
+		KEY.NUMPAD_7: DIR.NW,
+		KEY.NUMPAD_8: DIR.NO,
+		KEY.NUMPAD_9: DIR.NE,
 		'h': DIR.WE,
 		'j': DIR.SO,
 		'k': DIR.NO,
@@ -53,7 +57,7 @@ class UserInput(object):
 			'd': ("debug", no_args, no_kwds),
 			'+': ("sight_change", (1, ), no_kwds),
 			'-': ("sight_change", (-1, ), no_kwds),
-			'^r': ("redraw_view", no_args, no_kwds),
+			'^r': ("redraw", no_args, no_kwds),
 			'p': ("print_history", no_args, no_kwds),
 		}
 		for key, value in direction_map.items():
@@ -135,7 +139,7 @@ def attack(game, level, creature):
 		game.creature_attack(level, creature, direction_map[c])
 		return True
 
-def redraw_view(game, level, creature):
+def redraw(game, level, creature):
 	game.redraw()
 
 def enter(game, level, creature, passage):
@@ -209,7 +213,6 @@ def debug(game, level, creature):
 		io.draw_path(level.path(passage_up, passage_down))
 		game.redraw()
 	elif c == 's':
-		io.suspend()
 		code.interact(local=locals())
 	elif c == 'e':
 		import curses
@@ -217,7 +220,7 @@ def debug(game, level, creature):
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		io.a.clear()
+		io.a.erase()
 		io.a.addstr(10, 10, "penis penis penis penis penis")
 		io.a.refresh()
 		io.a.getch()
