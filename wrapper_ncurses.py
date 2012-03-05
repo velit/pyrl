@@ -77,9 +77,8 @@ def init():
 		curses.KEY_IC: KEY.INSERT,
 		curses.KEY_DC: KEY.DELETE,
 		curses.KEY_BACKSPACE: KEY.BACKSPACE,
-		curses.KEY_FIND: KEY.HOME,
-		curses.KEY_SELECT: KEY.END,
-		curses.KEY_BTAB: KEY.SHIFT_TAB,
+		curses.KEY_FIND: KEY.NUMPAD_7,
+		curses.KEY_SELECT: KEY.NUMPAD_1,
 		curses.KEY_F1: KEY.F1,
 		curses.KEY_F2: KEY.F2,
 		curses.KEY_F3: KEY.F3,
@@ -214,6 +213,8 @@ def getch(window):
 		window.nodelay(False)
 		if second_ch != curses.ERR:
 			ch = curses.ascii.alt(second_ch)
+		else:
+			return KEY.ESC
 	ch = curses.ascii.unctrl(ch)
 	if '^' in ch:
 		return ch.lower()
@@ -228,6 +229,9 @@ def erase(window):
 
 def blit(window, blit_args):
 	window.noutrefresh()
+
+def redraw(window):
+	window.redrawwin()
 
 def flush():
 	curses.doupdate()

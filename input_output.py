@@ -41,12 +41,13 @@ class Front(object):
 
 	def selective_getch(self, char_seq):
 		while True:
-			c = self.getch()
+			c = self.a.getch()
 			if c in char_seq:
 				return c
 
 	def ask(self, string, char_seq=KEY.GROUP_ALL):
 		self.msg(string)
+		self.refresh()
 		return self.selective_getch(char_seq)
 
 	def notify(self, *a):
@@ -63,17 +64,10 @@ class Front(object):
 		self.a.flush()
 
 	def erase(self):
-		self.m.erase()
-		self.l.erase()
-		self.s.erase()
+		self.a.erase()
 
 	def clear(self):
-		self.m.clear()
-		self.l.clear()
-		self.s.clear()
-
-	def erase_level_buffer(self, *a, **k):
-		self.l.erase(*a, **k)
+		self.a.clear()
 
 	def draw(self, character_data_sequence, reverse=False):
 		if not reverse:
