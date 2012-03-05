@@ -11,7 +11,7 @@ import const.generated_level_types as LEVEL_TYPE
 import const.slots as SLOT
 import const.stats as STAT
 
-from generic_algorithms import add_vector
+from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
 from input_output import io
 from char import Char
 
@@ -65,12 +65,12 @@ class UserInput(object):
 		for key, value in direction_map.items():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
-		self.walk_dir = None
+		self.walk_mode = None
 
 	def get_user_input_and_act(self, game, level, creature):
-		if self.walk_dir is not None:
+		if self.walk_mode is not None:
 			io.refresh()
-			time.sleep(0.02)
+			time.sleep(GAME.ANIMATION_DELAY)
 			return walk_mode(game, level, creature, self)
 		else:
 			c = io.getch()
@@ -85,16 +85,27 @@ class UserInput(object):
 
 def walk_mode_init(game, level, creature, userinput):
 	ch = io.ask("Specify walking direction [Z to abort]:", direction_map.viewkeys() | KEY.GROUP_DEFAULT)
-	if ch in direction_map:
-		userinput.walk_dir = direction_map[ch]
+	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
+		if ch in direction_map:
+			direction = direction_map[ch]
+			left_coord = add_vector(creature.coord, turn_vector_left(direction))
+			right_coord = add_vector(creature.coord, turn_vector_right(direction))
+			userinput.walk_mode = direction, level.is_passable(left_coord), level.is_passable(right_coord)
+	else:
+		io.msg("Not while there are creatures in the vicinity.")
 	return False
 
 def walk_mode(game, level, creature, userinput):
-	if game.creature_move(level, creature, userinput.walk_dir):
-		return True
-	else:
-		userinput.walk_dir = None
-		return False
+	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
+		direction, left_passable, right_passable = userinput.walk_mode
+		left_coord = add_vector(creature.coord, turn_vector_left(direction))
+		right_coord = add_vector(creature.coord, turn_vector_right(direction))
+		if (level.is_passable(left_coord) == left_passable and
+				level.is_passable(right_coord) == right_passable):
+			if game.creature_move(level, creature, direction):
+				return True
+	userinput.walk_mode = None
+	return False
 
 def act_to_dir(game, level, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
