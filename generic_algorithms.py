@@ -67,6 +67,12 @@ def get_vector(origin, target):
 def add_vector(coord, vector):
 	return coord[0] + vector[0], coord[1] + vector[1]
 
+def turn_vector_left(vector):
+	return -vector[1], vector[0]
+
+def turn_vector_right(vector):
+	return vector[1], -vector[0]
+
 def resize_vector_to_len(vector, length):
 	a, b = vector
 	gcd = abs(fractions.gcd(a, b))
