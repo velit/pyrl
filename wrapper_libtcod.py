@@ -34,6 +34,7 @@ TCOD_COLOR = {
 TCOD_KEYS = {
 	libtcod.KEY_ENTER: KEY.ENTER,
 	libtcod.KEY_TAB: KEY.TAB,
+	libtcod.KEY_ESC: KEY.ESC,
 	libtcod.KEY_SPACE: KEY.SPACE,
 	libtcod.KEY_LEFT: KEY.LEFT,
 	libtcod.KEY_RIGHT: KEY.RIGHT,

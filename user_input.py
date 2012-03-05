@@ -1,5 +1,6 @@
 import sys
 import code
+import time
 
 import const.keys as KEY
 import const.directions as DIR
@@ -54,25 +55,46 @@ class UserInput(object):
 			'q': ("look", no_args, no_kwds),
 			'Z': ("z_command", no_args, no_kwds),
 			'a': ("attack", no_args, no_kwds),
-			'd': ("debug", no_args, no_kwds),
+			'd': ("debug", (self, ), no_kwds),
 			'+': ("sight_change", (1, ), no_kwds),
 			'-': ("sight_change", (-1, ), no_kwds),
 			'^r': ("redraw", no_args, no_kwds),
 			'p': ("print_history", no_args, no_kwds),
+			'w': ("walk_mode_init", (self, ), no_kwds),
 		}
 		for key, value in direction_map.items():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
-	def get_and_act(self, game, level, creature):
-		c = io.getch()
-		if c in self.actions:
-			return self.execute_action(game, level, creature, self.actions[c])
+		self.walk_dir = None
+
+	def get_user_input_and_act(self, game, level, creature):
+		if self.walk_dir is not None:
+			io.refresh()
+			time.sleep(0.02)
+			return walk_mode(game, level, creature, self)
 		else:
-			io.msg("Undefined key: {}".format(str(c)))
+			c = io.getch()
+			if c in self.actions:
+				return self.execute_action(game, level, creature, self.actions[c])
+			else:
+				io.msg("Undefined key: {}".format(str(c)))
 
 	def execute_action(self, game, level, creature, act):
 		function, args, keywords = act
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
+
+def walk_mode_init(game, level, creature, userinput):
+	ch = io.ask("Specify walking direction [Z to abort]:", direction_map.viewkeys() | KEY.GROUP_DEFAULT)
+	if ch in direction_map:
+		userinput.walk_dir = direction_map[ch]
+	return False
+
+def walk_mode(game, level, creature, userinput):
+	if game.creature_move(level, creature, userinput.walk_dir):
+		return True
+	else:
+		userinput.walk_dir = None
+		return False
 
 def act_to_dir(game, level, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
@@ -82,7 +104,10 @@ def act_to_dir(game, level, creature, direction):
 		game.creature_attack(level, creature, direction)
 		return True
 	else:
-		io.msg("You can't move there.")
+		if not creature.can_act():
+			io.msg("You're out of energy.")
+		else:
+			io.msg("You can't move there.")
 		return False
 
 def z_command(game, level, creature):
@@ -134,7 +159,7 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.ask("Specify attack direction:", KEY.GROUP_DEFAULT | set(direction_map.iterkeys()))
+	c = io.ask("Specify attack direction [Z to abort]:", direction_map.viewkeys() | KEY.GROUP_DEFAULT)
 	if c in direction_map:
 		game.creature_attack(level, creature, direction_map[c])
 		return True
@@ -168,7 +193,7 @@ def sight_change(game, level, creature, amount):
 def print_history(game, level, creature):
 	io.m.print_history()
 
-def debug(game, level, creature):
+def debug(game, level, creature, userinput):
 	c = io.getch_print("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
 		game.flags.show_map = not game.flags.show_map
@@ -213,6 +238,7 @@ def debug(game, level, creature):
 		io.draw_path(level.path(passage_up, passage_down))
 		game.redraw()
 	elif c == 's':
+		io.suspend()
 		code.interact(local=locals())
 	elif c == 'e':
 		import curses
@@ -220,11 +246,8 @@ def debug(game, level, creature):
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		io.a.erase()
 		io.a.addstr(10, 10, "penis penis penis penis penis")
-		io.a.refresh()
-		io.a.getch()
-		game.redraw()
+		io.getch()
 	elif c == '+':
 		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 		while True:

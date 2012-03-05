@@ -40,14 +40,14 @@ class Game(object):
 		return self.player is creature
 
 	def register_status_texts(self, creature):
-		#io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-		#io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
+		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
 		io.s.add_element("sight", "SR: ", lambda: creature.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
 		io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
-		#io.s.add_element("ar", "AR: ", lambda: creature.ar)
-		#io.s.add_element("dr", "DR: ", lambda: creature.dr)
-		#io.s.add_element("pv", "PV: ", lambda: creature.pv)
+		io.s.add_element("ar", "AR: ", lambda: creature.ar)
+		io.s.add_element("dr", "DR: ", lambda: creature.dr)
+		io.s.add_element("pv", "PV: ", lambda: creature.pv)
 		io.s.add_element("speed", "SP: ", lambda: creature.speed)
 		io.s.add_element("coord", "Loc: ", lambda: creature.coord)
 		io.s.add_element("target", "TA: ", lambda: creature.target_coord)
@@ -73,6 +73,7 @@ class Game(object):
 			self.cur_level = self.levels[world_loc]
 		old_level.remove_creature(self.player)
 		self.cur_level.add_creature(self.player, self.cur_level.get_passage_coord(passage))
+		self.current_vision = set()
 		self.redraw()
 
 	def init_new_level(self, world_loc):
@@ -95,14 +96,10 @@ class Game(object):
 			ai.act_alert(self, self.cur_level, creature, self.player.coord)
 
 	def player_act(self):
-		i = 0
-		while True:
+		took_action = False
+		while not took_action:
 			self.draw()
-			took_action = self.user_input.get_and_act(self, self.cur_level, self.player)
-			if took_action:
-				i += 1
-			if i == 1:
-				break
+			took_action = self.user_input.get_user_input_and_act(self, self.cur_level, self.player)
 
 	def creature_move(self, level, creature, direction):
 		if level.creature_can_move(creature, direction) and creature.can_act():
@@ -173,13 +170,6 @@ class Game(object):
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))
 		self.update_view(level, creature)
 
-	def redraw(self):
-		io.clear()
-		level, creature = self.cur_level, self.player
-		if self.flags.show_map:
-			io.draw(level.get_wallhack_data(level.get_coord_iter()))
-		self.redraw_view(level)
-
 	def update_view(self, level, creature):
 		old = self.current_vision if not self.flags.show_map else set()
 		new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
@@ -193,6 +183,13 @@ class Game(object):
 		io.draw(new_visible_data, self.flags.reverse)
 
 		self.current_vision = new
+
+	def redraw(self):
+		io.clear()
+		level, creature = self.cur_level, self.player
+		if self.flags.show_map:
+			io.draw(level.get_wallhack_data(level.get_coord_iter()))
+		self.redraw_view(level)
 
 	def redraw_view(self, level):
 		memory_data = level.get_memory_data(level.visited_locations)
