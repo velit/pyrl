@@ -88,22 +88,35 @@ def walk_mode_init(game, level, creature, userinput):
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
 		if ch in direction_map:
 			direction = direction_map[ch]
-			left_coord = add_vector(creature.coord, turn_vector_left(direction))
-			right_coord = add_vector(creature.coord, turn_vector_right(direction))
+			left_coord = add_vector(add_vector(creature.coord, direction), turn_vector_left(direction))
+			right_coord = add_vector(add_vector(creature.coord, direction), turn_vector_right(direction))
 			userinput.walk_mode = direction, level.is_passable(left_coord), level.is_passable(right_coord)
+			return game.creature_move(level, creature, direction)
 	else:
 		io.msg("Not while there are creatures in the vicinity.")
 	return False
 
 def walk_mode(game, level, creature, userinput):
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		direction, left_passable, right_passable = userinput.walk_mode
-		left_coord = add_vector(creature.coord, turn_vector_left(direction))
-		right_coord = add_vector(creature.coord, turn_vector_right(direction))
-		if (level.is_passable(left_coord) == left_passable and
-				level.is_passable(right_coord) == right_passable):
-			if game.creature_move(level, creature, direction):
-				return True
+		direction, last_left_passable, last_right_passable = userinput.walk_mode
+		left_passable = level.is_passable(add_vector(creature.coord, turn_vector_left(direction)))
+		right_passable = level.is_passable(add_vector(creature.coord, turn_vector_right(direction)))
+		target_passable = level.is_passable(add_vector(creature.coord, direction))
+		if target_passable:
+			if (left_passable == last_left_passable and
+					right_passable == last_right_passable):
+				return game.creature_move(level, creature, direction)
+		elif (not last_left_passable and not last_right_passable and
+				left_passable != right_passable):
+			if left_passable:
+				new_direction = turn_vector_left(direction)
+			elif right_passable:
+				new_direction = turn_vector_right(direction)
+			else:
+				assert False
+			userinput.walk_mode = new_direction, last_left_passable, last_right_passable
+			return game.creature_move(level, creature, new_direction)
+
 	userinput.walk_mode = None
 	return False
 
