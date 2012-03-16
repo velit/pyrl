@@ -1,7 +1,7 @@
 import const.keys as KEY
 import const.colors as COLOR
 import const.game as GAME
-import libtcodpy as libtcod
+import libtcod.libtcodpy as libtcod
 
 TCOD_COLOR = {
 	COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),
@@ -34,7 +34,7 @@ TCOD_COLOR = {
 TCOD_KEYS = {
 	libtcod.KEY_ENTER: KEY.ENTER,
 	libtcod.KEY_TAB: KEY.TAB,
-	libtcod.KEY_ESC: KEY.ESC,
+	libtcod.KEY_ESCAPE: KEY.ESC,
 	libtcod.KEY_SPACE: KEY.SPACE,
 	libtcod.KEY_LEFT: KEY.LEFT,
 	libtcod.KEY_RIGHT: KEY.RIGHT,
@@ -78,7 +78,7 @@ TCOD_IGNORE_KEYS = set([
 ])
 
 def init():
-	libtcod.console_set_custom_font("terminal10x18_gs_ro.png",
+	libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
 			libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
 	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME,
 			False, libtcod.RENDERER_SDL)
