@@ -96,10 +96,8 @@ class Game(object):
 			ai.act_alert(self, self.cur_level, creature, self.player.coord)
 
 	def player_act(self):
-		took_action = False
-		while not took_action:
-			self.draw()
-			took_action = self.user_input.get_user_input_and_act(self, self.cur_level, self.player)
+		self.draw()
+		self.user_input.get_user_input_and_act(self, self.cur_level, self.player)
 
 	def creature_move(self, level, creature, direction):
 		if level.creature_can_move(creature, direction) and creature.can_act():
@@ -164,7 +162,7 @@ class Game(object):
 			io.refresh()
 			io.msg(state_store.save(self, "pyrl.svg"))
 
-	def draw(self):
+	def draw(self):#FIXME parempi nimi, ja ota parametriks creature
 		level, creature = self.cur_level, self.player
 		if self.flags.show_map:
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))

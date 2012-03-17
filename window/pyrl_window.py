@@ -28,8 +28,13 @@ class PyrlWindow(object):
 	def erase(self):
 		self.cursor_lib.erase(self.h)
 
-	def getch(self):
-		return self.cursor_lib.getch(self.h)
+	# Blocking
+	def get_key(self):
+		return self.cursor_lib.get_key(self.h)
+
+	# Non-blocking
+	def check_key(self):
+		return self.cursor_lib.check_key(self.h)
 
 	def get_dimensions(self):
 		return self.cursor_lib.get_dimensions(self.h)

@@ -60,7 +60,7 @@ class LevelFile(object):
 	def add_walls(self):
 		for y, x in ((y, x) for y in range(self.rows) for x in range(self.cols)):
 			if self.get_tile_id(y, x) == TILE.ROCK and any(
-					tile_id == TILE.FLOOR for tile_id in self.neighbors(y, x)):
+					tile_id not in (TILE.WALL, TILE.ROCK) for tile_id in self.neighbors(y, x)):
 				self.set_tile_id(y, x, TILE.WALL)
 
 	def get_dynamic_monster_spawn_list(self):

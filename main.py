@@ -18,7 +18,7 @@ def start(cursor_lib, root_window, options):
 		raw_message = "Current screen size {}x{} is too small. Needs to be at least {}x{}"
 		message = raw_message.format(window_cols, window_rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS)
 		cursor_lib.addstr(root_window, 0, 0, message)
-		cursor_lib.getch(root_window)
+		cursor_lib.get_key(root_window)
 		exit()
 
 	# the input_output module has to be init before the game module is imported

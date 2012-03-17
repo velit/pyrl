@@ -29,9 +29,9 @@ class MessageBar(PyrlWindow):
 		for obj in args:
 			self.msgqueue.append(str(obj))
 
-	def _selective_getch(self, char_seq=KEY.GROUP_DEFAULT):
+	def _selective_getch(self, char_seq=KEY.GROUP_MORE):
 		while True:
-			c = self.getch()
+			c = self.get_key()
 			if c in char_seq:
 				return c
 

@@ -42,7 +42,7 @@ def _a_star(start, goal, neighbors, heuristic):
 						io.draw_char(node, ('?', COLOR.YELLOW))
 					openmember.add(node)
 			if DEBUG.PATH_STEP:
-				io.getch()
+				io.get_key()
 
 	return came_from
 

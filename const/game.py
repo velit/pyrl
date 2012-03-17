@@ -1,3 +1,4 @@
+from __future__ import division
 import const.generated_level_types as GENERATED_LEVEL_TYPE
 
 OPTIMIZATION = True
@@ -23,7 +24,8 @@ MONSTERS_PER_LEVEL = 99
 LEVELS_PER_DUNGEON = 99
 
 # in seconds
-ANIMATION_DELAY = 0
+ANIMATION_DELAY = 0.02
+INPUT_INTERVAL = min(ANIMATION_DELAY / 10, 0.01)
 
 GAME_NAME = "pyrl"
 DATA_FOLDER = "data"
