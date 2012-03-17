@@ -162,7 +162,7 @@ class Game(object):
 			io.refresh()
 			io.msg(state_store.save(self, "pyrl.svg"))
 
-	def draw(self):#FIXME parempi nimi, ja ota parametriks creature
+	def draw(self):
 		level, creature = self.cur_level, self.player
 		if self.flags.show_map:
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))
