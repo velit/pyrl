@@ -56,7 +56,7 @@ def _update_ui(io, w, r, a):
 
 def _hilight_and_getch(io, sw, w, a):
 	_print_menu_word(io, sw, w, a, True)
-	c = io.getch()
+	c = io.get_key()
 	_print_menu_word(io, sw, w, a, False)
 	return c
 

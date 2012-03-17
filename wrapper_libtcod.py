@@ -69,13 +69,8 @@ TCOD_KEYS = {
 	libtcod.KEY_KP7: KEY.NUMPAD_7,
 	libtcod.KEY_KP8: KEY.NUMPAD_8,
 	libtcod.KEY_KP9: KEY.NUMPAD_9,
+	libtcod.KEY_NONE: KEY.NO_INPUT,
 }
-
-TCOD_IGNORE_KEYS = set([
-	libtcod.KEY_SHIFT,
-	libtcod.KEY_CONTROL,
-	libtcod.KEY_ALT,
-])
 
 def init():
 	libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
@@ -109,23 +104,35 @@ def draw_reverse(handle, char_payload_sequence):
 	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
 		f(handle, x, y, symbol, COLOR_LOOKUP[bg], COLOR_LOOKUP[fg])
 
-def getch(handle=None):
-	while True:
-		key = libtcod.console_wait_for_keypress(False)
-		
-		if key.c == ord('c') and key.lctrl or key.rctrl:
+def get_key(handle_not_used):
+	key = KEY.NO_INPUT
+	while key == KEY.NO_INPUT:
+		key_event = libtcod.Key()
+		mouse_event = libtcod.Mouse()
+		libtcod.sys_wait_for_event(libtcod.EVENT_KEY_PRESS, key_event, mouse_event, False)
+		key = interpret_event(key_event)
+	return key
+
+def check_key(handle_not_used):
+	event = libtcod.console_check_for_keypress(libtcod.KEY_PRESSED)
+	return interpret_event(event)
+
+def interpret_event(event):
+	if libtcod.console_is_window_closed():
+		return KEY.CLOSE_WINDOW
+	elif event.vk in TCOD_KEYS:
+		return TCOD_KEYS[event.vk]
+	elif event.vk == libtcod.KEY_CHAR:
+		if event.c == ord('c') and event.lctrl or event.rctrl:
 			raise KeyboardInterrupt
-		elif key.vk in TCOD_KEYS:
-			return TCOD_KEYS[key.vk]
-		elif key.c != 0:
-			ch = chr(key.c)
-			if key.lctrl or key.rctrl:
-				ch = "^" + ch
-			if key.lalt or key.ralt:
-				ch = "!" + ch
-			return ch
-		elif key.vk not in TCOD_IGNORE_KEYS:
-			return key.vk
+		ch = chr(event.c)
+		if event.lctrl or event.rctrl:
+			ch = "^" + ch
+		if event.lalt or event.ralt:
+			ch = "!" + ch
+		return ch
+	else:
+		return KEY.NO_INPUT
 
 def clear(handle):
 	libtcod.console_clear(handle)

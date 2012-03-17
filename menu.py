@@ -52,7 +52,7 @@ def _update_ui(io, start_line, indt, lines, line_ignores):
 
 def _hilight_and_getch(io, line_i, indt, lines):
 	_print_menu_line(io, line_i, indt, lines, True)
-	c = io.getch()
+	c = io.get_key()
 	_print_menu_line(io, line_i, indt, lines, False)
 	return c
 

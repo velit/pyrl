@@ -41,11 +41,14 @@ except ImportError:
 
 if sys.platform.find('linux') != -1:
     _lib = ctypes.cdll['./libtcod.so']
+    LINUX=True
 else:
     try:
         _lib = ctypes.cdll['./libtcod-mingw.dll']
+        MINGW=True
     except WindowsError:
         _lib = ctypes.cdll['./libtcod-VS.dll']
+        MSVC=True
     # On Windows, ctypes doesn't work well with function returning structs,
     # so we have to user the _wrapper functions instead
     _lib.TCOD_color_multiply = _lib.TCOD_color_multiply_wrapper
@@ -64,7 +67,7 @@ else:
 
 HEXVERSION = 0x010501
 STRVERSION = "1.5.1"
-TECHVERSION = 0x01050101
+TECHVERSION = 0x01050103
 
 ############################
 # color module
@@ -377,8 +380,84 @@ class Key(Structure):
               ('shift', c_bool),
               ]
 
-_lib.TCOD_console_wait_for_keypress.restype = Key
-_lib.TCOD_console_check_for_keypress.restype = Key
+class ConsoleBuffer:
+    # simple console that allows direct (fast) access to cells. simplifies
+    # use of the "fill" functions.
+    def __init__(self, width, height, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
+        # initialize with given width and height. values to fill the buffer
+        # are optional, defaults to black with no characters.
+        n = width * height
+        self.width = width
+        self.height = height
+        self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
+
+    def clear(self, back_r=0, back_g=0, back_b=0, fore_r=0, fore_g=0, fore_b=0, char=' '):
+        # clears the console. values to fill it with are optional, defaults
+        # to black with no characters.
+        n = self.width * self.height
+        self.back_r = [back_r] * n
+        self.back_g = [back_g] * n
+        self.back_b = [back_b] * n
+        self.fore_r = [fore_r] * n
+        self.fore_g = [fore_g] * n
+        self.fore_b = [fore_b] * n
+        self.char = [ord(char)] * n
+    
+    def copy(self):
+        # returns a copy of this ConsoleBuffer.
+        other = ConsoleBuffer(0, 0)
+        other.width = self.width
+        other.height = self.height
+        other.back_r = list(self.back_r)  # make explicit copies of all lists
+        other.back_g = list(self.back_g)
+        other.back_b = list(self.back_b)
+        other.fore_r = list(self.fore_r)
+        other.fore_g = list(self.fore_g)
+        other.fore_b = list(self.fore_b)
+        other.char = list(self.char)
+        return other
+    
+    def set_fore(self, x, y, r, g, b, char):
+        # set the character and foreground color of one cell.
+        i = self.width * y + x
+        self.fore_r[i] = r
+        self.fore_g[i] = g
+        self.fore_b[i] = b
+        self.char[i] = ord(char)
+    
+    def set_back(self, x, y, r, g, b):
+        # set the background color of one cell.
+        i = self.width * y + x
+        self.back_r[i] = r
+        self.back_g[i] = g
+        self.back_b[i] = b
+    
+    def set(self, x, y, back_r, back_g, back_b, fore_r, fore_g, fore_b, char):
+        # set the background color, foreground color and character of one cell.
+        i = self.width * y + x
+        self.back_r[i] = back_r
+        self.back_g[i] = back_g
+        self.back_b[i] = back_b
+        self.fore_r[i] = fore_r
+        self.fore_g[i] = fore_g
+        self.fore_b[i] = fore_b
+        self.char[i] = ord(char)
+    
+    def blit(self, dest, fill_fore=True, fill_back=True):
+        # use libtcod's "fill" functions to write the buffer to a console.
+        if (console_get_width(dest) != self.width or
+            console_get_height(dest) != self.height):
+            raise ValueError('ConsoleBuffer.blit: Destination console has an incorrect size.')
+
+        s = struct.Struct('%di' % len(self.back_r))
+
+        if fill_back:
+            _lib.TCOD_console_fill_background(dest, s.pack(*self.back_r), s.pack(*self.back_g), s.pack(*self.back_b))
+
+        if fill_fore:
+            _lib.TCOD_console_fill_foreground(dest, s.pack(*self.fore_r), s.pack(*self.fore_g), s.pack(*self.fore_b))
+            _lib.TCOD_console_fill_char(dest, s.pack(*self.char))
+
 _lib.TCOD_console_credits_render.restype = c_bool
 _lib.TCOD_console_set_custom_font.argtypes=[c_char_p,c_int]
 _lib.TCOD_console_is_fullscreen.restype = c_bool
@@ -641,7 +720,7 @@ def console_put_char_ex(con, x, y, c, fore, back):
     else:
         _lib.TCOD_console_put_char_ex(con, x, y, c, fore, back)
 
-def console_set_char_background(con, x, y, col, flag=BKGND_DEFAULT):
+def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     _lib.TCOD_console_set_char_background(con, x, y, col, flag)
 
 def console_set_char_foreground(con, x, y, col):
@@ -723,7 +802,7 @@ def console_get_fading_color():
 # handling keyboard input
 def console_wait_for_keypress(flush):
     k=Key()
-    _lib.TCOD_console_wait_for_keypress_wrapper(byref(k),c_int(flush))
+    _lib.TCOD_console_wait_for_keypress_wrapper(byref(k),c_bool(flush))
     return k
 
 def console_check_for_keypress(flags=KEY_RELEASED):
@@ -743,7 +822,8 @@ def console_disable_keyboard_repeat():
 # using offscreen consoles
 def console_new(w, h):
     return _lib.TCOD_console_new(w, h)
-
+def console_from_file(filename):
+    return _lib.TCOD_console_from_file(filename)
 def console_get_width(con):
     return _lib.TCOD_console_get_width(con)
 
@@ -805,7 +885,7 @@ def console_fill_background(con,r,g,b) :
     _lib.TCOD_console_fill_background(con, cr, cg, cb)
 
 def console_fill_char(con,arr) :
-    if (numpy_available and isinstance(r, numpy.ndarray) ):
+    if (numpy_available and isinstance(arr, numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
         arr = numpy.ascontiguousarray(arr, dtype=numpy.int_)
         carr = arr.ctypes.data_as(POINTER(c_int))
@@ -814,6 +894,15 @@ def console_fill_char(con,arr) :
         carr = struct.pack('%di' % len(arr), *arr)
 
     _lib.TCOD_console_fill_char(con, carr)
+        
+def console_load_asc(con, filename) :
+    _lib.TCOD_console_load_asc(con,filename)
+def console_save_asc(con, filename) :
+    _lib.TCOD_console_save_asc(con,filename)
+def console_load_apf(con, filename) :
+    _lib.TCOD_console_load_apf(con,filename)
+def console_save_apf(con, filename) :
+    _lib.TCOD_console_save_apf(con,filename)
 
 ############################
 # sys module
@@ -876,6 +965,21 @@ def sys_register_SDL_renderer(callback):
     global sdl_renderer_func
     sdl_renderer_func = SDL_RENDERER_FUNC(callback)
     _lib.TCOD_sys_register_SDL_renderer(sdl_renderer_func)
+
+# events
+EVENT_KEY_PRESS=1
+EVENT_KEY_RELEASE=2
+EVENT_KEY=EVENT_KEY_PRESS|EVENT_KEY_RELEASE
+EVENT_MOUSE_MOVE=4
+EVENT_MOUSE_PRESS=8
+EVENT_MOUSE_RELEASE=16
+EVENT_MOUSE=EVENT_MOUSE_MOVE|EVENT_MOUSE_PRESS|EVENT_MOUSE_RELEASE
+EVENT_ANY=EVENT_KEY|EVENT_MOUSE
+def sys_check_for_event(mask,k,m) :
+    return _lib.TCOD_sys_check_for_event(c_int(mask),byref(k),byref(m))
+
+def sys_wait_for_event(mask,k,m,flush) :
+    return _lib.TCOD_sys_wait_for_event(c_int(mask),byref(k),byref(m),c_bool(flush))
 
 ############################
 # line module
@@ -1022,9 +1126,9 @@ def mouse_move(x, y):
     _lib.TCOD_mouse_move(x, y)
 
 def mouse_get_status():
-    m = Mouse()
-    _lib.TCOD_mouse_get_status_wrapper(byref(m))
-    return m
+    mouse=Mouse()
+    _lib.TCOD_mouse_get_status_wrapper(byref(mouse))
+    return mouse
 
 ############################
 # parser module
@@ -1317,8 +1421,8 @@ def noise_delete(n):
 # fov module
 ############################
 _lib.TCOD_map_is_in_fov.restype = c_bool
-_lib.TCOD_map_is_transparent = c_bool
-_lib.TCOD_map_is_walkable = c_bool
+_lib.TCOD_map_is_transparent.restype = c_bool
+_lib.TCOD_map_is_walkable.restype = c_bool
 
 FOV_BASIC = 0
 FOV_DIAMOND = 1
@@ -1381,53 +1485,52 @@ _lib.TCOD_path_walk.restype = c_bool
 PATH_CBK_FUNC = CFUNCTYPE(c_float, c_int, c_int, c_int, c_int, py_object)
 
 def path_new_using_map(m, dcost=1.41):
-    return _lib.TCOD_path_new_using_map(c_void_p(m), c_float(dcost))
+    return (_lib.TCOD_path_new_using_map(c_void_p(m), c_float(dcost)), None)
 
 def path_new_using_function(w, h, func, userdata=0, dcost=1.41):
-    global cbk_func
     cbk_func = PATH_CBK_FUNC(func)
-    return _lib.TCOD_path_new_using_function(w, h, cbk_func,
-                                             py_object(userdata), c_float(dcost))
+    return (_lib.TCOD_path_new_using_function(w, h, cbk_func,
+            py_object(userdata), c_float(dcost)), cbk_func)
 
 def path_compute(p, ox, oy, dx, dy):
-    return _lib.TCOD_path_compute(p, ox, oy, dx, dy)
+    return _lib.TCOD_path_compute(p[0], ox, oy, dx, dy)
 
 def path_get_origin(p):
     x = c_int()
     y = c_int()
-    _lib.TCOD_path_get_origin(p, byref(x), byref(y))
+    _lib.TCOD_path_get_origin(p[0], byref(x), byref(y))
     return x.value, y.value
 
 def path_get_destination(p):
     x = c_int()
     y = c_int()
-    _lib.TCOD_path_get_destination(p, byref(x), byref(y))
+    _lib.TCOD_path_get_destination(p[0], byref(x), byref(y))
     return x.value, y.value
 
 def path_size(p):
-    return _lib.TCOD_path_size(p)
+    return _lib.TCOD_path_size(p[0])
 
 def path_reverse(p):
-    _lib.TCOD_path_reverse(p)	
-	
+    _lib.TCOD_path_reverse(p[0])  
+
 def path_get(p, idx):
     x = c_int()
     y = c_int()
-    _lib.TCOD_path_get(p, idx, byref(x), byref(y))
+    _lib.TCOD_path_get(p[0], idx, byref(x), byref(y))
     return x.value, y.value
 
 def path_is_empty(p):
-    return _lib.TCOD_path_is_empty(p)
+    return _lib.TCOD_path_is_empty(p[0])
 
 def path_walk(p, recompute):
     x = c_int()
     y = c_int()
-    if _lib.TCOD_path_walk(p, byref(x), byref(y), c_int(recompute)):
+    if _lib.TCOD_path_walk(p[0], byref(x), byref(y), c_int(recompute)):
         return x.value, y.value
     return None,None
 
 def path_delete(p):
-    _lib.TCOD_path_delete(p)
+    _lib.TCOD_path_delete(p[0])
 
 _lib.TCOD_dijkstra_path_set.restype = c_bool
 _lib.TCOD_dijkstra_is_empty.restype = c_bool
@@ -1435,47 +1538,46 @@ _lib.TCOD_dijkstra_path_walk.restype = c_bool
 _lib.TCOD_dijkstra_get_distance.restype = c_float
 
 def dijkstra_new(m, dcost=1.41):
-    return _lib.TCOD_dijkstra_new(c_void_p(m), c_float(dcost))
+    return (_lib.TCOD_dijkstra_new(c_void_p(m), c_float(dcost)), None)
 
 def dijkstra_new_using_function(w, h, func, userdata=0, dcost=1.41):
-    global cbk_func
     cbk_func = PATH_CBK_FUNC(func)
-    return _lib.TCOD_path_dijkstra_using_function(w, h, cbk_func,
-                                             py_object(userdata), c_float(dcost))
+    return (_lib.TCOD_path_dijkstra_using_function(w, h, cbk_func,
+            py_object(userdata), c_float(dcost)), cbk_func)
 
 def dijkstra_compute(p, ox, oy):
-    _lib.TCOD_dijkstra_compute(p, c_int(ox), c_int(oy))
+    _lib.TCOD_dijkstra_compute(p[0], c_int(ox), c_int(oy))
 
 def dijkstra_path_set(p, x, y):
-    return _lib.TCOD_dijkstra_path_set(p, c_int(x), c_int(y))
+    return _lib.TCOD_dijkstra_path_set(p[0], c_int(x), c_int(y))
 
 def dijkstra_get_distance(p, x, y):
-    return _lib.TCOD_dijkstra_get_distance(p, c_int(x), c_int(y))
+    return _lib.TCOD_dijkstra_get_distance(p[0], c_int(x), c_int(y))
 
 def dijkstra_size(p):
-    return _lib.TCOD_dijkstra_size(p)
+    return _lib.TCOD_dijkstra_size(p[0])
 
 def dijkstra_reverse(p):
-    _lib.TCOD_dijkstra_reverse(p)
+    _lib.TCOD_dijkstra_reverse(p[0])
 
 def dijkstra_get(p, idx):
     x = c_int()
     y = c_int()
-    _lib.TCOD_dijkstra_get(p, c_int(idx), byref(x), byref(y))
+    _lib.TCOD_dijkstra_get(p[0], c_int(idx), byref(x), byref(y))
     return x.value, y.value
 
 def dijkstra_is_empty(p):
-    return _lib.TCOD_dijkstra_is_empty(p)
+    return _lib.TCOD_dijkstra_is_empty(p[0])
 
 def dijkstra_path_walk(p):
     x = c_int()
     y = c_int()
-    if _lib.TCOD_dijkstra_path_walk(p, byref(x), byref(y)):
+    if _lib.TCOD_dijkstra_path_walk(p[0], byref(x), byref(y)):
         return x.value, y.value
     return None,None
 
 def dijkstra_delete(p):
-    _lib.TCOD_dijkstra_delete(p)
+    _lib.TCOD_dijkstra_delete(p[0])
 
 ############################
 # bsp module

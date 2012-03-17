@@ -21,7 +21,6 @@ class Curses256ColorDict(dict):
 			return color_pair
 
 class CursesColorDict(dict):
-
 	BASIC_COLORS = (COLOR.BASE_NORMAL, COLOR.BASE_WHITE, COLOR.BASE_BLACK, COLOR.BASE_RED,
 			COLOR.BASE_GREEN, COLOR.BASE_BLUE, COLOR.BASE_PURPLE, COLOR.BASE_CYAN,
 			COLOR.BASE_BROWN, COLOR.BASE_DARK_GRAY, COLOR.BASE_GRAY, COLOR.BASE_LIGHT_GRAY)
@@ -61,6 +60,7 @@ def init():
 		curses.ascii.CR: KEY.ENTER,
 		curses.ascii.TAB: KEY.TAB,
 		curses.ascii.SP: KEY.SPACE,
+		curses.ascii.ESC: KEY.ESC,
 		curses.KEY_UP: KEY.UP,
 		curses.KEY_DOWN: KEY.DOWN,
 		curses.KEY_LEFT: KEY.LEFT,
@@ -203,18 +203,31 @@ def draw_reverse(window, char_payload_sequence):
 			if y != maxY - 1 or x != maxX - 1:
 				raise
 
-def getch(window):
-	ch = window.getch()
-	if ch in CURSES_KEYS:
-		return CURSES_KEYS[ch]
-	elif ch == curses.ascii.ESC:
-		window.timeout(0)
+def _esc_key_handler(window, ch):
+	if ch == curses.ascii.ESC:
+		window.nodelay(True)
 		second_ch = window.getch()
 		window.nodelay(False)
 		if second_ch != curses.ERR:
-			ch = curses.ascii.alt(second_ch)
-		else:
-			return KEY.ESC
+			return curses.ascii.alt(second_ch)
+	return ch
+
+def get_key(window):
+	ch = _esc_key_handler(window, window.getch())
+	return interpret_ch(ch)
+
+def check_key(window):
+	window.nodelay(True)
+	ch = window.getch()
+	window.nodelay(False)
+	if ch == curses.ERR:
+		return KEY.NO_INPUT
+	ch = _esc_key_handler(window, ch)
+	return interpret_ch(ch)
+
+def interpret_ch(ch):
+	if ch in CURSES_KEYS:
+		return CURSES_KEYS[ch]
 	ch = curses.ascii.unctrl(ch)
 	if '^' in ch:
 		return ch.lower()

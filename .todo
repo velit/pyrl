@@ -126,6 +126,12 @@
             Donesies, with zlib (1000% compression ratio)
         </comment>
     </note>
+    <note priority="high" time="1329170052" done="1331941954">
+        Make tcod version exit when you close the window
+        <comment>
+            donesies
+        </comment>
+    </note>
     <note priority="high" time="1329944242" done="1330287427">
         Profile some fov algorithms and pick one
         <comment>
@@ -198,20 +204,20 @@
     <note priority="veryhigh" time="1330904930">
         Add a function that draws the square how it's supposed to be seen
     </note>
-    <note priority="high" time="1329073265">
-        Finish walk mode
-    </note>
-    <note priority="high" time="1329170052">
-        Make tcod version exit when you close the window
-    </note>
-    <note priority="high" time="1330821261">
-        Make ncurses version manage resizing of window
+    <note priority="high" time="1331941016">
+        Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
     </note>
     <note priority="medium" time="1315691945">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
     </note>
+    <note priority="medium" time="1329073265">
+        Finetune walk mode
+    </note>
     <note priority="medium" time="1329647500">
         Make a getstring method
+    </note>
+    <note priority="medium" time="1330821261">
+        Make ncurses version manage resizing of window
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus

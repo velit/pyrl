@@ -57,6 +57,7 @@ class UserInput(object):
 	def __init__(self):
 		no_args, no_kwds = (), {}
 		self.actions = {
+			KEY.CLOSE_WINDOW: ("endgame", no_args, no_kwds),
 			'<': ("enter", (GAME.PASSAGE_UP, ), no_kwds),
 			'>': ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
 			'Q': ("endgame", no_args, no_kwds),
@@ -77,57 +78,70 @@ class UserInput(object):
 		self.walk_mode = None
 
 	def get_user_input_and_act(self, game, level, creature):
-		if self.walk_mode is not None:
-			io.refresh()
-			time.sleep(GAME.ANIMATION_DELAY)
-			return walk_mode(game, level, creature, self)
-		else:
-			c = io.getch()
-			if c in self.actions:
-				return self.execute_action(game, level, creature, self.actions[c])
+		taken_action = False
+		while not taken_action:
+			if self.walk_mode is not None:
+				taken_action = _walk_mode(game, level, creature, self)
 			else:
-				io.msg("Undefined key: {}".format(str(c)))
+				key = io.get_key()
+				if key in self.actions:
+					taken_action = self.execute_action(game, level, creature, self.actions[key])
+				else:
+					io.msg("Undefined key: {}".format(key))
 
 	def execute_action(self, game, level, creature, act):
 		function, args, keywords = act
 		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
 
 def walk_mode_init(game, level, creature, userinput):
-	ch = io.ask("Specify walking direction [Z to abort]:", direction_map.viewkeys() | KEY.GROUP_DEFAULT)
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		if ch in direction_map:
-			direction = direction_map[ch]
+		key = io.ask("Specify walking direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
+		if key in direction_map:
+			direction = direction_map[key]
 			left_coord = add_vector(add_vector(creature.coord, direction), turn_vector_left(direction))
 			right_coord = add_vector(add_vector(creature.coord, direction), turn_vector_right(direction))
-			userinput.walk_mode = direction, level.is_passable(left_coord), level.is_passable(right_coord)
+			userinput.walk_mode = ((direction, level.is_passable(left_coord), level.is_passable(right_coord)),
+					io.get_future_time())
 			return game.creature_move(level, creature, direction)
 	else:
 		io.msg("Not while there are creatures in the vicinity.")
 	return False
 
-def walk_mode(game, level, creature, userinput):
+def _walk_mode(game, level, creature, userinput):
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		direction, last_left_passable, last_right_passable = userinput.walk_mode
-		left_passable = level.is_passable(add_vector(creature.coord, turn_vector_left(direction)))
-		right_passable = level.is_passable(add_vector(creature.coord, turn_vector_right(direction)))
-		target_passable = level.is_passable(add_vector(creature.coord, direction))
-		if target_passable:
-			if (left_passable == last_left_passable and
-					right_passable == last_right_passable):
-				return game.creature_move(level, creature, direction)
-		elif (not last_left_passable and not last_right_passable and
-				left_passable != right_passable):
-			if left_passable:
-				new_direction = turn_vector_left(direction)
-			elif right_passable:
-				new_direction = turn_vector_right(direction)
-			else:
-				assert False
-			userinput.walk_mode = new_direction, last_left_passable, last_right_passable
-			return game.creature_move(level, creature, new_direction)
+		old_walk_data, timestamp = userinput.walk_mode
+		old_direction = old_walk_data[0]
+		new_walk_data = (
+				level.is_passable(add_vector(creature.coord, old_direction)),
+				level.is_passable(add_vector(creature.coord, turn_vector_left(old_direction))),
+				level.is_passable(add_vector(creature.coord, turn_vector_right(old_direction))),
+		)
+		result = _walk_mode_logic(old_walk_data, new_walk_data)
+		if result is not None:
+			new_direction, new_left, new_right = result
+			io.msg("Press q to interrupt walk mode")
+			key = io.selective_check_key_until_timestamp(KEY.GROUP_CANCEL, timestamp)
+			if key not in KEY.GROUP_CANCEL:
+				walk_delay = io.get_future_time()
+				userinput.walk_mode = (new_direction, new_left, new_right), walk_delay
+				return game.creature_move(level, creature, new_direction)
 
 	userinput.walk_mode = None
 	return False
+
+# the booleans all denote if something is passable
+def _walk_mode_logic(old_walk_data, new_walk_data):
+	old_direction, old_left, old_right = old_walk_data
+	target, new_left, new_right = new_walk_data
+	if target:
+		if new_left == old_left and new_right == old_right:
+			return old_direction, old_left, old_right
+	elif not old_left and not old_right and new_left != new_right:
+		if new_left:
+			new_direction = turn_vector_left(old_direction)
+		elif new_right:
+			new_direction = turn_vector_right(old_direction)
+		return new_direction, old_left, old_right
 
 def act_to_dir(game, level, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
@@ -144,10 +158,10 @@ def act_to_dir(game, level, creature, direction):
 		return False
 
 def z_command(game, level, creature):
-	c = io.getch()
-	if c == ord('Q'):
+	c = io.get_key()
+	if c == 'Q':
 		game.endgame(ask=False)
-	elif c == ord('Z'):
+	elif c == 'Z':
 		game.savegame(ask=False)
 
 def look(game, level, creature):
@@ -168,7 +182,7 @@ def look(game, level, creature):
 			char = char[0], (COLOR.BASE_BLACK, COLOR.BASE_GREEN)
 			io.draw_char(coord, char)
 			io.draw_reverse_char(creature.coord, level._get_visible_char(creature.coord))
-		c = io.getch()
+		c = io.get_key()
 		game.redraw()
 		direction = DIR.STOP
 		if c in direction_map:
@@ -182,7 +196,7 @@ def look(game, level, creature):
 		elif c == 's':
 			if level.has_creature(coord):
 				game.register_status_texts(level.get_creature(coord))
-		elif c in "QqzZ ":
+		elif c in KEY.GROUP_CANCEL:
 			break
 
 def endgame(game, level, creature, *a, **k):
@@ -192,9 +206,9 @@ def savegame(game, level, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, level, creature):
-	c = io.ask("Specify attack direction [Z to abort]:", direction_map.viewkeys() | KEY.GROUP_DEFAULT)
-	if c in direction_map:
-		game.creature_attack(level, creature, direction_map[c])
+	key = io.ask("Specify attack direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
+	if key in direction_map:
+		game.creature_attack(level, creature, direction_map[key])
 		return True
 
 def redraw(game, level, creature):
@@ -227,7 +241,7 @@ def print_history(game, level, creature):
 	io.m.print_history()
 
 def debug(game, level, creature, userinput):
-	c = io.getch_print("Avail cmds: vclbdhkpors+-")
+	c = io.get_key("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
 		game.flags.show_map = not game.flags.show_map
 		game.redraw()
@@ -280,7 +294,7 @@ def debug(game, level, creature, userinput):
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
 		io.a.addstr(10, 10, "penis penis penis penis penis")
-		io.getch()
+		io.get_key()
 	elif c == '+':
 		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 		while True:
