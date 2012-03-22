@@ -29,7 +29,7 @@ class MessageBar(BaseWindow):
 		for obj in args:
 			self.msgqueue.append(str(obj))
 
-	def _selective_getch(self, char_seq=KEY.GROUP_MORE):
+	def _selective_get_key(self, char_seq=KEY.GROUP_MORE):
 		while True:
 			c = self.get_key()
 			if c in char_seq:
@@ -44,7 +44,7 @@ class MessageBar(BaseWindow):
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
 				self.addch(self.rows - 1, self.cols - 1, ("M", GREEN))
 				self.refresh()
-				if self._selective_getch() == KEY.ENTER:
+				if self._selective_get_key() == KEY.ENTER:
 					skip = True
 					break
 				self.erase()
@@ -56,4 +56,4 @@ class MessageBar(BaseWindow):
 	def print_history(self):
 		for i, event in enumerate(self.history):
 			self.print_event(["History line {}:".format(i)] + event)
-			self._selective_getch()
+			self._selective_get_key()

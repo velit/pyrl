@@ -1,5 +1,6 @@
 from main import cursor_lib
 
+
 class BaseWindow(object):
 
 	def __init__(self, concrete_handle, blit_args=None):
@@ -57,3 +58,7 @@ class BaseWindow(object):
 
 	def suspend(self):
 		cursor_lib.suspend(self.h)
+
+	def draw_inventory(self, lines):
+		for i, line in enumerate(lines):
+			self.addstr(i, 0, line)
