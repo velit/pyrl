@@ -150,6 +150,10 @@ def flush():
 def get_dimensions(handle):
 	return libtcod.console_get_height(handle), libtcod.console_get_width(handle)
 
+def get_root_window():
+	# 0 is the libtcod root window handle number
+	return 0
+
 def subwindow_handle(parent_handle, child_rows, child_cols, parent_offset_y, parent_offset_x):
 	child_handle = libtcod.console_new(child_cols, child_rows)
 

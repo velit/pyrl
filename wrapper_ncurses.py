@@ -252,8 +252,11 @@ def flush():
 def get_dimensions(window):
 	return window.getmaxyx()
 
+def get_root_window():
+	return curses.initscr()
+
 def subwindow_handle(parent_window, child_rows, child_cols, parent_offset_y, parent_offset_x):
-	# ncurses doesn't use blitting
+	# ncurses doesn't use blitting hence the second half of the tuple being None
 	return parent_window.derwin(child_rows, child_cols, parent_offset_y, parent_offset_x), None
 
 def suspend(window):

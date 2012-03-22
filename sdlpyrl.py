@@ -1,17 +1,7 @@
 #!/usr/bin/env python
-
-import argparse
-import cProfile
 import main
+import wrapper_libtcod
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-l", "--load", action="store_true")
-parser.add_argument("-p", "--profile", action="store_true")
-
-options = parser.parse_args()
-
-if options.profile:
-	cProfile.run("main.tcod_main(options)", "profiler_data")
-else:
-	main.tcod_main(options)
+main.cursor_lib
+main.set_cursor_library(wrapper_libtcod)
+main.start()

@@ -1,12 +1,12 @@
 import textwrap
-from .pyrl_window import PyrlWindow
+from window.base_window import BaseWindow
 
 
-class StatusBar(PyrlWindow):
+class StatusBar(BaseWindow):
 	"""Handles the status bar system."""
 
 	def __init__(self, *a, **k):
-		PyrlWindow.__init__(self, *a, **k)
+		BaseWindow.__init__(self, *a, **k)
 
 		self.elements = []
 		self.modified = False
