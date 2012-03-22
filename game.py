@@ -5,7 +5,7 @@ import state_store
 import rdg
 
 from main import io
-from player import Player
+from const.player import Player
 from level import Level
 from user_input import UserInput
 from world_file import WorldFile

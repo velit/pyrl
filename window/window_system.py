@@ -77,6 +77,11 @@ class WindowSystem(object):
 		else:
 			self.l.draw_reverse(character_data_sequence)
 
+	def draw_inventory(self, lines):
+		self.a.draw_inventory(lines)
+		self.a.refresh()
+		self.a.get_key()
+
 	def draw_char(self, coord, char):
 		self.l.draw_char(coord, char)
 

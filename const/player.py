@@ -11,10 +11,17 @@ def Player():
 	monster_file = MonsterFile("tappi", Char('@', (COLOR.BASE_BLACK, COLOR.BASE_GREEN)), 0, 0)
 	player = AdvancedCreature(monster_file)
 
-	armor_stats = {PV: 4, AR:100, DR: 170, SPEED: 100, SIGHT: 0}
-	player.equip(Item(armor_stats), BODY)
+	armor_stats = {
+		PV: 4,
+		AR: 100,
+		DR: 170,
+		SPEED: 100,
+		SIGHT: 0,
+	}
+	armor = Item("Armor of Kings", armor_stats)
+	player.equip(armor, BODY)
 
-	weapon = Weapon(1, 8, 20)
+	weapon = Weapon("Sting", 1, 8, 20)
 	player.equip(weapon, HANDS)
 
 	return player

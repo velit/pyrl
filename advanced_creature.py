@@ -32,6 +32,9 @@ class AdvancedCreature(Creature):
 	def unequip(self, slot):
 		self.slots[slot] = None
 
+	def get_item(self, slot):
+		return self.slots[slot]
+
 	def get_item_stats(self, STAT):
 		return sum(item.stats[STAT] for item in self.slots.values() if item is not None and STAT in item.stats)
 

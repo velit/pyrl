@@ -1,26 +1,27 @@
 from dice import dice_roll
 
-#types = set()
-#types.add = "weapon"
-#types.add = "shield"
-#types.add = "armor"
-#types.add = "hat"
-#types.add = "boots"
+#types = {
+	#"weapon",
+	#"shield",
+	#"armor",
+	#"hat",
+	#"boots",
+#}
 
 
 class Item(object):
-	def __init__(self, stats=()):
-		#self.type = _type
-		#self.equippable = equippable
+	def __init__(self, name, stats=()):
+		self.name = name
 		self.stats = stats
+		assert isinstance(name, str)
 
 
 class Weapon(Item):
-	def __init__(self, dice=1, sides=6, addition=0, stats=()):
+	def __init__(self, name, dice=1, sides=6, addition=0, stats=()):
 		self.dice = dice
 		self.sides = sides
 		self.addition = addition
-		Item.__init__(self, stats)
+		Item.__init__(self, name, stats)
 
 	def roll(self):
 		return dice_roll(self.dice, self.sides, self.addition)

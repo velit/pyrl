@@ -70,6 +70,7 @@ class UserInput(object):
 			'^r': ("redraw", no_args, no_kwds),
 			'p': ("print_history", no_args, no_kwds),
 			'w': ("walk_mode_init", (self, ), no_kwds),
+			'i': ("inventory", no_args, no_kwds),
 		}
 		for key, value in direction_map.items():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
@@ -212,6 +213,10 @@ def attack(game, level, creature):
 
 def redraw(game, level, creature):
 	game.redraw()
+
+def inventory(game, level, creature):
+	inventory = (creature.get_item(SLOT.BODY), creature.get_item(SLOT.HANDS))
+	io.draw_inventory(item.name for item in inventory)
 
 def enter(game, level, creature, passage):
 	coord = game.player.coord
