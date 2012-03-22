@@ -1,6 +1,5 @@
 import sys
 import code
-import time
 
 import const.keys as KEY
 import const.directions as DIR
@@ -12,7 +11,7 @@ import const.slots as SLOT
 import const.stats as STAT
 
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
-from input_output import io
+from main import io
 from char import Char
 
 direction_map = {

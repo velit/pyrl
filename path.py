@@ -1,8 +1,8 @@
 import const.debug as DEBUG
 import const.colors as COLOR
 
+from main import io
 from heapq import heappush, heappop
-from input_output import io
 from generic_algorithms import chebyshev
 
 

@@ -1,16 +1,16 @@
 import textwrap
 import const.keys as KEY
-from .pyrl_window import PyrlWindow
 from const.colors import GREEN
+from window.base_window import BaseWindow
 
 
 MORE_STR_LEN = 2
 
-class MessageBar(PyrlWindow):
+class MessageBar(BaseWindow):
 	"""Handles the messaging bar system."""
 
 	def __init__(self, *a, **k):
-		PyrlWindow.__init__(self, *a, **k)
+		BaseWindow.__init__(self, *a, **k)
 
 		self.history = []
 		self.msgqueue = []

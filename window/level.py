@@ -1,14 +1,14 @@
 import const.colors as COLOR
 from char import Char
-from .pyrl_window import PyrlWindow
 from generic_algorithms import bresenham
+from window.base_window import BaseWindow
 
 
-class LevelWindow(PyrlWindow):
+class LevelWindow(BaseWindow):
 	"""Handles the level display"""
 
 	def __init__(self, *a, **k):
-		PyrlWindow.__init__(self, *a, **k)
+		BaseWindow.__init__(self, *a, **k)
 
 	def update(self):
 		self.blit()

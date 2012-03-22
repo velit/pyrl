@@ -201,6 +201,9 @@
     <note priority="veryhigh" time="1315707472">
         Make an inventory, inventory.py module which calls io inventory menu drawing
     </note>
+    <note priority="veryhigh" time="1329073265">
+        Finetune walk mode
+    </note>
     <note priority="veryhigh" time="1330904930">
         Add a function that draws the square how it's supposed to be seen
     </note>
@@ -212,9 +215,6 @@
     </note>
     <note priority="medium" time="1315691945">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
-    </note>
-    <note priority="medium" time="1329073265">
-        Finetune walk mode
     </note>
     <note priority="medium" time="1329647500">
         Make a getstring method

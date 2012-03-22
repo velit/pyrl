@@ -4,7 +4,7 @@ import const.creature_actions as CC
 import state_store
 import rdg
 
-from input_output import io
+from main import io
 from player import Player
 from level import Level
 from user_input import UserInput
@@ -44,7 +44,7 @@ class Game(object):
 		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
 		io.s.add_element("sight", "SR: ", lambda: creature.sight)
 		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("world_loc", "Loc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
+		io.s.add_element("world_loc", "WLoc: ", lambda: "{}/{}".format(*self.cur_level.world_loc))
 		io.s.add_element("ar", "AR: ", lambda: creature.ar)
 		io.s.add_element("dr", "DR: ", lambda: creature.dr)
 		io.s.add_element("pv", "PV: ", lambda: creature.pv)
