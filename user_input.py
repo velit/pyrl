@@ -12,7 +12,6 @@ import const.stats as STAT
 
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
 from main import io
-from char import Char
 
 direction_map = {
 		KEY.UP: DIR.NO,
@@ -72,7 +71,7 @@ class UserInput(object):
 			'w': ("walk_mode_init", (self, ), no_kwds),
 			'i': ("inventory", no_args, no_kwds),
 		}
-		for key, value in direction_map.items():
+		for key, value in direction_map.viewitems():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
 		self.walk_mode = None
@@ -119,8 +118,8 @@ def _walk_mode(game, level, creature, userinput):
 		result = _walk_mode_logic(old_walk_data, new_walk_data)
 		if result is not None:
 			new_direction, new_left, new_right = result
-			io.msg("Press q to interrupt walk mode")
-			key = io.selective_check_key_until_timestamp(KEY.GROUP_CANCEL, timestamp)
+			message = "Press q to interrupt walk mode"
+			key = io.ask_until_timestamp(message, timestamp, KEY.GROUP_CANCEL)
 			if key not in KEY.GROUP_CANCEL:
 				walk_delay = io.get_future_time()
 				userinput.walk_mode = (new_direction, new_left, new_right), walk_delay
@@ -174,14 +173,14 @@ def look(game, level, creature):
 			coord = new_coord
 		io.msg(level.look_information(coord))
 		if drawline_flag:
-			io.drawline(creature.coord, coord, Char("*", COLOR.YELLOW))
-			io.drawline(coord, creature.coord, Char("*", COLOR.YELLOW))
+			io.drawline(creature.coord, coord, ("*", COLOR.YELLOW))
+			io.drawline(coord, creature.coord, ("*", COLOR.YELLOW))
 			io.msg("LoS: {}".format(level.check_los(creature.coord, coord)))
 		if coord != creature.coord:
 			char = level._get_visible_char(coord)
 			char = char[0], (COLOR.BASE_BLACK, COLOR.BASE_GREEN)
 			io.draw_char(coord, char)
-			io.draw_reverse_char(creature.coord, level._get_visible_char(creature.coord))
+			io.draw_char(creature.coord, level._get_visible_char(creature.coord), reverse=True)
 		c = io.get_key()
 		game.redraw()
 		direction = DIR.STOP
@@ -216,7 +215,7 @@ def redraw(game, level, creature):
 
 def inventory(game, level, creature):
 	inventory = (creature.get_item(SLOT.BODY), creature.get_item(SLOT.HANDS))
-	io.draw_inventory(item.name for item in inventory)
+	io.draw_lines(item.name for item in inventory)
 
 def enter(game, level, creature, passage):
 	coord = game.player.coord
@@ -240,6 +239,7 @@ def sight_change(game, level, creature, amount):
 	from const.slots import BODY
 	from const.stats import SIGHT
 	creature.slots[BODY].stats[SIGHT] += amount
+	return True
 
 def print_history(game, level, creature):
 	io.m.print_history()
@@ -297,8 +297,9 @@ def debug(game, level, creature, userinput):
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		io.a.addstr(10, 10, "penis penis penis penis penis")
-		io.get_key()
+		io.a.addstr(0, 0, "test")
+		io.a.refresh()
+		io.a.get_key()
 	elif c == '+':
 		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 		while True:

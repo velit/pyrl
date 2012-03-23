@@ -36,7 +36,7 @@ class AdvancedCreature(Creature):
 		return self.slots[slot]
 
 	def get_item_stats(self, STAT):
-		return sum(item.stats[STAT] for item in self.slots.values() if item is not None and STAT in item.stats)
+		return sum(item.stats[STAT] for item in self.slots.viewvalues() if item is not None and STAT in item.stats)
 
 	def update_energy(self, amount):
 		super(self.__class__, self).update_energy(amount)

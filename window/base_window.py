@@ -1,3 +1,6 @@
+import time
+import const.keys as KEY
+import const.game as GAME
 from main import cursor_lib
 
 
@@ -21,20 +24,49 @@ class BaseWindow(object):
 	def draw_reverse(self, char_payload_sequence):
 		cursor_lib.draw_reverse(self.h, char_payload_sequence)
 
-	# clear is stronger than erase, on ncurses it causes a full refresh
-	def clear(self):
-		cursor_lib.clear(self.h)
+	def add_lines(self, lines):
+		for i, line in enumerate(lines):
+			self.addstr(i, 0, line)
 
 	def erase(self):
 		cursor_lib.erase(self.h)
 
+	# clear is stronger than erase, on ncurses it causes a full refresh
+	def clear(self):
+		cursor_lib.clear(self.h)
+
 	# Blocking
-	def get_key(self):
+	def get_key(self, refresh=False):
+		if refresh:
+			self.refresh()
 		return cursor_lib.get_key(self.h)
 
 	# Non-blocking
-	def check_key(self):
+	def check_key(self, refresh=False):
+		if refresh:
+			self.refresh()
 		return cursor_lib.check_key(self.h)
+
+	# Blocking
+	def selective_get_key(self, key_set, refresh=False):
+		if refresh:
+			self.refresh()
+		while True:
+			key = self.get_key()
+			if key in key_set:
+				return key
+
+	# Half-blocking
+	def selective_get_key_until_timestamp(self, timestamp, key_set, refresh=False):
+		if refresh:
+			self.refresh()
+		while True:
+			if time.time() >= timestamp:
+				return KEY.NO_INPUT
+			key = self.check_key()
+			if key in key_set:
+				return key
+			time.sleep(GAME.INPUT_INTERVAL)
 
 	def get_dimensions(self):
 		return cursor_lib.get_dimensions(self.h)
@@ -58,7 +90,3 @@ class BaseWindow(object):
 
 	def suspend(self):
 		cursor_lib.suspend(self.h)
-
-	def draw_inventory(self, lines):
-		for i, line in enumerate(lines):
-			self.addstr(i, 0, line)

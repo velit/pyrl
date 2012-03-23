@@ -3,7 +3,6 @@ import const.colors as COLOR
 
 from level_file import LevelFile
 from monster_file import MonsterFile
-from char import Char
 
 L0 = LevelFile(
 		danger_level=1,
@@ -11,7 +10,7 @@ L0 = LevelFile(
 		use_dynamic_monsters=False,
 )
 
-#L0.add_monster_file(MonsterFile("The Crone", Char('@', COLOR.PURPLE)))
+#L0.add_monster_file(MonsterFile("The Crone", ('@', COLOR.PURPLE)))
 
 L0.passage_locations[GAME.PASSAGE_UP] = (22, 15)
 L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
