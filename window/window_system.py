@@ -4,12 +4,12 @@ import const.game as GAME
 import const.debug as DEBUG
 import const.keys as KEY
 import const.colors as COLOR
+from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
 from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
-from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
 
 class WindowSystem(object):
@@ -17,59 +17,43 @@ class WindowSystem(object):
 	def __init__(self, root_window):
 		self.a = BaseWindow(root_window)
 
-		mh, mb = self.a.sub_handle(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
-		lh, lb = self.a.sub_handle(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
-		sh, sb = self.a.sub_handle(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
+		m_handle, m_blit_args = self.a.sub_handle(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
+		l_handle, l_blit_args = self.a.sub_handle(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
+		s_handle, s_blit_args = self.a.sub_handle(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
 
-		self.m = MessageBar(mh, mb)
-		self.l = LevelWindow(lh, lb)
-		self.s = StatusBar(sh, sb)
+		self.m = MessageBar(m_handle, m_blit_args)
+		self.l = LevelWindow(l_handle, l_blit_args)
+		self.s = StatusBar(s_handle, s_blit_args)
 
 		self.rows, self.cols = self.a.get_dimensions()
 
-	def get_key(self, print_str=None):
-		if print_str is not None:
-			self.msg(print_str)
-		self.refresh()
+	def get_key(self, message=None, refresh=True):
+		if message is not None:
+			self.msg(message)
+		if refresh:
+			self.refresh()
 		return self.a.get_key()
-
-	# returns KEY.NO_INPUT if timestamp is reached without input
-	def selective_check_key_until_timestamp(self, key_set, timestamp, stepping=GAME.INPUT_INTERVAL):
-		self.refresh()
-		t = time.time
-		sleep = time.sleep
-		key = self.a.check_key()
-		while t() < timestamp and key not in key_set:
-			key = self.a.check_key()
-			sleep(stepping)
-		return key
-
-	def ask(self, string, char_seq=KEY.GROUP_ALL):
-		self.msg(string)
-		return self._selective_getch(char_seq)
-
-	def notify(self, print_str):
-		self.msg(print_str)
-		return self._selective_getch(KEY.GROUP_MORE)
 
 	def msg(self, *a):
 		self.m.queue_msg(*a)
 
+	def ask(self, message, keys=KEY.GROUP_ALL):
+		self.msg(message)
+		self.refresh()
+		return self.a.selective_get_key(keys)
+
+	def notify(self, print_str):
+		return self.ask(print_str, KEY.GROUP_MORE)
+
 	def refresh(self):
-		self.m.update()
-		self.l.update()
-		self.s.update()
-		self.a.flush()
+		self.m.update(); self.l.update(); self.s.update(); self.a.flush();
 
 	def erase(self):
-		self.m.erase()
-		self.l.erase()
-		self.s.erase()
+		self.a.erase(); self.m.erase(); self.l.erase(); self.s.erase();
 
+	# clear is stronger than erase, on ncurses it causes a full refresh
 	def clear(self):
-		self.m.clear()
-		self.l.clear()
-		self.s.clear()
+		self.a.clear(); self.m.clear(); self.l.clear(); self.s.clear();
 
 	def draw(self, character_data_sequence, reverse=False):
 		if not reverse:
@@ -77,41 +61,29 @@ class WindowSystem(object):
 		else:
 			self.l.draw_reverse(character_data_sequence)
 
-	def draw_inventory(self, lines):
-		self.a.draw_inventory(lines)
-		self.a.refresh()
-		self.a.get_key()
+	def menu(self, lines):
+		self.a.draw_lines(lines)
+		return self.a.get_key(refresh=True)
 
-	def draw_char(self, coord, char):
-		self.l.draw_char(coord, char)
-
-	def draw_reverse_char(self, coord, char):
-		self.l.draw_reverse_char(coord, char)
+	def draw_char(self, coord, char, reverse=False):
+		self.l.draw_char(coord, char, reverse)
 
 	def drawline(self, *a, **k):
 		self.l.draw_line(*a, **k)
 
-	def draw_star(self, *a, **k):
-		self.l.draw_star(*a, **k)
-
-	def draw_block(self, *a, **k):
-		self.l.draw_block(*a, **k)
-
-	def draw_path(self, iterator):
-		for x in iterator:
-			self.draw_block(x, COLOR.BASE_GREEN)
+	def draw_path(self, path):
+		for x in path:
+			self.draw_char(x, (" ", COLOR.GREEN), reverse=True)
 			if DEBUG.PATH_STEP: self.get_key()
 		if not DEBUG.PATH_STEP: self.get_key()
 
 	def suspend(self):
 		self.a.suspend()
 
+	def ask_until_timestamp(self, message, timestamp, key_set):
+		self.msg(message)
+		self.refresh()
+		return self.a.selective_get_key_until_timestamp(timestamp, key_set)
+
 	def get_future_time(self, delay=GAME.ANIMATION_DELAY):
 		return time.time() + delay
-
-	def _selective_getch(self, char_set):
-		self.refresh()
-		c = None
-		while c not in char_set:
-			c = self.a.get_key()
-		return c

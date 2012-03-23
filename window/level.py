@@ -1,7 +1,6 @@
-import const.colors as COLOR
-from char import Char
-from generic_algorithms import bresenham
 from window.base_window import BaseWindow
+from generic_algorithms import bresenham
+from const.colors import YELLOW
 
 
 class LevelWindow(BaseWindow):
@@ -13,27 +12,14 @@ class LevelWindow(BaseWindow):
 	def update(self):
 		self.blit()
 
-	def draw_char(self, coord, char):
+	def draw_char(self, coord, char, reverse=False):
 		y, x = coord
+		if reverse:
+			symbol, (fg, bg) = char
+			char = symbol, (bg, fg)
 		self.addch(y, x, char)
 
-	def draw_reverse_char(self, coord, char):
-		y, x = coord
-		symbol, color = char
-		self.addch(y, x, (symbol, color[::-1]))
-
-	def draw_star(self, coord, col=COLOR.GREEN):
-		y, x = coord
-		char = Char("*", col)
-		self.addch(y, x, char)
-
-	def draw_block(self, coord, col=COLOR.BASE_BLUE):
-		y, x = coord
-
-		char = (" ", (COLOR.BASE_BLACK, col))
-		self.addch(y, x, char)
-
-	def draw_line(self, coordA, coordB, char=Char('*', COLOR.YELLOW), includeFirst=False):
+	def draw_line(self, coordA, coordB, char=('*', YELLOW), includeFirst=False):
 		if includeFirst:
 			for y, x in bresenham(coordA, coordB):
 				self.addch(y, x, char)

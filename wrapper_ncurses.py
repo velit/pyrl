@@ -255,8 +255,8 @@ def get_dimensions(window):
 def get_root_window():
 	return curses.initscr()
 
+# ncurses doesn't use blitting hence the second half of the tuple is None in this case
 def subwindow_handle(parent_window, child_rows, child_cols, parent_offset_y, parent_offset_x):
-	# ncurses doesn't use blitting hence the second half of the tuple being None
 	return parent_window.derwin(child_rows, child_cols, parent_offset_y, parent_offset_x), None
 
 def suspend(window):
