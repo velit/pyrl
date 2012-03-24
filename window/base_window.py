@@ -84,7 +84,7 @@ class BaseWindow(object):
 	def redraw(self):
 		cursor_lib.redraw(self.h)
 
-	def sub_handle(self, rows, cols, offset_y, offset_x):
+	def subwindow(self, rows, cols, offset_y, offset_x):
 		new_handle, blit_args = cursor_lib.subwindow_handle(self.h, rows, cols, offset_y, offset_x)
 		return new_handle, blit_args
 
