@@ -17,9 +17,9 @@ class WindowSystem(object):
 	def __init__(self, root_window):
 		self.a = BaseWindow(root_window)
 
-		m_handle, m_blit_args = self.a.sub_handle(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
-		l_handle, l_blit_args = self.a.sub_handle(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
-		s_handle, s_blit_args = self.a.sub_handle(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
+		m_handle, m_blit_args = self.a.subwindow(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
+		l_handle, l_blit_args = self.a.subwindow(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
+		s_handle, s_blit_args = self.a.subwindow(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
 
 		self.m = MessageBar(m_handle, m_blit_args)
 		self.l = LevelWindow(l_handle, l_blit_args)

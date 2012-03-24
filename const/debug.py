@@ -2,3 +2,5 @@ PATH = True
 PATH_STEP = False
 CROSS = True
 CROSS_MOD = 100
+SHOW_MAP = False
+REVERSE = False

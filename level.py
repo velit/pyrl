@@ -204,6 +204,7 @@ class Level(object):
 		self.creatures[coord] = creature
 		self.modified_locations.add(coord)
 		creature.coord = coord
+		creature.level = self
 		self.turn_scheduler.add(creature)
 
 	def remove_creature(self, creature):
@@ -211,6 +212,7 @@ class Level(object):
 		del self.creatures[coord]
 		self.modified_locations.add(coord)
 		creature.coord = None
+		creature.level = None
 		self.turn_scheduler.remove(creature)
 
 	def move_creature(self, creature, new_coord):

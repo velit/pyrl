@@ -8,6 +8,7 @@ class Creature(object):
 	def __init__(self, creature_file):
 		self.name = creature_file.name
 		self.char = creature_file.char
+		self.level = None
 		self.coord = None
 		self.target_coord = None
 		self.chase_vector = None

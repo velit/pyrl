@@ -76,23 +76,24 @@ class UserInput(object):
 
 		self.walk_mode = None
 
-	def get_user_input_and_act(self, game, level, creature):
+	def get_user_input_and_act(self, game, creature):
 		taken_action = False
 		while not taken_action:
 			if self.walk_mode is not None:
-				taken_action = _walk_mode(game, level, creature, self)
+				taken_action = _walk_mode(game, creature, self)
 			else:
 				key = io.get_key()
 				if key in self.actions:
-					taken_action = self.execute_action(game, level, creature, self.actions[key])
+					taken_action = self.execute_action(game, creature, self.actions[key])
 				else:
 					io.msg("Undefined key: {}".format(key))
 
-	def execute_action(self, game, level, creature, act):
+	def execute_action(self, game, creature, act):
 		function, args, keywords = act
-		return getattr(sys.modules[__name__], function)(game, level, creature, *args, **keywords)
+		return getattr(sys.modules[__name__], function)(game, creature, *args, **keywords)
 
-def walk_mode_init(game, level, creature, userinput):
+def walk_mode_init(game, creature, userinput):
+	level = creature.level
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
 		key = io.ask("Specify walking direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
 		if key in direction_map:
@@ -101,12 +102,13 @@ def walk_mode_init(game, level, creature, userinput):
 			right_coord = add_vector(add_vector(creature.coord, direction), turn_vector_right(direction))
 			userinput.walk_mode = ((direction, level.is_passable(left_coord), level.is_passable(right_coord)),
 					io.get_future_time())
-			return game.creature_move(level, creature, direction)
+			return game.creature_move(creature, direction)
 	else:
 		io.msg("Not while there are creatures in the vicinity.")
 	return False
 
-def _walk_mode(game, level, creature, userinput):
+def _walk_mode(game, creature, userinput):
+	level = creature.level
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
 		old_walk_data, timestamp = userinput.walk_mode
 		old_direction = old_walk_data[0]
@@ -123,7 +125,7 @@ def _walk_mode(game, level, creature, userinput):
 			if key not in KEY.GROUP_CANCEL:
 				walk_delay = io.get_future_time()
 				userinput.walk_mode = (new_direction, new_left, new_right), walk_delay
-				return game.creature_move(level, creature, new_direction)
+				return game.creature_move(creature, new_direction)
 
 	userinput.walk_mode = None
 	return False
@@ -142,12 +144,12 @@ def _walk_mode_logic(old_walk_data, new_walk_data):
 			new_direction = turn_vector_right(old_direction)
 		return new_direction, old_left, old_right
 
-def act_to_dir(game, level, creature, direction):
+def act_to_dir(game, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
-	if game.creature_move(level, creature, direction):
+	if game.creature_move(creature, direction):
 		return True
-	elif level.has_creature(target_coord):
-		game.creature_attack(level, creature, direction)
+	elif creature.level.has_creature(target_coord):
+		game.creature_attack(creature, direction)
 		return True
 	else:
 		if not creature.can_act():
@@ -156,15 +158,16 @@ def act_to_dir(game, level, creature, direction):
 			io.msg("You can't move there.")
 		return False
 
-def z_command(game, level, creature):
+def z_command(game, creature):
 	c = io.get_key()
 	if c == 'Q':
 		game.endgame(ask=False)
 	elif c == 'Z':
 		game.savegame(ask=False)
 
-def look(game, level, creature):
+def look(game, creature):
 	coord = creature.coord
+	level = creature.level
 	drawline_flag = False
 	direction = DIR.STOP
 	while True:
@@ -198,27 +201,28 @@ def look(game, level, creature):
 		elif c in KEY.GROUP_CANCEL:
 			break
 
-def endgame(game, level, creature, *a, **k):
+def endgame(game, creature, *a, **k):
 	game.endgame(*a, **k)
 
-def savegame(game, level, creature, *a, **k):
+def savegame(game, creature, *a, **k):
 	game.savegame(*a, **k)
 
-def attack(game, level, creature):
+def attack(game, creature):
 	key = io.ask("Specify attack direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
 	if key in direction_map:
-		game.creature_attack(level, creature, direction_map[key])
+		game.creature_attack(creature, direction_map[key])
 		return True
 
-def redraw(game, level, creature):
+def redraw(game, creature):
 	game.redraw()
 
-def inventory(game, level, creature):
+def inventory(game, creature):
 	inventory = (creature.get_item(SLOT.BODY), creature.get_item(SLOT.HANDS))
 	io.draw_lines(item.name for item in inventory)
 
-def enter(game, level, creature, passage):
+def enter(game, creature, passage):
 	coord = game.player.coord
+	level = creature.level
 	if level.is_exit(coord) and level.get_exit(coord) == passage:
 		try:
 			game.enter_passage(level.world_loc, level.get_exit(coord))
@@ -235,21 +239,22 @@ def enter(game, level, creature, passage):
 			level.move_creature(game.player, new_coord)
 	return True
 
-def sight_change(game, level, creature, amount):
+def sight_change(game, creature, amount):
 	from const.slots import BODY
 	from const.stats import SIGHT
 	creature.slots[BODY].stats[SIGHT] += amount
 	return True
 
-def print_history(game, level, creature):
+def print_history(game, creature):
 	io.m.print_history()
 
-def debug(game, level, creature, userinput):
+def debug(game, creature, userinput):
+	level = creature.level
 	c = io.get_key("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
-		game.flags.show_map = not game.flags.show_map
+		DEBUG.SHOW_MAP = not DEBUG.SHOW_MAP
 		game.redraw()
-		io.msg("Show map set to {}".format(game.flags.show_map))
+		io.msg("Show map set to {}".format(DEBUG.SHOW_MAP))
 	elif c == 'c':
 		DEBUG.CROSS = not DEBUG.CROSS
 		io.msg("Path heuristic cross set to {}".format(DEBUG.CROSS))
@@ -270,9 +275,9 @@ def debug(game, level, creature, userinput):
 			DEBUG.PATH_STEP = False
 			io.msg("Path debug unset")
 	elif c == 'h':
-		game.flags.reverse = not game.flags.reverse
+		DEBUG.REVERSE = not DEBUG.REVERSE
 		game.redraw()
-		io.msg("Reverse set to {}".format(game.flags.reverse))
+		io.msg("Reverse set to {}".format(DEBUG.REVERSE))
 	elif c == 'k':
 		creature_list = level.creatures.values()
 		creature_list.remove(creature)

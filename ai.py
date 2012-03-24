@@ -4,7 +4,8 @@ import const.creature_actions as ACTIONS
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 
-def act_alert(game, level, creature, alert_coord):
+def act_alert(game, creature, alert_coord):
+	level = creature.level
 	# creature seeing actions
 	if level.creature_has_sight(creature, alert_coord):
 		if creature.target_coord is not None and creature.target_coord != alert_coord:
@@ -13,9 +14,9 @@ def act_alert(game, level, creature, alert_coord):
 
 		if creature.can_act():
 			if level.creature_can_reach(creature, alert_coord):
-				game.creature_attack(level, creature, get_vector(creature.coord, creature.target_coord))
+				game.creature_attack(creature, get_vector(creature.coord, creature.target_coord))
 			else:
-				move_towards(game, level, creature, alert_coord)
+				move_towards(game, creature, alert_coord)
 
 	# creature actions
 	elif creature.can_act():
@@ -32,12 +33,13 @@ def act_alert(game, level, creature, alert_coord):
 					creature.chase_vector = None
 
 		if creature.target_coord is not None:
-			move_towards(game, level, creature, creature.target_coord)
+			move_towards(game, creature, creature.target_coord)
 		else:
-			move_random(game, level, creature)
+			move_random(game, creature)
 
 
-def move_towards(game, level, creature, target_coord):
+def move_towards(game, creature, target_coord):
+	level = creature.level
 	best_action = ACTIONS.MOVE
 	best_direction = DIRS.STOP
 	best_cost = None
@@ -56,15 +58,15 @@ def move_towards(game, level, creature, target_coord):
 			best_cost = cost
 
 	if best_action == ACTIONS.MOVE:
-		game.creature_move(level, creature, best_direction)
+		game.creature_move(creature, best_direction)
 	elif best_action == ACTIONS.SWAP:
-		game.creature_swap(level, creature, best_direction)
+		game.creature_swap(creature, best_direction)
 	else:
 		assert False
 
 
-def move_random(game, level, creature):
+def move_random(game, creature):
 	for x in xrange(len(DIRS.ALL)):
 		direction = random.choice(DIRS.ALL)
-		if game.creature_move(level, creature, direction):
+		if game.creature_move(creature, direction):
 			return
