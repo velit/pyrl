@@ -217,8 +217,9 @@ def redraw(game, creature):
 	game.redraw()
 
 def inventory(game, creature):
-	inventory = (creature.get_item(SLOT.BODY), creature.get_item(SLOT.HANDS))
-	io.draw_lines(item.name for item in inventory)
+	inventory_lines = list(creature.get_inventory_lines())
+	key = io.menu(inventory_lines)
+	game.redraw()
 
 def enter(game, creature, passage):
 	coord = game.player.coord
