@@ -62,7 +62,7 @@ class WindowSystem(object):
 			self.l.draw_reverse(character_data_sequence)
 
 	def menu(self, lines):
-		self.a.draw_lines(lines)
+		self.a.add_lines(lines)
 		return self.a.get_key(refresh=True)
 
 	def draw_char(self, coord, char, reverse=False):

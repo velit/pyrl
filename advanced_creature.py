@@ -1,6 +1,7 @@
 from creature import Creature
 from const.slots import HEAD, BODY, FEET, HANDS
 from const.stats import *
+from item import Inventory
 
 class AdvancedCreature(Creature):
 
@@ -10,6 +11,7 @@ class AdvancedCreature(Creature):
 		self.slots[HEAD] = None
 		self.slots[BODY] = None
 		self.slots[FEET] = None
+		self.inventory = Inventory()
 
 		self.last_action_energy = 0
 
@@ -47,6 +49,15 @@ class AdvancedCreature(Creature):
 
 	def is_idle(self):
 		return False
+
+	def bag_item(self, item):
+		self.inventory.add_item(item)
+
+	def unbag_item(self, item):
+		self.inventory.remove_item(item)
+
+	def get_inventory_lines(self):
+		return self.inventory.get_menu_lines()
 
 	@property
 	def sight(self):
