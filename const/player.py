@@ -32,7 +32,7 @@ def Player():
 		Weapon("-1 short sword", 1, 6, -1),
 		Weapon("+3 short sword", 1, 6, 3),
 		Weapon("+0 short sword", 1, 6, 0),
-		Weapon("Lange of longinus", 4, 8, 8, {DEX: 8}),
+		Weapon("Lance of longinus", 4, 8, 8, {DEX: 8}),
 		Weapon("+2 long sword", 1, 8, 2),
 	)
 	for itam in itams:

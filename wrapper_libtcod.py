@@ -1,3 +1,4 @@
+from const.game import LIBTCOD
 import const.keys as KEY
 import const.colors as COLOR
 import const.game as GAME
@@ -71,16 +72,42 @@ TCOD_KEYS = {
 	libtcod.KEY_KP9: KEY.NUMPAD_9,
 	libtcod.KEY_NONE: KEY.NO_INPUT,
 }
+ROOT_WIN = None
 
-def init():
+def init(root_window):
+	global ROOT_WIN
 	libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
 			libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
-	libtcod.console_init_root(GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS, GAME.GAME_NAME,
+	libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, GAME.GAME_NAME,
 			False, libtcod.RENDERER_SDL)
 
 def init_handle(handle):
 	libtcod.console_set_default_background(handle, libtcod.black)
 	libtcod.console_set_default_foreground(handle, libtcod.white)
+
+def new_window(size):
+	rows, columns = size
+	handle = libtcod.console_new(columns, rows)
+	init_handle(handle)
+	return handle
+
+def flush():
+	libtcod.console_flush()
+
+def get_root_window():
+	return ROOT_WIN
+
+def suspend():
+	pass
+
+def resume():
+	pass
+	
+def toggle_fullscreen():
+	if libtcod.console_is_fullscreen():
+		libtcod.console_set_fullscreen(False)
+	else:
+		libtcod.console_set_fullscreen(True)
 
 def addch(handle, y, x, char):
 	symbol, (fg, bg) = char
@@ -137,41 +164,13 @@ def interpret_event(event):
 def clear(handle):
 	libtcod.console_clear(handle)
 
-def erase(handle):
-	libtcod.console_clear(handle)
-
-def blit(handle, blit_args):
-	if blit_args is not None:
-		libtcod.console_blit(*blit_args)
-
-def flush():
-	libtcod.console_flush()
+def blit(handle, size, screen_position):
+	rows, cols = size
+	y, x = screen_position
+	libtcod.console_blit(handle, 0, 0, cols, rows, ROOT_WIN, x, y, 1.0, 1.0)
 
 def get_dimensions(handle):
 	return libtcod.console_get_height(handle), libtcod.console_get_width(handle)
 
-def get_root_window():
-	# 0 is the libtcod root window handle number
-	return 0
-
-def subwindow_handle(parent_handle, child_rows, child_cols, parent_offset_y, parent_offset_x):
-	child_handle = libtcod.console_new(child_cols, child_rows)
-
-	blit_args = (
-			child_handle,                     # blitted window
-			0, 0, child_cols, child_rows,     # the area of new window that will be blitted
-			parent_handle,                    # target of the blit
-			parent_offset_x, parent_offset_y, # where to blit in target
-			1.0, 1.0                          # transparency
-	)
-
-	return child_handle, blit_args
-	
-def toggle_fullscreen():
-	if libtcod.console_is_fullscreen():
-		libtcod.console_set_fullscreen(False)
-	else:
-		libtcod.console_set_fullscreen(True)
-
-def suspend(handle):
-	pass
+def get_implementation():
+	return LIBTCOD

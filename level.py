@@ -174,7 +174,7 @@ class Level(object):
 		elif direction == DIRS.STOP:
 			value = GAME.MOVEMENT_COST
 		else:
-			raise GAME.PyrlException("Invalid direction: {}".format(direction))
+			raise ValueError("Invalid direction: {}".format(direction))
 		return value
 
 	def path(self, start_coord, goal_coord):

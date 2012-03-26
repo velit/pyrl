@@ -22,7 +22,7 @@ class MessageBar(BaseWindow):
 			self.history.append(self.msgqueue)
 			self.msgqueue = []
 		else:
-			self.erase()
+			self.clear()
 		self.blit()
 
 	def queue_msg(self, *args):
@@ -32,7 +32,7 @@ class MessageBar(BaseWindow):
 	def print_event(self, event):
 		skip = False
 		lines = self.wrap(" ".join(event))
-		self.erase()
+		self.clear()
 		for i, line in enumerate(lines):
 			self.addstr(i % self.rows, 0, line)
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
@@ -40,9 +40,9 @@ class MessageBar(BaseWindow):
 				if self.selective_get_key(KEY.GROUP_MORE) == KEY.ENTER:
 					skip = True
 					break
-				self.erase()
+				self.clear()
 		if skip:
-			self.erase()
+			self.clear()
 			for i in range(self.rows):
 				self.addstr(i, 0, lines[i - self.rows])
 

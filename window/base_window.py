@@ -1,16 +1,16 @@
 import time
 import const.keys as KEY
 import const.game as GAME
+
 from main import cursor_lib
 
 
 class BaseWindow(object):
 
-	def __init__(self, concrete_handle, blit_args=None):
-		self.h = concrete_handle
-		self.rows, self.cols = self.get_dimensions()
-		cursor_lib.init_handle(self.h)
-		self.blit_args = blit_args
+	def __init__(self, size, screen_position):
+		self.rows, self.cols = size
+		self.screen_position = screen_position
+		self.h = cursor_lib.new_window(size)
 
 	def addch(self, y, x, char):
 		cursor_lib.addch(self.h, y, x, char)
@@ -28,10 +28,6 @@ class BaseWindow(object):
 		for i, line in enumerate(lines):
 			self.addstr(i, 0, line)
 
-	def erase(self):
-		cursor_lib.erase(self.h)
-
-	# clear is stronger than erase, on ncurses it causes a full refresh
 	def clear(self):
 		cursor_lib.clear(self.h)
 
@@ -60,33 +56,19 @@ class BaseWindow(object):
 	def selective_get_key_until_timestamp(self, timestamp, key_set, refresh=False):
 		if refresh:
 			self.refresh()
-		while True:
+
+		key = self.check_key()
+		while key not in key_set:
 			if time.time() >= timestamp:
 				return KEY.NO_INPUT
-			key = self.check_key()
-			if key in key_set:
-				return key
 			time.sleep(GAME.INPUT_INTERVAL)
-
-	def get_dimensions(self):
-		return cursor_lib.get_dimensions(self.h)
+			key = self.check_key()
+		return key
 
 	def blit(self):
-		cursor_lib.blit(self.h, self.blit_args)
-
-	def flush(self):
-		cursor_lib.flush()
+		size = self.rows, self.cols
+		cursor_lib.blit(self.h, size, self.screen_position)
 
 	def refresh(self):
 		self.blit()
-		self.flush()
-
-	def redraw(self):
-		cursor_lib.redraw(self.h)
-
-	def subwindow(self, rows, cols, offset_y, offset_x):
-		new_handle, blit_args = cursor_lib.subwindow_handle(self.h, rows, cols, offset_y, offset_x)
-		return new_handle, blit_args
-
-	def suspend(self):
-		cursor_lib.suspend(self.h)
+		cursor_lib.flush()

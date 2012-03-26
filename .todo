@@ -66,6 +66,12 @@
             done, that didn't take long
         </comment>
     </note>
+    <note priority="veryhigh" time="1332456549" done="1332721900">
+        Move getch refresh from window_system to base_window
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -150,6 +156,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1331954520" done="1332721910">
+        Rename draw in game.py to something like update_view(creature) oslt
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -207,14 +219,8 @@
     <note priority="veryhigh" time="1330904930">
         Add a function that draws the square how it's supposed to be seen
     </note>
-    <note priority="veryhigh" time="1332456549">
-        Move getch refresh from window_system to base_window
-    </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
-    </note>
-    <note priority="high" time="1331954520">
-        Rename draw in game.py to something like update_view(creature) oslt
     </note>
     <note priority="high" time="1332539363">
         Fragment walk_mode into own file
@@ -225,8 +231,11 @@
     <note priority="medium" time="1329647500">
         Make a getstring method
     </note>
-    <note priority="medium" time="1330821261">
+    <note priority="medium" time="1330821261" done="1332721922">
         Make ncurses version manage resizing of window
+        <comment>
+            donesies
+        </comment>
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus

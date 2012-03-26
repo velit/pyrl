@@ -1,32 +1,28 @@
 import argparse
 import cProfile
 import state_store
-import const.game as GAME
+from const.game import NCURSES
 
 
 cursor_lib = None
 io = None
+root_win = None
 
-def set_cursor_library(cursor_library):
-	global cursor_lib, io
+
+def set_cursor_library(cursor_library, root_window):
+	global cursor_lib, io, root_win
 	cursor_lib = cursor_library
+	root_win = root_window
 
 	from window.window_system import WindowSystem
 	io = WindowSystem(cursor_lib.get_root_window())
 
 
 def start():
-	cursor_lib.init()
-	root_window = cursor_lib.get_root_window()
-
-	# check to see the window is big enough
-	window_rows, window_cols = cursor_lib.get_dimensions(root_window)
-	if window_rows < GAME.MIN_SCREEN_ROWS or window_cols < GAME.MIN_SCREEN_COLS:
-		raw_message = "Current screen size {}x{} is too small. Needs to be at least {}x{}"
-		message = raw_message.format(window_cols, window_rows, GAME.MIN_SCREEN_COLS, GAME.MIN_SCREEN_ROWS)
-		cursor_lib.addstr(root_window, 0, 0, message)
-		cursor_lib.get_key(root_window)
-		exit()
+	cursor_lib.init(root_win)
+	if cursor_lib.get_implementation() == NCURSES:
+		# check to see the window is big enough
+		cursor_lib._window_resized()
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-l", "--load", action="store_true")
