@@ -4,35 +4,30 @@ import const.game as GAME
 import const.debug as DEBUG
 import const.keys as KEY
 import const.colors as COLOR
-from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
 from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
+from main import cursor_lib
 
 
 class WindowSystem(object):
 
 	def __init__(self, root_window):
-		self.a = BaseWindow(root_window)
+		from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
 
-		m_handle, m_blit_args = self.a.subwindow(MSG_BAR_HEIGHT, LEVEL_WIDTH, 0, 0)
-		l_handle, l_blit_args = self.a.subwindow(LEVEL_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT, 0)
-		s_handle, s_blit_args = self.a.subwindow(STATUS_BAR_HEIGHT, LEVEL_WIDTH, MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0)
-
-		self.m = MessageBar(m_handle, m_blit_args)
-		self.l = LevelWindow(l_handle, l_blit_args)
-		self.s = StatusBar(s_handle, s_blit_args)
-
-		self.rows, self.cols = self.a.get_dimensions()
+		self.a = BaseWindow((GAME.SCREEN_ROWS, GAME.SCREEN_COLS), (0, 0))
+		self.m = MessageBar((MSG_BAR_HEIGHT, LEVEL_WIDTH), (0, 0))
+		self.l = LevelWindow((LEVEL_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT, 0))
+		self.s = StatusBar((STATUS_BAR_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0))
 
 	def get_key(self, message=None, refresh=True):
 		if message is not None:
 			self.msg(message)
 		if refresh:
 			self.refresh()
-		return self.a.get_key()
+		return self.l.get_key()
 
 	def msg(self, *a):
 		self.m.queue_msg(*a)
@@ -40,20 +35,16 @@ class WindowSystem(object):
 	def ask(self, message, keys=KEY.GROUP_ALL):
 		self.msg(message)
 		self.refresh()
-		return self.a.selective_get_key(keys)
+		return self.l.selective_get_key(keys)
 
 	def notify(self, print_str):
 		return self.ask(print_str, KEY.GROUP_MORE)
 
 	def refresh(self):
-		self.m.update(); self.l.update(); self.s.update(); self.a.flush();
-
-	def erase(self):
-		self.a.erase(); self.m.erase(); self.l.erase(); self.s.erase();
-
-	# clear is stronger than erase, on ncurses it causes a full refresh
-	def clear(self):
-		self.a.clear(); self.m.clear(); self.l.clear(); self.s.clear();
+		self.m.update()
+		self.l.update()
+		self.s.update()
+		cursor_lib.flush()
 
 	def draw(self, character_data_sequence, reverse=False):
 		if not reverse:
@@ -78,12 +69,18 @@ class WindowSystem(object):
 		if not DEBUG.PATH_STEP: self.get_key()
 
 	def suspend(self):
-		self.a.suspend()
+		cursor_lib.suspend()
+
+	def resume(self):
+		cursor_lib.resume()
 
 	def ask_until_timestamp(self, message, timestamp, key_set):
 		self.msg(message)
 		self.refresh()
-		return self.a.selective_get_key_until_timestamp(timestamp, key_set)
+		return self.l.selective_get_key_until_timestamp(timestamp, key_set)
 
-	def get_future_time(self, delay=GAME.ANIMATION_DELAY):
-		return time.time() + delay
+	def get_future_time(self, delay=None):
+		if delay is not None:
+			return time.time() + delay
+		else:
+			return time.time() + GAME.ANIMATION_DELAY

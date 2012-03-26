@@ -3,6 +3,8 @@ import const.maps as MAP
 
 from level_file import LevelFile
 
+class LevelNotFound(Exception): pass
+
 class WorldFile(object):
 
 	def __init__(self):
@@ -32,13 +34,13 @@ class WorldFile(object):
 		try:
 			return self.level_files[world_loc]
 		except KeyError:
-			raise GAME.PyrlException("Nonexistant level key: {}".format(world_loc))
+			raise LevelNotFound("Nonexistant level key: {}".format(world_loc))
 
 	def pop_level_file(self, world_loc):
 		try:
 			level_file = self.level_files[world_loc]
 		except KeyError:
-			raise GAME.PyrlException("Nonexistant level key: {}".format(world_loc))
+			raise LevelNotFound("Nonexistant level key: {}".format(world_loc))
 		else:
 			del self.level_files[world_loc]
 			return level_file

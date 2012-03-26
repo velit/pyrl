@@ -184,7 +184,7 @@ class Game(object):
 		self.current_vision = new
 
 	def redraw(self):
-		io.erase()
+		io.l.clear()
 		level = self.player.level
 		if DEBUG.SHOW_MAP:
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))

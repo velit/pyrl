@@ -16,7 +16,7 @@ class StatusBar(BaseWindow):
 		if self.modified:
 			self.elements.sort()
 			self.modified = False
-		self.erase()
+		self.clear()
 		self.print_elements()
 		self.blit()
 

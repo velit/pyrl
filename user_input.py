@@ -10,6 +10,7 @@ import const.generated_level_types as LEVEL_TYPE
 import const.slots as SLOT
 import const.stats as STAT
 
+from world_file import LevelNotFound
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
 from main import io
 
@@ -227,7 +228,7 @@ def enter(game, creature, passage):
 	if level.is_exit(coord) and level.get_exit(coord) == passage:
 		try:
 			game.enter_passage(level.world_loc, level.get_exit(coord))
-		except GAME.PyrlException:
+		except LevelNotFound:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
 		try:
@@ -297,15 +298,14 @@ def debug(game, creature, userinput):
 	elif c == 's':
 		io.suspend()
 		code.interact(local=locals())
+		io.resume()
 	elif c == 'e':
 		import curses
 		io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 	elif c == 'r':
-		io.a.addstr(0, 0, "test")
-		io.a.refresh()
-		io.a.get_key()
+		io.a.get_key(refresh=True)
 	elif c == '+':
 		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
 		while True:

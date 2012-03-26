@@ -9,7 +9,7 @@ import main
 import wrapper_ncurses
 
 def start(curses_window):
-	main.set_cursor_library(wrapper_ncurses)
+	main.set_cursor_library(wrapper_ncurses, curses_window)
 	main.start()
 
 curses.wrapper(start)

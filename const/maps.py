@@ -12,7 +12,7 @@ L0 = LevelFile(
 
 #L0.add_monster_file(MonsterFile("The Crone", ('@', COLOR.PURPLE)))
 
-L0.passage_locations[GAME.PASSAGE_UP] = (22, 15)
+L0.passage_locations[GAME.PASSAGE_UP] = (23, 15)
 L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
 L0.tilefile = \
 list(
