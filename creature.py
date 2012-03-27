@@ -1,4 +1,3 @@
-from const.slots import *
 import const.game as GAME
 import const.creature_actions as CC
 
@@ -22,12 +21,6 @@ class Creature(object):
 		self.perception = 10
 
 		self.hp = self.max_hp
-
-	def equip(self, item, slot):
-		self.slots[slot] = item
-
-	def unequip(self, slot):
-		self.slots[slot] = None
 
 	def get_damage_info(self):
 		dice = self.unarmed_dice
