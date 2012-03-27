@@ -192,6 +192,12 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1330821261" done="1332721922">
+        Make ncurses version manage resizing of window
+        <comment>
+            donesies
+        </comment>
+    </note>
     <note priority="low" time="1315848070" done="1328980741">
         make a generic status bar print that splits correctly
         <comment>
@@ -211,7 +217,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make an inventory, inventory.py module which calls io inventory menu drawing
+        Make an inventory that allows unequipping of items.
     </note>
     <note priority="veryhigh" time="1329073265">
         Finetune walk mode
@@ -230,12 +236,6 @@
     </note>
     <note priority="medium" time="1329647500">
         Make a getstring method
-    </note>
-    <note priority="medium" time="1330821261" done="1332721922">
-        Make ncurses version manage resizing of window
-        <comment>
-            donesies
-        </comment>
     </note>
     <note priority="low" time="1315155844">
         wizard/mana, warrior/stamina rogue/focus

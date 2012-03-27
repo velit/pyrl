@@ -1,21 +1,21 @@
 from creature import Creature
 from const.slots import HEAD, BODY, FEET, HANDS
 from const.stats import *
-from item import Inventory
 
 class AdvancedCreature(Creature):
 
 	def __init__(self, creature_file):
+		super(self.__class__, self).__init__(creature_file)
+
 		self.slots = {}
 		self.slots[HANDS] = None
 		self.slots[HEAD] = None
 		self.slots[BODY] = None
 		self.slots[FEET] = None
-		self.inventory = Inventory()
+		self.inventory = []
 
 		self.last_action_energy = 0
 
-		super(self.__class__, self).__init__(creature_file)
 
 	def get_damage_info(self):
 		if self.slots[HANDS] is not None:
@@ -27,12 +27,6 @@ class AdvancedCreature(Creature):
 			sides = self.unarmed_sides
 			addition = self.dmg_bonus
 		return dice, sides, addition
-
-	def equip(self, item, slot):
-		self.slots[slot] = item
-
-	def unequip(self, slot):
-		self.slots[slot] = None
 
 	def get_item(self, slot):
 		return self.slots[slot]
@@ -50,14 +44,24 @@ class AdvancedCreature(Creature):
 	def is_idle(self):
 		return False
 
+	def equip(self, item, slot):
+		self.slots[slot] = item
+
+	def unequip(self, slot):
+		item = self.slots[slot]
+		self.slots[slot] = None
+		return item
+
 	def bag_item(self, item):
-		self.inventory.add_item(item)
+		self.inventory.append(item)
 
 	def unbag_item(self, item):
-		self.inventory.remove_item(item)
+		self.inventory.remove(item)
 
 	def get_inventory_lines(self):
-		return self.inventory.get_menu_lines()
+		f = "{1}. {0.name} {0.stats}"
+		for i, item in enumerate(self.inventory):
+			yield f.format(item, (i + 1) % 10)
 
 	@property
 	def sight(self):
@@ -93,4 +97,4 @@ class AdvancedCreature(Creature):
 
 	@property
 	def speed(self):
-		return super(self.__class__, self).speed ++ self.get_item_stats(SPEED)
+		return super(self.__class__, self).speed + self.get_item_stats(SPEED)
