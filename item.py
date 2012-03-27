@@ -24,18 +24,3 @@ class Weapon(Item):
 
 	def roll(self):
 		return dice_roll(self.dice, self.sides, self.addition)
-
-class Inventory(object):
-	def __init__(self):
-		self.inventory = []
-
-	def add_item(self, item):
-		self.inventory.append(item)
-
-	def remove_item(self, item):
-		self.inventory.remove(item)
-
-	def get_menu_lines(self):
-		f = "{1}. {0.name} {0.stats}"
-		for i, item in enumerate(self.inventory):
-			yield f.format(item, (i + 1) % 10)
