@@ -5,17 +5,15 @@ from const.stats import *
 class AdvancedCreature(Creature):
 
 	def __init__(self, creature_file):
-		super(self.__class__, self).__init__(creature_file)
-
 		self.slots = {}
 		self.slots[HANDS] = None
 		self.slots[HEAD] = None
 		self.slots[BODY] = None
 		self.slots[FEET] = None
 		self.inventory = []
-
 		self.last_action_energy = 0
 
+		super(self.__class__, self).__init__(creature_file)
 
 	def get_damage_info(self):
 		if self.slots[HANDS] is not None:

@@ -10,9 +10,10 @@ import const.generated_level_types as LEVEL_TYPE
 import const.slots as SLOT
 import const.stats as STAT
 
+from main import io
 from world_file import LevelNotFound
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
-from main import io
+from inventory import inventory
 
 direction_map = {
 		KEY.UP: DIR.NO,
@@ -215,11 +216,6 @@ def attack(game, creature):
 		return True
 
 def redraw(game, creature):
-	game.redraw()
-
-def inventory(game, creature):
-	inventory_lines = list(creature.get_inventory_lines())
-	key = io.menu(inventory_lines)
 	game.redraw()
 
 def enter(game, creature, passage):

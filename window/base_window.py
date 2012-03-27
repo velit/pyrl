@@ -1,6 +1,7 @@
 import time
 import const.keys as KEY
 import const.game as GAME
+import const.colors as COLOR
 
 from main import cursor_lib
 
@@ -23,10 +24,6 @@ class BaseWindow(object):
 
 	def draw_reverse(self, char_payload_sequence):
 		cursor_lib.draw_reverse(self.h, char_payload_sequence)
-
-	def add_lines(self, lines):
-		for i, line in enumerate(lines):
-			self.addstr(i, 0, line)
 
 	def clear(self):
 		cursor_lib.clear(self.h)
@@ -72,3 +69,13 @@ class BaseWindow(object):
 	def refresh(self):
 		self.blit()
 		cursor_lib.flush()
+
+	def draw_header(self, header, color=COLOR.BROWN, y=0):
+		msg = "  {0:+^92}  ".format("  " + title + "  ")
+		self.addstr(y, 0, msg, color)
+
+	def draw_lines(self, lines, y_offset=2, x_offset=4):
+		for i, line in enumerate(lines):
+			self.addstr(y_offset + i, x_offset, line)
+
+	def draw_footer(self, footer
