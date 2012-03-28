@@ -74,6 +74,9 @@ TCOD_KEYS = {
 }
 ROOT_WIN = None
 
+DEFAULT_FG = libtcod.white
+DEFAULT_BG = libtcod.black
+
 def init(root_window):
 	global ROOT_WIN
 	libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
@@ -82,8 +85,8 @@ def init(root_window):
 			False, libtcod.RENDERER_SDL)
 
 def init_handle(handle):
-	libtcod.console_set_default_background(handle, libtcod.black)
-	libtcod.console_set_default_foreground(handle, libtcod.white)
+	libtcod.console_set_default_foreground(handle, DEFAULT_FG)
+	libtcod.console_set_default_background(handle, DEFAULT_BG)
 
 def new_window(size):
 	rows, columns = size
@@ -102,7 +105,7 @@ def suspend():
 
 def resume():
 	pass
-	
+
 def toggle_fullscreen():
 	if libtcod.console_is_fullscreen():
 		libtcod.console_set_fullscreen(False)
@@ -117,7 +120,12 @@ def addstr(handle, y, x, string, color=None):
 	if color is None:
 		libtcod.console_print(handle, x, y, string)
 	else:
-		raise NotImplemented("Not yet implemented")
+		fg, bg = color
+		libtcod.console_set_default_foreground(handle, TCOD_COLOR[fg])
+		libtcod.console_set_default_background(handle, TCOD_COLOR[bg])
+		libtcod.console_print(handle, x, y, string)
+		libtcod.console_set_default_foreground(handle, DEFAULT_FG)
+		libtcod.console_set_default_background(handle, DEFAULT_BG)
 
 def draw(handle, char_payload_sequence):
 	f = libtcod.console_put_char_ex
