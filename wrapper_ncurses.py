@@ -165,9 +165,11 @@ def init(root_window):
 def init_handle(window):
 	window.keypad(True)
 
+# Writing to the last cell of a window raises an exception because
+# the automatic cursor move to the next cell is illegal. The +1 fixes that.
 def new_window(size):
 	rows, columns = size
-	window = curses.newpad(rows, columns)
+	window = curses.newpad(rows + 1, columns)
 	init_handle(window)
 	return window
 
@@ -196,42 +198,25 @@ def resume():
 
 def addch(window, y, x, char):
 	symbol, color = char
-	maxY, maxX = window.getmaxyx()
-	try:
-		window.addch(y, x, symbol, CURSES_COLOR[color])
-	except curses.error:
-		if y != maxY - 1 or x != maxX - 1:
-			raise
-	# Writing to the last cell of a window raises an exception because
-	# the automatic cursor move to the next cell is illegal.
+	window.addch(y, x, symbol, CURSES_COLOR[color])
 
 def addstr(window, y, x, string, color=None):
-	if color is not None:
-		window.addstr(y, x, string, CURSES_COLOR[color])
-	else:
+	if color is None:
 		window.addstr(y, x, string)
+	else:
+		window.addstr(y, x, string, CURSES_COLOR[color])
 
 def draw(window, char_payload_sequence):
-	maxY, maxX = window.getmaxyx()
 	f = window.addch
 	COLOR_LOOKUP = CURSES_COLOR
 	for y, x, (symbol, color) in char_payload_sequence:
-		try:
-			f(y, x, symbol, COLOR_LOOKUP[color])
-		except curses.error:
-			if y != maxY - 1 or x != maxX - 1:
-				raise
+		f(y, x, symbol, COLOR_LOOKUP[color])
 
 def draw_reverse(window, char_payload_sequence):
-	maxY, maxX = window.getmaxyx()
 	f = window.addch
 	COLOR_LOOKUP = CURSES_COLOR
 	for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-		try:
-			f(y, x, symbol, COLOR_LOOKUP[bg, fg])
-		except curses.error:
-			if y != maxY - 1 or x != maxX - 1:
-				raise
+		f(y, x, symbol, COLOR_LOOKUP[bg, fg])
 
 def _esc_key_handler(window, ch):
 	if ch == curses.ascii.ESC:

@@ -71,11 +71,15 @@ class BaseWindow(object):
 		cursor_lib.flush()
 
 	def draw_header(self, header, color=COLOR.BROWN, y=0):
-		msg = "  {0:+^92}  ".format("  " + title + "  ")
-		self.addstr(y, 0, msg, color)
+		format_str = "{0:+^" + str(self.cols) +"}"
+		header = format_str.format("  " + header + "  ")
+		self.addstr(y, 0, header, color)
 
 	def draw_lines(self, lines, y_offset=2, x_offset=4):
 		for i, line in enumerate(lines):
 			self.addstr(y_offset + i, x_offset, line)
 
-	def draw_footer(self, footer
+	def draw_footer(self, footer, color=COLOR.BROWN, y=0):
+		format_str = "{0:+^" + str(self.cols) +"}"
+		footer = format_str.format("  " + footer + "  ")
+		self.addstr((self.rows - 1) - y, 0, footer, color)
