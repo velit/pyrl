@@ -21,7 +21,7 @@ def Player():
 	player.equip(armor, BODY)
 
 	weapon = Weapon("Sting", 1, 8, 20)
-	player.equip(weapon, HANDS)
+	player.equip(weapon, RIGHT_HAND)
 
 	itams = (
 		Weapon("+1 short sword", 1, 6, 1),

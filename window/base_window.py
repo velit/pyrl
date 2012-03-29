@@ -75,7 +75,7 @@ class BaseWindow(object):
 		header = format_str.format("  " + header + "  ")
 		self.addstr(y, 0, header, color)
 
-	def draw_lines(self, lines, y_offset=2, x_offset=4):
+	def draw_lines(self, lines, y_offset=2, x_offset=0):
 		for i, line in enumerate(lines):
 			self.addstr(y_offset + i, x_offset, line)
 
