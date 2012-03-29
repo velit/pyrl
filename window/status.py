@@ -20,12 +20,12 @@ class StatusBar(BaseWindow):
 		self.print_elements()
 		self.blit()
 
-	def add_element(self, handle, string, getter):
+	def add_element(self, string, getter):
 		self.elements.append((string, getter))
 		self.modified = True
 
 	def print_elements(self):
-		status_string = " ".join("{}[{}]".format(string, str(getter())) for string, getter in self.elements)
+		status_string = "  ".join("{}:{}".format(string, getter()) for string, getter in self.elements)
 		lines = self.wrapper.wrap(status_string)
 		for i, line in enumerate(lines):
 			self.addstr(i, 0, line)

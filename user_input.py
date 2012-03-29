@@ -13,7 +13,7 @@ import const.stats as STAT
 from main import io
 from world_file import LevelNotFound
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
-from inventory import inventory
+from inventory import equipment
 
 direction_map = {
 		KEY.UP: DIR.NO,
@@ -53,6 +53,10 @@ direction_map = {
 		'n': DIR.SE,
 }
 
+class Bindings(object):
+	LOOK_MODE = 'q'
+	INVENTORY = 'i'
+
 class UserInput(object):
 	def __init__(self):
 		no_args, no_kwds = (), {}
@@ -62,7 +66,6 @@ class UserInput(object):
 			'>': ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
 			'Q': ("endgame", no_args, no_kwds),
 			'S': ("savegame", no_args, no_kwds),
-			'q': ("look", no_args, no_kwds),
 			'Z': ("z_command", no_args, no_kwds),
 			'a': ("attack", no_args, no_kwds),
 			'd': ("debug", (self, ), no_kwds),
@@ -71,7 +74,8 @@ class UserInput(object):
 			'^r': ("redraw", no_args, no_kwds),
 			'p': ("print_history", no_args, no_kwds),
 			'w': ("walk_mode_init", (self, ), no_kwds),
-			'i': ("inventory", no_args, no_kwds),
+			Bindings.LOOK_MODE: ("look", no_args, no_kwds),
+			Bindings.INVENTORY: ("equipment", no_args, no_kwds),
 		}
 		for key, value in direction_map.viewitems():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
@@ -97,7 +101,7 @@ class UserInput(object):
 def walk_mode_init(game, creature, userinput):
 	level = creature.level
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		key = io.ask("Specify walking direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
+		key = io.ask("Specify walking direction, {} to abort".format(KEY.CANCEL), direction_map.viewkeys() | KEY.GROUP_CANCEL)
 		if key in direction_map:
 			direction = direction_map[key]
 			left_coord = add_vector(add_vector(creature.coord, direction), turn_vector_left(direction))
@@ -122,7 +126,7 @@ def _walk_mode(game, creature, userinput):
 		result = _walk_mode_logic(old_walk_data, new_walk_data)
 		if result is not None:
 			new_direction, new_left, new_right = result
-			message = "Press q to interrupt walk mode"
+			message = "Press {} to interrupt walk mode".format(KEY.CANCEL)
 			key = io.ask_until_timestamp(message, timestamp, KEY.GROUP_CANCEL)
 			if key not in KEY.GROUP_CANCEL:
 				walk_delay = io.get_future_time()
@@ -200,7 +204,7 @@ def look(game, creature):
 		elif c == 's':
 			if level.has_creature(coord):
 				game.register_status_texts(level.get_creature(coord))
-		elif c in KEY.GROUP_CANCEL:
+		elif c in KEY.GROUP_CANCEL or c == Bindings.LOOK_MODE:
 			break
 
 def endgame(game, creature, *a, **k):
@@ -210,7 +214,7 @@ def savegame(game, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, creature):
-	key = io.ask("Specify attack direction, q to abort", direction_map.viewkeys() | KEY.GROUP_CANCEL)
+	key = io.ask("Specify attack direction, {} to abort".format(KEY.CANCEL), direction_map.viewkeys() | KEY.GROUP_CANCEL)
 	if key in direction_map:
 		game.creature_attack(creature, direction_map[key])
 		return True

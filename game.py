@@ -39,18 +39,16 @@ class Game(object):
 		return self.player is creature
 
 	def register_status_texts(self, creature):
-		io.s.add_element("dmg", "DMG: ", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-		io.s.add_element("hp", "HP: ", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-		io.s.add_element("sight", "SR: ", lambda: creature.sight)
-		io.s.add_element("turns", "TC: ", lambda: self.turn_counter)
-		io.s.add_element("world_loc", "WLoc: ", lambda: "{}/{}".format(*self.player.level.world_loc))
-		io.s.add_element("ar", "AR: ", lambda: creature.ar)
-		io.s.add_element("dr", "DR: ", lambda: creature.dr)
-		io.s.add_element("pv", "PV: ", lambda: creature.pv)
-		io.s.add_element("speed", "SP: ", lambda: creature.speed)
-		io.s.add_element("coord", "Loc: ", lambda: creature.coord)
-		io.s.add_element("target", "TA: ", lambda: creature.target_coord)
-		io.s.add_element("chase_vector", "CV: ", lambda: creature.chase_vector)
+		io.s.add_element("DMG", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+		io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
+		io.s.add_element("SR", lambda: creature.sight)
+		io.s.add_element("TC", lambda: self.turn_counter)
+		io.s.add_element("WLoc", lambda: "{}/{}".format(*self.player.level.world_loc))
+		io.s.add_element("AR", lambda: creature.ar)
+		io.s.add_element("DR", lambda: creature.dr)
+		io.s.add_element("PV", lambda: creature.pv)
+		io.s.add_element("SP", lambda: creature.speed)
+		io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
 
 	def enter_passage(self, origin_world_loc, origin_passage):
 		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)

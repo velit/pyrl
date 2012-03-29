@@ -1,12 +1,12 @@
 from creature import Creature
-from const.slots import HEAD, BODY, FEET, HANDS
+from const.slots import HEAD, BODY, FEET, RIGHT_HAND, LEFT_HAND
 from const.stats import *
 
 class AdvancedCreature(Creature):
 
 	def __init__(self, creature_file):
 		self.slots = {}
-		self.slots[HANDS] = None
+		self.slots[RIGHT_HAND] = None
 		self.slots[HEAD] = None
 		self.slots[BODY] = None
 		self.slots[FEET] = None
@@ -16,10 +16,9 @@ class AdvancedCreature(Creature):
 		super(self.__class__, self).__init__(creature_file)
 
 	def get_damage_info(self):
-		if self.slots[HANDS] is not None:
-			dice = self.slots[HANDS].dice
-			sides = self.slots[HANDS].sides
-			addition = self.slots[HANDS].addition + self.dmg_bonus
+		if self.slots[RIGHT_HAND] is not None:
+			dice, sides, addition = self.slots[RIGHT_HAND].damage.get_values()
+			addition += self.dmg_bonus
 		else:
 			dice = self.unarmed_dice
 			sides = self.unarmed_sides
@@ -30,7 +29,8 @@ class AdvancedCreature(Creature):
 		return self.slots[slot]
 
 	def get_item_stats(self, STAT):
-		return sum(item.stats[STAT] for item in self.slots.viewvalues() if item is not None and STAT in item.stats)
+		return sum(item.stats[STAT] for item in self.slots.viewvalues() if
+				item is not None and STAT in item.stats)
 
 	def update_energy(self, amount):
 		super(self.__class__, self).update_energy(amount)

@@ -52,11 +52,12 @@ class WindowSystem(object):
 		else:
 			self.l.draw_reverse(character_data_sequence)
 
-	def menu(self, header, lines, footer):
+	def menu(self, header, lines, footer, key_set):
+		self.a.clear()
 		self.a.draw_header(header)
 		self.a.draw_lines(lines)
 		self.a.draw_footer(footer)
-		return self.a.get_key(refresh=True)
+		return self.a.selective_get_key(key_set, refresh=True)
 
 	def draw_char(self, coord, char, reverse=False):
 		self.l.draw_char(coord, char, reverse)
