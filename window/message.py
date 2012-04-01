@@ -1,5 +1,6 @@
 import textwrap
 import const.keys as KEY
+import mappings as MAPPING
 from const.colors import GREEN
 from window.base_window import BaseWindow
 
@@ -17,12 +18,11 @@ class MessageBar(BaseWindow):
 		self.wrap = textwrap.TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
 
 	def update(self):
+		self.clear()
 		if self.msgqueue:
 			self.print_event(self.msgqueue)
 			self.history.append(self.msgqueue)
 			self.msgqueue = []
-		else:
-			self.clear()
 		self.blit()
 
 	def queue_msg(self, *args):
@@ -32,12 +32,11 @@ class MessageBar(BaseWindow):
 	def print_event(self, event):
 		skip = False
 		lines = self.wrap(" ".join(event))
-		self.clear()
 		for i, line in enumerate(lines):
 			self.addstr(i % self.rows, 0, line)
 			if i % self.rows == self.rows - 1 and i != len(lines) - 1:
 				self.addch(self.rows - 1, self.cols - 1, ("M", GREEN))
-				if self.selective_get_key(KEY.GROUP_MORE) == KEY.ENTER:
+				if self.selective_get_key(MAPPING.GROUP_MORE, refresh=True) == KEY.ENTER:
 					skip = True
 					break
 				self.clear()
@@ -49,4 +48,4 @@ class MessageBar(BaseWindow):
 	def print_history(self):
 		for i, event in enumerate(self.history):
 			self.print_event(["History line {}:".format(i)] + event)
-			self.selective_get_key(KEY.GROUP_MORE)
+			self.selective_get_key(MAPPING.GROUP_MORE)

@@ -55,13 +55,12 @@ class Level(object):
 		return cost
 
 	def _a_star_neighbors(self, coord):
-		for direction in DIRS.ALL:
+		for direction in self.get_tile_passable_neighbors(coord):
 			neighbor_coord = add_vector(coord, direction)
-			if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
-				if direction in DIRS.DIAGONAL:
-					yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
-				else:
-					yield neighbor_coord, self.tiles[coord].movement_cost
+			if direction in DIRS.DIAGONAL:
+				yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
+			else:
+				yield neighbor_coord, self.tiles[coord].movement_cost
 
 	def _get_free_coord(self):
 		while True:
@@ -91,6 +90,12 @@ class Level(object):
 	def _spawn_predefined_creature(self, mons_file):
 		creature = Creature(mons_file)
 		self.add_creature(creature)
+
+	def get_tile_passable_neighbors(self, coord):
+		for direction in DIRS.ALL:
+			neighbor_coord = add_vector(coord, direction)
+			if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
+				yield direction
 
 	def legal_coord(self, coord, direction=(0,0)):
 		return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
