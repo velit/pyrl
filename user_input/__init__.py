@@ -13,8 +13,10 @@ import mappings as MAPPING
 
 from main import io
 from world_file import LevelNotFound
-from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
+from generic_algorithms import add_vector
+
 from inventory import equipment; equipment
+from walk_mode import walk_mode, walk_mode_init; walk_mode_init
 
 class UserInput(object):
 	def __init__(self):
@@ -39,13 +41,15 @@ class UserInput(object):
 		for key, value in MAPPING.DIRECTIONS.viewitems():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
-		self.walk_mode = None
+		self.walk_mode_data = None
 
 	def get_user_input_and_act(self, game, creature):
 		taken_action = False
 		while not taken_action:
-			if self.walk_mode is not None:
-				taken_action = _walk_mode(game, creature, self)
+			if self.walk_mode_data is not None:
+				self.walk_mode_data = walk_mode(game, creature, self.walk_mode_data)
+				if self.walk_mode_data is not None:
+					taken_action = game.creature_move(creature, self.walk_mode_data[0])
 			else:
 				key = io.get_key()
 				if key in self.actions:
@@ -56,59 +60,6 @@ class UserInput(object):
 	def execute_action(self, game, creature, act):
 		function, args, keywords = act
 		return getattr(sys.modules[__name__], function)(game, creature, *args, **keywords)
-
-def walk_mode_init(game, creature, userinput):
-	level = creature.level
-	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		key_set = MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL
-		key = io.ask("Specify walking direction, {} to abort".format(MAPPING.CANCEL), key_set)
-		if key in MAPPING.DIRECTIONS:
-			direction = MAPPING.DIRECTIONS[key]
-			left_coord = add_vector(add_vector(creature.coord, direction), turn_vector_left(direction))
-			right_coord = add_vector(add_vector(creature.coord, direction), turn_vector_right(direction))
-			userinput.walk_mode = ((direction, level.is_passable(left_coord), level.is_passable(right_coord)),
-					io.get_future_time())
-			return game.creature_move(creature, direction)
-	else:
-		io.msg("Not while there are creatures in the vicinity.")
-	return False
-
-def _walk_mode(game, creature, userinput):
-	level = creature.level
-	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		old_walk_data, timestamp = userinput.walk_mode
-		old_direction = old_walk_data[0]
-		new_walk_data = (
-				level.is_passable(add_vector(creature.coord, old_direction)),
-				level.is_passable(add_vector(creature.coord, turn_vector_left(old_direction))),
-				level.is_passable(add_vector(creature.coord, turn_vector_right(old_direction))),
-		)
-		result = _walk_mode_logic(old_walk_data, new_walk_data)
-		if result is not None:
-			new_direction, new_left, new_right = result
-			message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
-			key = io.ask_until_timestamp(message, timestamp, MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE})
-			if key not in MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE}:
-				walk_delay = io.get_future_time()
-				userinput.walk_mode = (new_direction, new_left, new_right), walk_delay
-				return game.creature_move(creature, new_direction)
-
-	userinput.walk_mode = None
-	return False
-
-# the booleans all denote if something is passable
-def _walk_mode_logic(old_walk_data, new_walk_data):
-	old_direction, old_left, old_right = old_walk_data
-	target, new_left, new_right = new_walk_data
-	if target:
-		if new_left == old_left and new_right == old_right:
-			return old_direction, old_left, old_right
-	elif not old_left and not old_right and new_left != new_right:
-		if new_left:
-			new_direction = turn_vector_left(old_direction)
-		elif new_right:
-			new_direction = turn_vector_right(old_direction)
-		return new_direction, old_left, old_right
 
 def act_to_dir(game, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
@@ -287,6 +238,6 @@ def debug_action(game, creature, userinput):
 			else:
 				break
 	elif c == 'm':
-		io.msg("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam varius massa enim, id fermentum erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. In et enim ut nibh rutrum suscipit. Aenean a lacus eget justo dignissim tempus. Nunc venenatis congue erat vel adipiscing. Nam nulla felis, accumsan eu sagittis aliquet, fermentum at tortor. Suspendisse tortor risus, dapibus quis porta vel, mattis sit amet libero. Morbi vel metus eget metus ultricies ultrices placerat ac sapien. Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Nulla urna erat, lacinia vitae pellentesque et, accumsan eget ante. Sed commodo molestie ipsum, a mattis sapien malesuada at. Integer et lorem magna. Sed nec erat orci. Donec id elementum elit. In hac habitasse platea dictumst. Duis id nisi ut felis convallis blandit id sit amet magna. Nam feugiat erat eget velit ullamcorper varius. Nunc tellus massa, fermentum eu aliquet non, fermentum a quam.  Pellentesque turpis erat, aliquam at feugiat in, congue nec urna. Nulla ut turpis dapibus metus blandit faucibus.  Suspendisse potenti. Proin facilisis massa vitae purus dignissim quis dapibus eros gravida. Vivamus ac sapien ante, ut euismod nunc. Pellentesque faucibus neque at tortor malesuada eu commodo nisl vehicula. Vivamus eu odio ut est egestas luctus. Duis orci magna, tincidunt id suscipit id, consectetur sodales nisl. Etiam justo lorem, molestie sit amet rutrum eget, consequat mattis magna.  Fusce eros est, tincidunt id consequat id, scelerisque ac sapien.  Donec lacus leo, adipiscing et vulputate in, pulvinar vitae sem. Suspendisse sem augue, adipiscing vitae tempor sit amet, egestas a neque. Donec nibh mauris, rutrum vitae dictum in, adipiscing in magna. Duis fringilla sem vel nisl tempus dignissim. Fusce vel felis ipsum. Sed risus ipsum, iaculis a mollis vel, viverra in nisi. Suspendisse est tellus, aliquet et vulputate vel, iaculis egestas nulla.  Praesent sed tortor sed neque varius consequat. Quisque interdum facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis nisi id molestie. Aenean rutrum elementum mauris, vitae venenatis tellus semper et. Proin eu nisl ligula. Maecenas dui mi, varius eget adipiscing quis, commodo et libero.")
+		io.msg(debug.debug_string)
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))

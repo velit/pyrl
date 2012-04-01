@@ -40,7 +40,6 @@ def bresenham_old(coord_a, coord_b, includelast=True):
 			x += xstep
 			error += deltay
 
-
 def chebyshev(coordA, coordB):
 	ay, ax = coordA
 	by, bx = coordB
@@ -48,13 +47,11 @@ def chebyshev(coordA, coordB):
 	orthogonal_steps = abs(ay - by) + abs(ax - bx) - 2 * diagonal_steps
 	return orthogonal_steps, diagonal_steps
 
-
 def cross_product(line_start_coord, wild_coord, line_finish_coord):
 	start_y, start_x = line_start_coord
 	wild_y, wild_x = wild_coord
 	finish_y, finish_x = line_finish_coord
 	return abs((start_x - wild_x) * (finish_y - wild_y) - (finish_x - wild_x) * (start_y - wild_y))
-
 
 def minimize_vector(vector):
 	a, b = vector
@@ -67,11 +64,40 @@ def get_vector(origin, target):
 def add_vector(coord, vector):
 	return coord[0] + vector[0], coord[1] + vector[1]
 
-def turn_vector_left(vector):
+def reverse_vector(vector):
+	return -vector[0], -vector[1]
+
+def anticlockwise(vector):
 	return -vector[1], vector[0]
 
-def turn_vector_right(vector):
+def clockwise(vector):
 	return vector[1], -vector[0]
+
+def anticlockwise_45(vector):
+	turn = {
+		(1, 0):    (1, 1),
+		(1, 1):    (0, 1),
+		(0, 1):    (-1, 1),
+		(-1, 1):   (-1, 0),
+		(-1, 0):   (-1, -1),
+		(-1, -1):  (0, -1),
+		(0, -1):   (1, -1),
+		(1, -1):   (1, 0),
+	}
+	return turn[vector]
+
+def clockwise_45(vector):
+	turn = {
+		(1, 0):    (1, -1),
+		(1, 1):    (1, 0),
+		(0, 1):    (1, 1),
+		(-1, 1):   (0, 1),
+		(-1, 0):   (-1, 1),
+		(-1, -1):  (-1, 0),
+		(0, -1):   (-1, -1),
+		(1, -1):   (0, -1),
+	}
+	return turn[vector]
 
 def resize_vector_to_len(vector, length):
 	a, b = vector
