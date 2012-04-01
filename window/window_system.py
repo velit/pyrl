@@ -1,6 +1,5 @@
 from __future__ import division
 import time
-import const.game as GAME
 import debug
 import mappings as MAPPING
 import const.colors as COLOR
@@ -16,8 +15,9 @@ class WindowSystem(object):
 
 	def __init__(self, root_window):
 		from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
+		from const.game import SCREEN_ROWS, SCREEN_COLS
 
-		self.a = BaseWindow((GAME.SCREEN_ROWS, GAME.SCREEN_COLS), (0, 0))
+		self.a = BaseWindow((SCREEN_ROWS, SCREEN_COLS), (0, 0))
 		self.m = MessageBar((MSG_BAR_HEIGHT, LEVEL_WIDTH), (0, 0))
 		self.l = LevelWindow((LEVEL_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT, 0))
 		self.s = StatusBar((STATUS_BAR_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0))
@@ -82,8 +82,8 @@ class WindowSystem(object):
 		self.refresh()
 		return self.l.selective_get_key_until_timestamp(timestamp, key_set)
 
-	def get_future_time(self, delay=None):
-		if delay is not None:
-			return time.time() + delay
-		else:
-			return time.time() + GAME.ANIMATION_DELAY
+	def get_future_time(self, delay):
+		return time.time() + delay
+
+	def get_current_time(self):
+		return time.time()

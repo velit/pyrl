@@ -1,3 +1,4 @@
+import const.game as GAME
 import mappings as MAPPING
 import const.directions as DIR
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector
@@ -8,6 +9,8 @@ CORRIDOR = (False, False)
 LEFT = (False, True)
 RIGHT = (True, False)
 OPEN = (True, True)
+
+INTERRUPT_MSG_TIME = 5
 
 def walk_mode_init(game, creature, userinput):
 	if _any_creatures_visible(game, creature):
@@ -24,7 +27,7 @@ def walk_mode_init(game, creature, userinput):
 
 def walk_mode(game, creature, walk_mode_data):
 	if not _any_creatures_visible(game, creature):
-		direction, old_walk_type, timestamp = walk_mode_data
+		direction, old_walk_type, timestamp, msg_time = walk_mode_data
 		if old_walk_type == CORRIDOR:
 			result = _corridor(game, creature, direction)
 		else:
@@ -32,19 +35,21 @@ def walk_mode(game, creature, walk_mode_data):
 
 		if result is not None:
 			new_direction, new_walk_type = result
-			message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
+			if msg_time < io.get_current_time():
+				message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
+			else:
+				message = ""
 			key = io.ask_until_timestamp(message, timestamp, MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE})
 			if key not in MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE}:
-				walk_delay = io.get_future_time()
-				return new_direction, new_walk_type, walk_delay
+				walk_delay = io.get_future_time(GAME.ANIMATION_DELAY)
+				return new_direction, new_walk_type, walk_delay, msg_time
 
 def _walk_mode_init(game, creature, direction):
 	if game.creature_move(creature, direction):
 		forward, walk_type = _get_walk_type_data(creature, direction)
-		if forward:
-			return (direction, walk_type, io.get_future_time())
-		else:
-			return (direction, CORRIDOR, io.get_future_time())
+		if not forward:
+			walk_type = CORRIDOR
+		return (direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME))
 
 def _corridor(game, creature, direction):
 	forward, (left, right) = _get_walk_type_data(creature, direction)
