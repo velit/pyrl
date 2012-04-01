@@ -3,7 +3,7 @@ import random
 import path
 import const.directions as DIRS
 import const.game as GAME
-import const.debug as DEBUG
+import debug
 
 from creature import Creature
 from turn_scheduler import TurnScheduler
@@ -50,8 +50,8 @@ class Level(object):
 	# nudge_coord nudges towards a line between this and start_coord
 	def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
 		cost = self.distance_heuristic(start_coord, end_coord)
-		if DEBUG.CROSS:
-			cost += cross_product(start_coord, end_coord, nudge_coord) / DEBUG.CROSS_MOD
+		if debug.cross:
+			cost += cross_product(start_coord, end_coord, nudge_coord) / debug.cross_mod
 		return cost
 
 	def _a_star_neighbors(self, coord):

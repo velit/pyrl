@@ -14,7 +14,10 @@ class Dice(object):
 		return self.dices, self.sides, self.addition
 
 	def __str__(self):
-		return "{0.dices}D{0.sides}+{0.addition}".format(self)
+		if self.addition != 0:
+			return "{0.dices}D{0.sides}{0.addition:+}".format(self)
+		else:
+			return "{0.dices}D{0.sides}".format(self)
 
 def dice_roll(dices=1, sides=6, addition=0):
 	return sum(randrange(sides) + 1 for die in xrange(dices)) + addition

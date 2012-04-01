@@ -217,7 +217,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make an inventory that allows unequipping of items.
+        Make an inventory that allows unequipping of items. 30 keys for view inventory
     </note>
     <note priority="veryhigh" time="1329073265">
         Finetune walk mode

@@ -17,7 +17,7 @@ class Creature(object):
 		self.strength = 10
 		self.dexterity = 10
 		self.toughness = 10
-		self.intelligence = 10
+		self.learning = 10
 		self.perception = 10
 
 		self.hp = self.max_hp
@@ -58,40 +58,60 @@ class Creature(object):
 		return self.target_coord is None and self.chase_vector is None
 
 	@property
+	def st(self):
+		return self.strength
+
+	@property
+	def dx(self):
+		return self.dexterity
+
+	@property
+	def to(self):
+		return self.toughness
+
+	@property
+	def le(self):
+		return self.learning
+
+	@property
+	def pe(self):
+		return self.perception
+
+	@property
 	def sight(self):
-		return int((2 * self.perception) ** 0.5 + 1)
+		return int((2 * self.pe) ** 0.5 + 1)
 
 	@property
 	def max_hp(self):
-		return self.toughness + self.strength // 2
+		return self.to + self.st // 2
 
 	@property
 	def dmg_bonus(self):
-		return self.strength // 5 + self.dexterity // 10
+		return self.st // 5 + self.dx // 10
 
 	@property
 	def pv(self):
-		return self.toughness // 10
+		return self.to // 10
 
 	@property
 	def ar(self):
-		return self.dexterity + self.intelligence // 2
+		return self.dx + self.le // 2
 
 	@property
 	def dr(self):
-		return self.dexterity + self.intelligence // 2
+		return self.dx + self.le // 2
 
 	@property
 	def unarmed_dice(self):
-		return self.strength // 20 + 1
+		return self.st // 20 + 1
 
 	@property
 	def unarmed_sides(self):
-		return self.strength // 3 + self.dexterity // 6
+		return self.st // 3 + self.dx // 6
 
 	@property
 	def speed(self):
-		return 93 + self.dexterity // 2 + self.strength // 5
+		return 93 + self.dx // 2 + self.strength // 5
 
 	@property
 	def attack_energy_cost(self):
