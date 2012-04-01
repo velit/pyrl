@@ -1,83 +1,42 @@
 import sys
 import code
+import debug
 
 import const.keys as KEY
 import const.directions as DIR
 import const.game as GAME
-import const.debug as DEBUG
 import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
 import const.slots as SLOT
 import const.stats as STAT
+import mappings as MAPPING
 
 from main import io
 from world_file import LevelNotFound
 from generic_algorithms import add_vector, turn_vector_left, turn_vector_right
-from inventory import equipment
-
-direction_map = {
-		KEY.UP: DIR.NO,
-		KEY.DOWN: DIR.SO,
-		KEY.LEFT: DIR.WE,
-		KEY.RIGHT: DIR.EA,
-		KEY.END: DIR.SW,
-		KEY.HOME: DIR.NW,
-		KEY.PAGE_UP: DIR.NE,
-		KEY.PAGE_DOWN: DIR.SE,
-		KEY.NUMPAD_1: DIR.SW,
-		KEY.NUMPAD_2: DIR.SO,
-		KEY.NUMPAD_3: DIR.SE,
-		KEY.NUMPAD_4: DIR.WE,
-		KEY.NUMPAD_5: DIR.STOP,
-		KEY.NUMPAD_6: DIR.EA,
-		KEY.NUMPAD_7: DIR.NW,
-		KEY.NUMPAD_8: DIR.NO,
-		KEY.NUMPAD_9: DIR.NE,
-		'1': DIR.SW,
-		'2': DIR.SO,
-		'3': DIR.SE,
-		'4': DIR.WE,
-		'5': DIR.STOP,
-		'6': DIR.EA,
-		'7': DIR.NW,
-		'8': DIR.NO,
-		'9': DIR.NE,
-		'h': DIR.WE,
-		'j': DIR.SO,
-		'k': DIR.NO,
-		'l': DIR.EA,
-		'.': DIR.STOP,
-		'y': DIR.NW,
-		'u': DIR.NE,
-		'b': DIR.SW,
-		'n': DIR.SE,
-}
-
-class Bindings(object):
-	LOOK_MODE = 'q'
-	INVENTORY = 'i'
+from inventory import equipment; equipment
 
 class UserInput(object):
 	def __init__(self):
 		no_args, no_kwds = (), {}
 		self.actions = {
 			KEY.CLOSE_WINDOW: ("endgame", no_args, no_kwds),
-			'<': ("enter", (GAME.PASSAGE_UP, ), no_kwds),
-			'>': ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
-			'Q': ("endgame", no_args, no_kwds),
-			'S': ("savegame", no_args, no_kwds),
-			'Z': ("z_command", no_args, no_kwds),
-			'a': ("attack", no_args, no_kwds),
-			'd': ("debug", (self, ), no_kwds),
+			MAPPING.ASCEND: ("enter", (GAME.PASSAGE_UP, ), no_kwds),
+			MAPPING.DESCEND: ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
+			MAPPING.QUIT: ("endgame", no_args, no_kwds),
+			MAPPING.SAVE: ("savegame", no_args, no_kwds),
+			MAPPING.ATTACK: ("attack", no_args, no_kwds),
+			MAPPING.REDRAW: ("redraw", no_args, no_kwds),
+			MAPPING.HISTORY: ("print_history", no_args, no_kwds),
+			MAPPING.WALK_MODE: ("walk_mode_init", (self, ), no_kwds),
+			MAPPING.LOOK_MODE: ("look", no_args, no_kwds),
+			MAPPING.INVENTORY: ("equipment", no_args, no_kwds),
+			'z': ("z_command", no_args, no_kwds),
+			'd': ("debug_action", (self, ), no_kwds),
 			'+': ("sight_change", (1, ), no_kwds),
 			'-': ("sight_change", (-1, ), no_kwds),
-			'^r': ("redraw", no_args, no_kwds),
-			'p': ("print_history", no_args, no_kwds),
-			'w': ("walk_mode_init", (self, ), no_kwds),
-			Bindings.LOOK_MODE: ("look", no_args, no_kwds),
-			Bindings.INVENTORY: ("equipment", no_args, no_kwds),
 		}
-		for key, value in direction_map.viewitems():
+		for key, value in MAPPING.DIRECTIONS.viewitems():
 			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
 
 		self.walk_mode = None
@@ -101,9 +60,10 @@ class UserInput(object):
 def walk_mode_init(game, creature, userinput):
 	level = creature.level
 	if not any(level.has_creature(coord) for coord in game.current_vision if coord != creature.coord):
-		key = io.ask("Specify walking direction, {} to abort".format(KEY.CANCEL), direction_map.viewkeys() | KEY.GROUP_CANCEL)
-		if key in direction_map:
-			direction = direction_map[key]
+		key_set = MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL
+		key = io.ask("Specify walking direction, {} to abort".format(MAPPING.CANCEL), key_set)
+		if key in MAPPING.DIRECTIONS:
+			direction = MAPPING.DIRECTIONS[key]
 			left_coord = add_vector(add_vector(creature.coord, direction), turn_vector_left(direction))
 			right_coord = add_vector(add_vector(creature.coord, direction), turn_vector_right(direction))
 			userinput.walk_mode = ((direction, level.is_passable(left_coord), level.is_passable(right_coord)),
@@ -126,9 +86,9 @@ def _walk_mode(game, creature, userinput):
 		result = _walk_mode_logic(old_walk_data, new_walk_data)
 		if result is not None:
 			new_direction, new_left, new_right = result
-			message = "Press {} to interrupt walk mode".format(KEY.CANCEL)
-			key = io.ask_until_timestamp(message, timestamp, KEY.GROUP_CANCEL)
-			if key not in KEY.GROUP_CANCEL:
+			message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
+			key = io.ask_until_timestamp(message, timestamp, MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE})
+			if key not in MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE}:
 				walk_delay = io.get_future_time()
 				userinput.walk_mode = (new_direction, new_left, new_right), walk_delay
 				return game.creature_move(creature, new_direction)
@@ -193,8 +153,8 @@ def look(game, creature):
 		c = io.get_key()
 		game.redraw()
 		direction = DIR.STOP
-		if c in direction_map:
-			direction = direction_map[c]
+		if c in MAPPING.DIRECTIONS:
+			direction = MAPPING.DIRECTIONS[c]
 		elif c == 'd':
 			drawline_flag = not drawline_flag
 		elif c == 'b':
@@ -204,7 +164,7 @@ def look(game, creature):
 		elif c == 's':
 			if level.has_creature(coord):
 				game.register_status_texts(level.get_creature(coord))
-		elif c in KEY.GROUP_CANCEL or c == Bindings.LOOK_MODE:
+		elif c in MAPPING.GROUP_CANCEL or c == MAPPING.LOOK_MODE:
 			break
 
 def endgame(game, creature, *a, **k):
@@ -214,9 +174,9 @@ def savegame(game, creature, *a, **k):
 	game.savegame(*a, **k)
 
 def attack(game, creature):
-	key = io.ask("Specify attack direction, {} to abort".format(KEY.CANCEL), direction_map.viewkeys() | KEY.GROUP_CANCEL)
-	if key in direction_map:
-		game.creature_attack(creature, direction_map[key])
+	key = io.ask("Specify attack direction, {} to abort".format(MAPPING.CANCEL), MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL)
+	if key in MAPPING.DIRECTIONS:
+		game.creature_attack(creature, MAPPING.DIRECTIONS[key])
 		return True
 
 def redraw(game, creature):
@@ -244,42 +204,42 @@ def enter(game, creature, passage):
 def sight_change(game, creature, amount):
 	from const.slots import BODY
 	from const.stats import SIGHT
-	creature.slots[BODY].stats[SIGHT] += amount
+	creature.get_item(BODY).stats[SIGHT] += amount
 	return True
 
 def print_history(game, creature):
 	io.m.print_history()
 
-def debug(game, creature, userinput):
+def debug_action(game, creature, userinput):
 	level = creature.level
 	c = io.get_key("Avail cmds: vclbdhkpors+-")
 	if c == 'v':
-		DEBUG.SHOW_MAP = not DEBUG.SHOW_MAP
+		debug.show_map = not debug.show_map
 		game.redraw()
-		io.msg("Show map set to {}".format(DEBUG.SHOW_MAP))
+		io.msg("Show map set to {}".format(debug.show_map))
 	elif c == 'c':
-		DEBUG.CROSS = not DEBUG.CROSS
-		io.msg("Path heuristic cross set to {}".format(DEBUG.CROSS))
+		debug.cross = not debug.cross
+		io.msg("Path heuristic cross set to {}".format(debug.cross))
 	elif c == 'l':
 		GAME.LEVEL_TYPE = LEVEL_TYPE.ARENA if GAME.LEVEL_TYPE == LEVEL_TYPE.DUNGEON else LEVEL_TYPE.DUNGEON
 		io.msg("Level type set to {}".format(GAME.LEVEL_TYPE))
 	elif c == 'b':
 		io.draw_block((4,4))
 	elif c == 'd':
-		if not DEBUG.PATH:
-			DEBUG.PATH = True
+		if not debug.path:
+			debug.path = True
 			io.msg("Path debug set")
-		elif not DEBUG.PATH_STEP:
-			DEBUG.PATH_STEP = True
+		elif not debug.path_step:
+			debug.path_step = True
 			io.msg("Path debug and stepping set")
 		else:
-			DEBUG.PATH = False
-			DEBUG.PATH_STEP = False
+			debug.path = False
+			debug.path_step = False
 			io.msg("Path debug unset")
 	elif c == 'h':
-		DEBUG.REVERSE = not DEBUG.REVERSE
+		debug.reverse = not debug.reverse
 		game.redraw()
-		io.msg("Reverse set to {}".format(DEBUG.REVERSE))
+		io.msg("Reverse set to {}".format(debug.reverse))
 	elif c == 'k':
 		creature_list = level.creatures.values()
 		creature_list.remove(creature)
@@ -307,23 +267,23 @@ def debug(game, creature, userinput):
 	elif c == 'r':
 		io.a.get_key(refresh=True)
 	elif c == '+':
-		creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
+		creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
 		while True:
 			c2 = io.getch_print("[+-]")
 			if c2 == "+":
-				creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
+				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
 			elif c2 == "-":
-				creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
+				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
 			else:
 				break
 	elif c == '-':
-		creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
+		creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
 		while True:
 			c2 = io.getch_print("[+-]")
 			if c2 == "+":
-				creature.slots[SLOT.BODY].stats[STAT.SIGHT] += 1
+				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
 			elif c2 == "-":
-				creature.slots[SLOT.BODY].stats[STAT.SIGHT] -= 1
+				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
 			else:
 				break
 	elif c == 'm':

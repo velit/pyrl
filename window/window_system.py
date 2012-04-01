@@ -1,8 +1,8 @@
 from __future__ import division
 import time
 import const.game as GAME
-import const.debug as DEBUG
-import const.keys as KEY
+import debug
+import mappings as MAPPING
 import const.colors as COLOR
 
 from window.base_window import BaseWindow
@@ -32,13 +32,13 @@ class WindowSystem(object):
 	def msg(self, *a):
 		self.m.queue_msg(*a)
 
-	def ask(self, message, keys=KEY.GROUP_ALL):
+	def ask(self, message, keys=MAPPING.GROUP_ALL):
 		self.msg(message)
 		self.refresh()
 		return self.l.selective_get_key(keys)
 
 	def notify(self, print_str):
-		return self.ask(print_str, KEY.GROUP_MORE)
+		return self.ask(print_str, MAPPING.GROUP_MORE)
 
 	def refresh(self):
 		self.m.update()
@@ -68,8 +68,8 @@ class WindowSystem(object):
 	def draw_path(self, path):
 		for x in path:
 			self.draw_char(x, (" ", COLOR.GREEN), reverse=True)
-			if DEBUG.PATH_STEP: self.get_key()
-		if not DEBUG.PATH_STEP: self.get_key()
+			if debug.path_step: self.get_key()
+		if not debug.path_step: self.get_key()
 
 	def suspend(self):
 		cursor_lib.suspend()

@@ -1,4 +1,4 @@
-import const.debug as DEBUG
+import debug
 import const.colors as COLOR
 
 from main import io
@@ -28,7 +28,7 @@ def _a_star(start, goal, neighbors, heuristic):
 	while openprio[0][1] != goal:
 		origin = heappop(openprio)[1]
 		if origin not in closedset:
-			if DEBUG.PATH and origin != start:
+			if debug.path and origin != start:
 				io.draw_char(origin, ('+', COLOR.LIGHT_BLUE))
 			openmember.remove(origin)
 			closedset.add(origin)
@@ -38,10 +38,10 @@ def _a_star(start, goal, neighbors, heuristic):
 					came_from[node] = origin
 					g[node] = g[origin] + cost
 					heappush(openprio, (g[node] + heuristic(node, goal, start), node))
-					if DEBUG.PATH and node != goal:
+					if debug.path and node != goal:
 						io.draw_char(node, ('?', COLOR.YELLOW))
 					openmember.add(node)
-			if DEBUG.PATH_STEP:
+			if debug.path_step:
 				io.get_key()
 
 	return came_from
