@@ -23,9 +23,12 @@ def _a_star(start, goal, neighbors, heuristic):
 	openmember.add(start)
 
 	g = {start: 0}
-	openprio = [(0, start)]
+	openprio = []
+	heappush(openprio, (0, start))
 
-	while openprio[0][1] != goal:
+	while openprio:
+		if openprio[0][1] == goal:
+			return came_from
 		origin = heappop(openprio)[1]
 		if origin not in closedset:
 			if debug.path and origin != start:
@@ -43,8 +46,8 @@ def _a_star(start, goal, neighbors, heuristic):
 					openmember.add(node)
 			if debug.path_step:
 				io.get_key()
-
-	return came_from
+	else:
+		raise Exception("No possible paths between arguments start:{} goal:{}".format(start, goal))
 
 
 def _iterate_path(came_from, start, goal):
