@@ -47,9 +47,7 @@ class UserInput(object):
 		taken_action = False
 		while not taken_action:
 			if self.walk_mode_data is not None:
-				self.walk_mode_data = walk_mode(game, creature, self.walk_mode_data)
-				if self.walk_mode_data is not None:
-					taken_action = game.creature_move(creature, self.walk_mode_data[0])
+				taken_action = walk_mode(game, creature, self)
 			else:
 				key = io.get_key()
 				if key in self.actions:
