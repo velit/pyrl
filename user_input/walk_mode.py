@@ -46,8 +46,8 @@ def walk_mode(game, creature, userinput):
 					userinput.walk_mode_data = new_direction, new_walk_type, walk_delay, msg_time
 					return True
 
-		userinput.walk_mode_data = None
-		return False
+	userinput.walk_mode_data = None
+	return False
 
 def _walk_mode_init(game, creature, direction):
 	if game.creature_move(creature, direction):
