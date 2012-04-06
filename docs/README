@@ -1,4 +1,0 @@
-python roguelike
-
-pyrl.py for ncurses version (not on windows)
-sdlpyrl.py for libtcod version (only on windows and on linux if sdl is installed)
