@@ -39,17 +39,18 @@ class Curses256ColorDict(dict):
 
 	def __init__(self):
 		dict.__init__(self)
-		self.pair_nr = 0
+		# 0 is hard-coded to be curses.NORMAL in curses
+		self.pair_nr = 1
 
 	def __getitem__(self, key):
 		try:
 			return dict.__getitem__(self, key)
 		except KeyError:
 			fg, bg = key
-			self.pair_nr += 1
 			curses.init_pair(self.pair_nr, self.CURSES_ATTR[fg], self.CURSES_ATTR[bg])
 			color_pair = curses.color_pair(self.pair_nr)
 			self[key] = color_pair
+			self.pair_nr += 1
 			return color_pair
 
 
@@ -90,23 +91,23 @@ class CursesColorDict(dict):
 			COLOR.BASE_GREEN, COLOR.BASE_BLUE, COLOR.BASE_PURPLE, COLOR.BASE_CYAN,
 			COLOR.BASE_BROWN, COLOR.BASE_DARK_GRAY, COLOR.BASE_GRAY, COLOR.BASE_LIGHT_GRAY}
 
-	def __init__(self, CURSES_ATTR):
+	def __init__(self):
 		dict.__init__(self)
-		self.pair_nr = 0
-		self.CURSES_ATTR = CURSES_ATTR
+		# 0 is hard-coded to be NORMAL
+		self.pair_nr = 1
 
 	def __getitem__(self, key):
 		try:
 			return dict.__getitem__(self, key)
 		except KeyError:
 			fg, bg = key
-			self.pair_nr += 1
 			curses.init_pair(self.pair_nr, self.CURSES_ATTR[fg], self.CURSES_ATTR[bg])
 			if fg not in self.BASIC_COLORS:
 				color_pair = curses.color_pair(self.pair_nr) | curses.A_BOLD
 			else:
 				color_pair = curses.color_pair(self.pair_nr)
 			self[key] = color_pair
+			self.pair_nr += 1
 			return color_pair
 
 

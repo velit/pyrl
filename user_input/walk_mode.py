@@ -84,6 +84,8 @@ def _get_walk_type_data(creature, direction):
 	elif direction in DIR.DIAGONAL:
 		left = _passable(creature, anticlockwise_45(direction))
 		right =	_passable(creature, clockwise_45(direction))
+	else:
+		raise Exception("Not a valid direction {0}".format(direction))
 	return forward, (left, right)
 
 def _any_creatures_visible(game, creature):
