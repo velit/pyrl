@@ -17,13 +17,15 @@ from generic_algorithms import add_vector
 from itertools import imap
 
 
+user_input = UserInput()
+
+
 class Game(object):
 
 	def __init__(self):
 		"""pyrl; Python roguelike by Tapani Kiiskinen"""
 
 		self.turn_counter = 0
-		self.user_input = UserInput()
 		self.current_vision = set()
 		self.levels = {}
 		self.world_file = WorldFile()
@@ -54,17 +56,6 @@ class Game(object):
 		io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
 		io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
 		io.s.add_element("Turns", lambda: self.turn_counter)
-
-	def enter_passage(self, origin_world_loc, origin_passage):
-		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
-		if instruction == GAME.SET_LEVEL:
-			self.change_level((d, i))
-		else:
-			d, i = self.player.level.world_loc
-			if instruction == GAME.PREVIOUS_LEVEL:
-				self.change_level((d, i - 1), GAME.PASSAGE_DOWN)
-			elif instruction == GAME.NEXT_LEVEL:
-				self.change_level((d, i + 1), GAME.PASSAGE_UP)
 
 	def change_level(self, world_loc, passage):
 		old_level = self.player.level
@@ -103,13 +94,34 @@ class Game(object):
 		if debug.show_map:
 			io.draw(level.get_wallhack_data(level.get_coord_iter()))
 		self.update_view(self.player.level, self.player)
-		self.user_input.get_user_input_and_act(self, self.player)
+		user_input.get_user_input_and_act(self, self.player)
+
+	def creature_enter_passage(self, creature, origin_world_loc, origin_passage):
+		instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
+		if instruction == GAME.SET_LEVEL:
+			self.change_level((d, i))
+		else:
+			d, i = creature.level.world_loc
+			if instruction == GAME.PREVIOUS_LEVEL:
+				self.change_level((d, i - 1), GAME.PASSAGE_DOWN)
+			elif instruction == GAME.NEXT_LEVEL:
+				self.change_level((d, i + 1), GAME.PASSAGE_UP)
+		creature.update_energy(GAME.MOVEMENT_COST)
 
 	def creature_move(self, creature, direction):
 		level = creature.level
 		if level.creature_can_move(creature, direction) and creature.can_act():
 			target_coord = add_vector(creature.coord, direction)
 			creature.update_energy(level.movement_cost(direction, target_coord))
+			level.move_creature(creature, target_coord)
+			return True
+		else:
+			return False
+
+	def creature_teleport(self, creature, target_coord):
+		level = creature.level
+		if level.is_passable(target_coord) and creature.can_act():
+			creature.update_energy(GAME.MOVEMENT_COST)
 			level.move_creature(creature, target_coord)
 			return True
 		else:

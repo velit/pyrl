@@ -16,7 +16,7 @@ def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
 		else:
 			level_file.add_walls()
 
-		for x in xrange(2000):
+		for x in xrange(GAME.RDG_LEVEL_PASSES):
 			if rand() < 0.50:
 				_attempt_corridor(level_file)
 			else:

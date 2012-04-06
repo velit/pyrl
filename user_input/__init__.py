@@ -1,4 +1,3 @@
-import sys
 import code
 import debug
 
@@ -15,49 +14,44 @@ from main import io
 from world_file import LevelNotFound
 from generic_algorithms import add_vector
 
-from inventory import equipment; equipment
-from walk_mode import walk_mode, walk_mode_init; walk_mode_init
+from inventory import equipment
+from walk_mode import walk_mode, walk_mode_init
 
 class UserInput(object):
 	def __init__(self):
+		self.walk_mode_data = None
 		no_args, no_kwds = (), {}
 		self.actions = {
-			KEY.CLOSE_WINDOW: ("endgame", no_args, no_kwds),
-			MAPPING.ASCEND: ("enter", (GAME.PASSAGE_UP, ), no_kwds),
-			MAPPING.DESCEND: ("enter", (GAME.PASSAGE_DOWN, ), no_kwds),
-			MAPPING.QUIT: ("endgame", no_args, no_kwds),
-			MAPPING.SAVE: ("savegame", no_args, no_kwds),
-			MAPPING.ATTACK: ("attack", no_args, no_kwds),
-			MAPPING.REDRAW: ("redraw", no_args, no_kwds),
-			MAPPING.HISTORY: ("print_history", no_args, no_kwds),
-			MAPPING.WALK_MODE: ("walk_mode_init", (self, ), no_kwds),
-			MAPPING.LOOK_MODE: ("look", no_args, no_kwds),
-			MAPPING.INVENTORY: ("equipment", no_args, no_kwds),
-			'z': ("z_command", no_args, no_kwds),
-			'd': ("debug_action", (self, ), no_kwds),
-			'+': ("sight_change", (1, ), no_kwds),
-			'-': ("sight_change", (-1, ), no_kwds),
+			KEY.CLOSE_WINDOW:   (endgame, no_args, no_kwds),
+			MAPPING.ASCEND:     (enter, (GAME.PASSAGE_UP, ), no_kwds),
+			MAPPING.DESCEND:    (enter, (GAME.PASSAGE_DOWN, ), no_kwds),
+			MAPPING.QUIT:       (endgame, no_args, no_kwds),
+			MAPPING.SAVE:       (savegame, no_args, no_kwds),
+			MAPPING.ATTACK:     (attack, no_args, no_kwds),
+			MAPPING.REDRAW:     (redraw, no_args, no_kwds),
+			MAPPING.HISTORY:    (print_history, no_args, no_kwds),
+			MAPPING.WALK_MODE:  (walk_mode_init, (self, ), no_kwds),
+			MAPPING.LOOK_MODE:  (look, no_args, no_kwds),
+			MAPPING.INVENTORY:  (equipment, no_args, no_kwds),
+
+			'd':  (debug_action, (self, ), no_kwds),
+			'+':  (sight_change, (1, ), no_kwds),
+			'-':  (sight_change, (-1, ), no_kwds),
 		}
 		for key, value in MAPPING.DIRECTIONS.viewitems():
-			self.actions[key] = ("act_to_dir", (value, ), no_kwds)
-
-		self.walk_mode_data = None
+			self.actions[key] = (act_to_dir, (value, ), no_kwds)
 
 	def get_user_input_and_act(self, game, creature):
-		taken_action = False
-		while not taken_action:
+		while creature.can_act():
 			if self.walk_mode_data is not None:
-				taken_action = walk_mode(game, creature, self)
+				walk_mode(game, creature, self)
 			else:
 				key = io.get_key()
 				if key in self.actions:
-					taken_action = self.execute_action(game, creature, self.actions[key])
+					function, args, keywords = self.actions[key]
+					function(game, creature, *args, **keywords)
 				else:
 					io.msg("Undefined key: {}".format(key))
-
-	def execute_action(self, game, creature, act):
-		function, args, keywords = act
-		return getattr(sys.modules[__name__], function)(game, creature, *args, **keywords)
 
 def act_to_dir(game, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
@@ -72,13 +66,6 @@ def act_to_dir(game, creature, direction):
 		else:
 			io.msg("You can't move there.")
 		return False
-
-def z_command(game, creature):
-	c = io.get_key()
-	if c == 'Q':
-		game.endgame(ask=False)
-	elif c == 'Z':
-		game.savegame(ask=False)
 
 def look(game, creature):
 	coord = creature.coord
@@ -125,8 +112,7 @@ def savegame(game, creature, *a, **k):
 def attack(game, creature):
 	key = io.ask("Specify attack direction, {} to abort".format(MAPPING.CANCEL), MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL)
 	if key in MAPPING.DIRECTIONS:
-		game.creature_attack(creature, MAPPING.DIRECTIONS[key])
-		return True
+		return game.creature_attack(creature, MAPPING.DIRECTIONS[key])
 
 def redraw(game, creature):
 	game.redraw()
@@ -136,7 +122,7 @@ def enter(game, creature, passage):
 	level = creature.level
 	if level.is_exit(coord) and level.get_exit(coord) == passage:
 		try:
-			game.enter_passage(level.world_loc, level.get_exit(coord))
+			game.creature_enter_passage(creature, level.world_loc, level.get_exit(coord))
 		except LevelNotFound:
 			io.msg("This passage doesn't seem to lead anywhere.")
 	else:
@@ -147,8 +133,8 @@ def enter(game, creature, passage):
 		else:
 			if not level.is_passable(new_coord):
 				level.remove_creature(level.get_creature(new_coord))
-			level.move_creature(game.player, new_coord)
-	return True
+			if not game.creature_teleport(creature, new_coord):
+				io.msg("Teleport failed.")
 
 def sight_change(game, creature, amount):
 	from const.slots import BODY
