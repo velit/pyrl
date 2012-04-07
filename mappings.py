@@ -51,6 +51,7 @@ DIRECTIONS = {
 }
 
 # main view
+HELP = KEY.F1
 LOOK_MODE = 'q'
 INVENTORY = 'i'
 DESCEND = '>'

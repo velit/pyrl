@@ -11,8 +11,8 @@ SE = (1, 1)
 ALL = (WE, SO, NO, EA, NW, NE, SW, SE, STOP)
 ALL_MINUS_STOP = (WE, SO, NO, EA, NW, NE, SW, SE)
 
-DIAGONAL = (NW, NE, SW, SE)
-ORTHOGONAL = (NO, EA, SO, WE)
+DIAGONALS = (NW, NE, SW, SE)
+ORTHOGONALS = (NO, EA, SO, WE)
 
 rotate_clockwise = {
 		NW: NO,
@@ -35,3 +35,15 @@ rotate_counter_clockwise = {
 		NE: NO,
 		NO: NW,
 }
+
+STRINGS = (
+	(NW, "North West"),
+	(NO, "North"),
+	(NE, "North East"),
+	(WE, "West"),
+	(EA, "East"),
+	(SW, "South West"),
+	(SO, "South"),
+	(SE, "South East"),
+	(STOP, "Current position"),
+)

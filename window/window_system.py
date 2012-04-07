@@ -52,17 +52,19 @@ class WindowSystem(object):
 		else:
 			self.l.draw_reverse(character_data_sequence)
 
-	def menu(self, header, lines, footer, key_set):
-		self.a.clear()
-		self.a.draw_header(header)
-		self.a.draw_lines(lines)
-		self.a.draw_footer(footer)
-		return self.a.selective_get_key(key_set, refresh=True)
+	def menu(self, header, lines, footer, key_set, target_window=None):
+		if target_window is None:
+			target_window = self.a
+		target_window.clear()
+		target_window.draw_header(header)
+		target_window.draw_lines(lines)
+		target_window.draw_footer(footer)
+		return target_window.selective_get_key(key_set, refresh=True)
 
 	def draw_char(self, coord, char, reverse=False):
 		self.l.draw_char(coord, char, reverse)
 
-	def drawline(self, *a, **k):
+	def draw_line(self, *a, **k):
 		self.l.draw_line(*a, **k)
 
 	def draw_path(self, path):
