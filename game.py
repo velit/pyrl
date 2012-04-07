@@ -1,4 +1,5 @@
 import ai
+import mappings as MAPPING
 import const.game as GAME
 import const.creature_actions as CC
 import const.stats as STAT
@@ -36,6 +37,7 @@ class Game(object):
 		first_level.add_creature(self.player, first_level.get_passage_coord(GAME.PASSAGE_UP))
 		self.register_status_texts(self.player)
 		self.vision_cache = None
+		io.msg("{0} for help menu".format(MAPPING.HELP))
 
 	def is_player(self, creature):
 		return self.player is creature

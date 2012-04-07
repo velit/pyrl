@@ -1,7 +1,7 @@
 from __future__ import division
 import random
 import path
-import const.directions as DIRS
+import const.directions as DIR
 import const.game as GAME
 import debug
 
@@ -57,7 +57,7 @@ class Level(object):
 	def _a_star_neighbors(self, coord):
 		for direction in self.get_tile_passable_neighbors(coord):
 			neighbor_coord = add_vector(coord, direction)
-			if direction in DIRS.DIAGONAL:
+			if direction in DIR.DIAGONALS:
 				yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
 			else:
 				yield neighbor_coord, self.tiles[coord].movement_cost
@@ -92,7 +92,7 @@ class Level(object):
 		self.add_creature(creature)
 
 	def get_tile_passable_neighbors(self, coord):
-		for direction in DIRS.ALL:
+		for direction in DIR.ALL_MINUS_STOP:
 			neighbor_coord = add_vector(coord, direction)
 			if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
 				yield direction
@@ -172,11 +172,11 @@ class Level(object):
 		return round(path.heuristic(coordA, coordB, GAME.MOVEMENT_COST, GAME.DIAGONAL_MODIFIER))
 
 	def movement_cost(self, direction, end_coord):
-		if direction in DIRS.ORTHOGONAL:
+		if direction in DIR.ORTHOGONALS:
 			value = self.tiles[end_coord].movement_cost
-		elif direction in DIRS.DIAGONAL:
+		elif direction in DIR.DIAGONALS:
 			value = round(self.tiles[end_coord].movement_cost * GAME.DIAGONAL_MODIFIER)
-		elif direction == DIRS.STOP:
+		elif direction == DIR.STOP:
 			value = GAME.MOVEMENT_COST
 		else:
 			raise ValueError("Invalid direction: {}".format(direction))
@@ -245,13 +245,13 @@ class Level(object):
 			return True
 		else:
 			vector = get_vector(creature.coord, target_coord)
-			if vector in DIRS.ALL:
+			if vector in DIR.ALL:
 				return True
 			else:
 				return False
 
 	def creature_can_move(self, creature, direction):
-		if direction == DIRS.STOP:
+		if direction == DIR.STOP:
 			return True
 		elif self.legal_coord(creature.coord, direction):
 			coord = add_vector(creature.coord, direction)

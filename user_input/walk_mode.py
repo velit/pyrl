@@ -25,6 +25,15 @@ def walk_mode_init(game, creature, userinput):
 				return True
 	return False
 
+def _walk_mode_init(game, creature, direction):
+	forward, old_walk_type = _get_walk_type_data(creature, direction)
+	if game.creature_move(creature, direction):
+		forward, walk_type = _get_walk_type_data(creature, direction)
+		if not forward:
+			walk_type = CORRIDOR
+		if not (old_walk_type == LEFT and walk_type == RIGHT) and not (old_walk_type == RIGHT and walk_type == LEFT):
+			return (direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME))
+
 def walk_mode(game, creature, userinput):
 	if not _any_creatures_visible(game, creature):
 		direction, old_walk_type, timestamp, msg_time = userinput.walk_mode_data
@@ -49,24 +58,26 @@ def walk_mode(game, creature, userinput):
 	userinput.walk_mode_data = None
 	return False
 
-def _walk_mode_init(game, creature, direction):
-	if game.creature_move(creature, direction):
-		forward, walk_type = _get_walk_type_data(creature, direction)
-		if not forward:
-			walk_type = CORRIDOR
-		return (direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME))
+def _corridor_walk_type(game, creature, origin_direction):
+	forward_dirs, orthogonal_dirs, ignored_dirs = _get_corridor_candidate_dirs(creature, origin_direction)
+	if len(forward_dirs) == 1:
+		direction = forward_dirs.pop()
+		if clockwise_45(direction) not in ignored_dirs and anticlockwise_45(direction) not in ignored_dirs:
+			return direction, CORRIDOR
+	elif len(forward_dirs) > 1 and len(orthogonal_dirs) == 1:
+		direction = orthogonal_dirs.pop()
+		if all(get_vector(direction, other) in DIR.ALL for other in forward_dirs):
+			if clockwise_45(direction) not in ignored_dirs and anticlockwise_45(direction) not in ignored_dirs:
+				return direction, CORRIDOR
 
-def _corridor_walk_type(game, creature, direction):
-	valid_forward_dirs = _valid_forward_dirs(creature, direction)
-	if len(valid_forward_dirs) == 1:
-		return valid_forward_dirs[0], CORRIDOR
-	elif len(valid_forward_dirs) == 2:
-		d1, d2 = valid_forward_dirs
-		if get_vector(d1, d2) in DIR.ALL:
-			if d1 in DIR.ORTHOGONAL and d2 in DIR.DIAGONAL:
-				return d1, CORRIDOR
-			elif d2 in DIR.ORTHOGONAL and d1 in DIR.DIAGONAL:
-				return d2, CORRIDOR
+def _get_corridor_candidate_dirs(creature, direction):
+	reverse = reverse_vector(direction)
+	back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
+	candidate_dirs = set(creature.level.get_tile_passable_neighbors(creature.coord)) - {reverse}
+	candidate_forward_dirs = candidate_dirs - back_sides
+	candidate_orthogonal_dirs = candidate_dirs & set(DIR.ORTHOGONALS)
+	ignored_dirs = candidate_dirs & back_sides
+	return candidate_forward_dirs, candidate_orthogonal_dirs, ignored_dirs
 
 def _normal_walk_type(game, creature, direction, old_walk_type):
 	forward, new_walk_type = _get_walk_type_data(creature, direction)
@@ -78,10 +89,10 @@ def _passable(creature, direction):
 
 def _get_walk_type_data(creature, direction):
 	forward = _passable(creature, direction)
-	if direction in DIR.ORTHOGONAL:
+	if direction in DIR.ORTHOGONALS:
 		left = _passable(creature, anticlockwise(direction))
 		right =	_passable(creature, clockwise(direction))
-	elif direction in DIR.DIAGONAL:
+	elif direction in DIR.DIAGONALS:
 		left = _passable(creature, anticlockwise_45(direction))
 		right =	_passable(creature, clockwise_45(direction))
 	else:
@@ -90,8 +101,3 @@ def _get_walk_type_data(creature, direction):
 
 def _any_creatures_visible(game, creature):
 	return any(creature.level.has_creature(coord) for coord in game.current_vision if coord != creature.coord)
-
-def _valid_forward_dirs(creature, direction):
-	reverse = reverse_vector(direction)
-	return tuple(set(creature.level.get_tile_passable_neighbors(creature.coord)) -
-			{DIR.STOP, reverse, anticlockwise_45(reverse), clockwise_45(reverse)})

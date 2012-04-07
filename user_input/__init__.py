@@ -33,6 +33,7 @@ class UserInput(object):
 			MAPPING.WALK_MODE:  (walk_mode_init, (self, ), no_kwds),
 			MAPPING.LOOK_MODE:  (look, no_args, no_kwds),
 			MAPPING.INVENTORY:  (equipment, no_args, no_kwds),
+			MAPPING.HELP:       (help_screen, no_args, no_kwds),
 
 			'd':  (debug_action, (self, ), no_kwds),
 			'+':  (sight_change, (1, ), no_kwds),
@@ -49,23 +50,22 @@ class UserInput(object):
 				key = io.get_key()
 				if key in self.actions:
 					function, args, keywords = self.actions[key]
-					function(game, creature, *args, **keywords)
+					if function(game, creature, *args, **keywords):
+						return
 				else:
 					io.msg("Undefined key: {}".format(key))
 
 def act_to_dir(game, creature, direction):
 	target_coord = add_vector(creature.coord, direction)
-	if game.creature_move(creature, direction):
-		return True
-	elif creature.level.has_creature(target_coord):
+	level = creature.level
+	if level.creature_can_move(creature, direction):
+		game.creature_move(creature, direction)
+	elif level.has_creature(target_coord):
 		game.creature_attack(creature, direction)
-		return True
+	elif not creature.can_act():
+		io.msg("You're out of energy.")
 	else:
-		if not creature.can_act():
-			io.msg("You're out of energy.")
-		else:
-			io.msg("You can't move there.")
-		return False
+		io.msg("You can't move there.")
 
 def look(game, creature):
 	coord = creature.coord
@@ -78,8 +78,8 @@ def look(game, creature):
 			coord = new_coord
 		io.msg(level.look_information(coord))
 		if drawline_flag:
-			io.drawline(creature.coord, coord, ("*", COLOR.YELLOW))
-			io.drawline(coord, creature.coord, ("*", COLOR.YELLOW))
+			io.draw_line(creature.coord, coord, ("*", COLOR.YELLOW))
+			io.draw_line(coord, creature.coord, ("*", COLOR.YELLOW))
 			io.msg("LoS: {}".format(level.check_los(creature.coord, coord)))
 		if coord != creature.coord:
 			char = level._get_visible_char(coord)
@@ -112,7 +112,7 @@ def savegame(game, creature, *a, **k):
 def attack(game, creature):
 	key = io.ask("Specify attack direction, {} to abort".format(MAPPING.CANCEL), MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL)
 	if key in MAPPING.DIRECTIONS:
-		return game.creature_attack(creature, MAPPING.DIRECTIONS[key])
+		game.creature_attack(creature, MAPPING.DIRECTIONS[key])
 
 def redraw(game, creature):
 	game.redraw()
@@ -152,14 +152,12 @@ def debug_action(game, creature, userinput):
 		debug.show_map = not debug.show_map
 		game.redraw()
 		io.msg("Show map set to {}".format(debug.show_map))
-	elif c == 'c':
+	elif c == 'r':
 		debug.cross = not debug.cross
 		io.msg("Path heuristic cross set to {}".format(debug.cross))
 	elif c == 'l':
 		GAME.LEVEL_TYPE = LEVEL_TYPE.ARENA if GAME.LEVEL_TYPE == LEVEL_TYPE.DUNGEON else LEVEL_TYPE.DUNGEON
 		io.msg("Level type set to {}".format(GAME.LEVEL_TYPE))
-	elif c == 'b':
-		io.draw_block((4,4))
 	elif c == 'd':
 		if not debug.path:
 			debug.path = True
@@ -181,6 +179,7 @@ def debug_action(game, creature, userinput):
 		for i in creature_list:
 			level.remove_creature(i)
 		io.msg("Abrakadabra.")
+		return True
 	elif c == 'o':
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(creature.coord, passage_down))
@@ -190,38 +189,48 @@ def debug_action(game, creature, userinput):
 		passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
 		io.draw_path(level.path(passage_up, passage_down))
 		game.redraw()
-	elif c == 's':
+	elif c == 'i':
 		io.suspend()
 		code.interact(local=locals())
 		io.resume()
-	elif c == 'e':
+	elif c == 'c':
 		import curses
 		io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
 		io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
 				curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
-	elif c == 'r':
-		io.a.get_key(refresh=True)
-	elif c == '+':
-		creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
-		while True:
-			c2 = io.getch_print("[+-]")
-			if c2 == "+":
-				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
-			elif c2 == "-":
-				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
-			else:
-				break
-	elif c == '-':
-		creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
-		while True:
-			c2 = io.getch_print("[+-]")
-			if c2 == "+":
-				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] += 1
-			elif c2 == "-":
-				creature.get_item(SLOT.BODY).stats[STAT.SIGHT] -= 1
-			else:
-				break
 	elif c == 'm':
 		io.msg(debug.debug_string)
 	else:
 		io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
+
+def help_screen(game, creature):
+	header = "Help Screen, ^ means ctrl, ! means alt"
+	help_lines = [
+		"Help           {0}".format(MAPPING.HELP),
+		"Look Mode      {0}".format(MAPPING.LOOK_MODE),
+		"Inventory      {0}".format(MAPPING.INVENTORY),
+		"Descend        {0}".format(MAPPING.DESCEND),
+		"Ascend         {0}".format(MAPPING.ASCEND),
+		"Quit           {0}".format(MAPPING.QUIT),
+		"Save           {0}".format(MAPPING.SAVE),
+		"Manual Attack  {0}".format(MAPPING.ATTACK),
+		"Redraw Screen  {0}".format(MAPPING.REDRAW),
+		"Print History  {0}".format(MAPPING.HISTORY),
+		"Walk Mode      {0}".format(MAPPING.WALK_MODE),
+		"",
+		"Direction keys used for movement, implicit attacking, walk mode, et cetera:",
+		"  Numpad keys",
+		"  So called vi-keys (hjklyubn.)",
+		"",
+		"Debug keys that start with d",
+		"Map hax             dv        Other path                   dp",
+		"Kill monsters       dk        Reverse fov                  dh",
+		"Path to stairs      do        Interactive console          di",
+		"Toggle path debugs  dd        Change level types           dl",
+		"Print debug string  dm        Set cross heuristic in path  dr",
+		"",
+		"Colors available     dc (only on ncurses ie. pyrl.py)",
+	]
+	footer = "{0} to close".format(MAPPING.CANCEL)
+	io.menu(header, help_lines, footer, MAPPING.GROUP_CANCEL)
+	game.redraw()
