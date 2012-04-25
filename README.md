@@ -1,39 +1,29 @@
 Running pyrl
 ============
 
-Execute either pyrl.py or sdlpyrl.py depending on your platform/environment.
+Execute either 'pyrl.py' or 'sdlpyrl.py' depending on if you want the ncurses or
+sdl version of the game. Windows only has support for the sdl version.
 
-### Windows requirements
+### Windows sdlpyrl.py requirements
 
 * 32-bit Python 2.7
 
-Execute sdlpyrl.py to start. (No ncurses variant available)
-
-### \*nix requirements
+### \*nix sdlpyrl.py requirements
 
 * Python 2.7 32-bit
 * libSDL
 
-Execute sdlpyrl.py to start.
-
-or
+### \*nix and Mac pyrl.py requirements
 
 * Python 2.7
 * libncurses
-
-Execute pyrl.py in a terminal emulator to start.
-
-### Mac requirements
-
-* Python 2.7 and ncurses
-
-Execute pyrl.py in a terminal emulator to start.
+* A terminal or a terminal emulator
 
 
 Installing SDL
 --------------
 
-A windows dll for SDL comes bundled with the game
+A .dll for SDL comes bundled with the game on windows.
 
 ### Ubuntu
     sudo apt-get install libsdl1.2
@@ -41,15 +31,12 @@ A windows dll for SDL comes bundled with the game
 ### Debian
     sudo apt-get install libsdl1.2debian
 
-### Windows
-comes bundled with the game
-
 
 Ncurses specific issues
 =======================
 
 Information in this paragraph is only relevant when using the terminal version
-of the game, ie. when running pyrl.py
+of the game, ie. when using 'pyrl.py'.
 
 More colors
 -----------
@@ -138,7 +125,7 @@ following in your .screenrc
 
 The game doesn't require the user to use ESC when playing the game because of
 the one second default delay that some terminals have. If you wish to use ESC
-when running pyrl.py without a considerable delay you can set the environmental
+when using 'pyrl.py' without a considerable delay you can set the environmental
 variable ESCDELAY a value of your choosing in milliseconds. To set the value do
 the following in the command line or .bashrc (or equivalent)
 
