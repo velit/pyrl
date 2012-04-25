@@ -168,6 +168,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1332539363" done="1334175954">
+        Fragment walk_mode into own file
+        <comment>
+            d
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -234,11 +240,11 @@
     <note priority="veryhigh" time="1333839359">
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
     </note>
+    <note priority="veryhigh" time="1334875084">
+        retab project to spaces
+    </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
-    </note>
-    <note priority="high" time="1332539363">
-        Fragment walk_mode into own file
     </note>
     <note priority="high" time="1333062945">
         Add configurable keybindings
