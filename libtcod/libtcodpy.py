@@ -1345,7 +1345,7 @@ def random_new_from_seed(seed, algo=RNG_CMWC):
     return _lib.TCOD_random_new_from_seed(algo,c_uint(seed))
 
 def random_set_distribution(rnd, dist) :
-	_lib.TCOD_random_set_distribution(rnd, dist)
+    _lib.TCOD_random_set_distribution(rnd, dist)
 
 def random_get_int(rnd, mi, ma):
     return _lib.TCOD_random_get_int(rnd, mi, ma)
