@@ -78,6 +78,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1334875084" done="1335475471">
+        retab project to spaces
+        <comment>
+            d
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -229,7 +235,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make print_lines or inventory scrollable
+        Make print_lines scrollable
     </note>
     <note priority="veryhigh" time="1330904930">
         Add a function that draws the square how it's supposed to be seen
@@ -240,8 +246,11 @@
     <note priority="veryhigh" time="1333839359">
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
     </note>
-    <note priority="veryhigh" time="1334875084">
-        retab project to spaces
+    <note priority="veryhigh" time="1335477427">
+        Try moving ai state from creatures to ai.py
+    </note>
+    <note priority="veryhigh" time="1335477455">
+        Try making a priority queue based scheduling
     </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
