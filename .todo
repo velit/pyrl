@@ -246,8 +246,11 @@
     <note priority="veryhigh" time="1333839359">
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
     </note>
-    <note priority="veryhigh" time="1335477427">
+    <note priority="veryhigh" time="1335477427" done="1335546787">
         Try moving ai state from creatures to ai.py
+        <comment>
+            didn't move the state, instead made the attributes dynamic
+        </comment>
     </note>
     <note priority="veryhigh" time="1335477455">
         Try making a priority queue based scheduling

@@ -6,8 +6,6 @@ import const.directions as DIR
 import const.game as GAME
 import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
-import const.slots as SLOT
-import const.stats as STAT
 import mappings as MAPPING
 
 from main import io

@@ -9,8 +9,6 @@ class Creature(object):
         self.char = creature_file.char
         self.level = None
         self.coord = None
-        self.target_coord = None
-        self.chase_vector = None
 
         self.energy = 0
 
@@ -21,6 +19,11 @@ class Creature(object):
         self.perception = 10
 
         self.hp = self.max_hp
+
+        # Possibly set by ai.py
+
+        #self.target_coord = None
+        #self.chase_vector = None
 
     def get_damage_info(self):
         dice = self.unarmed_dice
@@ -55,7 +58,7 @@ class Creature(object):
         return amount
 
     def is_idle(self):
-        return self.target_coord is None and self.chase_vector is None
+        return not hasattr(self, "target_coord") and not hasattr(self, "chase_vector")
 
     @property
     def st(self):
