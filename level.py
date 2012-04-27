@@ -192,8 +192,10 @@ class Level(object):
             c = self.get_creature(coord)
             creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
             information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
-            information += " target:{}".format(coord)
-            information += " direction:{}".format(c.chase_vector)
+            if hasattr(c, "target_coord"):
+                information += " target:{}".format(c.target_coord)
+            if hasattr(c, "chase_vector"):
+                information += " direction:{}".format(c.chase_vector)
         else:
             information += self.tiles[coord].name
         return information
