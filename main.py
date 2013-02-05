@@ -39,14 +39,9 @@ def start():
         game = Game()
 
     if options.profile:
-        cProfile.run("play(game)")
+        cProfile.run("game.main_loop()")
     else:
-        play(game)
-
-
-def play(game):
-    while True:
-        game.play()
+        game.main_loop()
 
 
 def load(name):

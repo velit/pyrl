@@ -84,6 +84,12 @@
             d
         </comment>
     </note>
+    <note priority="veryhigh" time="1335477427" done="1335546787">
+        Try moving ai state from creatures to ai.py
+        <comment>
+            didn't move the state, instead made the attributes dynamic
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -246,12 +252,6 @@
     <note priority="veryhigh" time="1333839359">
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
     </note>
-    <note priority="veryhigh" time="1335477427" done="1335546787">
-        Try moving ai state from creatures to ai.py
-        <comment>
-            didn't move the state, instead made the attributes dynamic
-        </comment>
-    </note>
     <note priority="veryhigh" time="1335477455">
         Try making a priority queue based scheduling
     </note>
@@ -265,10 +265,13 @@
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
     </note>
     <note priority="medium" time="1329647500">
-        Make a getstring method
+        Make a curses getstring method
     </note>
-    <note priority="low" time="1315155844">
+    <note priority="low" time="1315155844" done="1355047491">
         wizard/mana, warrior/stamina rogue/focus
+        <comment>
+            meh
+        </comment>
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels
