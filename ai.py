@@ -36,7 +36,6 @@ def act_alert(game, creature, alert_coord):
                 else:
                     del creature.target_coord
                     del creature.chase_vector
-
         # actions
         if hasattr(creature, "target_coord"):
             move_towards(game, creature, creature.target_coord)

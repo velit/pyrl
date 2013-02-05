@@ -39,8 +39,21 @@ class Game(object):
         self.vision_cache = None
         io.msg("{0} for help menu".format(MAPPING.HELP))
 
-    def is_player(self, creature):
-        return self.player is creature
+    def main_loop(self):
+        player = self.player
+        while True:
+            creature, newcycle = player.level.turn_scheduler.get_actor_and_is_newcycle()
+
+            #if newcycle:
+                ## do cycle based stuff
+
+            if creature is not self.player:
+                ai.act_alert(self, creature, self.player.coord)
+            elif creature.can_act():
+                self.player_act()
+                self.turn_counter += 1
+
+            creature.recover_energy()
 
     def register_status_texts(self, creature):
         io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
@@ -76,20 +89,6 @@ class Game(object):
         if not level_file.static_level:
             rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
         self.levels[world_loc] = Level(world_loc, level_file)
-
-    def play(self):
-        level = self.player.level
-        if level.turn_scheduler.is_new_turn():
-            pass
-
-        creature = level.turn_scheduler.get()
-        creature.recover_energy()
-        if self.is_player(creature):
-            if creature.can_act():
-                self.player_act()
-                self.turn_counter += 1
-        else:
-            ai.act_alert(self, creature, self.player.coord)
 
     def player_act(self):
         level = self.player.level
@@ -157,8 +156,8 @@ class Game(object):
                 died = target.is_dead()
             else:
                 died = False
-            player_matrix = imap(self.is_player, (creature, target))
-            msg = get_combat_message(succeeds, damage, died, player_matrix, creature.name, target.name)
+            personity = (creature is self.player, target is self.player)
+            msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
             if died:
                 self.creature_death(target)
             io.msg(msg)
@@ -168,7 +167,7 @@ class Game(object):
 
     def creature_death(self, creature):
         level = creature.level
-        if self.is_player(creature):
+        if creature is self.player:
             io.notify("You die...")
             self.endgame(False)
         level.remove_creature(creature)
