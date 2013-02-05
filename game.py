@@ -1,4 +1,3 @@
-import ai
 import mappings as MAPPING
 import const.game as GAME
 import const.creature_actions as CC
@@ -10,12 +9,12 @@ import rdg
 from main import io
 from const.player import Player
 from level import Level
+from ai import AI
 from user_input import UserInput
 from world_file import WorldFile
 from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
 from generic_algorithms import add_vector
-from itertools import imap
 
 
 user_input = UserInput()
@@ -31,6 +30,7 @@ class Game(object):
         self.levels = {}
         self.world_file = WorldFile()
         self.player = Player()
+        self.ai = AI()
 
         self.init_new_level(GAME.FIRST_LEVEL)
         first_level = self.levels[GAME.FIRST_LEVEL]
@@ -48,7 +48,7 @@ class Game(object):
                 ## do cycle based stuff
 
             if creature is not self.player:
-                ai.act_alert(self, creature, self.player.coord)
+                self.ai.act_alert(self, creature, self.player.coord)
             elif creature.can_act():
                 self.player_act()
                 self.turn_counter += 1
@@ -117,6 +117,11 @@ class Game(object):
             level.move_creature(creature, target_coord)
             return True
         else:
+            if creature is not self.player:
+                if not level.creature_can_move(creature, direction):
+                    io.msg("Creature can't move there.")
+                if not creature.can_act():
+                    io.msg("Creature can't act now.")
             return False
 
     def creature_teleport(self, creature, target_coord):
@@ -126,20 +131,25 @@ class Game(object):
             level.move_creature(creature, target_coord)
             return True
         else:
+            if creature is not self.player:
+                io.msg("Creature teleport failed.")
             return False
 
     def creature_swap(self, creature, direction):
         target_coord = add_vector(creature.coord, direction)
         level = creature.level
-        if creature.can_act() and level.creature_is_swappable(target_coord):
+        if creature.can_act() and level.has_creature(target_coord):
             target_creature = level.get_creature(target_coord)
-            energy_cost = level.movement_cost(direction, target_coord)
-            creature.update_energy(energy_cost)
-            target_creature.update_energy(energy_cost)
-            level.swap_creature(creature, target_creature)
-            return True
-        else:
-            return False
+            if self.ai.willing_to_swap(target_creature, creature, self.player):
+                energy_cost = level.movement_cost(direction, target_coord)
+                creature.update_energy(energy_cost)
+                target_creature.update_energy(energy_cost)
+                level.swap_creature(creature, target_creature)
+                return True
+
+        if creature is not self.player:
+            io.msg("Creature swap failed.")
+        return False
 
     def creature_attack(self, creature, direction):
         level = creature.level
@@ -163,24 +173,25 @@ class Game(object):
             io.msg(msg)
             return True
         else:
+            if creature is not self.player:
+                io.msg("Creature attack failed.")
             return False
 
     def creature_death(self, creature):
+        self.ai.remove_creature_state(creature)
         level = creature.level
         if creature is self.player:
             io.notify("You die...")
-            self.endgame(False)
+            self.endgame(dont_ask=True)
         level.remove_creature(creature)
 
-    def endgame(self, ask=False, message=""):
+    def endgame(self, dont_ask=True, message=""):
         io.msg(message)
-        if not ask:
-            exit()
-        if io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
+        if dont_ask or io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
             exit()
 
-    def savegame(self, ask=False):
-        if not ask or io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
+    def savegame(self, dont_ask=True):
+        if dont_ask or io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
             io.msg("Saving...")
             io.refresh()
             io.msg(state_store.save(self, "pyrl.svg"))
