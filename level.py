@@ -236,12 +236,6 @@ class Level(object):
         self.creatures[creatureB.coord] = creatureA
         creatureA.coord, creatureB.coord = creatureB.coord, creatureA.coord
 
-    def creature_is_swappable(self, coord):
-        try:
-            return self.get_creature(coord).is_idle()
-        except KeyError:
-            return False
-
     def creature_can_reach(self, creature, target_coord):
         if creature.coord == target_coord:
             return True

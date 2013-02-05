@@ -20,11 +20,6 @@ class Creature(object):
 
         self.hp = self.max_hp
 
-        # Possibly set by ai.py
-
-        #self.target_coord = None
-        #self.chase_vector = None
-
     def get_damage_info(self):
         dice = self.unarmed_dice
         sides = self.unarmed_sides
@@ -56,9 +51,6 @@ class Creature(object):
             assert False
         self.energy -= amount
         return amount
-
-    def is_idle(self):
-        return not hasattr(self, "target_coord") and not hasattr(self, "chase_vector")
 
     @property
     def st(self):
