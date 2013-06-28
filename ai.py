@@ -9,12 +9,12 @@ class AI(object):
         self.ai_state = {}
 
     def act_alert(self, game, creature, alert_coord):
+        level = creature.level
         if creature in self.ai_state:
             chase_coord, chase_vector = self.ai_state[creature]
         else:
             chase_coord, chase_vector = None, None
 
-        level = creature.level
         if level.creature_has_sight(creature, alert_coord):
             # passive actions
             if chase_coord is not None and chase_coord != alert_coord:

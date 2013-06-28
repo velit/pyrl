@@ -162,6 +162,7 @@ def init(root_window):
         CURSES_COLOR = Curses256ColorDict()
     else:
         CURSES_COLOR = CursesColorDict()
+    _window_resized()
 
 def init_handle(window):
     window.keypad(True)
@@ -177,10 +178,11 @@ def new_window(size):
 def _window_resized():
     rows, cols = get_dimensions(ROOT_WIN)
     while rows < SCREEN_ROWS or cols < SCREEN_COLS:
-        raw_message = "Current screen size {}x{} is too small. Needs to be at least {}x{}. Please resize."
-        message = raw_message.format(rows, cols, SCREEN_COLS, SCREEN_ROWS)
-        addstr(ROOT_WIN, 0, 0, message)
-        get_key(ROOT_WIN)
+        message = "Game needs at least a screen size of {}x{} while the current size is {}x{}. " \
+                "Please resize the screen or press Q to quit immediately."
+        addstr(ROOT_WIN, 0, 0, message.format(SCREEN_COLS, SCREEN_ROWS, rows, cols))
+        if get_key(ROOT_WIN) == "Q":
+            exit()
         rows, cols = get_dimensions(ROOT_WIN)
 
 def flush():
@@ -229,6 +231,8 @@ def _esc_key_handler(window, ch):
     return ch
 
 def _interpret_ch(ch):
+    if ch == curses.KEY_RESIZE:
+        _window_resized()
     if ch in CURSES_KEYS:
         return CURSES_KEYS[ch]
     ch = curses.ascii.unctrl(ch)
