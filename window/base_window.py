@@ -3,7 +3,7 @@ import const.keys as KEY
 import const.game as GAME
 import const.colors as COLOR
 
-from main import cursor_lib
+from pyrl.main import cursor_lib
 
 
 class BaseWindow(object):

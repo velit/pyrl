@@ -1,14 +1,14 @@
 from __future__ import division
 import time
-import debug
-import mappings as MAPPING
+from pyrl import debug
+from pyrl import mappings as MAPPING
 import const.colors as COLOR
 
 from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
-from main import cursor_lib
+from pyrl.main import cursor_lib
 
 
 class WindowSystem(object):

@@ -1,7 +1,7 @@
 import const.colors as COLOR
-from advanced_creature import AdvancedCreature
-from monster_file import MonsterFile
-from item import Item, Weapon
+from pyrl.advanced_creature import AdvancedCreature
+from pyrl.monster_file import MonsterFile
+from pyrl.item import Item, Weapon
 from const.stats import *
 from const.slots import *
 

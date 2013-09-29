@@ -1,5 +1,5 @@
 from window.base_window import BaseWindow
-from generic_algorithms import bresenham
+from pyrl.generic_algorithms import bresenham
 from const.colors import YELLOW
 
 

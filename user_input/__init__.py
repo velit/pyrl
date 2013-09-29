@@ -1,16 +1,16 @@
 import code
-import debug
+from pyrl import debug
 
 import const.keys as KEY
 import const.directions as DIR
 import const.game as GAME
 import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
-import mappings as MAPPING
+from pyrl import mappings as MAPPING
 
-from main import io
-from world_file import LevelNotFound
-from generic_algorithms import add_vector
+from pyrl.main import io
+from pyrl.world_file import LevelNotFound
+from pyrl.generic_algorithms import add_vector
 
 from inventory import equipment
 from walk_mode import walk_mode, walk_mode_init

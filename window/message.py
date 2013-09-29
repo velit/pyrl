@@ -1,6 +1,6 @@
 import textwrap
 import const.keys as KEY
-import mappings as MAPPING
+from pyrl import mappings as MAPPING
 from const.colors import GREEN
 from window.base_window import BaseWindow
 

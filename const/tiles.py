@@ -1,5 +1,5 @@
 import const.game as GAME
-from tile import Tile
+from pyrl.tile import Tile
 from const.colors import *
 
 UNKNOWN = " "

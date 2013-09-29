@@ -1,5 +1,5 @@
 import const.colors as COLOR
-from monster_file import MonsterFile
+from pyrl.monster_file import MonsterFile
 
 monster_files = (
     MonsterFile("zombie", ('z', COLOR.CYAN), -3, 0),
