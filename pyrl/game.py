@@ -1,4 +1,4 @@
-import mappings as MAPPING
+import pyrl.mappings as MAPPING
 import const.game as GAME
 import const.creature_actions as CC
 import const.stats as STAT

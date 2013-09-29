@@ -1,8 +1,8 @@
 import const.game as GAME
 import const.colors as COLOR
 
-from level_file import LevelFile
-from monster_file import MonsterFile
+from pyrl.level_file import LevelFile
+from pyrl.monster_file import MonsterFile
 
 L0 = LevelFile(
         danger_level=1,

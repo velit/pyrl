@@ -1,8 +1,8 @@
-import mappings as MAPPING
+from pyrl import mappings as MAPPING
 import const.slots as SLOT
 from collections import OrderedDict
-from main import io
-from mappings import CANCEL, GROUP_DEFAULT, VIEW_INVENTORY, INVENTORY_KEYS
+from pyrl.main import io
+from pyrl.mappings import CANCEL, GROUP_DEFAULT, VIEW_INVENTORY, INVENTORY_KEYS
 
 
 equipment_slots = OrderedDict()
