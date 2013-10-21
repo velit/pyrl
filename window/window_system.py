@@ -8,19 +8,19 @@ from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar
 from window.level import LevelWindow
-from main import cursor_lib
 
 
 class WindowSystem(object):
 
-    def __init__(self, root_window):
+    def __init__(self, cursor_lib):
         from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
         from const.game import SCREEN_ROWS, SCREEN_COLS
 
-        self.a = BaseWindow((SCREEN_ROWS, SCREEN_COLS), (0, 0))
-        self.m = MessageBar((MSG_BAR_HEIGHT, LEVEL_WIDTH), (0, 0))
-        self.l = LevelWindow((LEVEL_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT, 0))
-        self.s = StatusBar((STATUS_BAR_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0))
+        self.cursor_lib = cursor_lib
+        self.a = BaseWindow(cursor_lib, (SCREEN_ROWS, SCREEN_COLS), (0, 0))
+        self.m = MessageBar(cursor_lib, (MSG_BAR_HEIGHT, LEVEL_WIDTH), (0, 0))
+        self.l = LevelWindow(cursor_lib, (LEVEL_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT, 0))
+        self.s = StatusBar(cursor_lib, (STATUS_BAR_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0))
 
     def get_key(self, message=None, refresh=True):
         if message is not None:
@@ -44,7 +44,7 @@ class WindowSystem(object):
         self.m.update()
         self.l.update()
         self.s.update()
-        cursor_lib.flush()
+        self.cursor_lib.flush()
 
     def draw(self, character_data_sequence, reverse=False):
         if not reverse:
@@ -70,14 +70,16 @@ class WindowSystem(object):
     def draw_path(self, path):
         for x in path:
             self.draw_char(x, (" ", COLOR.GREEN), reverse=True)
-            if debug.path_step: self.get_key()
-        if not debug.path_step: self.get_key()
+            if debug.path_step:
+                self.get_key()
+        if not debug.path_step:
+            self.get_key()
 
     def suspend(self):
-        cursor_lib.suspend()
+        self.cursor_lib.suspend()
 
     def resume(self):
-        cursor_lib.resume()
+        self.cursor_lib.resume()
 
     def ask_until_timestamp(self, message, timestamp, key_set):
         self.msg(message)

@@ -2,27 +2,22 @@ import argparse
 import cProfile
 import state_store
 from const.game import NCURSES
+from window.window_system import WindowSystem
 
-
-cursor_lib = None
+# Global object for the input and output window system
+# Check the WindowSystem class for the implementation
 io = None
-root_win = None
 
 
-def set_cursor_library(cursor_library, root_window):
-    global cursor_lib, io, root_win
-    cursor_lib = cursor_library
-    root_win = root_window
-
-    from window.window_system import WindowSystem
-    io = WindowSystem(cursor_lib.get_root_window())
+def init_window_system(cursor_library):
+    global io
+    io = WindowSystem(cursor_library)
 
 
 def start():
-    cursor_lib.init(root_win)
-    if cursor_lib.get_implementation() == NCURSES:
+    if io.cursor_lib.get_implementation() == NCURSES:
         # check to see the window is big enough
-        cursor_lib._window_resized()
+        io.cursor_lib._window_resized()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--load", action="store_true")

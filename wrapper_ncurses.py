@@ -87,9 +87,20 @@ class CursesColorDict(dict):
         COLOR.BASE_DARKEST: curses.COLOR_BLACK,
     }
 
-    BASIC_COLORS = {COLOR.BASE_NORMAL, COLOR.BASE_WHITE, COLOR.BASE_BLACK, COLOR.BASE_RED,
-            COLOR.BASE_GREEN, COLOR.BASE_BLUE, COLOR.BASE_PURPLE, COLOR.BASE_CYAN,
-            COLOR.BASE_BROWN, COLOR.BASE_DARK_GRAY, COLOR.BASE_GRAY, COLOR.BASE_LIGHT_GRAY}
+    BASIC_COLORS = {
+        COLOR.BASE_NORMAL,
+        COLOR.BASE_WHITE,
+        COLOR.BASE_BLACK,
+        COLOR.BASE_RED,
+        COLOR.BASE_GREEN,
+        COLOR.BASE_BLUE,
+        COLOR.BASE_PURPLE,
+        COLOR.BASE_CYAN,
+        COLOR.BASE_BROWN,
+        COLOR.BASE_DARK_GRAY,
+        COLOR.BASE_GRAY,
+        COLOR.BASE_LIGHT_GRAY,
+    }
 
     def __init__(self):
         dict.__init__(self)
@@ -151,6 +162,7 @@ CURSES_KEYS = {
 }
 ROOT_WIN = None
 
+
 def init(root_window):
     global CURSES_COLOR, ROOT_WIN
 
@@ -164,44 +176,57 @@ def init(root_window):
         CURSES_COLOR = CursesColorDict()
     _window_resized()
 
+
 def init_handle(window):
     window.keypad(True)
 
-# Writing to the last cell of a window raises an exception because
-# the automatic cursor move to the next cell is illegal. The +1 fixes that.
+
 def new_window(size):
     rows, columns = size
+
+    # Writing to the last cell of a window raises an exception because
+    # the automatic cursor move to the next cell is illegal. The +1 fixes that.
     window = curses.newpad(rows + 1, columns)
+
     init_handle(window)
     return window
+
 
 def _window_resized():
     rows, cols = get_dimensions(ROOT_WIN)
     while rows < SCREEN_ROWS or cols < SCREEN_COLS:
         message = "Game needs at least a screen size of {}x{} while the current size is {}x{}. " \
-                "Please resize the screen or press Q to quit immediately."
-        addstr(ROOT_WIN, 0, 0, message.format(SCREEN_COLS, SCREEN_ROWS, rows, cols))
-        if get_key(ROOT_WIN) == "Q":
+            "Please resize the screen or press Q to quit immediately."
+        addstr(ROOT_WIN, 0, 0, message.format(SCREEN_COLS, SCREEN_ROWS, cols, rows))
+        if ROOT_WIN.getch() == "Q":
             exit()
         rows, cols = get_dimensions(ROOT_WIN)
+        ROOT_WIN.erase()
+        ROOT_WIN.refresh()
+
 
 def flush():
     curses.doupdate()
 
+
 def get_root_window():
     return ROOT_WIN
+
 
 def suspend():
     curses.def_prog_mode()
     curses.reset_shell_mode()
     curses.endwin()
 
+
 def resume():
     curses.reset_prog_mode()
+
 
 def addch(window, y, x, char):
     symbol, color = char
     window.addch(y, x, symbol, CURSES_COLOR[color])
+
 
 def addstr(window, y, x, string, color=None):
     if color is None:
@@ -209,17 +234,20 @@ def addstr(window, y, x, string, color=None):
     else:
         window.addstr(y, x, string, CURSES_COLOR[color])
 
+
 def draw(window, char_payload_sequence):
     f = window.addch
     COLOR_LOOKUP = CURSES_COLOR
     for y, x, (symbol, color) in char_payload_sequence:
         f(y, x, symbol, COLOR_LOOKUP[color])
 
+
 def draw_reverse(window, char_payload_sequence):
     f = window.addch
     COLOR_LOOKUP = CURSES_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
         f(y, x, symbol, COLOR_LOOKUP[bg, fg])
+
 
 def _esc_key_handler(window, ch):
     if ch == curses.ascii.ESC:
@@ -229,6 +257,7 @@ def _esc_key_handler(window, ch):
         if second_ch != curses.ERR:
             return curses.ascii.alt(second_ch)
     return ch
+
 
 def _interpret_ch(ch):
     if ch == curses.KEY_RESIZE:
@@ -241,8 +270,10 @@ def _interpret_ch(ch):
     else:
         return ch
 
+
 def get_key(window):
     return _interpret_ch(_esc_key_handler(window, window.getch()))
+
 
 def check_key(window):
     window.nodelay(True)
@@ -253,8 +284,10 @@ def check_key(window):
     else:
         return _interpret_ch(_esc_key_handler(window, ch))
 
+
 def clear(window):
     window.erase()
+
 
 def blit(window, size, screen_position):
     screen_rows, screen_cols = get_dimensions(ROOT_WIN)
@@ -264,15 +297,19 @@ def blit(window, size, screen_position):
     y, x = screen_position
     window.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
 
+
 def get_dimensions(window):
     rows, columns = window.getmaxyx()
     return rows, columns
 
+
 def move(window, y, x):
     window.move(y, x)
 
+
 def get_cursor_pos(window):
     return window.getyx()
+
 
 def get_implementation():
     return NCURSES

@@ -8,8 +8,10 @@ except ImportError:
 import main
 import wrapper_ncurses
 
+
 def start(curses_window):
-    main.set_cursor_library(wrapper_ncurses, curses_window)
+    wrapper_ncurses.init(curses_window)
+    main.init_window_system(wrapper_ncurses)
     main.start()
 
 curses.wrapper(start)

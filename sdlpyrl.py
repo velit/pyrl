@@ -2,8 +2,7 @@
 import main
 import wrapper_libtcod
 
-ROOT_WINDOW = 0
-
-main.cursor_lib
-main.set_cursor_library(wrapper_libtcod, ROOT_WINDOW)
+ROOT_WIN = 0
+wrapper_libtcod.init(ROOT_WIN)
+main.init_window_system(wrapper_libtcod)
 main.start()
