@@ -1,6 +1,7 @@
 from random import randint
 from dice import dice_roll
 
+
 def get_melee_attack(ar, damage_info, dr, pv):
     roll = randint(1, 100) + ar - dr
     if roll > 25:

@@ -15,25 +15,25 @@ DIAGONALS = (NW, NE, SW, SE)
 ORTHOGONALS = (NO, EA, SO, WE)
 
 rotate_clockwise = {
-        NW: NO,
-        NO: NE,
-        NE: EA,
-        EA: SE,
-        SE: SO,
-        SO: SW,
-        SW: WE,
-        WE: NW,
+    NW: NO,
+    NO: NE,
+    NE: EA,
+    EA: SE,
+    SE: SO,
+    SO: SW,
+    SW: WE,
+    WE: NW,
 }
 
 rotate_counter_clockwise = {
-        NW: WE,
-        WE: SW,
-        SW: SO,
-        SO: SE,
-        SE: EA,
-        EA: NE,
-        NE: NO,
-        NO: NW,
+    NW: WE,
+    WE: SW,
+    SW: SO,
+    SO: SE,
+    SE: EA,
+    EA: NE,
+    NE: NO,
+    NO: NW,
 }
 
 STRINGS = (

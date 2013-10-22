@@ -1,6 +1,7 @@
 import const.slots as SLOT
 from dice import Dice
 
+
 def get_stats_str(stats):
     stats_str = ", ".join("{0}:{1}".format(stat, value) for stat, value in stats.viewitems())
     return "{" + stats_str + "}"

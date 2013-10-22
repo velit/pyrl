@@ -15,6 +15,7 @@ from generic_algorithms import add_vector
 from inventory import equipment
 from walk_mode import walk_mode, walk_mode_init
 
+
 class UserInput(object):
     def __init__(self):
         self.walk_mode_data = None
@@ -55,6 +56,7 @@ class UserInput(object):
                 else:
                     io.msg("Undefined key: {}".format(key))
 
+
 def act_to_dir(game, creature, direction):
     target_coord = add_vector(creature.coord, direction)
     level = creature.level
@@ -66,6 +68,7 @@ def act_to_dir(game, creature, direction):
         io.msg("You're out of energy.")
     else:
         io.msg("You can't move there.")
+
 
 def look(game, creature):
     coord = creature.coord
@@ -103,19 +106,24 @@ def look(game, creature):
         elif c in MAPPING.GROUP_CANCEL or c == MAPPING.LOOK_MODE:
             break
 
+
 def endgame(game, creature, *a, **k):
     game.endgame(*a, **k)
 
+
 def savegame(game, creature, *a, **k):
     game.savegame(*a, **k)
+
 
 def attack(game, creature):
     key = io.ask("Specify attack direction, {} to abort".format(MAPPING.CANCEL), MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL)
     if key in MAPPING.DIRECTIONS:
         game.creature_attack(creature, MAPPING.DIRECTIONS[key])
 
+
 def redraw(game, creature):
     game.redraw()
+
 
 def enter(game, creature, passage):
     coord = game.player.coord
@@ -136,14 +144,17 @@ def enter(game, creature, passage):
             if not game.creature_teleport(creature, new_coord):
                 io.msg("Teleport failed.")
 
+
 def sight_change(game, creature, amount):
     from const.slots import BODY
     from const.stats import SIGHT
     creature.get_item(BODY).stats[SIGHT] += amount
     return True
 
+
 def print_history(game, creature):
     io.m.print_history()
+
 
 def debug_action(game, creature, userinput):
     level = creature.level
@@ -197,11 +208,12 @@ def debug_action(game, creature, userinput):
         import curses
         io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
         io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
-                curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
+               curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
     elif c == 'm':
         io.msg(debug.debug_string)
     else:
         io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
+
 
 def help_screen(game, creature):
     header = "Help Screen, ^ means ctrl, ! means alt"

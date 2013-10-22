@@ -35,6 +35,7 @@ def equipment(game, creature):
         elif key in GROUP_DEFAULT:
             return
 
+
 def inventory(game, creature, slot=None):
     header = "Inventory"
     footer = "{} to close".format(CANCEL)

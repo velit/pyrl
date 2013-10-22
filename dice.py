@@ -19,5 +19,6 @@ class Dice(object):
         else:
             return "{0.dices}D{0.sides}".format(self)
 
+
 def dice_roll(dices=1, sides=6, addition=0):
     return sum(randrange(sides) + 1 for die in xrange(dices)) + addition

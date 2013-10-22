@@ -3,6 +3,7 @@ from collections import deque
 
 class TurnScheduler(object):
     _TURN_DELIMITER = "Turn delimiter"
+
     def __init__(self):
         self.queue = deque()
         self.queue.append(self._TURN_DELIMITER)

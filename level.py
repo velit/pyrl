@@ -97,7 +97,7 @@ class Level(object):
             if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
 
-    def legal_coord(self, coord, direction=(0,0)):
+    def legal_coord(self, coord, direction=(0, 0)):
         return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
 
     def get_exit(self, coord):
@@ -157,7 +157,7 @@ class Level(object):
 
     def check_los(self, coordA, coordB):
         return not (any(not self.is_see_through(coord) for coord in bresenham(coordA, coordB)) and
-                any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
+                    any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
 
     def get_last_pathable_coord(self, coord_start, coord_end):
         last = coord_start

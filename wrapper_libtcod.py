@@ -77,16 +77,19 @@ ROOT_WIN = None
 DEFAULT_FG = libtcod.white
 DEFAULT_BG = libtcod.black
 
+
 def init(root_window):
     global ROOT_WIN
     libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
-            libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
-    libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, GAME.GAME_NAME,
-            False, libtcod.RENDERER_SDL)
+                                    libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
+    libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
+                              GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
+
 
 def init_handle(handle):
     libtcod.console_set_default_foreground(handle, DEFAULT_FG)
     libtcod.console_set_default_background(handle, DEFAULT_BG)
+
 
 def new_window(size):
     rows, columns = size
@@ -94,17 +97,22 @@ def new_window(size):
     init_handle(handle)
     return handle
 
+
 def flush():
     libtcod.console_flush()
+
 
 def get_root_window():
     return ROOT_WIN
 
+
 def suspend():
     pass
 
+
 def resume():
     pass
+
 
 def toggle_fullscreen():
     if libtcod.console_is_fullscreen():
@@ -112,9 +120,11 @@ def toggle_fullscreen():
     else:
         libtcod.console_set_fullscreen(True)
 
+
 def addch(handle, y, x, char):
     symbol, (fg, bg) = char
     libtcod.console_put_char_ex(handle, x, y, symbol, TCOD_COLOR[fg], TCOD_COLOR[bg])
+
 
 def addstr(handle, y, x, string, color=None):
     if color is None:
@@ -127,17 +137,20 @@ def addstr(handle, y, x, string, color=None):
         libtcod.console_set_default_foreground(handle, DEFAULT_FG)
         libtcod.console_set_default_background(handle, DEFAULT_BG)
 
+
 def draw(handle, char_payload_sequence):
     f = libtcod.console_put_char_ex
     COLOR_LOOKUP = TCOD_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
         f(handle, x, y, symbol, COLOR_LOOKUP[fg], COLOR_LOOKUP[bg])
 
+
 def draw_reverse(handle, char_payload_sequence):
     f = libtcod.console_put_char_ex
     COLOR_LOOKUP = TCOD_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
         f(handle, x, y, symbol, COLOR_LOOKUP[bg], COLOR_LOOKUP[fg])
+
 
 def get_key(handle_not_used):
     key = KEY.NO_INPUT
@@ -148,9 +161,11 @@ def get_key(handle_not_used):
         key = interpret_event(key_event)
     return key
 
+
 def check_key(handle_not_used):
     event = libtcod.console_check_for_keypress(libtcod.KEY_PRESSED)
     return interpret_event(event)
+
 
 def interpret_event(event):
     if libtcod.console_is_window_closed():
@@ -169,16 +184,20 @@ def interpret_event(event):
     else:
         return KEY.NO_INPUT
 
+
 def clear(handle):
     libtcod.console_clear(handle)
+
 
 def blit(handle, size, screen_position):
     rows, cols = size
     y, x = screen_position
     libtcod.console_blit(handle, 0, 0, cols, rows, ROOT_WIN, x, y, 1.0, 1.0)
 
+
 def get_dimensions(handle):
     return libtcod.console_get_height(handle), libtcod.console_get_width(handle)
+
 
 def get_implementation():
     return LIBTCOD

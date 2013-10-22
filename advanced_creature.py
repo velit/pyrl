@@ -2,6 +2,7 @@ from creature import Creature
 from const.slots import HEAD, BODY, FEET, RIGHT_HAND, LEFT_HAND
 from const.stats import *
 
+
 class AdvancedCreature(Creature):
 
     def __init__(self, creature_file):

@@ -3,6 +3,7 @@ import const.directions as DIRS
 import const.creature_actions as ACTIONS
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
+
 class AI(object):
 
     def __init__(self):

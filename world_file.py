@@ -3,7 +3,10 @@ import const.maps as MAP
 
 from level_file import LevelFile
 
-class LevelNotFound(Exception): pass
+
+class LevelNotFound(Exception):
+    pass
+
 
 class WorldFile(object):
 
@@ -27,7 +30,7 @@ class WorldFile(object):
         else:
             self.level_files[dungeon_key, level_i] = level_file
         self.level_passageways[dungeon_key, level_i] = {GAME.PASSAGE_UP: GAME.UP,
-                GAME.PASSAGE_DOWN: GAME.DOWN}
+                                                        GAME.PASSAGE_DOWN: GAME.DOWN}
         self.dungeon_lengths[dungeon_key] += 1
 
     def get_level_file(self, world_loc):

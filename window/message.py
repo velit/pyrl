@@ -7,6 +7,7 @@ from window.base_window import BaseWindow
 
 MORE_STR_LEN = 2
 
+
 class MessageBar(BaseWindow):
     """Handles the messaging bar system."""
 

@@ -30,7 +30,7 @@ INPUT_INTERVAL = min(ANIMATION_DELAY / 10, 0.01)
 
 GAME_NAME = "pyrl"
 DATA_FOLDER = "data"
-SAVE_FILE_COMPRESSION_LEVEL = 6 # valid in range(1, 10)
+SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 
 ENCODING = "utf-8"
 

@@ -7,6 +7,7 @@ _mult = (
         (1, 0, 0, 1, -1, 0, 0, -1),
 )
 
+
 def get_light_set(visibility_func, coord, sight, max_rows, max_cols):
     y, x = coord
     light_set = set()
@@ -14,12 +15,12 @@ def get_light_set(visibility_func, coord, sight, max_rows, max_cols):
         light_set.add(coord)
     for octant in xrange(8):
         _shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
-                _mult[0][octant], _mult[1][octant], _mult[2][octant], _mult[3][octant])
+                     _mult[0][octant], _mult[1][octant], _mult[2][octant], _mult[3][octant])
     return light_set
+
 
 # Based on an algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
 # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
-
 def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, max_rows, max_cols, xx, xy, yx, yy):
     """Recursive lightcasting function"""
     if start < end:
@@ -61,7 +62,7 @@ def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, max_row
                             # This is a blocking square, start a child scan:
                             blocked = True
                             _shadow_cast(light_set, visibility_func, cy, cx, j + 1, start, l_slope, r,
-                                    max_rows, max_cols, xx, xy, yx, yy)
+                                         max_rows, max_cols, xx, xy, yx, yy)
                             new_start = r_slope
 
         # Row is scanned; do next row unless last square was blocked:

@@ -17,8 +17,8 @@ def gettile(handle, tile_dict=None):
 
 class LevelFile(object):
 
-    def __init__(self, danger_level=0, tilefile=None, static_level=False, use_dynamic_monsters=True,
-                rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
+    def __init__(self, danger_level=0, tilefile=None, static_level=False,
+                 use_dynamic_monsters=True, rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
         self.danger_level = danger_level
         self.tilefile = tilefile
         self.static_level = static_level
@@ -69,5 +69,5 @@ class LevelFile(object):
             start = monster.speciation_lvl
             if start <= self.danger_level:
                 weight_coeff = self.danger_level - monster.speciation_lvl
-                monster_list.extend((monster, )*weight_coeff)
+                monster_list.extend((monster, ) * weight_coeff)
         return monster_list
