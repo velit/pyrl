@@ -7,21 +7,22 @@ Running pyrl
 ============
 
 Execute either 'pyrl.py' or 'sdlpyrl.py' depending on if you want the ncurses or
-sdl version of the game. Windows only has support for the sdl version.
+SDL version of the game. Windows supports only the SDL version.
 
 ### Windows sdlpyrl.py requirements
 
-* 32-bit Python 2.7
+* Python 2.7 32-bit (Libtcod forces 32-bit)
 
 ### \*nix sdlpyrl.py requirements
 
-* Python 2.7 32-bit
-* libSDL
+* Python 2.7
+* libSDL (package name is libsdl1.2debian)
 
 ### \*nix and Mac pyrl.py requirements
 
-* Python 2.7
-* libncurses
+* Python 2.7 or Python 3.2 (Works for both, libtcod forces python 2 but pyrl
+  itself supports both)
+* libncurses (Base package should come pre-installed in most \*nixes)
 * A terminal or a terminal emulator
 
 
@@ -30,11 +31,9 @@ Installing SDL
 
 A .dll for SDL comes bundled with the game on windows.
 
-### Ubuntu
-    sudo apt-get install libsdl1.2
-
-### Debian
-    sudo apt-get install libsdl1.2debian
+### Ubuntu or Debian
+    sudo apt-get install libsdl1.2debian (if incorrect, don't hesitate to use
+    google)
 
 
 Ncurses specific issues

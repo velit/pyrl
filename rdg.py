@@ -21,7 +21,7 @@ def add_generated_tilefile(level_file, level_type=LEVEL_TYPE.ARENA):
         else:
             level_file.add_walls()
 
-        for x in xrange(GAME.RDG_LEVEL_PASSES):
+        for x in range(GAME.RDG_LEVEL_PASSES):
             if rand() < 0.50:
                 _attempt_corridor(level_file)
             else:
@@ -60,7 +60,7 @@ def add_passageway(level_file, passage, passage_tile_id):
 
 
 def _init_tilemap(level_file):
-    level_file.tilefile = [R for x in xrange(level_file.rows * level_file.cols)]
+    level_file.tilefile = [R for x in range(level_file.rows * level_file.cols)]
 
 
 def _make_initial_room(level_file):
@@ -105,8 +105,8 @@ def _rect_diggable(level_file, y0, x0, height, width):
     if y0 < 0 or x0 < 0 or y0 + height >= level_file.rows \
             or x0 + width >= level_file.cols:
         return False
-    for y in xrange(y0, y0 + height):
-        for x in xrange(x0, x0 + width):
+    for y in range(y0, y0 + height):
+        for x in range(x0, x0 + width):
             if level_file.get_tile_id(y, x) != R and \
                     level_file.get_tile_id(y, x) != W:
                 return False
@@ -137,8 +137,8 @@ def _attempt_room(level_file):
 
 
 def _make_room(level_file, y0, x0, height, width):
-    for y in xrange(y0, y0 + height):
-        for x in xrange(x0, x0 + width):
+    for y in range(y0, y0 + height):
+        for x in range(x0, x0 + width):
             if y in (y0, y0 + height - 1) or x in (x0, x0 + width - 1):
                 level_file.set_tile_id(y, x, W)
             else:
@@ -146,8 +146,8 @@ def _make_room(level_file, y0, x0, height, width):
 
 
 def _dig_rect(level_file, y0, x0, tile, height=1, width=1):
-    for y in xrange(y0, y0 + height):
-        for x in xrange(x0, x0 + width):
+    for y in range(y0, y0 + height):
+        for x in range(x0, x0 + width):
             level_file.set_tile_id(y, x, tile)
 
 

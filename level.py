@@ -48,7 +48,7 @@ class Level(object):
 
         if level_file.use_dynamic_monsters:
             self.creature_spawn_list = level_file.get_dynamic_monster_spawn_list()
-            for x in xrange(GAME.MONSTERS_PER_LEVEL):
+            for x in range(GAME.MONSTERS_PER_LEVEL):
                 self._spawn_random_creature()
 
     # nudge_coord nudges towards a line between this and start_coord
@@ -111,8 +111,8 @@ class Level(object):
         return self.creatures[coord]
 
     def get_coord_iter(self):
-        for y in xrange(self.rows):
-            for x in xrange(self.cols):
+        for y in range(self.rows):
+            for x in range(self.cols):
                 yield y, x
 
     def get_visible_data(self, location_set):

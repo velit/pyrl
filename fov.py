@@ -18,7 +18,7 @@ def get_light_set(visibility_func, coord, sight, max_rows, max_cols):
     light_set = set()
     if sight > 0:
         light_set.add(coord)
-    for octant in xrange(8):
+    for octant in range(8):
         _shadow_cast(light_set, visibility_func, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
                      _mult[0][octant], _mult[1][octant], _mult[2][octant], _mult[3][octant])
     return light_set
@@ -31,7 +31,7 @@ def _shadow_cast(light_set, visibility_func, cy, cx, row, start, end, r, max_row
     if start < end:
         return
     radius_squared = r * r
-    for j in xrange(row, r + 1):
+    for j in range(row, r + 1):
         dx = -j - 1
         dy = -j
         blocked = False

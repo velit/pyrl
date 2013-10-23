@@ -13,7 +13,7 @@ class Dice(object):
         self.addition = addition
 
     def roll(self):
-        return sum(randrange(self.sides) + 1 for die in xrange(self.dices)) + self.addition
+        return sum(randrange(self.sides) + 1 for die in range(self.dices)) + self.addition
 
     def get_values(self):
         return self.dices, self.sides, self.addition
@@ -26,4 +26,4 @@ class Dice(object):
 
 
 def dice_roll(dices=1, sides=6, addition=0):
-    return sum(randrange(sides) + 1 for die in xrange(dices)) + addition
+    return sum(randrange(sides) + 1 for die in range(dices)) + addition

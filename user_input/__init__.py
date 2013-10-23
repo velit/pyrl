@@ -43,9 +43,9 @@ class UserInput(object):
             '+':  (sight_change, (1, ), no_kwds),
             '-':  (sight_change, (-1, ), no_kwds),
         }
-        for key, value in MAPPING.DIRECTIONS.viewitems():
+        for key, value in MAPPING.DIRECTIONS.items():
             self.actions[key] = (act_to_dir, (value, ), no_kwds)
-        for key, value in MAPPING.INSTANT_WALK_MODE.viewitems():
+        for key, value in MAPPING.INSTANT_WALK_MODE.items():
             self.actions[key] = (walk_mode_init, (self, value), no_kwds)
 
     def get_user_input_and_act(self, game, creature):

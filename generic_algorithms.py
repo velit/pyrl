@@ -37,7 +37,7 @@ def bresenham_old(coord_a, coord_b, includelast=True):
     error = deltay // 2
     x = ax
     xstep = 1 if ax < bx else -1
-    y_range = xrange(ay, by + includelast) if ay < by else range(by, ay + includelast)[::-1]
+    y_range = range(ay, by + includelast) if ay < by else range(by, ay + includelast)[::-1]
     for y in y_range:
         yield (x, y) if steep else (y, x)
         error -= deltax

@@ -16,7 +16,7 @@ def get_light_set(visibility_func, start_coord, sight):
     light_set = set()
     sight_squared = sight * sight
     start_y, start_x = start_coord
-    for octant in xrange(8):
+    for octant in range(8):
         mult_y_i = _mult[0][octant]
         mult_x_i = _mult[1][octant]
         mult_y_s = _mult[2][octant]
