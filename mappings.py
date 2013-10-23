@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import string
 import const.keys as KEY
 import const.directions as DIR
@@ -57,8 +62,8 @@ INSTANT_WALK_MODE = {
 HELP = KEY.F1
 LOOK_MODE = 'q'
 INVENTORY = 'i'
-DESCEND = '>'
-ASCEND = '<'
+DESCEND = 'X'
+ASCEND = 'x'
 QUIT = 'Q'
 SAVE = 'S'
 ATTACK = 'a'
@@ -74,4 +79,4 @@ EQUIPMENT_SLOT_BODY = 'b'
 EQUIPMENT_SLOT_RIGHT_HAND = 'r'
 EQUIPMENT_SLOT_FEET = 'f'
 
-INVENTORY_KEYS = tuple(letter for letter in string.lowercase if letter != CANCEL)
+INVENTORY_KEYS = tuple(letter for letter in string.ascii_lowercase if letter != CANCEL)

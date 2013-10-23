@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import const.game as GAME
 import const.generated_level_types as LEVEL_TYPE
 import const.tiles as TILE

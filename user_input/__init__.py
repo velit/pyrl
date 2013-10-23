@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import code
 import debug
 
@@ -12,8 +17,8 @@ from main import io
 from world_file import LevelNotFound
 from generic_algorithms import add_vector
 
-from inventory import equipment
-from walk_mode import walk_mode, walk_mode_init
+from .inventory import equipment
+from .walk_mode import walk_mode, walk_mode_init
 
 
 class UserInput(object):

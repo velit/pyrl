@@ -1,6 +1,11 @@
-from const.game import NCURSES, SCREEN_ROWS, SCREEN_COLS
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import const.keys as KEY
 import const.colors as COLOR
+import const.game as GAME
 import curses
 import curses.ascii
 
@@ -194,10 +199,10 @@ def new_window(size):
 
 def _window_resized():
     rows, cols = get_dimensions(ROOT_WIN)
-    while rows < SCREEN_ROWS or cols < SCREEN_COLS:
+    while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
         message = "Game needs at least a screen size of {}x{} while the current size is {}x{}. " \
             "Please resize the screen or press Q to quit immediately."
-        addstr(ROOT_WIN, 0, 0, message.format(SCREEN_COLS, SCREEN_ROWS, cols, rows))
+        addstr(ROOT_WIN, 0, 0, message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows))
         if ROOT_WIN.getch() == "Q":
             exit()
         rows, cols = get_dimensions(ROOT_WIN)
@@ -225,28 +230,28 @@ def resume():
 
 def addch(window, y, x, char):
     symbol, color = char
-    window.addch(y, x, symbol, CURSES_COLOR[color])
+    window.addch(y, x, symbol.encode(GAME.ENCODING), CURSES_COLOR[color])
 
 
 def addstr(window, y, x, string, color=None):
     if color is None:
-        window.addstr(y, x, string)
+        window.addstr(y, x, string.encode(GAME.ENCODING))
     else:
-        window.addstr(y, x, string, CURSES_COLOR[color])
+        window.addstr(y, x, string.encode(GAME.ENCODING), CURSES_COLOR[color])
 
 
 def draw(window, char_payload_sequence):
     f = window.addch
     COLOR_LOOKUP = CURSES_COLOR
     for y, x, (symbol, color) in char_payload_sequence:
-        f(y, x, symbol, COLOR_LOOKUP[color])
+        f(y, x, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[color])
 
 
 def draw_reverse(window, char_payload_sequence):
     f = window.addch
     COLOR_LOOKUP = CURSES_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-        f(y, x, symbol, COLOR_LOOKUP[bg, fg])
+        f(y, x, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[bg, fg])
 
 
 def _esc_key_handler(window, ch):
@@ -291,7 +296,7 @@ def clear(window):
 
 def blit(window, size, screen_position):
     screen_rows, screen_cols = get_dimensions(ROOT_WIN)
-    if screen_rows < SCREEN_ROWS or screen_cols < SCREEN_COLS:
+    if screen_rows < GAME.SCREEN_ROWS or screen_cols < GAME.SCREEN_COLS:
         _window_resized()
     rows, cols = size
     y, x = screen_position
@@ -312,4 +317,4 @@ def get_cursor_pos(window):
 
 
 def get_implementation():
-    return NCURSES
+    return GAME.NCURSES

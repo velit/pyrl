@@ -1,5 +1,10 @@
-# Multipliers for transforming coordinates to other octants:
+from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+
+# Multipliers for transforming coordinates to other octants:
 _mult = (
         (1, 0, 0, -1, -1, 0, 0, 1),
         (0, 1, -1, 0, 0, -1, 1, 0),

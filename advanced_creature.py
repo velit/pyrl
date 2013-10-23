@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from creature import Creature
 from const.slots import HEAD, BODY, FEET, RIGHT_HAND, LEFT_HAND
 from const.stats import *

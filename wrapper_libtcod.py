@@ -1,8 +1,14 @@
-from const.game import LIBTCOD
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import const.keys as KEY
 import const.colors as COLOR
 import const.game as GAME
 import libtcod.libtcodpy as libtcod
+
+from const.game import LIBTCOD
 
 TCOD_COLOR = {
     COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),

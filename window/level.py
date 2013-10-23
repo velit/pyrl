@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from window.base_window import BaseWindow
 from generic_algorithms import bresenham
 from const.colors import YELLOW

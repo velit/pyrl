@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import const.colors as COLOR
 from advanced_creature import AdvancedCreature
 from monster_file import MonsterFile

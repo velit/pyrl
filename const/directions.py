@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 NW = (-1, -1)
 NO = (-1, 0)
 NE = (-1, 1)
