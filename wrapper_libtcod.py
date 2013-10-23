@@ -129,17 +129,17 @@ def toggle_fullscreen():
 
 def addch(handle, y, x, char):
     symbol, (fg, bg) = char
-    libtcod.console_put_char_ex(handle, x, y, symbol, TCOD_COLOR[fg], TCOD_COLOR[bg])
+    libtcod.console_put_char_ex(handle, x, y, symbol.encode(GAME.ENCODING), TCOD_COLOR[fg], TCOD_COLOR[bg])
 
 
 def addstr(handle, y, x, string, color=None):
     if color is None:
-        libtcod.console_print(handle, x, y, string)
+        libtcod.console_print(handle, x, y, string.encode(GAME.ENCODING))
     else:
         fg, bg = color
         libtcod.console_set_default_foreground(handle, TCOD_COLOR[fg])
         libtcod.console_set_default_background(handle, TCOD_COLOR[bg])
-        libtcod.console_print(handle, x, y, string)
+        libtcod.console_print(handle, x, y, string.encode(GAME.ENCODING))
         libtcod.console_set_default_foreground(handle, DEFAULT_FG)
         libtcod.console_set_default_background(handle, DEFAULT_BG)
 
@@ -148,14 +148,14 @@ def draw(handle, char_payload_sequence):
     f = libtcod.console_put_char_ex
     COLOR_LOOKUP = TCOD_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-        f(handle, x, y, symbol, COLOR_LOOKUP[fg], COLOR_LOOKUP[bg])
+        f(handle, x, y, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[fg], COLOR_LOOKUP[bg])
 
 
 def draw_reverse(handle, char_payload_sequence):
     f = libtcod.console_put_char_ex
     COLOR_LOOKUP = TCOD_COLOR
     for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-        f(handle, x, y, symbol, COLOR_LOOKUP[bg], COLOR_LOOKUP[fg])
+        f(handle, x, y, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[bg], COLOR_LOOKUP[fg])
 
 
 def get_key(handle_not_used):
