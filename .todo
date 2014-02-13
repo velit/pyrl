@@ -261,6 +261,9 @@
     <note priority="veryhigh" time="1335477455">
         Try making a priority queue based scheduling
     </note>
+    <note priority="veryhigh" time="1385064782">
+        Make LevelFile into LevelTemplate and the other Files as well
+    </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
     </note>
