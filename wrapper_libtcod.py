@@ -6,7 +6,13 @@ from __future__ import unicode_literals
 import const.keys as KEY
 import const.colors as COLOR
 import const.game as GAME
-import libtcod.libtcodpy as libtcod
+try:
+    import libtcod.libtcodpy as libtcod
+except Exception as e:
+    import sys
+    print("Couldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
+    print("This can potentially happen because libsdl isn't installed", file=sys.stderr)
+    sys.exit(1)
 
 from const.game import LIBTCOD
 

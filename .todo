@@ -285,4 +285,7 @@
     <note priority="low" time="1315862158">
         make move_random better
     </note>
+    <note priority="low" time="1388282755">
+        add a way to calm monsters by talking
+    </note>
 </todo>
