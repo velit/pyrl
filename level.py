@@ -32,23 +32,24 @@ class TileStructure(list):
 
 class Level(object):
 
-    def __init__(self, world_loc, level_file):
+    def __init__(self, world_loc, level_template):
+        level_template.finalize()
         self.world_loc = world_loc
-        self.rows = level_file.rows
-        self.cols = level_file.cols
-        self.danger_level = level_file.danger_level
-        self.passage_locations = level_file.passage_locations
-        self.tiles = TileStructure(level_file.tilemap(), self.cols)
+        self.rows = level_template.rows
+        self.cols = level_template.cols
+        self.danger_level = level_template.danger_level
+        self.passage_locations = level_template.passage_locations
+        self.tiles = TileStructure(level_template.tilemap(), self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
-        for monster_file in level_file.static_monster_files:
+        for monster_file in level_template.static_monster_files:
             self._spawn_predefined_creature(monster_file)
 
-        if level_file.use_dynamic_monsters:
-            self.creature_spawn_list = level_file.get_dynamic_monster_spawn_list()
+        if level_template.use_dynamic_monsters:
+            self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
             for x in range(GAME.MONSTERS_PER_LEVEL):
                 self._spawn_random_creature()
 

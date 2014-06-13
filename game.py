@@ -9,7 +9,6 @@ import const.creature_actions as CC
 import const.stats as STAT
 import debug
 import state_store
-import rdg
 
 from main import io
 from const.player import Player
@@ -90,10 +89,8 @@ class Game(object):
         self.redraw()
 
     def init_new_level(self, world_loc):
-        level_file = self.world_file.pop_level_file(world_loc)
-        if not level_file.static_level:
-            rdg.add_generated_tilefile(level_file, GAME.LEVEL_TYPE)
-        self.levels[world_loc] = Level(world_loc, level_file)
+        level_template = self.world_file.pop_level_template(world_loc)
+        self.levels[world_loc] = Level(world_loc, level_template)
 
     def player_act(self):
         level = self.player.level

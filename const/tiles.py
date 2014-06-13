@@ -9,6 +9,7 @@ from const.colors import *
 
 UNKNOWN = " "
 FLOOR = "."
+BLACK_FLOOR = "b"
 WALL = "w"
 ROCK = "#"
 STAIRS_UP = "<"
@@ -17,6 +18,7 @@ STAIRS_DOWN = ">"
 tiles = {
     UNKNOWN: Tile("You have not seen this place yet", (' ', NORMAL), (' ', NORMAL), False, False),
     FLOOR: Tile("dungeon floor", ('.', LIGHT), ('.', GRAY)),
+    BLACK_FLOOR: Tile("obisidian dungeon floor", ('.', RED), ('.', RED)),
     WALL: Tile("wall", ('#', BROWN), ('#', DARK), False, False),
     ROCK: Tile("dungeon rock", ('#', DARK), ('#', DARKEST), False, False),
     STAIRS_DOWN: Tile("down staircase", ('>', RED), ('>', NORMAL), exit_point=GAME.PASSAGE_DOWN),

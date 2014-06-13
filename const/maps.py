@@ -5,9 +5,9 @@ from __future__ import unicode_literals
 
 import const.game as GAME
 
-from level_file import LevelFile
+from level_template import LevelTemplate
 
-L0 = LevelFile(
+L0 = LevelTemplate(
     danger_level=1,
     static_level=True,
     use_dynamic_monsters=False,
@@ -17,7 +17,7 @@ L0 = LevelFile(
 
 L0.passage_locations[GAME.PASSAGE_UP] = (23, 15)
 L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
-L0.tilefile = list(
+L0.tilemap_template = list(
     "################################################################################################"
     "#######################..##################.#.#.#######.....####################################"
     "######...##############.#.################.#.#.#.#####.####.###......###########################"
@@ -45,7 +45,7 @@ L0.tilefile = list(
     "#######################################..................................#######################"
     "################################################################################################"
 )
-L0.add_walls()
+L0._add_walls()
 
 first = [
     "ggggggggggggggggggggggggggggg",

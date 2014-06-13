@@ -252,8 +252,11 @@
     <note priority="veryhigh" time="1330904930">
         Add a function that draws the square how it's supposed to be seen
     </note>
-    <note priority="veryhigh" time="1333683326">
+    <note priority="veryhigh" time="1333683326" done="1402757936">
         make rdg initial room be in the middleish
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1333839359">
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
@@ -263,6 +266,9 @@
     </note>
     <note priority="veryhigh" time="1385064782">
         Make LevelFile into LevelTemplate and the other Files as well
+    </note>
+    <note priority="veryhigh" time="1402756261">
+        Refactor rdg.py
     </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
