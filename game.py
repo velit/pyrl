@@ -11,7 +11,7 @@ import debug
 import state_store
 
 from main import io
-from const.player import Player
+from templates.player import Player
 from level import Level
 from ai import AI
 from user_input import UserInput

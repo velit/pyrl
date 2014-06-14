@@ -8,9 +8,9 @@ import const.generated_level_types as LEVEL_TYPE
 import const.tiles as TILE
 
 from random import randrange as rr, random as rand
-from const.tiles import WALL as W
-from const.tiles import ROCK as R
-from const.tiles import FLOOR as F
+from templates.tiles import WALL as W
+from templates.tiles import ROCK as R
+from templates.tiles import FLOOR as F
 
 
 def generate_tilemap_template(level_template, level_type=LEVEL_TYPE.ARENA):
