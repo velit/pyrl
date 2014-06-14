@@ -3,22 +3,22 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import const.colors as COLOR
-from monster_file import MonsterFile
+import const.colors as COL
+from monster_template import MonsterTemplate
 
-monster_files = (
-    MonsterFile("zombie", ('z', COLOR.CYAN), -3, 0),
-    MonsterFile("kobold", ('k', COLOR.LIGHT_GREEN), -3, 0),
-    MonsterFile("goblin", ('g', COLOR.GREEN), -2, 0),
-    MonsterFile("giant bat", ('B', COLOR.BROWN), -3, 0),
-    MonsterFile("orc", ('o', COLOR.GREEN), -1, 0),
-    MonsterFile("giant worm", ('w', COLOR.BROWN), 0, 0),
-    MonsterFile("fire imp", ('I', COLOR.RED), 3, 0),
-    MonsterFile("moloch", ('&', COLOR.YELLOW), 18, 0),
-    MonsterFile("blue drake", ('D', COLOR.BLUE), 0, 0),
-    MonsterFile("blue baby drake", ('D', COLOR.LIGHT_BLUE), 0, 0),
-    MonsterFile("red baby dragon", ("d", COLOR.LIGHT_RED), 0, 0),
-    MonsterFile("lightning lizard", ("l", COLOR.YELLOW), 0, 0),
-    MonsterFile("giant slug", ("F", COLOR.LIGHT_PURPLE), 0, 0),
-    MonsterFile("ratling warrior", ("r", COLOR.LIGHT_CYAN), 0, 0),
+monster_templates = (
+    MonsterTemplate("zombie", ('z', COL.CYAN), -3, 0),
+    MonsterTemplate("kobold", ('k', COL.LIGHT_GREEN), -3, 0),
+    MonsterTemplate("goblin", ('g', COL.GREEN), -2, 0),
+    MonsterTemplate("giant bat", ('B', COL.BROWN), -3, 0),
+    MonsterTemplate("orc", ('o', COL.GREEN), -1, 0),
+    MonsterTemplate("giant worm", ('w', COL.BROWN), 0, 0),
+    MonsterTemplate("fire imp", ('I', COL.RED), 3, 0),
+    MonsterTemplate("moloch", ('&', COL.YELLOW), 18, 0),
+    MonsterTemplate("blue drake", ('D', COL.BLUE), 0, 0),
+    MonsterTemplate("blue baby drake", ('D', COL.LIGHT_BLUE), 0, 0),
+    MonsterTemplate("red baby dragon", ("d", COL.LIGHT_RED), 0, 0),
+    MonsterTemplate("lightning lizard", ("l", COL.YELLOW), 0, 0),
+    MonsterTemplate("giant slug", ("F", COL.LIGHT_PURPLE), 0, 0),
+    MonsterTemplate("ratling warrior", ("r", COL.LIGHT_CYAN), 0, 0),
 )

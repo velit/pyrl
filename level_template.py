@@ -5,11 +5,11 @@ from __future__ import unicode_literals
 
 import rdg
 import const.game as GAME
-import const.tiles as TILE
+import templates.tiles as TILE
 import const.directions as DIR
-import const.monsters as MONSTER
 
 from generic_algorithms import add_vector
+from templates.monsters import monster_templates
 
 
 def gettile(handle, tile_dict=None):
@@ -33,7 +33,7 @@ class LevelTemplate(object):
         self.rows = rows
         self.cols = cols
         self.passage_locations = {}
-        self.static_monster_files = []
+        self.static_monster_templates = []
         self.tile_dict = {}
 
     def finalize(self):
@@ -54,14 +54,14 @@ class LevelTemplate(object):
             yield gettile(key, self.tile_dict)
 
     def add_monster_file(self, monster):
-        self.static_monster_files.append(monster)
+        self.static_monster_templates.append(monster)
 
     def legal_coord(self, coord):
         return (0 <= coord[0] < self.rows) and (0 <= coord[1] < self.cols)
 
     def get_dynamic_monster_spawn_list(self):
         monster_list = []
-        for monster in MONSTER.monster_files:
+        for monster in monster_templates:
             start = monster.speciation_lvl
             if start <= self.danger_level:
                 weight_coeff = self.danger_level - monster.speciation_lvl

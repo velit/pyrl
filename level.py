@@ -45,7 +45,7 @@ class Level(object):
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
-        for monster_file in level_template.static_monster_files:
+        for monster_file in level_template.static_monster_templates:
             self._spawn_predefined_creature(monster_file)
 
         if level_template.use_dynamic_monsters:

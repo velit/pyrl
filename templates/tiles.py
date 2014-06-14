@@ -4,7 +4,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import const.game as GAME
-import const.colors as C
+import const.colors as COL
 from tile import Tile
 
 UNKNOWN = " "
@@ -16,20 +16,20 @@ STAIRS_UP = "<"
 STAIRS_DOWN = ">"
 
 tiles = {
-    UNKNOWN: Tile("You have not seen this place yet", (' ', C.NORMAL), (' ', C.NORMAL), False, False),
-    FLOOR: Tile("dungeon floor", ('.', C.LIGHT), ('.', C.GRAY)),
-    BLACK_FLOOR: Tile("obisidian dungeon floor", ('.', C.RED), ('.', C.RED)),
-    WALL: Tile("wall", ('#', C.BROWN), ('#', C.DARK), False, False),
-    ROCK: Tile("dungeon rock", ('#', C.DARK), ('#', C.DARKEST), False, False),
-    STAIRS_DOWN: Tile("down staircase", ('>', C.RED), ('>', C.NORMAL), exit_point=GAME.PASSAGE_DOWN),
-    STAIRS_UP: Tile("up staircase", ('<', C.RED), ('<', C.NORMAL), exit_point=GAME.PASSAGE_UP),
-    '+': Tile("Closed door", ('+', C.BROWN), ('+', C.BROWN), False, False),
-    '/': Tile("Open door", ('/', C.BROWN), ('/', C.BROWN)),
-    'o': Tile("Window", ('o', C.NORMAL), ('o', C.NORMAL), False, True),
-    '=': Tile("Closet", ('=', C.BROWN), ('=', C.BROWN), False, True),
-    '-': Tile("Small table", ('-', C.BROWN), ('-', C.BROWN), False, True),
-    'c': Tile("Chair", ('c', C.DARK), ('c', C.DARK)),
-    's': Tile("Sink", ('s', C.WHITE), ('s', C.WHITE), False, True),
-    't': Tile("Toilet", ('t', C.WHITE), ('t', C.WHITE)),
-    '"': Tile("Grass", ('"', C.GREEN), ('"', C.GREEN)),
+    UNKNOWN: Tile("You have not seen this place yet", (' ', COL.NORMAL), (' ', COL.NORMAL), False, False),
+    FLOOR: Tile("dungeon floor", ('.', COL.LIGHT), ('.', COL.GRAY)),
+    BLACK_FLOOR: Tile("obisidian dungeon floor", ('.', COL.RED), ('.', COL.RED)),
+    WALL: Tile("wall", ('#', COL.BROWN), ('#', COL.DARK), False, False),
+    ROCK: Tile("dungeon rock", ('#', COL.DARK), ('#', COL.DARKEST), False, False),
+    STAIRS_DOWN: Tile("down staircase", ('>', COL.RED), ('>', COL.NORMAL), exit_point=GAME.PASSAGE_DOWN),
+    STAIRS_UP: Tile("up staircase", ('<', COL.RED), ('<', COL.NORMAL), exit_point=GAME.PASSAGE_UP),
+    '+': Tile("Closed door", ('+', COL.BROWN), ('+', COL.BROWN), False, False),
+    '/': Tile("Open door", ('/', COL.BROWN), ('/', COL.BROWN)),
+    'o': Tile("Window", ('o', COL.NORMAL), ('o', COL.NORMAL), False, True),
+    '=': Tile("Closet", ('=', COL.BROWN), ('=', COL.BROWN), False, True),
+    '-': Tile("Small table", ('-', COL.BROWN), ('-', COL.BROWN), False, True),
+    'c': Tile("Chair", ('c', COL.DARK), ('c', COL.DARK)),
+    's': Tile("Sink", ('s', COL.WHITE), ('s', COL.WHITE), False, True),
+    't': Tile("Toilet", ('t', COL.WHITE), ('t', COL.WHITE)),
+    '"': Tile("Grass", ('"', COL.GREEN), ('"', COL.GREEN)),
 }

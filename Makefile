@@ -1,7 +1,6 @@
 clean:
-	rm *.pyc
-	rm */*.pyc
-	rm errors.err
+	find . -name '*.pyc' -delete
+	rm -f errors.err
 
 release:
 	python setup.py sdist

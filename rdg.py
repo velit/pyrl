@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import const.game as GAME
 import const.generated_level_types as LEVEL_TYPE
-import const.tiles as TILE
+import templates.tiles as TILE
 
 from random import randrange as rr, random as rand
 from templates.tiles import WALL as W

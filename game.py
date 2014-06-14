@@ -12,10 +12,10 @@ import state_store
 
 from main import io
 from templates.player import Player
+from templates.maps import World
 from level import Level
 from ai import AI
 from user_input import UserInput
-from world_template import WorldTemplate
 from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
 from generic_algorithms import add_vector
@@ -32,7 +32,7 @@ class Game(object):
         self.turn_counter = 0
         self.current_vision = set()
         self.levels = {}
-        self.world = WorldTemplate()
+        self.world = World()
         self.player = Player()
         self.ai = AI()
 
@@ -89,7 +89,7 @@ class Game(object):
         self.redraw()
 
     def init_new_level(self, world_loc):
-        level_template = self.world.pop_level_template(world_loc)
+        level_template = self.world.get_level_template(world_loc)
         self.levels[world_loc] = Level(world_loc, level_template)
 
     def player_act(self):

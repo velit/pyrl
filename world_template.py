@@ -4,8 +4,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import const.game as GAME
-import const.maps as MAP
-
 from level_template import LevelTemplate
 
 
@@ -19,11 +17,6 @@ class WorldTemplate(object):
         self.level_templates = {}
         self.level_passageways = {}
         self.dungeon_lengths = {}
-
-        self.add_dungeon(GAME.DUNGEON)
-        self.add_level(GAME.DUNGEON, MAP.L0)
-        for x in range(GAME.LEVELS_PER_DUNGEON - 1):
-            self.add_level(GAME.DUNGEON)
 
     def add_dungeon(self, dungeon_key):
         self.dungeon_lengths[dungeon_key] = 1
