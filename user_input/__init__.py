@@ -14,7 +14,7 @@ import const.generated_level_types as LEVEL_TYPE
 import mappings as MAPPING
 
 from main import io
-from world_file import LevelNotFound
+from world_template import LevelNotFound
 from generic_algorithms import add_vector
 
 from .inventory import equipment

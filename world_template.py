@@ -13,7 +13,7 @@ class LevelNotFound(Exception):
     pass
 
 
-class WorldFile(object):
+class WorldTemplate(object):
 
     def __init__(self):
         self.level_templates = {}

@@ -15,7 +15,7 @@ from const.player import Player
 from level import Level
 from ai import AI
 from user_input import UserInput
-from world_file import WorldFile
+from world_template import WorldTemplate
 from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
 from generic_algorithms import add_vector
@@ -32,7 +32,7 @@ class Game(object):
         self.turn_counter = 0
         self.current_vision = set()
         self.levels = {}
-        self.world_file = WorldFile()
+        self.world = WorldTemplate()
         self.player = Player()
         self.ai = AI()
 
@@ -89,7 +89,7 @@ class Game(object):
         self.redraw()
 
     def init_new_level(self, world_loc):
-        level_template = self.world_file.pop_level_template(world_loc)
+        level_template = self.world.pop_level_template(world_loc)
         self.levels[world_loc] = Level(world_loc, level_template)
 
     def player_act(self):
@@ -100,7 +100,7 @@ class Game(object):
         user_input.get_user_input_and_act(self, self.player)
 
     def creature_enter_passage(self, creature, origin_world_loc, origin_passage):
-        instruction, d, i = self.world_file.get_passage_info(origin_world_loc, origin_passage)
+        instruction, d, i = self.world.get_passage_info(origin_world_loc, origin_passage)
         if instruction == GAME.SET_LEVEL:
             self.change_level((d, i))
         else:
