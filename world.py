@@ -13,6 +13,11 @@ class World(object):
         try:
             return self.levels[world_loc]
         except KeyError:
-            level = Level(world_loc, self.world_template.get_level_template(world_loc))
+            level_template = self.world_template.get_level_template(world_loc)
+            level_template.finalize()
+            level = Level(world_loc, level_template)
             self.levels[world_loc] = level
             return level
+
+    def get_first_level_info(self):
+        return self.world_template.first_level_info

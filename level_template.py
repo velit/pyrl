@@ -1,10 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import rdg
-import const.game as GAME
-import templates.tiles as TILE
 import const.directions as DIR
-
+import const.game as GAME
+import rdg
+import templates.tiles as TILE
 from generic_algorithms import add_vector
 from templates.monsters import monster_templates
 
@@ -20,9 +19,10 @@ def gettile(handle, tile_dict=None):
 
 class LevelTemplate(object):
 
-    def __init__(self, danger_level=0, tilemap_template=None,
-                 static_level=False, use_dynamic_monsters=True,
-                 rows=GAME.LEVEL_HEIGHT, cols=GAME.LEVEL_WIDTH):
+    def __init__(self, danger_level=0, static_level=False,
+                 use_dynamic_monsters=True, tilemap_template=None,
+                 static_monster_seq=(), rows=GAME.LEVEL_HEIGHT,
+                 cols=GAME.LEVEL_WIDTH):
         self.danger_level = danger_level
         self.tilemap_template = tilemap_template
         self.static_level = static_level
@@ -31,11 +31,13 @@ class LevelTemplate(object):
         self.cols = cols
         self.passage_locations = {}
         self.passage_destination_infos = {}
-        self.static_monster_templates = []
+        self.static_monster_templates = list(static_monster_seq)
         self.tile_dict = {}
 
     def finalize(self):
-        if not self.static_level:
+        if self.static_level:
+            self._finalize_manual_tilemap_template()
+        else:
             rdg.generate_tilemap_template(self, GAME.LEVEL_TYPE)
 
     def get_tile_handle(self, y, x):
@@ -65,6 +67,16 @@ class LevelTemplate(object):
                 weight_coeff = self.danger_level - monster.speciation_lvl
                 monster_list.extend((monster, ) * weight_coeff)
         return monster_list
+
+    def _finalize_manual_tilemap_template(self):
+        for loc, tile in enumerate(self.tilemap_template):
+            coord = loc // self.cols, loc % self.cols
+            if tile == TILE.STAIRS_UP:
+                self.passage_locations[GAME.PASSAGE_UP] = coord
+            elif tile == TILE.STAIRS_DOWN:
+                self.passage_locations[GAME.PASSAGE_DOWN] = coord
+
+        self._add_walls()
 
     def _add_walls(self):
         self.tilemap_template = [TILE.WALL if self._tile_qualifies_as_wall(loc, tile)

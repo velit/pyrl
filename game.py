@@ -11,7 +11,7 @@ from combat import get_melee_attack, get_combat_message
 from fov import get_light_set
 from generic_algorithms import add_vector
 from main import io
-from templates.maps import FIRST_LEVEL, get_world_template
+from templates.maps import get_world_template
 from templates.player import Player
 from user_input import UserInput
 from world import World
@@ -28,11 +28,12 @@ class Game(object):
 
         self.turn_counter = 0
         self.current_vision = set()
-        self.world = World(get_world_template())
         self.player = Player()
         self.ai = AI()
+        self.world = World(get_world_template())
 
-        self.move_creature_to_level(self.player, FIRST_LEVEL, GAME.PASSAGE_UP)
+        first_level, passage = self.world.get_first_level_info()
+        self.move_creature_to_level(self.player, first_level, passage)
         self.register_status_texts(self.player)
         self.vision_cache = None
 

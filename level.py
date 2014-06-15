@@ -30,7 +30,6 @@ class TileStructure(list):
 class Level(object):
 
     def __init__(self, world_loc, level_template):
-        level_template.finalize()
         self.world_loc = world_loc
         self.rows = level_template.rows
         self.cols = level_template.cols

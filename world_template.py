@@ -15,6 +15,10 @@ class WorldTemplate(object):
     def __init__(self):
         self.level_templates = {}
         self.dungeon_lengths = defaultdict(lambda: 0)
+        self.first_level_info = None
+
+    def add_first_level_info(self, wloc, passage):
+        self.first_level_info = wloc, passage
 
     def add_level(self, dungeon_key, level_template=None):
         self.dungeon_lengths[dungeon_key] += 1
