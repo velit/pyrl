@@ -1,21 +1,21 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import mappings as MAPPING
-import const.game as GAME
 import const.creature_actions as CC
+import const.game as GAME
 import const.stats as STAT
 import debug
+import mappings as MAPPING
 import state_store
-
-from main import io
-from templates.player import Player
-from templates.maps import World
-from level import Level
 from ai import AI
-from user_input import UserInput
-from fov import get_light_set
 from combat import get_melee_attack, get_combat_message
+from fov import get_light_set
 from generic_algorithms import add_vector
+from main import io
+from templates.maps import FIRST_LEVEL, get_world_template
+from templates.player import Player
+from user_input import UserInput
+from world import World
+from world_template import LevelNotFound
 
 
 user_input = UserInput()
@@ -28,16 +28,14 @@ class Game(object):
 
         self.turn_counter = 0
         self.current_vision = set()
-        self.levels = {}
-        self.world = World()
+        self.world = World(get_world_template())
         self.player = Player()
         self.ai = AI()
 
-        self.init_new_level(GAME.FIRST_LEVEL)
-        first_level = self.levels[GAME.FIRST_LEVEL]
-        first_level.add_creature(self.player, first_level.get_passage_coord(GAME.PASSAGE_UP))
+        self.move_creature_to_level(self.player, FIRST_LEVEL, GAME.PASSAGE_UP)
         self.register_status_texts(self.player)
         self.vision_cache = None
+
         io.msg("{0} for help menu".format(MAPPING.HELP))
 
     def main_loop(self):
@@ -48,46 +46,14 @@ class Game(object):
             #if newcycle:
                 ## do cycle based stuff
 
-            if creature is not self.player:
+            if creature is player:
+                if creature.can_act():
+                    self.player_act()
+                    self.turn_counter += 1
+            else:
                 self.ai.act_alert(self, creature, self.player.coord)
-            elif creature.can_act():
-                self.player_act()
-                self.turn_counter += 1
 
             creature.recover_energy()
-
-    def register_status_texts(self, creature):
-        io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-        io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-        io.s.add_element(STAT.SIGHT, lambda: creature.sight)
-        io.s.add_element(STAT.AR, lambda: creature.ar)
-        io.s.add_element(STAT.DR, lambda: creature.dr)
-        io.s.add_element(STAT.PV, lambda: creature.pv)
-        io.s.add_element(STAT.SPEED, lambda: creature.speed)
-        io.s.add_element(STAT.ST, lambda: creature.st)
-        io.s.add_element(STAT.DX, lambda: creature.dx)
-        io.s.add_element(STAT.TO, lambda: creature.to)
-        io.s.add_element(STAT.LE, lambda: creature.le)
-        io.s.add_element(STAT.PE, lambda: creature.pe)
-        io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
-        io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
-        io.s.add_element("Turns", lambda: self.turn_counter)
-
-    def change_level(self, world_loc, passage):
-        old_level = self.player.level
-        try:
-            new_level = self.levels[world_loc]
-        except KeyError:
-            self.init_new_level(world_loc)
-            new_level = self.levels[world_loc]
-        old_level.remove_creature(self.player)
-        new_level.add_creature(self.player, new_level.get_passage_coord(passage))
-        self.current_vision = set()
-        self.redraw()
-
-    def init_new_level(self, world_loc):
-        level_template = self.world.get_level_template(world_loc)
-        self.levels[world_loc] = Level(world_loc, level_template)
 
     def player_act(self):
         level = self.player.level
@@ -96,17 +62,35 @@ class Game(object):
         self.update_view(self.player.level, self.player)
         user_input.get_user_input_and_act(self, self.player)
 
-    def creature_enter_passage(self, creature, origin_world_loc, origin_passage):
-        instruction, d, i = self.world.get_passage_info(origin_world_loc, origin_passage)
-        if instruction == GAME.SET_LEVEL:
-            self.change_level((d, i))
+    def move_creature_to_level(self, creature, world_loc, passage):
+        try:
+            target_level = self.world.get_level(world_loc)
+        except LevelNotFound:
+            return False
+
+        if creature.level is not None:
+            creature.level.remove_creature(creature)
+
+        target_level.add_creature_to_passage(creature, passage)
+
+        if creature is self.player:
+            self.current_vision = set()
+            self.redraw()
+
+        return True
+
+    def creature_enter_passage(self, creature):
+        level = creature.level
+        if level.is_exit(creature.coord):
+            passage = level.get_exit(creature.coord)
+            dest_world_loc, dest_passage = level.get_destination_info(passage)
+            if self.move_creature_to_level(creature, dest_world_loc, dest_passage):
+                creature.update_energy(GAME.MOVEMENT_COST)
+                return True
+            io.msg("This passage doesn't seem to lead anywhere.")
         else:
-            d, i = creature.level.world_loc
-            if instruction == GAME.PREVIOUS_LEVEL:
-                self.change_level((d, i - 1), GAME.PASSAGE_DOWN)
-            elif instruction == GAME.NEXT_LEVEL:
-                self.change_level((d, i + 1), GAME.PASSAGE_UP)
-        creature.update_energy(GAME.MOVEMENT_COST)
+            io.msg("There is no entrance.")
+        return False
 
     def creature_move(self, creature, direction):
         level = creature.level
@@ -183,6 +167,23 @@ class Game(object):
             io.notify("You die...")
             self.endgame(dont_ask=True)
         level.remove_creature(creature)
+
+    def register_status_texts(self, creature):
+        io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+        io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
+        io.s.add_element(STAT.SIGHT, lambda: creature.sight)
+        io.s.add_element(STAT.AR, lambda: creature.ar)
+        io.s.add_element(STAT.DR, lambda: creature.dr)
+        io.s.add_element(STAT.PV, lambda: creature.pv)
+        io.s.add_element(STAT.SPEED, lambda: creature.speed)
+        io.s.add_element(STAT.ST, lambda: creature.st)
+        io.s.add_element(STAT.DX, lambda: creature.dx)
+        io.s.add_element(STAT.TO, lambda: creature.to)
+        io.s.add_element(STAT.LE, lambda: creature.le)
+        io.s.add_element(STAT.PE, lambda: creature.pe)
+        io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
+        io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
+        io.s.add_element("Turns", lambda: self.turn_counter)
 
     def endgame(self, dont_ask=True, message=""):
         io.msg(message)

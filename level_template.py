@@ -30,6 +30,7 @@ class LevelTemplate(object):
         self.rows = rows
         self.cols = cols
         self.passage_locations = {}
+        self.passage_destination_infos = {}
         self.static_monster_templates = []
         self.tile_dict = {}
 
@@ -50,7 +51,7 @@ class LevelTemplate(object):
         for key in self.tilemap_template:
             yield gettile(key, self.tile_dict)
 
-    def add_monster_file(self, monster):
+    def add_monster_template(self, monster):
         self.static_monster_templates.append(monster)
 
     def legal_coord(self, coord):

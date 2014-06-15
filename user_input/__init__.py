@@ -1,21 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import code
-import debug
 
-import const.keys as KEY
+import const.colors as COLOR
 import const.directions as DIR
 import const.game as GAME
-import const.colors as COLOR
 import const.generated_level_types as LEVEL_TYPE
+import const.keys as KEY
+import debug
 import mappings as MAPPING
-
-from main import io
-from world_template import LevelNotFound
-from generic_algorithms import add_vector
-
 from .inventory import equipment
 from .walk_mode import walk_mode, walk_mode_init
+from generic_algorithms import add_vector
+from main import io
+from world_template import LevelNotFound
 
 
 class UserInput(object):
@@ -131,10 +129,7 @@ def enter(game, creature, passage):
     coord = game.player.coord
     level = creature.level
     if level.is_exit(coord) and level.get_exit(coord) == passage:
-        try:
-            game.creature_enter_passage(creature, level.world_loc, level.get_exit(coord))
-        except LevelNotFound:
-            io.msg("This passage doesn't seem to lead anywhere.")
+        game.creature_enter_passage(creature)
     else:
         try:
             new_coord = level.get_passage_coord(passage)

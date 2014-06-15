@@ -36,6 +36,7 @@ class Level(object):
         self.cols = level_template.cols
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
+        self.passage_destination_infos = level_template.passage_destination_infos
         self.tiles = TileStructure(level_template.tilemap(), self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
@@ -132,6 +133,9 @@ class Level(object):
         else:
             return self.passage_locations[passage]
 
+    def get_destination_info(self, passage):
+        return self.passage_destination_infos[passage]
+
     def has_creature(self, coord):
         return coord in self.creatures
 
@@ -204,6 +208,9 @@ class Level(object):
         return information
         #else:
         #   return "You don't know anything about this place."
+
+    def add_creature_to_passage(self, creature, passage):
+        self.add_creature(creature, self.get_passage_coord(passage))
 
     def add_creature(self, creature, coord=None):
         if coord is None:

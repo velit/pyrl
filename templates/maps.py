@@ -1,14 +1,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import const.game as GAME
+import world_template
 
 from level_template import LevelTemplate
-from world_template import WorldTemplate
 from monster_template import MonsterTemplate
 from const.colors import PURPLE
 
 
-def World():
+DUNGEON = "dungeon"
+FIRST_LEVEL = (DUNGEON, 1)
+
+
+def get_world_template():
+
+    world_template_instance = world_template.WorldTemplate()
 
     L0 = LevelTemplate(
         danger_level=1,
@@ -16,10 +22,8 @@ def World():
         use_dynamic_monsters=False,
     )
 
-    L0.add_monster_file(MonsterTemplate("The Crone", ('@', PURPLE)))
+    L0.add_monster_template(MonsterTemplate("The Crone", ('@', PURPLE)))
 
-    L0.passage_locations[GAME.PASSAGE_UP] = (23, 15)
-    L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
     L0.tilemap_template = list(
         "################################################################################################"
         "#######################..##################.#.#.#######.....####################################"
@@ -48,15 +52,17 @@ def World():
         "#######################################..................................#######################"
         "################################################################################################"
     )
+    L0.passage_locations[GAME.PASSAGE_UP] = (23, 15)
+    L0.passage_locations[GAME.PASSAGE_DOWN] = (19, 81)
     L0._add_walls()
+    #TODO: L0.automagicize()
 
-    world = WorldTemplate()
-    world.add_dungeon(GAME.DUNGEON)
-    world.add_level(GAME.DUNGEON, L0)
+    world_template_instance.add_level(DUNGEON, L0)
+
     for x in range(GAME.LEVELS_PER_DUNGEON - 1):
-        world.add_level(GAME.DUNGEON)
+        world_template_instance.add_level(DUNGEON)
 
-    return world
+    return world_template_instance
 
 #first = [
     #"ggggggggggggggggggggggggggggg",

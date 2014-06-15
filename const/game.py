@@ -35,18 +35,9 @@ SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 
 ENCODING = "utf-8"
 
-SET_LEVEL = "set-level"
-NEXT_LEVEL = "next-level"
-PREVIOUS_LEVEL = "previous-level"
-UP = (PREVIOUS_LEVEL, None, None)
-DOWN = (NEXT_LEVEL, None, None)
-
-DUNGEON = "dungeon"
-FIRST_LEVEL = (DUNGEON, 1)
-
-PASSAGE_UP = "an exit going up"
-PASSAGE_DOWN = "an exit going down"
-PASSAGE_RANDOM = "random entry point"
+PASSAGE_UP = "up"
+PASSAGE_DOWN = "down"
+PASSAGE_RANDOM = "random"
 
 NCURSES = "ncurses"
 LIBTCOD = "libtcod"

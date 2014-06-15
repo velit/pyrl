@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import defaultdict
+
 import const.game as GAME
 from level_template import LevelTemplate
 
@@ -12,21 +14,20 @@ class WorldTemplate(object):
 
     def __init__(self):
         self.level_templates = {}
-        self.level_passageways = {}
-        self.dungeon_lengths = {}
-
-    def add_dungeon(self, dungeon_key):
-        self.dungeon_lengths[dungeon_key] = 1
+        self.dungeon_lengths = defaultdict(lambda: 0)
 
     def add_level(self, dungeon_key, level_template=None):
-        level_i = self.dungeon_lengths[dungeon_key]
-        if level_template is None:
-            self.level_templates[dungeon_key, level_i] = LevelTemplate(level_i)
-        else:
-            self.level_templates[dungeon_key, level_i] = level_template
-        self.level_passageways[dungeon_key, level_i] = {GAME.PASSAGE_UP: GAME.UP,
-                                                        GAME.PASSAGE_DOWN: GAME.DOWN}
         self.dungeon_lengths[dungeon_key] += 1
+        level_i = self.dungeon_lengths[dungeon_key]
+
+        if level_template is None:
+            level_template = LevelTemplate(level_i)
+
+        infos = level_template.passage_destination_infos
+        infos[GAME.PASSAGE_UP] = (dungeon_key, level_i - 1), GAME.PASSAGE_DOWN
+        infos[GAME.PASSAGE_DOWN] = (dungeon_key, level_i + 1), GAME.PASSAGE_UP
+
+        self.level_templates[dungeon_key, level_i] = level_template
 
     def get_level_template(self, world_loc):
         try:
@@ -42,6 +43,3 @@ class WorldTemplate(object):
         else:
             del self.level_templates[world_loc]
             return level_template
-
-    def get_passage_info(self, world_loc, passage):
-        return self.level_passageways[world_loc][passage]
