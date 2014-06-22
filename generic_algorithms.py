@@ -72,6 +72,10 @@ def add_vector(coord, vector):
     return coord[0] + vector[0], coord[1] + vector[1]
 
 
+def scalar_mult(scalar, vector):
+    return scalar * vector[0], scalar * vector[1]
+
+
 def reverse_vector(vector):
     return -vector[0], -vector[1]
 

@@ -5,15 +5,15 @@ import code
 import const.colors as COLOR
 import const.directions as DIR
 import const.game as GAME
-import const.generated_level_types as LEVEL_TYPE
 import const.keys as KEY
 import debug
+import level_template
 import mappings as MAPPING
+import rdg
 from .inventory import equipment
 from .walk_mode import walk_mode, walk_mode_init
 from generic_algorithms import add_vector
 from main import io
-from world_template import LevelNotFound
 
 
 class UserInput(object):
@@ -164,8 +164,8 @@ def debug_action(game, creature, userinput):
         debug.cross = not debug.cross
         io.msg("Path heuristic cross set to {}".format(debug.cross))
     elif c == 'l':
-        GAME.LEVEL_TYPE = LEVEL_TYPE.ARENA if GAME.LEVEL_TYPE == LEVEL_TYPE.DUNGEON else LEVEL_TYPE.DUNGEON
-        io.msg("Level type set to {}".format(GAME.LEVEL_TYPE))
+        level_template.DEFAULT_LEVEL_TYPE = rdg.ARENA if level_template.DEFAULT_LEVEL_TYPE == rdg.DUNGEON else rdg.DUNGEON
+        io.msg("Level type set to {}".format(level_template.DEFAULT_LEVEL_TYPE))
     elif c == 'd':
         if not debug.path:
             debug.path = True

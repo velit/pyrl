@@ -8,13 +8,7 @@ from generic_algorithms import add_vector
 from templates.monsters import monster_templates
 
 
-def gettile(handle, tile_dict=None):
-    if tile_dict is not None and handle in tile_dict:
-        return tile_dict[handle]
-    elif handle in TILE.tiles:
-        return TILE.tiles[handle]
-    else:
-        raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))
+DEFAULT_LEVEL_TYPE = rdg.DUNGEON
 
 
 class LevelTemplate(object):
@@ -38,7 +32,7 @@ class LevelTemplate(object):
         if self.static_level:
             self._finalize_manual_tilemap_template()
         else:
-            rdg.generate_tilemap_template(self, GAME.LEVEL_TYPE)
+            rdg.generate_tilemap_template(self, DEFAULT_LEVEL_TYPE)
 
     def get_tile_handle(self, y, x):
         return self.tilemap_template[y * self.cols + x]
@@ -47,11 +41,11 @@ class LevelTemplate(object):
         self.tilemap_template[y * self.cols + x] = tile_id
 
     def get_tile_from_coord(self, y, x):
-        return gettile(self.get_tile_handle(y, x), self.tile_dict)
+        return self._gettile(self.get_tile_handle(y, x))
 
     def tilemap(self):
-        for key in self.tilemap_template:
-            yield gettile(key, self.tile_dict)
+        for handle in self.tilemap_template:
+            yield self._gettile(handle)
 
     def add_monster_template(self, monster):
         self.static_monster_templates.append(monster)
@@ -67,6 +61,16 @@ class LevelTemplate(object):
                 weight_coeff = self.danger_level - monster.speciation_lvl
                 monster_list.extend((monster, ) * weight_coeff)
         return monster_list
+
+    def _gettile(self, handle, tile_dict=None):
+        if tile_dict is not None and handle in tile_dict:
+            return tile_dict[handle]
+        elif handle in self.tile_dict:
+            return self.tile_dict[handle]
+        elif handle in TILE.tiles:
+            return TILE.tiles[handle]
+        else:
+            raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))
 
     def _finalize_manual_tilemap_template(self):
         for loc, tile in enumerate(self.tilemap_template):

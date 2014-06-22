@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.generated_level_types as GENERATED_LEVEL_TYPE
-
 OPTIMIZATION = True
 
 MSG_BAR_HEIGHT = 2
@@ -19,7 +17,6 @@ MOVEMENT_COST = 1000
 ATTACK_COST = 1000
 DIAGONAL_MODIFIER = 2 ** 0.5
 
-LEVEL_TYPE = GENERATED_LEVEL_TYPE.DUNGEON
 RDG_LEVEL_PASSES = 2000
 
 MONSTERS_PER_LEVEL = 99

@@ -10,6 +10,11 @@ SW = (1, -1)
 SO = (1, 0)
 SE = (1, 1)
 
+NORTH = NO
+SOUTH = SO
+EAST = EA
+WEST = WE
+
 ALL = (WE, SO, NO, EA, NW, NE, SW, SE, STOP)
 ALL_MINUS_STOP = (WE, SO, NO, EA, NW, NE, SW, SE)
 
