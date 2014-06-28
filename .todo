@@ -268,10 +268,13 @@
         Make libtcod keys represent shift/ctrl/alt keys in their __str__
     </note>
     <note priority="veryhigh" time="1335477455">
-        Try making a priority queue based scheduling
+        Make a priority queue based scheduling
     </note>
-    <note priority="veryhigh" time="1402756261">
+    <note priority="veryhigh" time="1402756261" done="1403627050">
         Make rdg.py use a class
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1402783190">
         Add a wrapper that prints to player or messages AI based on processed creature actions

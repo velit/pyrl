@@ -34,14 +34,16 @@ class LevelTemplate(object):
         else:
             rdg.generate_tilemap_template(self, DEFAULT_LEVEL_TYPE)
 
-    def get_tile_handle(self, y, x):
+    def get_tile_handle(self, coord):
+        y, x = coord
         return self.tilemap_template[y * self.cols + x]
 
-    def set_tile_handle(self, y, x, tile_id):
+    def set_tile_handle(self, coord, tile_id):
+        y, x = coord
         self.tilemap_template[y * self.cols + x] = tile_id
 
-    def get_tile_from_coord(self, y, x):
-        return self._gettile(self.get_tile_handle(y, x))
+    def get_tile_from_coord(self, coord):
+        return self._gettile(self.get_tile_handle(coord))
 
     def tilemap(self):
         for handle in self.tilemap_template:
@@ -51,7 +53,8 @@ class LevelTemplate(object):
         self.static_monster_templates.append(monster)
 
     def legal_coord(self, coord):
-        return (0 <= coord[0] < self.rows) and (0 <= coord[1] < self.cols)
+        y, x = coord
+        return (0 <= y < self.rows) and (0 <= x < self.cols)
 
     def get_dynamic_monster_spawn_list(self):
         monster_list = []
@@ -91,5 +94,5 @@ class LevelTemplate(object):
             return False
         coord = loc // self.cols, loc % self.cols
         neighbor_coords = (add_vector(coord, direction) for direction in DIR.ALL_MINUS_STOP)
-        valid_handles = (self.get_tile_handle(*coord) for coord in neighbor_coords if self.legal_coord(coord))
+        valid_handles = (self.get_tile_handle(coord) for coord in neighbor_coords if self.legal_coord(coord))
         return any(handle not in (TILE.WALL, TILE.ROCK) for handle in valid_handles)

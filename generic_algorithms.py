@@ -68,8 +68,8 @@ def get_vector(origin, target):
     return target[0] - origin[0], target[1] - origin[1]
 
 
-def add_vector(coord, vector):
-    return coord[0] + vector[0], coord[1] + vector[1]
+def add_vector(vectorA, vectorB):
+    return vectorA[0] + vectorB[0], vectorA[1] + vectorB[1]
 
 
 def scalar_mult(scalar, vector):

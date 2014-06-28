@@ -3,15 +3,15 @@
 if [ $# -eq 0 ]; then
     ./pyrl.py 2> errors.err
 else
-    ./$1 2> errors.err
+    $@ 2> errors.err
 fi
 
 if [ -s errors.err ]; then
-    if [ $# -eq 2 ]; then
-        cat errors.err
-    else
+    if [ $# -eq 0 ]; then
         vim -q errors.err
         rm errors.err
+    else
+        cat errors.err
     fi
 else
     rm errors.err

@@ -1,6 +1,7 @@
 *~
 *.swp
 *.pyc
+tags
 data/pyrl.svg
 Session.vim
 errors.err
