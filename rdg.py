@@ -11,7 +11,9 @@ from const.directions import NORTH, SOUTH, WEST, EAST
 
 DUNGEON = "GENERATED_LEVEL_TYPE_DUNGEON"
 ARENA = "GENERATED_LEVEL_TYPE_ARENA"
+
 RDG_LEVEL_PASSES = 300
+CORRIDOR_CHANCE = 0.3
 
 
 def generate_tilemap_template(level_template, level_type=ARENA):
@@ -43,13 +45,13 @@ def Rectangle(y, x, height, width):
         x_start = x
         x_limit = x + width
 
-    return _Rectangle((y_start, y_limit, x_start, x_limit))
+    return _Rectangle((y_start, x_start, y_limit, x_limit))
 
 
 class _Rectangle(tuple):
 
     def iterate(self):
-        y_start, y_limit, x_start, x_limit = self
+        y_start, x_start, y_limit, x_limit = self
 
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):
@@ -69,7 +71,7 @@ class RDG(object):
                 self.make_initial_room()
 
             for x in range(RDG_LEVEL_PASSES):
-                if random() < 0.30:
+                if random() < CORRIDOR_CHANCE:
                     self.attempt_corridor()
                 else:
                     self.attempt_room()
@@ -214,7 +216,7 @@ class RDG(object):
         return 0 < y < self.rows and 0 < x < self.cols
 
     def make_room(self, rectangle):
-        y_start, y_limit, x_start, x_limit = rectangle
+        y_start, x_start, y_limit, x_limit = rectangle
 
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):

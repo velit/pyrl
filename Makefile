@@ -1,3 +1,6 @@
+test:
+	py.test
+
 debug:
 	python -m pdb pyrl.py
 
