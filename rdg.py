@@ -1,13 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from random import randrange, random, choice
 from functools import partial
+from random import randrange, random, choice
 
 import const.game as GAME
 import templates.tiles as TILE
+from const.directions import NORTH, SOUTH, WEST, EAST
 from generic_algorithms import add_vector
 from templates.tiles import WALL as W, ROCK as R, FLOOR as F
-from const.directions import NORTH, SOUTH, WEST, EAST
 
 
 DUNGEON = "GENERATED_LEVEL_TYPE_DUNGEON"

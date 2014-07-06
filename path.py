@@ -1,11 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config import debug
-import const.colors as COLOR
-
-from main import io
 from heapq import heappush, heappop
+
+import const.colors as COLOR
+from config import debug
 from generic_algorithms import chebyshev
+from main import io
 
 
 def path(start_coord, goal_coord, neighbor_function, heuristic):

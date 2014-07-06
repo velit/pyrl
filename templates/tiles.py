@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.game as GAME
 import const.colors as COL
+import const.game as GAME
 from tile import Tile
+
 
 UNKNOWN = " "
 FLOOR = "."

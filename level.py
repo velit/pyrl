@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import random
-import path
+
 import const.directions as DIR
 import const.game as GAME
+import path
 from config import debug
-
 from creature import Creature
-from turn_scheduler import TurnScheduler
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
+from turn_scheduler import TurnScheduler
 
 
 class TileStructure(list):

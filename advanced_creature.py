@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from creature import Creature
-from const.slots import HEAD, BODY, FEET, RIGHT_HAND, LEFT_HAND
+from const.slots import HEAD, BODY, FEET, RIGHT_HAND
 from const.stats import *
+from creature import Creature
 
 
 class AdvancedCreature(Creature):

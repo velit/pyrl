@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.game as GAME
 import const.creature_actions as CC
+import const.game as GAME
 
 
 class Creature(object):

@@ -1,10 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import const.directions as DIR
 import const.game as GAME
 import mappings as MAPPING
-import const.directions as DIR
-from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector
-from generic_algorithms import clockwise_45, anticlockwise_45
+from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
 from main import io
 
 

@@ -1,12 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import const.colors as COLOR
-import const.stats as ST
 import const.slots as SL
-
+import const.stats as ST
 from advanced_creature import AdvancedCreature
-from monster_template import MonsterTemplate
 from item import Item, Weapon
+from monster_template import MonsterTemplate
 
 
 def Player():

@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
-import mappings as MAPPING
-import const.colors as COLOR
 
+import const.colors as COLOR
+import mappings as MAPPING
 from config import debug
 from window.base_window import BaseWindow
+from window.level import LevelWindow
 from window.message import MessageBar
 from window.status import StatusBar
-from window.level import LevelWindow
 
 
 class WindowSystem(object):

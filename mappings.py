@@ -1,8 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import string
-import const.keys as KEY
+
 import const.directions as DIR
+import const.keys as KEY
+
 
 # general
 CANCEL = 'z'

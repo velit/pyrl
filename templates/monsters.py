@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import const.colors as COL
 from monster_template import MonsterTemplate
 
+
 monster_templates = (
     MonsterTemplate("zombie", ('z', COL.CYAN), -3, 0),
     MonsterTemplate("kobold", ('k', COL.LIGHT_GREEN), -3, 0),

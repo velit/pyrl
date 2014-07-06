@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import mappings as MAPPING
-import const.slots as SLOT
 from collections import OrderedDict
+
+import const.slots as SLOT
+import mappings as MAPPING
 from main import io
 from mappings import CANCEL, GROUP_DEFAULT, VIEW_INVENTORY, INVENTORY_KEYS
 

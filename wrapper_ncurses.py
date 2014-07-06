@@ -1,10 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.keys as KEY
+import curses.ascii
+
 import const.colors as COLOR
 import const.game as GAME
-import curses
-import curses.ascii
+import const.keys as KEY
 
 
 class Curses256ColorDict(dict):

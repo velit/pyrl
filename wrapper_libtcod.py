@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.keys as KEY
 import const.colors as COLOR
 import const.game as GAME
+import const.keys as KEY
+from const.game import LIBTCOD
+
+
 try:
     import libtcod.libtcodpy as libtcod
 except Exception as e:
@@ -11,7 +14,6 @@ except Exception as e:
     print("This can potentially happen because libsdl isn't installed", file=sys.stderr)
     sys.exit(1)
 
-from const.game import LIBTCOD
 
 TCOD_COLOR = {
     COLOR.BASE_BLACK: libtcod.Color(0, 0, 0),

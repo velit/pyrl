@@ -1,8 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import random
-import const.directions as DIR
+
 import const.creature_actions as ACTIONS
+import const.directions as DIR
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 

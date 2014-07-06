@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 from cProfile import Profile
 
-import state_store
 import profile_util
+import state_store
 from const.game import NCURSES
 from window.window_system import WindowSystem
 

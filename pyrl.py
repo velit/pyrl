@@ -1,9 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+import main
+import wrapper_ncurses
 
 
 try:
@@ -12,8 +11,6 @@ except ImportError:
     print("Couldn't import curses. Try running sdlpyrl.py")
     exit()
 
-import main
-import wrapper_ncurses
 
 
 def start(curses_window):

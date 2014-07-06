@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
-import sys
 import pstats
+import sys
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

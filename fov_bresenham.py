@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from generic_algorithms import bresenham
 
+
 _mult = (
         (0, 0, 1, 1, 0, 0, -1, -1),
         (1, 1, 0, 0, -1, -1, 0, 0),
