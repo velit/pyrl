@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from random import randrange, random
+from random import randrange, random, choice
 from functools import partial
 
 import const.game as GAME
@@ -25,7 +25,7 @@ CORRIDOR_CHANCE_RANGE = (0, 0.3)
 ROOM_CHANCE_RANGE = (0.3, 1)
 
 
-def generate_tilemap_template(level_template, level_type=ARENA):
+def generate_tilemap_template(level_template, level_type=DUNGEON):
     return RDG(level_template, level_type).generate_tilemap_template()
 
 
@@ -59,6 +59,7 @@ def Rectangle(y, x, height, width):
 class _Rectangle(tuple):
 
     def iterate(self):
+
         y_start, x_start, y_limit, x_limit = self
 
         for y in range(y_start, y_limit):
@@ -69,10 +70,15 @@ class _Rectangle(tuple):
 class RDG(object):
 
     def __init__(self, level_template, level_type=ARENA):
+
         self.level_template = level_template
         self.rows = level_template.rows
         self.cols = level_template.cols
         self.level_type = level_type
+
+        self.wall_coords = set()
+        self.wall_coords_cache = tuple()
+        self.is_wall_coords_dirty = True
 
     def generate_tilemap_template(self):
 
@@ -135,9 +141,11 @@ class RDG(object):
                 assert False
 
     def init_tilemap_template(self):
+
         self.level_template.tilemap_template = [R for _ in range(self.rows * self.cols)]
 
     def add_passageway(self, passage, passage_tile_id):
+
         while True:
             coord = self.get_free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
@@ -150,6 +158,7 @@ class RDG(object):
         self.level_template.passage_locations[passage] = coord
 
     def make_initial_room(self):
+
         while True:
             height, width = randrange(5, 11), randrange(7, 14)
             if height * width <= 8 * 8:
@@ -198,18 +207,36 @@ class RDG(object):
             return False
 
     def get_free_coord(self):
+
         while True:
             coord = self.get_random_coord()
             if self.level_template.get_tile_from_coord(coord).is_passable:
                 return coord
 
     def get_random_coord(self):
+
         return randrange(self.rows), randrange(self.cols)
+
+    def get_random_wall_coord(self):
+
+        if self.is_wall_coords_dirty:
+            self.wall_coords_cache = tuple(self.wall_coords)
+            self.is_wall_coords_dirty = False
+
+        return choice(self.wall_coords_cache)
+
+    def mark_wall(self, coord):
+
+        if coord in self.wall_coords:
+            self.wall_coords.remove(coord)
+        else:
+            self.wall_coords.add(coord)
+        self.is_wall_coords_dirty = True
 
     def get_wall_coord_and_dir(self):
         """Return a random wall coordinate and build direction."""
         while True:
-            coord = self.get_random_coord()
+            coord = self.get_random_wall_coord()
             direction = self.is_edge(coord)
             if direction:
                 return coord, direction
@@ -233,6 +260,7 @@ class RDG(object):
             return False
 
     def get_up_down_left_right_neighbors(self, coord):
+
         get = self.level_template.get_tile_handle
         neighbors = (get(add_vector(coord, NORTH)),
                      get(add_vector(coord, SOUTH)),
@@ -241,30 +269,39 @@ class RDG(object):
         return neighbors
 
     def is_legal(self, coord):
+
         y, x = coord
         return 0 <= y < self.rows and 0 <= x < self.cols
 
     def make_room(self, rectangle):
+
         y_start, x_start, y_limit, x_limit = rectangle
 
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):
                 if y in (y_start, y_limit - 1) or x in (x_start, x_limit - 1):
                     self.level_template.set_tile_handle((y, x), W)
+                    self.mark_wall((y, x))
                 else:
                     self.level_template.set_tile_handle((y, x), F)
 
     def rectangle_consists_of_tiles(self, rectangle, tile_seq):
 
-        coords = rectangle.iterate()
         get_tile = self.level_template.get_tile_handle
-
-        return all(self.is_legal(coord) and (get_tile(coord) in tile_seq) for coord in coords)
+        for coord in rectangle.iterate():
+            if not self.is_legal(coord) or get_tile(coord) not in tile_seq:
+                return False
+        return True
 
     def set_rectangle(self, rectangle, tile):
         """Set all the tiles in rectangle to given tile."""
-        for coord in rectangle.iterate():
-            self.level_template.set_tile_handle(coord, tile)
+        if tile == TILE.WALL:
+            for coord in rectangle.iterate():
+                self.level_template.set_tile_handle(coord, tile)
+                self.mark_wall(coord)
+        else:
+            for coord in rectangle.iterate():
+                self.level_template.set_tile_handle(coord, tile)
 
     def turn_rock_to_wall(self):
         self.level_template.tilemap_template = [W if x == R else x for

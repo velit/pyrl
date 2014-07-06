@@ -5,4 +5,5 @@ tags
 data/pyrl.svg
 Session.vim
 errors.err
+profiling_results
 .ropeproject/

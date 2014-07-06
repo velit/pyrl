@@ -9,7 +9,7 @@ setup(
     url='http://iridian.fixme.fi/~tappi/pyrl-alpha.tar.gz',
     version='alpha',
     packages=['', 'const', 'libtcod', 'user_input', 'window'],
-    platforms=['windows', 'linux', 'mac', 'anything with python 2.6 and curses'],
+    platforms=['windows', 'unix', 'mac', 'anything with python 2.7 and curses'],
     license="Creative Commons Attribution-NonCommercial-Sharelike 3.0 Unported License",
     data_files=[
         ('data', ['data/terminal10x18_gs_ro.png']),
