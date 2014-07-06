@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from random import randrange, random
+from functools import partial
 
 import const.game as GAME
 import templates.tiles as TILE
@@ -12,12 +13,20 @@ from const.directions import NORTH, SOUTH, WEST, EAST
 DUNGEON = "GENERATED_LEVEL_TYPE_DUNGEON"
 ARENA = "GENERATED_LEVEL_TYPE_ARENA"
 
+ROOM_Y_RANGE = (5, 11)
+ROOM_X_RANGE = (7, 14)
+
+CORRIDOR_Y_RANGE = (5, 14)
+CORRIDOR_X_RANGE = (7, 20)
+
 RDG_LEVEL_PASSES = 300
-CORRIDOR_CHANCE = 0.3
+
+CORRIDOR_CHANCE_RANGE = (0, 0.3)
+ROOM_CHANCE_RANGE = (0.3, 1)
 
 
 def generate_tilemap_template(level_template, level_type=ARENA):
-    return RDG().generate_tilemap_template(level_template, level_type)
+    return RDG(level_template, level_type).generate_tilemap_template()
 
 
 def Rectangle(y, x, height, width):
@@ -30,7 +39,6 @@ def Rectangle(y, x, height, width):
     y_start and x_start are always calculated to be top left and y_limit and
     x_limit are calculated to be positive.
     """
-
     if height < 0:
         y_start = y + height + 1
         y_limit = y + 1
@@ -60,23 +68,22 @@ class _Rectangle(tuple):
 
 class RDG(object):
 
-    def generate_tilemap_template(self, level_template, level_type=ARENA):
+    def __init__(self, level_template, level_type=ARENA):
         self.level_template = level_template
         self.rows = level_template.rows
         self.cols = level_template.cols
+        self.level_type = level_type
 
-        if level_type == DUNGEON:
+    def generate_tilemap_template(self):
+
+        if self.level_type == DUNGEON:
             if self.level_template.tilemap_template is None:
                 self.init_tilemap_template()
                 self.make_initial_room()
 
-            for x in range(RDG_LEVEL_PASSES):
-                if random() < CORRIDOR_CHANCE:
-                    self.attempt_corridor()
-                else:
-                    self.attempt_room()
+            self.generator_loop()
 
-        elif level_type == ARENA:
+        elif self.level_type == ARENA:
             self.init_tilemap_template()
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
@@ -85,8 +92,50 @@ class RDG(object):
         if GAME.PASSAGE_DOWN not in self.level_template.passage_locations:
             self.add_passageway(GAME.PASSAGE_DOWN, TILE.STAIRS_DOWN)
 
+    def generator_loop(self):
+
+        rand_room_height = partial(randrange, *ROOM_Y_RANGE)
+        rand_room_width = partial(randrange, *ROOM_X_RANGE)
+        rand_corridor_height = partial(randrange, *CORRIDOR_Y_RANGE)
+        rand_corridor_width = partial(randrange, *CORRIDOR_X_RANGE)
+        room_start, room_limit = ROOM_CHANCE_RANGE
+        corridor_start, corridor_limit = CORRIDOR_CHANCE_RANGE
+
+        for _ in range(RDG_LEVEL_PASSES):
+
+            (door_y, door_x), (y_dir, x_dir) = self.get_wall_coord_and_dir()
+            artifact_roll = random()
+
+            if corridor_start <= artifact_roll < corridor_limit:
+
+                if y_dir:
+                    corridor_length = rand_corridor_height()
+                elif x_dir:
+                    corridor_length = rand_corridor_width()
+                self.attempt_corridor((door_y, door_x), (y_dir, x_dir), corridor_length)
+
+            elif room_start <= artifact_roll < room_limit:
+
+                height, width = rand_room_height(), rand_room_width()
+                if y_dir:
+                    room_y = door_y
+                    room_x = door_x - 1 - randrange(width - 2)
+                    height *= y_dir
+                elif x_dir:
+                    room_y = door_y - 1 - randrange(height - 2)
+                    room_x = door_x
+                    width *= x_dir
+                else:
+                    assert False
+
+                room = Rectangle(room_y, room_x, height, width)
+                self.attempt_room(room, (door_y, door_x))
+
+            else:
+                assert False
+
     def init_tilemap_template(self):
-        self.level_template.tilemap_template = [R for x in range(self.rows * self.cols)]
+        self.level_template.tilemap_template = [R for _ in range(self.rows * self.cols)]
 
     def add_passageway(self, passage, passage_tile_id):
         while True:
@@ -120,15 +169,10 @@ class RDG(object):
         self.make_room(Rectangle(y, x, height, width))
         self.level_template.set_tile_handle((y + 2, x + 2), TILE.BLACK_FLOOR)
 
-    def attempt_corridor(self):
-        (y, x), (y_dir, x_dir) = self.get_wall_coord_and_dir()
+    def attempt_corridor(self, door_coord, direction, length):
 
-        if y_dir:
-            length = randrange(5, 14)
-        elif x_dir:
-            length = randrange(7, 20)
-        else:
-            assert False
+        y, x = door_coord
+        y_dir, x_dir = direction
 
         # Corridors are three tiles wide, thus times three
         corridor_rectangle = Rectangle(y - x_dir, x - y_dir, y_dir * length +
@@ -144,28 +188,14 @@ class RDG(object):
         else:
             return False
 
-    def attempt_room(self):
-        (door_y, door_x), (y_dir, x_dir) = self.get_wall_coord_and_dir()
-        height = randrange(5, 11)
-        width = randrange(7, 14)
-        y_mod = randrange(height - 2)
-        x_mod = randrange(width - 2)
+    def attempt_room(self, rectangle, door_coord):
 
-        if y_dir:
-            y = door_y
-            x = door_x - 1 - x_mod
-            height *= y_dir
-        elif x_dir:
-            y = door_x - 1 - y_mod
-            x = door_x
-            width *= x_dir
-        else:
-            assert False
-
-        rectangle = Rectangle(y, x, height, width)
         if self.rectangle_consists_of_tiles(rectangle, (W, R)):
             self.make_room(rectangle)
-            self.level_template.set_tile_handle((door_y, door_x), F)
+            self.level_template.set_tile_handle(door_coord, F)
+            return True
+        else:
+            return False
 
     def get_free_coord(self):
         while True:
@@ -186,7 +216,6 @@ class RDG(object):
 
     def is_edge(self, coord):
         """Return a valid direction if the coordinate is an edge with a buildable direction."""
-
         y, x = coord
 
         # Exclude map border squares
@@ -213,7 +242,7 @@ class RDG(object):
 
     def is_legal(self, coord):
         y, x = coord
-        return 0 < y < self.rows and 0 < x < self.cols
+        return 0 <= y < self.rows and 0 <= x < self.cols
 
     def make_room(self, rectangle):
         y_start, x_start, y_limit, x_limit = rectangle
@@ -234,7 +263,6 @@ class RDG(object):
 
     def set_rectangle(self, rectangle, tile):
         """Set all the tiles in rectangle to given tile."""
-
         for coord in rectangle.iterate():
             self.level_template.set_tile_handle(coord, tile)
 

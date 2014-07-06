@@ -80,12 +80,12 @@ def reverse_vector(vector):
     return -vector[0], -vector[1]
 
 
-def anticlockwise(vector):
-    return -vector[1], vector[0]
-
-
 def clockwise(vector):
     return vector[1], -vector[0]
+
+
+def anticlockwise(vector):
+    return -vector[1], vector[0]
 
 
 def anticlockwise_45(vector):

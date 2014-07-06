@@ -83,16 +83,20 @@ class LevelTemplate(object):
             elif tile == TILE.STAIRS_DOWN:
                 self.passage_locations[GAME.PASSAGE_DOWN] = coord
 
-        self._add_walls()
+        self._transform_dynamic_walls()
+        self._fill_rock()
 
-    def _add_walls(self):
+    def _transform_dynamic_walls(self):
         self.tilemap_template = [TILE.WALL if self._tile_qualifies_as_wall(loc, tile)
                                  else tile for loc, tile in enumerate(self.tilemap_template)]
 
     def _tile_qualifies_as_wall(self, loc, tile_handle):
-        if tile_handle != TILE.ROCK:
+        if tile_handle != TILE.DYNAMIC_WALL:
             return False
         coord = loc // self.cols, loc % self.cols
         neighbor_coords = (add_vector(coord, direction) for direction in DIR.ALL_MINUS_STOP)
         valid_handles = (self.get_tile_handle(coord) for coord in neighbor_coords if self.legal_coord(coord))
-        return any(handle not in (TILE.WALL, TILE.ROCK) for handle in valid_handles)
+        return any(handle not in (TILE.DYNAMIC_WALL, TILE.WALL, TILE.ROCK) for handle in valid_handles)
+
+    def _fill_rock(self):
+        self.tilemap_template = [TILE.ROCK if tile == TILE.DYNAMIC_WALL else tile for tile in self.tilemap_template]
