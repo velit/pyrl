@@ -4,7 +4,7 @@ import random
 import path
 import const.directions as DIR
 import const.game as GAME
-from const import debug
+from config import debug
 
 from creature import Creature
 from turn_scheduler import TurnScheduler

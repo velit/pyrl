@@ -4,7 +4,7 @@ import time
 import mappings as MAPPING
 import const.colors as COLOR
 
-from const import debug
+from config import debug
 from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar
