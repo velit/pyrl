@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import const.creature_actions as CC
 import const.game as GAME
 import const.stats as STAT
-import debug
+import const.debug
 import mappings as MAPPING
 import state_store
 from ai import AI
@@ -58,7 +58,7 @@ class Game(object):
 
     def player_act(self):
         level = self.player.level
-        if debug.show_map:
+        if const.debug.show_map:
             io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(self.player.level, self.player)
         user_input.get_user_input_and_act(self, self.player)
@@ -198,7 +198,7 @@ class Game(object):
             io.msg(state_store.save(self, "pyrl.svg"))
 
     def update_view(self, level, creature):
-        old = self.current_vision if not debug.show_map else set()
+        old = self.current_vision if not const.debug.show_map else set()
         new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
         mod = level.pop_modified_locations()
         level.update_visited_locations(new - old)
@@ -207,16 +207,16 @@ class Game(object):
         io.draw(out_of_sight_memory_data)
 
         new_visible_data = level.get_visible_data(new - (old - mod))
-        io.draw(new_visible_data, debug.reverse)
+        io.draw(new_visible_data, const.debug.reverse)
 
         self.current_vision = new
 
     def redraw(self):
         io.l.clear()
         level = self.player.level
-        if debug.show_map:
+        if const.debug.show_map:
             io.draw(level.get_wallhack_data(level.get_coord_iter()))
         memory_data = level.get_memory_data(level.visited_locations)
         io.draw(memory_data)
         vision_data = level.get_visible_data(self.current_vision)
-        io.draw(vision_data, debug.reverse)
+        io.draw(vision_data, const.debug.reverse)

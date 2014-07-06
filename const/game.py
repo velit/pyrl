@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from os.path import join
+
 OPTIMIZATION = True
 
 MSG_BAR_HEIGHT = 2
@@ -26,6 +28,7 @@ INPUT_INTERVAL = min(ANIMATION_DELAY / 10, 0.01)
 
 GAME_NAME = "pyrl"
 DATA_FOLDER = "data"
+PROFILE_DATA_PATH = join(DATA_FOLDER, "profiling_results")
 SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 
 ENCODING = "utf-8"

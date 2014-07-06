@@ -1,16 +1,20 @@
 test:
-	py.test
+	py.test -k-slow
 
 profile-test:
-	python -m profile/profile
-	less profiling_results
+	python -m profile_util.run_profiler
+	less data/profiling_results
+
+profile-pyrl:
+	python pyrl.py -p
+	less data/profiling_results
 
 debug:
 	python -m pdb pyrl.py
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -f errors.err profiling_results
+	rm -f data/errors.err data/profiling_results
 
 release:
 	python setup.py sdist

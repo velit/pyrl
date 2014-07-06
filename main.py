@@ -1,10 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
-import cProfile
+from cProfile import Profile
+
 import state_store
+import profile_util
 from const.game import NCURSES
 from window.window_system import WindowSystem
+
 
 # Global object for the input and output window system
 # Check the WindowSystem class for the implementation
@@ -36,9 +39,14 @@ def start():
         game = Game()
 
     if options.profile:
-        cProfile.run("game.main_loop()")
-    else:
-        game.main_loop()
+        profiler = Profile()
+        profiler.enable()
+
+    game.main_loop()
+
+    if options.profile:
+        profiler.disable()
+        profile_util.write_profile_results(profiler)
 
 
 def load(name):

@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import debug
+from const import debug
 import const.colors as COLOR
 
 from main import io
@@ -53,7 +53,7 @@ def _a_star(start, goal, neighbors, heuristic):
 
 
 def _iterate_path(came_from, start, goal):
-    """Iterates the path structure returned by _path()."""
+    """Iterate the path structure returned by _path()."""
     cur = start
     while cur != goal:
         cur = came_from[cur]

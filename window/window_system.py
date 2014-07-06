@@ -1,10 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
-import debug
 import mappings as MAPPING
 import const.colors as COLOR
 
+from const import debug
 from window.base_window import BaseWindow
 from window.message import MessageBar
 from window.status import StatusBar

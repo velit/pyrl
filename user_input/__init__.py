@@ -6,12 +6,12 @@ import const.colors as COLOR
 import const.directions as DIR
 import const.game as GAME
 import const.keys as KEY
-import debug
 import level_template
 import mappings as MAPPING
 import rdg
 from .inventory import equipment
 from .walk_mode import walk_mode, walk_mode_init
+from const import debug
 from generic_algorithms import add_vector
 from main import io
 
