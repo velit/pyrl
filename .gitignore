@@ -2,7 +2,7 @@
 *.swp
 *.pyc
 tags
-data/pyrl.svg
+data
 Session.vim
 errors.err
 profiling_results

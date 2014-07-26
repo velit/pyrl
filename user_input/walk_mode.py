@@ -7,6 +7,7 @@ from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise,
 from main import io
 
 
+WALK_IN_PLACE = (None, None)
 CORRIDOR = (False, False)
 LEFT = (True, False)
 RIGHT = (False, True)
@@ -33,28 +34,30 @@ def walk_mode_init(game, creature, userinput, direction=None):
 def _walk_mode_init(game, creature, direction):
     if game.creature_move(creature, direction):
         walk_type = _get_walk_type(creature, direction)
-        n = _get_neighbor_passables(creature, direction)
-        forward, upper_left, upper_right, left, right, lower_left, lower_right = n
-        if forward:
-            if left and not upper_left and not lower_left \
-                    or right and not upper_right and not lower_right:
-                return
-        else:
-            if left and lower_left \
-                    or right and lower_right:
-                return
-            walk_type = CORRIDOR
+        if walk_type != WALK_IN_PLACE:
+            (forward, upper_left, upper_right, left, right, lower_left,
+                    lower_right) = _get_neighbor_passables(creature, direction)
+            if forward:
+                if (left and not upper_left and not lower_left or
+                        right and not upper_right and not lower_right):
+                    return None
+            else:
+                if left and lower_left or right and lower_right:
+                    return None
+                walk_type = CORRIDOR
 
         return direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME)
 
 
 def walk_mode(game, creature, userinput):
     if not _any_creatures_visible(game, creature):
-        direction, old_walk_type, timestamp, msg_time = userinput.walk_mode_data
-        if old_walk_type == CORRIDOR:
-            result = _corridor_walk_type(game, creature, direction)
+        old_direction, old_walk_type, timestamp, msg_time = userinput.walk_mode_data
+        if old_walk_type == WALK_IN_PLACE:
+            result = old_direction, old_walk_type
+        elif old_walk_type == CORRIDOR:
+            result = _corridor_walk_type(game, creature, old_direction)
         else:
-            result = _normal_walk_type(game, creature, direction, old_walk_type)
+            result = _normal_walk_type(game, creature, old_direction, old_walk_type)
 
         if result is not None:
             new_direction, new_walk_type = result
@@ -127,8 +130,11 @@ def _get_walk_type(creature, direction):
     elif direction in DIR.DIAGONALS:
         left = _passable(creature, anticlockwise_45(direction))
         right = _passable(creature, clockwise_45(direction))
+    elif direction == DIR.STOP:
+        left = None
+        right = None
     else:
-        raise Exception("Not a valid direction {0}".format(direction))
+        raise Exception("Not a valid moving direction {0}".format(direction))
     return (left, right)
 
 

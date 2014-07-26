@@ -1,10 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
 import curses.ascii
 
 import const.colors as COLOR
 import const.game as GAME
 import const.keys as KEY
+from config import debug
 
 
 class Curses256ColorDict(dict):
@@ -130,6 +132,7 @@ CURSES_KEYS = {
     curses.ascii.TAB: KEY.TAB,
     curses.ascii.SP: KEY.SPACE,
     curses.ascii.ESC: KEY.ESC,
+    curses.ERR: KEY.NO_INPUT,
     curses.KEY_UP: KEY.UP,
     curses.KEY_DOWN: KEY.DOWN,
     curses.KEY_LEFT: KEY.LEFT,
@@ -262,15 +265,22 @@ def _esc_key_handler(window, ch):
 
 
 def _interpret_ch(ch):
+
     if ch == curses.KEY_RESIZE:
         _window_resized()
-    if ch in CURSES_KEYS:
-        return CURSES_KEYS[ch]
-    ch = curses.ascii.unctrl(ch)
-    if '^' in ch:
-        return ch.lower()
+
+    elif ch in CURSES_KEYS:
+        ch = CURSES_KEYS[ch]
+
     else:
-        return ch
+        ch = curses.ascii.unctrl(ch)
+        if '^' in ch:
+            ch = ch.lower()
+
+    if debug.show_keycodes and ch != KEY.NO_INPUT:
+        logging.debug("User input: {}".format(ch))
+
+    return ch
 
 
 def get_key(window):
@@ -278,13 +288,14 @@ def get_key(window):
 
 
 def check_key(window):
+    """Non-blocking version of get_key."""
     window.nodelay(True)
-    ch = window.getch()
+    ch = get_key(window)
     window.nodelay(False)
-    if ch == curses.ERR:
-        return KEY.NO_INPUT
+    if ch != curses.ERR:
+        return ch
     else:
-        return _interpret_ch(_esc_key_handler(window, ch))
+        return KEY.NO_INPUT
 
 
 def clear(window):

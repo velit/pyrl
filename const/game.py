@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import logging
 from os.path import join
 
 
@@ -29,6 +30,8 @@ INPUT_INTERVAL = min(ANIMATION_DELAY / 10, 0.01)
 
 GAME_NAME = "pyrl"
 DATA_FOLDER = "data"
+LOG_LEVEL = logging.DEBUG
+LOG_FILE = join(DATA_FOLDER, "pyrl.log")
 PROFILE_DATA_PATH = join(DATA_FOLDER, "profiling_results")
 SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 

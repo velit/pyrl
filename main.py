@@ -1,11 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
+import logging
 from cProfile import Profile
 
 import profile_util
 import state_store
-from const.game import NCURSES
+from const.game import NCURSES, LOG_FILE, LOG_LEVEL
 from window.window_system import WindowSystem
 
 
@@ -19,7 +20,13 @@ def init_window_system(cursor_library):
     io = WindowSystem(cursor_library)
 
 
+def init_logger_system():
+    logging.basicConfig(filename=LOG_FILE, level=LOG_LEVEL)
+
+
 def start():
+
+    init_logger_system()
     if io.cursor_lib.get_implementation() == NCURSES:
         # check to see the window is big enough
         io.cursor_lib._window_resized()

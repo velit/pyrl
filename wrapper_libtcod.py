@@ -97,7 +97,7 @@ def init(root_window):
                               GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
 
 
-def init_handle(handle):
+def _init_handle(handle):
     libtcod.console_set_default_foreground(handle, DEFAULT_FG)
     libtcod.console_set_default_background(handle, DEFAULT_BG)
 
@@ -105,7 +105,7 @@ def init_handle(handle):
 def new_window(size):
     rows, columns = size
     handle = libtcod.console_new(columns, rows)
-    init_handle(handle)
+    _init_handle(handle)
     return handle
 
 
@@ -164,13 +164,13 @@ def draw_reverse(handle, char_payload_sequence):
 
 
 def get_key(handle_not_used):
-    key = KEY.NO_INPUT
-    while key == KEY.NO_INPUT:
+    while True:
         key_event = libtcod.Key()
         mouse_event = libtcod.Mouse()
         libtcod.sys_wait_for_event(libtcod.EVENT_KEY_PRESS, key_event, mouse_event, False)
         key = interpret_event(key_event)
-    return key
+        if key != KEY.NO_INPUT:
+            return key
 
 
 def check_key(handle_not_used):

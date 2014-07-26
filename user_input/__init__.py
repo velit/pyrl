@@ -155,7 +155,7 @@ def print_history(game, creature):
 
 def debug_action(game, creature, userinput):
     level = creature.level
-    c = io.get_key("Avail cmds: vclbdhkpors+-")
+    c = io.get_key("Avail cmds: bcdhikloprsvy+-")
     if c == 'v':
         debug.show_map = not debug.show_map
         game.redraw()
@@ -201,6 +201,9 @@ def debug_action(game, creature, userinput):
         io.suspend()
         code.interact(local=locals())
         io.resume()
+    elif c == 'y':
+        debug.show_keycodes = not debug.show_keycodes
+        io.msg("Input code debug set to {}".format(debug.show_keycodes))
     elif c == 'c':
         import curses
         io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())

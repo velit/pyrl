@@ -78,4 +78,4 @@ EQUIPMENT_SLOT_BODY = 'b'
 EQUIPMENT_SLOT_RIGHT_HAND = 'r'
 EQUIPMENT_SLOT_FEET = 'f'
 
-INVENTORY_KEYS = tuple(letter for letter in string.ascii_lowercase if letter != CANCEL)
+INVENTORY_KEYS = tuple(filter(lambda c: c != CANCEL, string.ascii_lowercase))
