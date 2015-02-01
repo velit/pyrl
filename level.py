@@ -8,23 +8,8 @@ import path
 from config import debug
 from creature import Creature
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
+from generic_structures import TwoDimensionalList
 from turn_scheduler import TurnScheduler
-
-
-class TileStructure(list):
-
-    def __init__(self, iterable, cols):
-        super(TileStructure, self).__init__(iterable)
-        self._cols = cols
-
-    def __getitem__(self, coord):
-        return list.__getitem__(self, coord[0] * self._cols + coord[1])
-
-    def __setitem__(self, coord, value):
-        return list.__setitem__(self, coord[0] * self._cols + coord[1], value)
-
-    def __delitem__(self, coord):
-        return list.__delitem__(self, coord[0] * self._cols + coord[1])
 
 
 class Level(object):
@@ -36,7 +21,7 @@ class Level(object):
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
-        self.tiles = TileStructure(level_template.tilemap(), self.cols)
+        self.tiles = TwoDimensionalList(level_template.tilemap(), self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
         self.turn_scheduler = TurnScheduler()

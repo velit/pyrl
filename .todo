@@ -102,6 +102,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1402756261" done="1403627050">
+        Make rdg.py use a class
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -270,12 +276,6 @@
     <note priority="veryhigh" time="1335477455">
         Make a priority queue based scheduling
     </note>
-    <note priority="veryhigh" time="1402756261" done="1403627050">
-        Make rdg.py use a class
-        <comment>
-            done
-        </comment>
-    </note>
     <note priority="veryhigh" time="1402783190">
         Add a wrapper that prints to player or messages AI based on processed creature actions
     </note>
@@ -293,6 +293,9 @@
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method
+    </note>
+    <note priority="medium" time="1420977210">
+        Mark things that shouldn't be pickled instead of a hack with global vars to bypass the need. (user_input in Game)
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels

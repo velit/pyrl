@@ -184,6 +184,8 @@ def init(root_window):
 
 def init_handle(window):
     window.keypad(True)
+    window.immedok(False)
+    window.scrollok(False)
 
 
 def new_window(size):

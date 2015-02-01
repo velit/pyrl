@@ -12,10 +12,10 @@ except ImportError:
     exit()
 
 
-
 def start(curses_window):
     wrapper_ncurses.init(curses_window)
     main.init_window_system(wrapper_ncurses)
     main.start()
+
 
 curses.wrapper(start)

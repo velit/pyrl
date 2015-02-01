@@ -18,6 +18,7 @@ from world import World
 from world_template import LevelNotFound
 
 
+# Intentionally global due to Game getting pickled
 user_input = UserInput()
 
 
