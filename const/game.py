@@ -35,8 +35,6 @@ LOG_FILE = join(DATA_FOLDER, "pyrl.log")
 PROFILE_DATA_PATH = join(DATA_FOLDER, "profiling_results")
 SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 
-ENCODING = "utf-8"
-
 PASSAGE_UP = "up"
 PASSAGE_DOWN = "down"
 PASSAGE_RANDOM = "random"

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import locale
 import const.colors as COLOR
 import const.game as GAME
 import const.keys as KEY
@@ -22,13 +23,15 @@ class LibTCODWrapper(object):
     def __init__(self):
 
         libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
-                                        libtcod.FONT_TYPE_GREYSCALE |
-                                        libtcod.FONT_LAYOUT_ASCII_INROW)
+                                        libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
         libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
                                   GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
 
         self.default_fg = libtcod.white
         self.default_bg = libtcod.black
+
+        locale.setlocale(locale.LC_ALL, "")
+        self.encoding = locale.getpreferredencoding()
 
         C = COLOR
         lC = libtcod.Color
@@ -106,16 +109,16 @@ class LibTCODWrapper(object):
 
     def addch(self, window, y, x, char):
         symbol, (fg, bg) = char
-        libtcod.console_put_char_ex(window, x, y, symbol.encode(GAME.ENCODING), self.color_map[fg], self.color_map[bg])
+        libtcod.console_put_char_ex(window, x, y, symbol.encode(self.encoding), self.color_map[fg], self.color_map[bg])
 
     def addstr(self, window, y, x, string, color=None):
         if color is None:
-            libtcod.console_print(window, x, y, string.encode(GAME.ENCODING))
+            libtcod.console_print(window, x, y, string.encode(self.encoding))
         else:
             fg, bg = color
             libtcod.console_set_default_foreground(window, self.color_map[fg])
             libtcod.console_set_default_background(window, self.color_map[bg])
-            libtcod.console_print(window, x, y, string.encode(GAME.ENCODING))
+            libtcod.console_print(window, x, y, string.encode(self.encoding))
             libtcod.console_set_default_foreground(window, self.default_fg)
             libtcod.console_set_default_background(window, self.default_bg)
 
@@ -123,13 +126,13 @@ class LibTCODWrapper(object):
         f = libtcod.console_put_char_ex
         color = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(window, x, y, symbol.encode(GAME.ENCODING), color[fg], color[bg])
+            f(window, x, y, symbol.encode(self.encoding), color[fg], color[bg])
 
     def draw_reverse(self, window, char_payload_sequence):
         f = libtcod.console_put_char_ex
         color = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(window, x, y, symbol.encode(GAME.ENCODING), color[bg], color[fg])
+            f(window, x, y, symbol.encode(self.encoding), color[bg], color[fg])
 
     def get_key(self, window_not_used):
         while True:

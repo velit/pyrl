@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import curses
 import curses.ascii
+import locale
 
 import const.colors as COLOR
 import const.game as GAME
@@ -118,6 +119,9 @@ class NCursesWrapper(object):
             self.color_map = CursesColorDict()
         self._window_resized()
 
+        locale.setlocale(locale.LC_ALL, "")
+        self.encoding = locale.getpreferredencoding()
+
         c = curses
         self.key_map = {
             c.ERR: KEY.NO_INPUT,         c.KEY_A1: KEY.NUMPAD_7,           c.KEY_A3: KEY.NUMPAD_9,
@@ -177,25 +181,25 @@ class NCursesWrapper(object):
 
     def addch(self, window, y, x, char):
         symbol, color = char
-        window.addch(y, x, symbol.encode(GAME.ENCODING), self.color_map[color])
+        window.addch(y, x, symbol.encode(self.encoding), self.color_map[color])
 
     def addstr(self, window, y, x, string, color=None):
         if color is None:
-            window.addstr(y, x, string.encode(GAME.ENCODING))
+            window.addstr(y, x, string.encode(self.encoding))
         else:
-            window.addstr(y, x, string.encode(GAME.ENCODING), self.color_map[color])
+            window.addstr(y, x, string.encode(self.encoding), self.color_map[color])
 
     def draw(self, window, char_payload_sequence):
         f = window.addch
         COLOR_LOOKUP = self.color_map
         for y, x, (symbol, color) in char_payload_sequence:
-            f(y, x, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[color])
+            f(y, x, symbol.encode(self.encoding), COLOR_LOOKUP[color])
 
     def draw_reverse(self, window, char_payload_sequence):
         f = window.addch
         COLOR_LOOKUP = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(y, x, symbol.encode(GAME.ENCODING), COLOR_LOOKUP[bg, fg])
+            f(y, x, symbol.encode(self.encoding), COLOR_LOOKUP[bg, fg])
 
     def _esc_key_handler(self, window, ch):
         if ch == curses.ascii.ESC:
