@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import main
-from wrapper_ncurses import NCursesWrapper
+from io_wrappers.ncurses import NCursesWrapper
 
 
 try:
