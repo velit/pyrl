@@ -1,3 +1,5 @@
+"""pyrl; Python roguelike by Tapani Kiiskinen."""
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import const.creature_actions as CC
@@ -25,7 +27,6 @@ user_input = UserInput()
 class Game(object):
 
     def __init__(self):
-        """pyrl; Python roguelike by Tapani Kiiskinen."""
         self.turn_counter = 0
         self.current_vision = set()
         self.player = Player()

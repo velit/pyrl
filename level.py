@@ -8,7 +8,7 @@ import path
 from config import debug
 from creature import Creature
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
-from generic_structures import TwoDimensionalFlatList
+from generic_structures import List2D
 from turn_scheduler import TurnScheduler
 
 
@@ -21,7 +21,7 @@ class Level(object):
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
-        self.tiles = TwoDimensionalFlatList(level_template.tilemap(), self.cols)
+        self.tiles = List2D(level_template.tilemap(), self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
         self.turn_scheduler = TurnScheduler()

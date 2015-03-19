@@ -11,7 +11,7 @@ try:
 except Exception as e:
     import sys
     print("Couldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
-    print("This can potentially happen because libsdl isn't installed", file=sys.stderr)
+    print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
     sys.exit(1)
 
 
