@@ -11,36 +11,36 @@ class BaseWindow(object):
 
     def __init__(self, cursor_lib, size, screen_position):
         self.cursor_lib = cursor_lib
-        self.h = self.cursor_lib.new_window(size)
+        self.cursor_win = self.cursor_lib.new_window(size)
         self.rows, self.cols = size
         self.screen_position = screen_position
 
     def addch(self, y, x, char):
-        self.cursor_lib.addch(self.h, y, x, char)
+        self.cursor_win.addch(y, x, char)
 
     def addstr(self, y, x, string, color=None):
-        self.cursor_lib.addstr(self.h, y, x, string, color)
+        self.cursor_win.addstr(y, x, string, color)
 
     def draw(self, char_payload_sequence):
-        self.cursor_lib.draw(self.h, char_payload_sequence)
+        self.cursor_win.draw(char_payload_sequence)
 
     def draw_reverse(self, char_payload_sequence):
-        self.cursor_lib.draw_reverse(self.h, char_payload_sequence)
+        self.cursor_win.draw_reverse(char_payload_sequence)
 
     def clear(self):
-        self.cursor_lib.clear(self.h)
+        self.cursor_win.clear()
 
     # Blocking
     def get_key(self, refresh=False):
         if refresh:
             self.refresh()
-        return self.cursor_lib.get_key(self.h)
+        return self.cursor_win.get_key()
 
     # Non-blocking
     def check_key(self, refresh=False):
         if refresh:
             self.refresh()
-        return self.cursor_lib.check_key(self.h)
+        return self.cursor_win.check_key()
 
     # Blocking
     def selective_get_key(self, key_set, refresh=False):
@@ -66,7 +66,7 @@ class BaseWindow(object):
 
     def blit(self):
         size = self.rows, self.cols
-        self.cursor_lib.blit(self.h, size, self.screen_position)
+        self.cursor_win.blit(size, self.screen_position)
 
     def refresh(self):
         self.blit()

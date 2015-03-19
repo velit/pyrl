@@ -104,6 +104,23 @@ class CursesColorDict(dict):
             self.pair_nr += 1
             return color_pair
 
+c = curses
+key_map = {
+    c.ERR: KEY.NO_INPUT,         c.KEY_A1: KEY.NUMPAD_7,           c.KEY_A3: KEY.NUMPAD_9,
+    c.KEY_B2: KEY.NUMPAD_5,      c.KEY_BACKSPACE: KEY.BACKSPACE,   c.KEY_C1: KEY.NUMPAD_1,
+    c.KEY_C3: KEY.NUMPAD_3,      c.KEY_DC: KEY.DELETE,             c.KEY_DOWN: KEY.DOWN,
+    c.KEY_END: KEY.END,          c.KEY_F1: KEY.F1,                 c.KEY_F2: KEY.F2,
+    c.KEY_F3: KEY.F3,            c.KEY_F4: KEY.F4,                 c.KEY_F5: KEY.F5,
+    c.KEY_F6: KEY.F6,            c.KEY_F7: KEY.F7,                 c.KEY_F8: KEY.F8,
+    c.KEY_F9: KEY.F9,            c.KEY_F10: KEY.F10,               c.KEY_F11: KEY.F11,
+    c.KEY_F12: KEY.F12,          c.KEY_FIND: KEY.NUMPAD_7,         c.KEY_HOME: KEY.HOME,
+    c.KEY_IC: KEY.INSERT,        c.KEY_LEFT: KEY.LEFT,             c.KEY_NPAGE: KEY.PAGE_DOWN,
+    c.KEY_PPAGE: KEY.PAGE_UP,    c.KEY_RESIZE: KEY.WINDOW_RESIZE,  c.KEY_RIGHT: KEY.RIGHT,
+    c.KEY_SELECT: KEY.NUMPAD_1,  c.KEY_UP: KEY.UP,                 c.ascii.CR: KEY.ENTER,
+    c.ascii.ESC: KEY.ESC,        c.ascii.SP: KEY.SPACE,            c.ascii.TAB: KEY.TAB,
+}
+del c
+
 
 class NCursesWrapper(object):
 
@@ -117,59 +134,26 @@ class NCursesWrapper(object):
             self.color_map = Curses256ColorDict()
         else:
             self.color_map = CursesColorDict()
+
         self._window_resized()
 
-        locale.setlocale(locale.LC_ALL, "")
-        self.encoding = locale.getpreferredencoding()
-
-        c = curses
-        self.key_map = {
-            c.ERR: KEY.NO_INPUT,         c.KEY_A1: KEY.NUMPAD_7,           c.KEY_A3: KEY.NUMPAD_9,
-            c.KEY_B2: KEY.NUMPAD_5,      c.KEY_BACKSPACE: KEY.BACKSPACE,   c.KEY_C1: KEY.NUMPAD_1,
-            c.KEY_C3: KEY.NUMPAD_3,      c.KEY_DC: KEY.DELETE,             c.KEY_DOWN: KEY.DOWN,
-            c.KEY_END: KEY.END,          c.KEY_F1: KEY.F1,                 c.KEY_F2: KEY.F2,
-            c.KEY_F3: KEY.F3,            c.KEY_F4: KEY.F4,                 c.KEY_F5: KEY.F5,
-            c.KEY_F6: KEY.F6,            c.KEY_F7: KEY.F7,                 c.KEY_F8: KEY.F8,
-            c.KEY_F9: KEY.F9,            c.KEY_F10: KEY.F10,               c.KEY_F11: KEY.F11,
-            c.KEY_F12: KEY.F12,          c.KEY_FIND: KEY.NUMPAD_7,         c.KEY_HOME: KEY.HOME,
-            c.KEY_IC: KEY.INSERT,        c.KEY_LEFT: KEY.LEFT,             c.KEY_NPAGE: KEY.PAGE_DOWN,
-            c.KEY_PPAGE: KEY.PAGE_UP,    c.KEY_RESIZE: KEY.WINDOW_RESIZE,  c.KEY_RIGHT: KEY.RIGHT,
-            c.KEY_SELECT: KEY.NUMPAD_1,  c.KEY_UP: KEY.UP,                 c.ascii.CR: KEY.ENTER,
-            c.ascii.ESC: KEY.ESC,        c.ascii.SP: KEY.SPACE,            c.ascii.TAB: KEY.TAB,
-        }
-
-    def init_handle(self, window):
-        window.keypad(True)
-        window.immedok(False)
-        window.scrollok(False)
-
     def new_window(self, size):
-        rows, columns = size
-
-        # Writing to the last cell of a window raises an exception because
-        # the automatic cursor move to the next cell is illegal. The +1 fixes that.
-        window = curses.newpad(rows + 1, columns)
-
-        self.init_handle(window)
-        return window
+        return _NCursesWindow(size, self)
 
     def _window_resized(self):
-        rows, cols = self.get_dimensions(self.root_window)
+        rows, cols = self.get_root_window_dimensions()
         while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
             message = "Game needs at least a screen size of {}x{} while the current size is {}x{}. " \
                 "Please resize the screen or press Q to quit immediately."
             self.addstr(self.root_window, 0, 0, message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows))
             if self.root_window.getch() == "Q":
                 exit()
-            rows, cols = self.get_dimensions(self.root_window)
+            rows, cols = self.get_root_window_dimensions()
             self.root_window.erase()
             self.root_window.refresh()
 
     def flush(self):
         curses.doupdate()
-
-    def get_root_window(self):
-        return self.root_window
 
     def suspend(self):
         curses.def_prog_mode()
@@ -179,33 +163,57 @@ class NCursesWrapper(object):
     def resume(self):
         curses.reset_prog_mode()
 
-    def addch(self, window, y, x, char):
+    def get_implementation(self):
+        return GAME.NCURSES
+
+    def get_root_window_dimensions(self):
+        return self.root_window.getmaxyx()
+
+
+class _NCursesWindow(object):
+
+    def __init__(self, size, cursor_lib):
+        self.cursor_lib = cursor_lib
+        rows, columns = size
+
+        # Writing to the last cell of a window raises an exception because
+        # the automatic cursor move to the next cell is illegal. The +1 fixes that.
+        self.window = curses.newpad(rows + 1, columns)
+
+        self.window.keypad(True)
+        self.window.immedok(False)
+        self.window.scrollok(False)
+
+        locale.setlocale(locale.LC_ALL, "")
+        self.encoding = locale.getpreferredencoding()
+
+    def addch(self, y, x, char):
         symbol, color = char
-        window.addch(y, x, symbol.encode(self.encoding), self.color_map[color])
+        self.window.addch(y, x, symbol.encode(self.encoding), self.cursor_lib.color_map[color])
 
-    def addstr(self, window, y, x, string, color=None):
+    def addstr(self, y, x, string, color=None):
         if color is None:
-            window.addstr(y, x, string.encode(self.encoding))
+            self.window.addstr(y, x, string.encode(self.encoding))
         else:
-            window.addstr(y, x, string.encode(self.encoding), self.color_map[color])
+            self.window.addstr(y, x, string.encode(self.encoding), self.cursor_lib.color_map[color])
 
-    def draw(self, window, char_payload_sequence):
-        f = window.addch
-        COLOR_LOOKUP = self.color_map
+    def draw(self, char_payload_sequence):
+        f = self.window.addch
+        local_color = self.cursor_lib.color_map
         for y, x, (symbol, color) in char_payload_sequence:
-            f(y, x, symbol.encode(self.encoding), COLOR_LOOKUP[color])
+            f(y, x, symbol.encode(self.encoding), local_color[color])
 
-    def draw_reverse(self, window, char_payload_sequence):
-        f = window.addch
-        COLOR_LOOKUP = self.color_map
+    def draw_reverse(self, char_payload_sequence):
+        f = self.window.addch
+        local_color = self.cursor_lib.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(y, x, symbol.encode(self.encoding), COLOR_LOOKUP[bg, fg])
+            f(y, x, symbol.encode(self.encoding), local_color[bg, fg])
 
-    def _esc_key_handler(self, window, ch):
+    def _esc_key_handler(self, ch):
         if ch == curses.ascii.ESC:
-            window.nodelay(True)
-            second_ch = window.getch()
-            window.nodelay(False)
+            self.window.nodelay(True)
+            second_ch = self.window.getch()
+            self.window.nodelay(False)
             if second_ch != curses.ERR:
                 return curses.ascii.alt(second_ch)
         return ch
@@ -214,8 +222,8 @@ class NCursesWrapper(object):
 
         if ch == curses.KEY_RESIZE:
             self._window_resized()
-        elif ch in self.key_map:
-            ch = self.key_map[ch]
+        elif ch in key_map:
+            ch = key_map[ch]
         else:
             ch = curses.ascii.unctrl(ch)
             if '^' in ch:
@@ -226,39 +234,35 @@ class NCursesWrapper(object):
 
         return ch
 
-    def get_key(self, window):
-        return self._interpret_ch(self._esc_key_handler(window, window.getch()))
+    def get_key(self):
+        return self._interpret_ch(self._esc_key_handler(self.window.getch()))
 
-    def check_key(self, window):
+    def check_key(self):
         """Non-blocking version of get_key."""
-        window.nodelay(True)
-        ch = self.get_key(window)
-        window.nodelay(False)
+        self.window.nodelay(True)
+        ch = self.get_key()
+        self.window.nodelay(False)
         if ch != curses.ERR:
             return ch
         else:
             return KEY.NO_INPUT
 
-    def clear(self, window):
-        window.erase()
+    def clear(self):
+        self.window.erase()
 
-    def blit(self, window, size, screen_position):
-        screen_rows, screen_cols = self.get_dimensions(self.root_window)
+    def blit(self, size, screen_position):
+        screen_rows, screen_cols = self.cursor_lib.get_root_window_dimensions()
         if screen_rows < GAME.SCREEN_ROWS or screen_cols < GAME.SCREEN_COLS:
             self._window_resized()
         rows, cols = size
         y, x = screen_position
-        window.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
+        self.window.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
 
-    def get_dimensions(self, window):
-        rows, columns = window.getmaxyx()
-        return rows, columns
+    def get_dimensions(self):
+        return self.window.getmaxyx()
 
-    def move(self, window, y, x):
-        window.move(y, x)
+    def move(self, y, x):
+        self.window.move(y, x)
 
-    def get_cursor_pos(self, window):
-        return window.getyx()
-
-    def get_implementation(self):
-        return GAME.NCURSES
+    def get_cursor_pos(self):
+        return self.window.getyx()

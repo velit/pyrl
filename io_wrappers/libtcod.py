@@ -16,82 +16,68 @@ except Exception as e:
     sys.exit(1)
 
 
+C, lC = COLOR, libtcod.Color
+color_map = {
+
+    C.BASE_RED: lC(175, 0, 0),              C.BASE_GREEN: lC(0, 175, 0),
+    C.BASE_BLUE: lC(0, 0, 175),
+
+    C.BASE_PURPLE: lC(175, 0, 175),         C.BASE_CYAN: lC(0, 175, 175),
+    C.BASE_YELLOW: lC(255, 255, 95),        C.BASE_BROWN: lC(150, 75, 0),
+
+    C.BASE_DARK_BLUE: lC(0, 0, 175),        C.BASE_DARK_BROWN: lC(135, 95, 0),
+
+    C.BASE_LIGHT_RED: lC(255, 95, 95),      C.BASE_LIGHT_GREEN: lC(95, 255, 95),
+    C.BASE_LIGHT_BLUE: lC(95, 95, 255),
+
+    C.BASE_LIGHT_PURPLE: lC(255, 95, 255),  C.BASE_LIGHT_CYAN: lC(95, 255, 255),
+
+    C.BASE_WHITE: lC(255, 255, 255),        C.BASE_LIGHT: lC(218, 218, 218),
+    C.BASE_NORMAL: lC(187, 187, 187),       C.BASE_LIGHT_GRAY: lC(168, 168, 168),
+    C.BASE_GRAY: lC(138, 138, 138),         C.BASE_DARK_GRAY: lC(108, 108, 108),
+    C.BASE_DARK: lC(78, 78, 78),            C.BASE_DARKER: lC(48, 48, 48),
+    C.BASE_DARKEST: lC(20, 20, 20),         C.BASE_BLACK: lC(0, 0, 0),
+}
+del C, lC
+
+key_map = {
+    libtcod.KEY_ENTER: KEY.ENTER,          libtcod.KEY_TAB: KEY.TAB,
+    libtcod.KEY_ESCAPE: KEY.ESC,           libtcod.KEY_SPACE: KEY.SPACE,
+    libtcod.KEY_LEFT: KEY.LEFT,            libtcod.KEY_RIGHT: KEY.RIGHT,
+    libtcod.KEY_UP: KEY.UP,                libtcod.KEY_DOWN: KEY.DOWN,
+    libtcod.KEY_HOME: KEY.HOME,            libtcod.KEY_END: KEY.END,
+    libtcod.KEY_PAGEDOWN: KEY.PAGE_DOWN,   libtcod.KEY_PAGEUP: KEY.PAGE_UP,
+    libtcod.KEY_INSERT: KEY.INSERT,        libtcod.KEY_DELETE: KEY.DELETE,
+    libtcod.KEY_BACKSPACE: KEY.BACKSPACE,  libtcod.KEY_F1: KEY.F1,
+    libtcod.KEY_F2: KEY.F2,                libtcod.KEY_F3: KEY.F3,
+    libtcod.KEY_F4: KEY.F4,                libtcod.KEY_F5: KEY.F5,
+    libtcod.KEY_F6: KEY.F6,                libtcod.KEY_F7: KEY.F7,
+    libtcod.KEY_F8: KEY.F8,                libtcod.KEY_F9: KEY.F9,
+    libtcod.KEY_F10: KEY.F10,              libtcod.KEY_F11: KEY.F11,
+    libtcod.KEY_F12: KEY.F12,              libtcod.KEY_KP0: KEY.NUMPAD_0,
+    libtcod.KEY_KP1: KEY.NUMPAD_1,         libtcod.KEY_KP2: KEY.NUMPAD_2,
+    libtcod.KEY_KP3: KEY.NUMPAD_3,         libtcod.KEY_KP4: KEY.NUMPAD_4,
+    libtcod.KEY_KP5: KEY.NUMPAD_5,         libtcod.KEY_KP6: KEY.NUMPAD_6,
+    libtcod.KEY_KP7: KEY.NUMPAD_7,         libtcod.KEY_KP8: KEY.NUMPAD_8,
+    libtcod.KEY_KP9: KEY.NUMPAD_9,         libtcod.KEY_NONE: KEY.NO_INPUT,
+}
+
+
 class LibTCODWrapper(object):
 
-    _ROOT_WIN = 0
-
     def __init__(self):
+        self.root_window = 0
 
         libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
                                         libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
         libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
                                   GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
 
-        self.default_fg = libtcod.white
-        self.default_bg = libtcod.black
-
-        locale.setlocale(locale.LC_ALL, "")
-        self.encoding = locale.getpreferredencoding()
-
-        C = COLOR
-        lC = libtcod.Color
-        self.color_map = {
-
-            C.BASE_RED: lC(175, 0, 0),              C.BASE_GREEN: lC(0, 175, 0),
-            C.BASE_BLUE: lC(0, 0, 175),
-
-            C.BASE_PURPLE: lC(175, 0, 175),         C.BASE_CYAN: lC(0, 175, 175),
-            C.BASE_YELLOW: lC(255, 255, 95),        C.BASE_BROWN: lC(150, 75, 0),
-
-            C.BASE_DARK_BLUE: lC(0, 0, 175),        C.BASE_DARK_BROWN: lC(135, 95, 0),
-
-            C.BASE_LIGHT_RED: lC(255, 95, 95),      C.BASE_LIGHT_GREEN: lC(95, 255, 95),
-            C.BASE_LIGHT_BLUE: lC(95, 95, 255),
-
-            C.BASE_LIGHT_PURPLE: lC(255, 95, 255),  C.BASE_LIGHT_CYAN: lC(95, 255, 255),
-
-            C.BASE_WHITE: lC(255, 255, 255),        C.BASE_LIGHT: lC(218, 218, 218),
-            C.BASE_NORMAL: lC(187, 187, 187),       C.BASE_LIGHT_GRAY: lC(168, 168, 168),
-            C.BASE_GRAY: lC(138, 138, 138),         C.BASE_DARK_GRAY: lC(108, 108, 108),
-            C.BASE_DARK: lC(78, 78, 78),            C.BASE_DARKER: lC(48, 48, 48),
-            C.BASE_DARKEST: lC(20, 20, 20),         C.BASE_BLACK: lC(0, 0, 0),
-        }
-
-        l = libtcod
-        self.key_map = {
-            l.KEY_ENTER: KEY.ENTER,          l.KEY_TAB: KEY.TAB,
-            l.KEY_ESCAPE: KEY.ESC,           l.KEY_SPACE: KEY.SPACE,
-            l.KEY_LEFT: KEY.LEFT,            l.KEY_RIGHT: KEY.RIGHT,
-            l.KEY_UP: KEY.UP,                l.KEY_DOWN: KEY.DOWN,
-            l.KEY_HOME: KEY.HOME,            l.KEY_END: KEY.END,
-            l.KEY_PAGEDOWN: KEY.PAGE_DOWN,   l.KEY_PAGEUP: KEY.PAGE_UP,
-            l.KEY_INSERT: KEY.INSERT,        l.KEY_DELETE: KEY.DELETE,
-            l.KEY_BACKSPACE: KEY.BACKSPACE,  l.KEY_F1: KEY.F1,
-            l.KEY_F2: KEY.F2,                l.KEY_F3: KEY.F3,
-            l.KEY_F4: KEY.F4,                l.KEY_F5: KEY.F5,
-            l.KEY_F6: KEY.F6,                l.KEY_F7: KEY.F7,
-            l.KEY_F8: KEY.F8,                l.KEY_F9: KEY.F9,
-            l.KEY_F10: KEY.F10,              l.KEY_F11: KEY.F11,
-            l.KEY_F12: KEY.F12,              l.KEY_KP0: KEY.NUMPAD_0,
-            l.KEY_KP1: KEY.NUMPAD_1,         l.KEY_KP2: KEY.NUMPAD_2,
-            l.KEY_KP3: KEY.NUMPAD_3,         l.KEY_KP4: KEY.NUMPAD_4,
-            l.KEY_KP5: KEY.NUMPAD_5,         l.KEY_KP6: KEY.NUMPAD_6,
-            l.KEY_KP7: KEY.NUMPAD_7,         l.KEY_KP8: KEY.NUMPAD_8,
-            l.KEY_KP9: KEY.NUMPAD_9,         l.KEY_NONE: KEY.NO_INPUT,
-        }
-
     def new_window(self, size):
-        rows, columns = size
-        window = libtcod.console_new(columns, rows)
-        libtcod.console_set_default_foreground(window, self.default_fg)
-        libtcod.console_set_default_background(window, self.default_bg)
-        return window
+        return _LibTCODWindow(size, self)
 
     def flush(self):
         libtcod.console_flush()
-
-    def get_root_window(self):
-        return self._ROOT_WIN
 
     def suspend(self):
         """SDL version doesn't require suspend."""
@@ -107,51 +93,24 @@ class LibTCODWrapper(object):
         else:
             libtcod.console_set_fullscreen(True)
 
-    def addch(self, window, y, x, char):
-        symbol, (fg, bg) = char
-        libtcod.console_put_char_ex(window, x, y, symbol.encode(self.encoding), self.color_map[fg], self.color_map[bg])
-
-    def addstr(self, window, y, x, string, color=None):
-        if color is None:
-            libtcod.console_print(window, x, y, string.encode(self.encoding))
-        else:
-            fg, bg = color
-            libtcod.console_set_default_foreground(window, self.color_map[fg])
-            libtcod.console_set_default_background(window, self.color_map[bg])
-            libtcod.console_print(window, x, y, string.encode(self.encoding))
-            libtcod.console_set_default_foreground(window, self.default_fg)
-            libtcod.console_set_default_background(window, self.default_bg)
-
-    def draw(self, window, char_payload_sequence):
-        f = libtcod.console_put_char_ex
-        color = self.color_map
-        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(window, x, y, symbol.encode(self.encoding), color[fg], color[bg])
-
-    def draw_reverse(self, window, char_payload_sequence):
-        f = libtcod.console_put_char_ex
-        color = self.color_map
-        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(window, x, y, symbol.encode(self.encoding), color[bg], color[fg])
-
-    def get_key(self, window_not_used):
+    def _get_key(self, window_not_used=None):
         while True:
             key_event = libtcod.Key()
             mouse_event = libtcod.Mouse()
             libtcod.sys_wait_for_event(libtcod.EVENT_KEY_PRESS, key_event, mouse_event, False)
-            key = self.interpret_event(key_event)
+            key = self._interpret_event(key_event)
             if key != KEY.NO_INPUT:
                 return key
 
-    def check_key(self, handle_not_used):
+    def _check_key(self, window_not_used=None):
         event = libtcod.console_check_for_keypress(libtcod.KEY_PRESSED)
-        return self.interpret_event(event)
+        return self._interpret_event(event)
 
-    def interpret_event(self, event):
+    def _interpret_event(self, event):
         if libtcod.console_is_window_closed():
             return KEY.CLOSE_WINDOW
-        elif event.vk in self.key_map:
-            return self.key_map[event.vk]
+        elif event.vk in key_map:
+            return key_map[event.vk]
         elif event.vk == libtcod.KEY_CHAR:
             if event.c == ord('c') and event.lctrl or event.rctrl:
                 raise KeyboardInterrupt
@@ -164,16 +123,71 @@ class LibTCODWrapper(object):
         else:
             return KEY.NO_INPUT
 
-    def clear(self, window):
-        libtcod.console_clear(window)
-
-    def blit(self, window, size, screen_position):
-        rows, cols = size
-        y, x = screen_position
-        libtcod.console_blit(window, 0, 0, cols, rows, self._ROOT_WIN, x, y, 1.0, 1.0)
-
-    def get_dimensions(self, window):
-        return libtcod.console_get_height(window), libtcod.console_get_width(window)
-
     def get_implementation(self):
         return LIBTCOD
+
+    def get_root_window_dimensions(self):
+        return libtcod.console_get_height(self.root_window), libtcod.console_get_width(self.root_window)
+
+
+class _LibTCODWindow(object):
+
+    def __init__(self, size, cursor_lib):
+        self.cursor_lib = cursor_lib
+        self.default_fg = libtcod.white
+        self.default_bg = libtcod.black
+
+        locale.setlocale(locale.LC_ALL, "")
+        self.encoding = locale.getpreferredencoding()
+
+        rows, columns = size
+        self.window = libtcod.console_new(columns, rows)
+        libtcod.console_set_default_foreground(self.window, self.default_fg)
+        libtcod.console_set_default_background(self.window, self.default_bg)
+
+    def clear(self):
+        libtcod.console_clear(self.window)
+
+    def blit(self, size, screen_position):
+        rows, cols = size
+        y, x = screen_position
+        libtcod.console_blit(self.window, 0, 0, cols, rows,
+                             self.cursor_lib.root_window, x, y, 1.0, 1.0)
+
+    def get_dimensions(self):
+        return libtcod.console_get_height(self.window), libtcod.console_get_width(self.window)
+
+    def get_key(self):
+        return self.cursor_lib._get_key()
+
+    def check_key(self):
+        return self.cursor_lib._check_key()
+
+    def addch(self, y, x, char):
+        symbol, (fg, bg) = char
+        libtcod.console_put_char_ex(self.window, x, y, symbol.encode(self.encoding), color_map[fg], color_map[bg])
+
+    def addstr(self, y, x, string, color=None):
+        if color is None:
+            libtcod.console_print(self.window, x, y, string.encode(self.encoding))
+        else:
+            fg, bg = color
+            libtcod.console_set_default_foreground(self.window, color_map[fg])
+            libtcod.console_set_default_background(self.window, color_map[bg])
+            libtcod.console_print(self.window, x, y, string.encode(self.encoding))
+            libtcod.console_set_default_foreground(self.window, self.default_fg)
+            libtcod.console_set_default_background(self.window, self.default_bg)
+
+    def draw(self, char_payload_sequence):
+        f = libtcod.console_put_char_ex
+        local_color = color_map
+        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+            f(self.window, x, y, symbol.encode(self.encoding), local_color[fg],
+              local_color[bg])
+
+    def draw_reverse(self, char_payload_sequence):
+        f = libtcod.console_put_char_ex
+        local_color = color_map
+        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+            f(self.window, x, y, symbol.encode(self.encoding), local_color[bg],
+              local_color[fg])
