@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import main
-import wrapper_ncurses
+from wrapper_ncurses import NCursesWrapper
 
 
 try:
@@ -13,8 +13,8 @@ except ImportError:
 
 
 def start(curses_window):
-    wrapper_ncurses.init(curses_window)
-    main.init_window_system(wrapper_ncurses)
+
+    main.init_window_system(NCursesWrapper(curses_window))
     main.start()
 
 

@@ -288,6 +288,9 @@
     <note priority="high" time="1360038167">
         Implement wait mode
     </note>
+    <note priority="high" time="1426791146">
+        Investigate if it's possible to remove the global io-system and make it an attribute in game
+    </note>
     <note priority="medium" time="1315691945">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
     </note>
