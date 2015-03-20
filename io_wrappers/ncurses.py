@@ -8,8 +8,7 @@ import logging
 import const.game as GAME
 import const.keys as KEY
 from config import debug
-from io_wrappers.ncurses_color_dicts import Curses256ColorDict, CursesColorDict
-from io_wrappers.ncurses_key_map import ncurses_key_map
+from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 
 
 def NCursesWrapper(curses_root_window):
@@ -26,60 +25,26 @@ def NCursesWrapper(curses_root_window):
 
 class _NCursesWrapper(object):
 
+    _root_window = None
+
+    IMPLEMENTATION = GAME.NCURSES
+
     key_map = ncurses_key_map
+    color_map = None
+
     locale.setlocale(locale.LC_ALL, "")
     encoding = locale.getpreferredencoding()
-
-    root_window = None
-    color_map = None
-    IMPLEMENTATION = GAME.NCURSES
 
     @classmethod
     def init_module(cls, curses_root_window):
         """Module needs to be lazily initialized due to curses colors."""
         if curses.COLORS == 256:
-            cls.color_map = Curses256ColorDict()
+            cls.color_map = NCurses256ColorDict()
         else:
-            cls.color_map = CursesColorDict()
+            cls.color_map = NCursesColorDict()
 
-        cls.root_window = cls(curses_root_window)
+        cls._root_window = cls(curses_root_window)
         return cls
-
-    def __init__(self, curses_window):
-        self.window = curses_window
-        self.window.keypad(True)
-        self.window.immedok(False)
-        self.window.scrollok(False)
-
-    @classmethod
-    def new_window(cls, size):
-        rows, columns = size
-        # Writing to the last cell of a window raises an exception because
-        # the automatic cursor move to the next cell is illegal. The +1 fixes that.
-        window = curses.newpad(rows + 1, columns)
-        return cls(window)
-
-    @classmethod
-    def _check_root_window_size(cls):
-        rows, cols = cls.root_window.get_dimensions()
-        while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
-            message = ("Game needs at least a screen size of {}x{} while the "
-                       "current size is {}x{}. Please resize the screen or "
-                       "press Q to quit.")
-            message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
-            cls.root_window.addstr(0, 0, message.encode(cls.encoding))
-            cls.root_window.window.refresh()
-
-            if cls.root_window.get_key() == "Q":
-                cls.root_window.clear()
-                message = "Confirm quit by pressing Y."
-                cls.root_window.addstr(0, 0, message.encode(cls.encoding))
-                cls.root_window.window.refresh()
-                if cls.root_window.get_key() == "Y":
-                    exit()
-            cls.root_window.clear()
-            cls.root_window.window.refresh()
-            rows, cols = cls.root_window.get_dimensions()
 
     @staticmethod
     def flush():
@@ -94,6 +59,20 @@ class _NCursesWrapper(object):
     @staticmethod
     def resume():
         curses.reset_prog_mode()
+
+    @classmethod
+    def new_window(cls, size):
+        rows, columns = size
+        # Writing to the last cell of a window raises an exception because
+        # the automatic cursor move to the next cell is illegal. The +1 fixes that.
+        window = curses.newpad(rows + 1, columns)
+        return cls(window)
+
+    def __init__(self, curses_window):
+        self.window = curses_window
+        self.window.keypad(True)
+        self.window.immedok(False)
+        self.window.scrollok(False)
 
     def addch(self, y, x, char):
         symbol, color = char
@@ -172,3 +151,25 @@ class _NCursesWrapper(object):
             if second_ch != curses.ERR:
                 return curses.ascii.alt(second_ch)
         return ch
+
+    @classmethod
+    def _check_root_window_size(cls):
+        rows, cols = cls._root_window.get_dimensions()
+        while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
+            message = ("Game needs at least a screen size of {}x{} while the "
+                       "current size is {}x{}. Please resize the screen or "
+                       "press Q to quit.")
+            message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
+            cls._root_window.addstr(0, 0, message.encode(cls.encoding))
+            cls._root_window.window.refresh()
+
+            if cls._root_window.get_key() == "Q":
+                cls._root_window.clear()
+                message = "Confirm quit by pressing Y."
+                cls._root_window.addstr(0, 0, message.encode(cls.encoding))
+                cls._root_window.window.refresh()
+                if cls._root_window.get_key() == "Y":
+                    exit()
+            cls._root_window.clear()
+            cls._root_window.window.refresh()
+            rows, cols = cls._root_window.get_dimensions()
