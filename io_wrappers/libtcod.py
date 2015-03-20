@@ -4,7 +4,6 @@ import locale
 import const.colors as COLOR
 import const.game as GAME
 import const.keys as KEY
-from const.game import LIBTCOD
 
 
 try:
@@ -65,6 +64,8 @@ key_map = {
 
 class LibTCODWrapper(object):
 
+    IMPLEMENTATION = GAME.LIBTCOD
+
     def __init__(self):
         self.root_window = 0
 
@@ -122,12 +123,6 @@ class LibTCODWrapper(object):
             return ch
         else:
             return KEY.NO_INPUT
-
-    def get_implementation(self):
-        return LIBTCOD
-
-    def get_root_window_dimensions(self):
-        return libtcod.console_get_height(self.root_window), libtcod.console_get_width(self.root_window)
 
 
 class _LibTCODWindow(object):
