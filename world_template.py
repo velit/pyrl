@@ -10,11 +10,15 @@ class LevelNotFound(Exception):
     pass
 
 
+def _zero_factory():
+    return 0
+
+
 class WorldTemplate(object):
 
     def __init__(self):
         self.level_templates = {}
-        self.dungeon_lengths = defaultdict(lambda: 0)
+        self.dungeon_lengths = defaultdict(_zero_factory)
         self.first_level_info = None
 
     def add_first_level_info(self, wloc, passage):

@@ -85,16 +85,16 @@ class _NCursesWrapper(object):
             self.window.addstr(y, x, string.encode(self.encoding), self.color_map[color])
 
     def draw(self, char_payload_sequence):
-        f = self.window.addch
+        d = self.window.addch
         local_color = self.color_map
         for y, x, (symbol, color) in char_payload_sequence:
-            f(y, x, symbol.encode(self.encoding), local_color[color])
+            d(y, x, symbol.encode(self.encoding), local_color[color])
 
     def draw_reverse(self, char_payload_sequence):
-        f = self.window.addch
+        d = self.window.addch
         local_color = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(y, x, symbol.encode(self.encoding), local_color[bg, fg])
+            d(y, x, symbol.encode(self.encoding), local_color[bg, fg])
 
     def clear(self):
         self.window.erase()

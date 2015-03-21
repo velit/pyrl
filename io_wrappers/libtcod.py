@@ -132,15 +132,15 @@ class _LibTCODWrapper(object):
             libtcod.console_set_default_background(self.window, self._default_bg)
 
     def draw(self, char_payload_sequence):
-        f = libtcod.console_put_char_ex
+        d = libtcod.console_put_char_ex
         local_color = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(self.window, x, y, symbol.encode(self.encoding), local_color[fg],
+            d(self.window, x, y, symbol.encode(self.encoding), local_color[fg],
               local_color[bg])
 
     def draw_reverse(self, char_payload_sequence):
-        f = libtcod.console_put_char_ex
+        d = libtcod.console_put_char_ex
         local_color = self.color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            f(self.window, x, y, symbol.encode(self.encoding), local_color[bg],
+            d(self.window, x, y, symbol.encode(self.encoding), local_color[bg],
               local_color[fg])

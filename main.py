@@ -12,7 +12,7 @@ from window.window_system import WindowSystem
 
 # Global object for the input and output window system
 # Check the WindowSystem class for the implementation
-io = None
+#io = None
 
 
 def init_window_system(cursor_library):

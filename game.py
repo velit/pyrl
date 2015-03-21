@@ -21,7 +21,6 @@ from world_template import LevelNotFound
 
 
 # Intentionally global due to Game getting pickled
-user_input = UserInput()
 
 
 class Game(object):
@@ -38,7 +37,11 @@ class Game(object):
         self.register_status_texts(self.player)
         self.vision_cache = None
 
+        self.init_transient_objects()
         io.msg("{0} for help menu".format(MAPPING.HELP))
+
+    def init_transient_objects(self):
+        self.user_input = UserInput()
 
     def main_loop(self):
         player = self.player
@@ -62,7 +65,7 @@ class Game(object):
         if debug.show_map:
             io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(self.player.level, self.player)
-        user_input.get_user_input_and_act(self, self.player)
+        self.user_input.get_user_input_and_act(self, self.player)
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
@@ -221,3 +224,12 @@ class Game(object):
         io.draw(memory_data)
         vision_data = level.get_visible_data(self.current_vision)
         io.draw(vision_data, debug.reverse)
+
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['user_input']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.init_transient_objects()

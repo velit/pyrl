@@ -1,6 +1,9 @@
 test:
 	py.test -k-slow
 
+test-all:
+	py.test
+
 profile-test:
 	python -m profile_util.run_profiler
 	less data/profiling_results
