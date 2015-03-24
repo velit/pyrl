@@ -16,27 +16,38 @@ except Exception as e:
     sys.exit(1)
 
 
-def LibTCODWrapper():
-    libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
-            libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW)
-    libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
-            GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
-    return _LibTCODWrapper
+class LibTCODWrapper(object):
 
-
-class _LibTCODWrapper(object):
-
-    _root_win = 0
+    _root_win = None
+    _encoding = None
     _default_fg = libtcod.white
     _default_bg = libtcod.black
-
+    _key_map = libtcod_key_map
+    _color_map = libtcod_color_map
     IMPLEMENTATION = GAME.LIBTCOD
 
-    key_map = libtcod_key_map
-    color_map = libtcod_color_map
+    @classmethod
+    def init(cls):
+        """Init the SDL surface and prepare for draw calls."""
+        libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
+                                        libtcod.FONT_TYPE_GREYSCALE |
+                                        libtcod.FONT_LAYOUT_ASCII_INROW)
+        libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
+                                  GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
+        cls._root_win = 0
+        cls._encoding = locale.getpreferredencoding()
+        return cls
 
-    locale.setlocale(locale.LC_ALL, "")
-    encoding = locale.getpreferredencoding()
+    @classmethod
+    def new_window(cls, size):
+        rows, columns = size
+        window = libtcod.console_new(columns, rows)
+        return cls(window)
+
+    def __init__(self, libtcod_window):
+        self.win = libtcod_window
+        libtcod.console_set_default_foreground(self.win, self._default_fg)
+        libtcod.console_set_default_background(self.win, self._default_bg)
 
     @staticmethod
     def flush():
@@ -71,8 +82,8 @@ class _LibTCODWrapper(object):
     def _interpret_event(cls, event):
         if libtcod.console_is_window_closed():
             return KEY.CLOSE_WINDOW
-        elif event.vk in cls.key_map:
-            return cls.key_map[event.vk]
+        elif event.vk in cls._key_map:
+            return cls._key_map[event.vk]
         elif event.vk == libtcod.KEY_CHAR:
             if event.c == ord('c') and event.lctrl or event.rctrl:
                 raise KeyboardInterrupt
@@ -92,55 +103,44 @@ class _LibTCODWrapper(object):
         else:
             libtcod.console_set_fullscreen(True)
 
-    @classmethod
-    def new_window(cls, size):
-        rows, columns = size
-        window = libtcod.console_new(columns, rows)
-        return cls(window)
-
-    def __init__(self, libtcod_window):
-        self.window = libtcod_window
-        libtcod.console_set_default_foreground(self.window, self._default_fg)
-        libtcod.console_set_default_background(self.window, self._default_bg)
-
     def clear(self):
-        libtcod.console_clear(self.window)
+        libtcod.console_clear(self.win)
 
     def blit(self, size, screen_position):
         rows, cols = size
         y, x = screen_position
-        libtcod.console_blit(self.window, 0, 0, cols, rows, self._root_win, x, y, 1.0, 1.0)
+        libtcod.console_blit(self.win, 0, 0, cols, rows, self._root_win, x, y, 1.0, 1.0)
 
     def get_dimensions(self):
-        return libtcod.console_get_height(self.window), libtcod.console_get_width(self.window)
+        return libtcod.console_get_height(self.win), libtcod.console_get_width(self.win)
 
     def addch(self, y, x, char):
         symbol, (fg, bg) = char
-        libtcod.console_put_char_ex(self.window, x, y,
-                                    symbol.encode(self.encoding),
-                                    self.color_map[fg], self.color_map[bg])
+        libtcod.console_put_char_ex(self.win, x, y,
+                                    symbol.encode(self._encoding),
+                                    self._color_map[fg], self._color_map[bg])
 
     def addstr(self, y, x, string, color=None):
         if color is None:
-            libtcod.console_print(self.window, x, y, string.encode(self.encoding))
+            libtcod.console_print(self.win, x, y, string.encode(self._encoding))
         else:
             fg, bg = color
-            libtcod.console_set_default_foreground(self.window, self.color_map[fg])
-            libtcod.console_set_default_background(self.window, self.color_map[bg])
-            libtcod.console_print(self.window, x, y, string.encode(self.encoding))
-            libtcod.console_set_default_foreground(self.window, self._default_fg)
-            libtcod.console_set_default_background(self.window, self._default_bg)
+            libtcod.console_set_default_foreground(self.win, self._color_map[fg])
+            libtcod.console_set_default_background(self.win, self._color_map[bg])
+            libtcod.console_print(self.win, x, y, string.encode(self._encoding))
+            libtcod.console_set_default_foreground(self.win, self._default_fg)
+            libtcod.console_set_default_background(self.win, self._default_bg)
 
     def draw(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
-        local_color = self.color_map
+        local_color = self._color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.window, x, y, symbol.encode(self.encoding), local_color[fg],
+            d(self.win, x, y, symbol.encode(self._encoding), local_color[fg],
               local_color[bg])
 
     def draw_reverse(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
-        local_color = self.color_map
+        local_color = self._color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.window, x, y, symbol.encode(self.encoding), local_color[bg],
+            d(self.win, x, y, symbol.encode(self._encoding), local_color[bg],
               local_color[fg])

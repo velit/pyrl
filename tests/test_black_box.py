@@ -10,12 +10,10 @@ def game_and_mockwrapper():
     import main
     from io_wrappers.mock import MockWrapper
 
-    mockwrapper = MockWrapper()
-    main.init_window_system(mockwrapper)
+    main.init_window_system(MockWrapper)
+    game = main.prepare_game(cmdline_arg_string="")
 
-    from game import Game
-    game = Game()
-    return game, mockwrapper
+    return game, main.io.cursor_lib
 
 
 def prepare_input_and_exe(game_and_mockwrapper, input_seq):

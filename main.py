@@ -1,6 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import argparse
+import atexit
+import locale
 import logging
 from cProfile import Profile
 
@@ -24,19 +26,26 @@ def init_logger_system():
     logging.basicConfig(filename=LOG_FILE, level=LOG_LEVEL)
 
 
-def start():
-
-    init_logger_system()
+def get_cmdl_args(cmdline_arg_string):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--load", action="store_true")
     parser.add_argument("-p", "--profile", action="store_true")
-    options = parser.parse_args()
+
+    return parser.parse_args(cmdline_arg_string)
+
+
+def prepare_game(cmdline_arg_string=None):
+
+    locale.setlocale(locale.LC_ALL, "")
+    init_logger_system()
+
+    options = get_cmdl_args(cmdline_arg_string)
 
     from game import Game
 
     if options.load:
-        game = load("pyrl.svg")
+        game = state_store.load("pyrl.svg")
         game.register_status_texts(game.player)
         game.redraw()
     else:
@@ -46,12 +55,15 @@ def start():
         profiler = Profile()
         profiler.enable()
 
+        def write_profile():
+            profiler.disable()
+            profile_util.write_profile_results(profiler)
+
+        atexit.register(write_profile)
+
+    return game
+
+
+def start():
+    game = prepare_game()
     game.main_loop()
-
-    if options.profile:
-        profiler.disable()
-        profile_util.write_profile_results(profiler)
-
-
-def load(name):
-    return state_store.load(name)

@@ -10,8 +10,7 @@ import const.keys as KEY
 class BaseWindow(object):
 
     def __init__(self, cursor_lib, size, screen_position):
-        self.cursor_lib = cursor_lib
-        self.cursor_win = self.cursor_lib.new_window(size)
+        self.cursor_win = cursor_lib.new_window(size)
         self.rows, self.cols = size
         self.screen_position = screen_position
 
@@ -70,7 +69,7 @@ class BaseWindow(object):
 
     def refresh(self):
         self.blit()
-        self.cursor_lib.flush()
+        self.cursor_win.flush()
 
     def draw_header(self, header, color=COLOR.BROWN, y=0):
         format_str = "{0:+^" + str(self.cols) + "}"

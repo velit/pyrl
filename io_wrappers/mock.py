@@ -3,20 +3,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import deque
 
 
-def MockWrapper(prepared_ch_input=None, prepared_str_input=None):
-
-    if prepared_ch_input:
-        _MockWrapper._prepare_ch_input(prepared_ch_input)
-    if prepared_str_input:
-        _MockWrapper._prepare_str_input(prepared_str_input)
-    return _MockWrapper
-
-
 class MockInputEndError(Exception):
     pass
 
 
-class _MockWrapper():
+class MockWrapper():
 
     _prepared_input = deque()
 

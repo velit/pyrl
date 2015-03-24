@@ -5,5 +5,5 @@ import main
 from io_wrappers.libtcod import LibTCODWrapper
 
 
-main.init_window_system(LibTCODWrapper())
+main.init_window_system(LibTCODWrapper.init())
 main.start()
