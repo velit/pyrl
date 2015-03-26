@@ -14,7 +14,7 @@ except ImportError:
 
 def start(curses_window):
 
-    main.init_window_system(NCursesWrapper.init(curses_window))
+    main.init_window_system(NCursesWrapper(curses_window))
     main.start()
 
 

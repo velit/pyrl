@@ -11,7 +11,48 @@ from config import debug
 from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 
 
+def _init_curses(curses_root_window=None):
+    if curses_root_window is None:
+        curses_root_window = curses.initscr()
+        curses.start_color()
+    curses.curs_set(0)
+    curses.nonl()
+    return curses_root_window
+
+
 class NCursesWrapper(object):
+
+    IMPLEMENTATION = GAME.NCURSES
+
+    def __init__(self, curses_root_window=None):
+        """Initialize curses if not already and initialize NCursesWindow."""
+        NCursesWindow.init_class_attributes(_init_curses(curses_root_window))
+
+    def new_window(self, dimensions):
+        """Create and return an ncurses window wrapper of dimensions = (rows, colums)."""
+        rows, columns = dimensions
+
+        # Writing to the last cell of a window raises an exception because the
+        # automatic cursor move to the next cell is illegal which is an ncurses
+        # limitation. The +1 to rows fixes that without impacting most anything
+        # else. The one thing it affects is there's a line after the last
+        # application line where writes don't explicitely error out.
+        window = curses.newpad(rows + 1, columns)
+        return NCursesWindow(window)
+
+    def flush(self):
+        curses.doupdate()
+
+    def suspend(self):
+        curses.def_prog_mode()
+        curses.reset_shell_mode()
+        curses.endwin()
+
+    def resume(self):
+        curses.reset_prog_mode()
+
+
+class NCursesWindow(object):
 
     _root_win = None
     _color_map = None
@@ -20,52 +61,26 @@ class NCursesWrapper(object):
     IMPLEMENTATION = GAME.NCURSES
 
     @classmethod
-    def init(cls, curses_root_window=None):
-        """Initialize curses and prepare for draw calls."""
-        if curses_root_window is None:
-            curses_root_window = curses.initscr()
-            curses.start_color()
-        curses.curs_set(0)
-        curses.nonl()
+    def init_class_attributes(cls, curses_root_window=None):
+        """
+        Initialize curses if not already and prepare class attributes.
+
+        This function has to be called separately if this class is used directly
+        instead from NCursesWrapper().new_window(dimensions).
+        """
+        cls._encoding = locale.getpreferredencoding()
+        cls._root_win = cls(_init_curses(curses_root_window))
 
         if curses.COLORS == 256:
             cls._color_map = NCurses256ColorDict()
         else:
             cls._color_map = NCursesColorDict()
 
-        cls._root_win = cls(curses_root_window)
-        cls._encoding = locale.getpreferredencoding()
-        return cls
-
-    @classmethod
-    def new_window(cls, dimensions):
-        """Create and return an ncurses window wrapper of dimensions = (rows, colums)."""
-        rows, columns = dimensions
-
-        # Writing to the last cell of a window raises an exception because
-        # the automatic cursor move to the next cell is illegal. The +1 fixes that.
-        window = curses.newpad(rows + 1, columns)
-        return cls(window)
-
     def __init__(self, curses_window):
         self.win = curses_window
         self.win.keypad(True)
         self.win.immedok(False)
         self.win.scrollok(False)
-
-    @staticmethod
-    def flush():
-        curses.doupdate()
-
-    @staticmethod
-    def suspend():
-        curses.def_prog_mode()
-        curses.reset_shell_mode()
-        curses.endwin()
-
-    @staticmethod
-    def resume():
-        curses.reset_prog_mode()
 
     def addch(self, y, x, char):
         symbol, color = char
@@ -154,15 +169,15 @@ class NCursesWrapper(object):
                        "press Q to quit.")
             message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
             cls._root_win.addstr(0, 0, message.encode(cls._encoding))
-            cls._root_win.window.refresh()
+            cls._root_win.win.refresh()
 
             if cls._root_win.get_key() == "Q":
                 cls._root_win.clear()
                 message = "Confirm quit by pressing Y."
                 cls._root_win.addstr(0, 0, message.encode(cls._encoding))
-                cls._root_win.window.refresh()
+                cls._root_win.win.refresh()
                 if cls._root_win.get_key() == "Y":
                     exit()
             cls._root_win.clear()
-            cls._root_win.window.refresh()
+            cls._root_win.win.refresh()
             rows, cols = cls._root_win.get_dimensions()

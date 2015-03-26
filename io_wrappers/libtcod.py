@@ -18,6 +18,42 @@ except Exception as e:
 
 class LibTCODWrapper(object):
 
+    IMPLEMENTATION = GAME.LIBTCOD
+
+    def __init__(self, curses_root_window=None):
+        """Init the SDL surface and prepare for draw calls."""
+        libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
+                                        libtcod.FONT_TYPE_GREYSCALE |
+                                        libtcod.FONT_LAYOUT_ASCII_INROW)
+        libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
+                                  GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
+        LibTCODWindow.init_class_attributes()
+
+    def new_window(self, dimensions):
+        rows, columns = dimensions
+        window = libtcod.console_new(columns, rows)
+        return LibTCODWindow(window)
+
+    def flush(self):
+        libtcod.console_flush()
+
+    def suspend(self):
+        """SDL version doesn't require suspend."""
+        pass
+
+    def resume(self):
+        """SDL version doesn't require resume."""
+        pass
+
+    def _toggle_fullscreen(self):
+        if libtcod.console_is_fullscreen():
+            libtcod.console_set_fullscreen(False)
+        else:
+            libtcod.console_set_fullscreen(True)
+
+
+class LibTCODWindow(object):
+
     _root_win = None
     _encoding = None
     _default_fg = libtcod.white
@@ -27,41 +63,20 @@ class LibTCODWrapper(object):
     IMPLEMENTATION = GAME.LIBTCOD
 
     @classmethod
-    def init(cls):
-        """Init the SDL surface and prepare for draw calls."""
-        libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
-                                        libtcod.FONT_TYPE_GREYSCALE |
-                                        libtcod.FONT_LAYOUT_ASCII_INROW)
-        libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
-                                  GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
+    def init_class_attributes(cls):
+        """
+        Initialize class attributes.
+
+        This function has to be called separately if this class is used
+        directly instead of from LibTCODWrapper().new_window(dimensions)
+        """
         cls._root_win = 0
         cls._encoding = locale.getpreferredencoding()
-        return cls
-
-    @classmethod
-    def new_window(cls, size):
-        rows, columns = size
-        window = libtcod.console_new(columns, rows)
-        return cls(window)
 
     def __init__(self, libtcod_window):
         self.win = libtcod_window
         libtcod.console_set_default_foreground(self.win, self._default_fg)
         libtcod.console_set_default_background(self.win, self._default_bg)
-
-    @staticmethod
-    def flush():
-        libtcod.console_flush()
-
-    @staticmethod
-    def suspend():
-        """SDL version doesn't require suspend."""
-        pass
-
-    @staticmethod
-    def resume():
-        """SDL version doesn't require resume."""
-        pass
 
     @classmethod
     def get_key(cls):
@@ -95,13 +110,6 @@ class LibTCODWrapper(object):
             return ch
         else:
             return KEY.NO_INPUT
-
-    @staticmethod
-    def _toggle_fullscreen():
-        if libtcod.console_is_fullscreen():
-            libtcod.console_set_fullscreen(False)
-        else:
-            libtcod.console_set_fullscreen(True)
 
     def clear(self):
         libtcod.console_clear(self.win)
