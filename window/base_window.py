@@ -37,9 +37,7 @@ class BaseWindow(object):
         return self.cursor_win.get_key()
 
     # Non-blocking
-    def check_key(self, refresh=False):
-        if refresh:
-            self.refresh()
+    def check_key(self):
         return self.cursor_win.check_key()
 
     # Blocking

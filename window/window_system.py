@@ -69,12 +69,12 @@ class WindowSystem(object):
         self.l.draw_line(*a, **k)
 
     def draw_path(self, path):
-        for x in path:
-            self.draw_char(x, (" ", COLOR.GREEN), reverse=True)
+        for coord in path:
+            self.draw_char(coord, (" ", COLOR.GREEN), reverse=True)
             if debug.path_step:
-                self.get_key()
+                self.l.get_key(refresh=True)
         if not debug.path_step:
-            self.get_key()
+            self.l.get_key(refresh=True)
 
     def suspend(self):
         self.cursor_lib.suspend()

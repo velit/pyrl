@@ -8,10 +8,12 @@ from const.colors import GREEN
 from window.base_window import BaseWindow
 
 
-MORE_STR_LEN = 2
+MORE_STR = " More"
+MORE_STR_LEN = len(MORE_STR)
 
 
 class MessageBar(BaseWindow):
+
     """Handles the messaging bar system."""
 
     def __init__(self, *a, **k):
@@ -39,7 +41,7 @@ class MessageBar(BaseWindow):
         for i, line in enumerate(lines):
             self.addstr(i % self.rows, 0, line)
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-                self.addch(self.rows - 1, self.cols - 1, ("M", GREEN))
+                self.addstr(self.rows - 1, self.cols - MORE_STR_LEN, MORE_STR, GREEN)
                 if self.selective_get_key(MAPPING.GROUP_MORE, refresh=True) == KEY.ENTER:
                     skip = True
                     break

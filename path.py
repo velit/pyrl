@@ -2,10 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from heapq import heappush, heappop
 
-import const.colors as COLOR
-from config import debug
 from generic_algorithms import chebyshev
-from main import io
 
 
 def path(start_coord, goal_coord, neighbor_function, heuristic):
@@ -33,8 +30,6 @@ def _a_star(start, goal, neighbors, heuristic):
             return came_from
         origin = heappop(openprio)[1]
         if origin not in closedset:
-            if debug.path and origin != start:
-                io.draw_char(origin, ('+', COLOR.LIGHT_BLUE))
             openmember.remove(origin)
             closedset.add(origin)
 
@@ -43,11 +38,7 @@ def _a_star(start, goal, neighbors, heuristic):
                     came_from[node] = origin
                     g[node] = g[origin] + cost
                     heappush(openprio, (g[node] + heuristic(node, goal, start), node))
-                    if debug.path and node != goal:
-                        io.draw_char(node, ('?', COLOR.YELLOW))
                     openmember.add(node)
-            if debug.path_step:
-                io.get_key()
     else:
         raise Exception("No possible paths between arguments start:{} goal:{}".format(start, goal))
 

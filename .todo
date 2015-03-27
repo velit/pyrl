@@ -285,6 +285,9 @@
     <note priority="veryhigh" time="1426898176">
         Remove io from being a global thing in main and make it a dependency injection into game
     </note>
+    <note priority="veryhigh" time="1427332689">
+        Make walk mode a frigging class...
+    </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
     </note>

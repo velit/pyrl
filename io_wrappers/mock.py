@@ -30,6 +30,10 @@ class MockWrapper():
     def resume():
         pass
 
+    @classmethod
+    def new_window(cls, size):
+        return cls()
+
     def get_key(self):
         try:
             return self._prepared_input.popleft()
@@ -41,10 +45,6 @@ class MockWrapper():
             return self._prepare_input.popleft()
         except IndexError:
             raise MockInputEndError()
-
-    @classmethod
-    def new_window(cls, size):
-        return cls()
 
     def clear(self):
         pass

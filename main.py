@@ -4,52 +4,31 @@ import argparse
 import atexit
 import locale
 import logging
+import sys
 from cProfile import Profile
 
 import profile_util
 import state_store
-from const.game import LOG_FILE, LOG_LEVEL
-from window.window_system import WindowSystem
+from const.game import LOG_FILE, LOG_LEVEL, GAME_NAME
 
 
-# Global object for the input and output window system
-# Check the WindowSystem class for the implementation
-#io = None
+def start(cursor_lib_callback):
+    game = prepare_game(cursor_lib_callback)
+    game.main_loop()
 
 
-def init_window_system(cursor_library):
-    global io
-    io = WindowSystem(cursor_library)
+def prepare_game(cursor_lib_callback, cmdline_args=None):
 
-
-def init_logger_system():
-    logging.basicConfig(filename=LOG_FILE, level=LOG_LEVEL)
-
-
-def get_cmdl_args(cmdline_arg_string):
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--load", action="store_true")
-    parser.add_argument("-p", "--profile", action="store_true")
-
-    return parser.parse_args(cmdline_arg_string)
-
-
-def prepare_game(cmdline_arg_string=None):
+    options = get_commandline_options(cmdline_args)
 
     locale.setlocale(locale.LC_ALL, "")
     init_logger_system()
 
-    options = get_cmdl_args(cmdline_arg_string)
-
-    from game import Game
-
     if options.load:
-        game = state_store.load("pyrl.svg")
-        game.register_status_texts(game.player)
-        game.redraw()
+        game = load_game(options.load, cursor_lib_callback)
     else:
-        game = Game()
+        from game import Game
+        game = Game(options.game, cursor_lib_callback)
 
     if options.profile:
         profiler = Profile()
@@ -64,6 +43,29 @@ def prepare_game(cmdline_arg_string=None):
     return game
 
 
-def start():
-    game = prepare_game()
-    game.main_loop()
+def init_logger_system():
+    logging.basicConfig(filename=LOG_FILE, level=LOG_LEVEL)
+
+
+def get_commandline_options(args=None):
+
+    parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
+    start_group = parser.add_mutually_exclusive_group()
+    start_group.add_argument("-g", "--game", help="Specify the name for a new game.",
+                             nargs="?", const=GAME_NAME, default=GAME_NAME)
+    start_group.add_argument("-l", "--load", help="Specify the game to be loaded.", nargs="?", const=GAME_NAME)
+    parser.add_argument("-p", "--profile", help="Generate profiling data during the game.", action="store_true")
+
+    return parser.parse_args(args)
+
+
+def load_game(game_name, cursor_lib_callback):
+    try:
+        game = state_store.load(game_name)
+    # python3: use FileNotFoundError here instead
+    except IOError:
+        print("Game '{}' not found.".format(game_name), file=sys.stderr)
+        sys.exit(1)
+    game.reinit_transient_objects(cursor_lib_callback)
+    game.redraw()
+    return game

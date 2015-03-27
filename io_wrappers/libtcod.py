@@ -1,12 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import locale
-import const.game as GAME
-import const.keys as KEY
-from io_wrappers.libtcod_dicts import libtcod_color_map
-from io_wrappers.libtcod_dicts import libtcod_key_map
-
-
 try:
     import libtcod.libtcodpy as libtcod
 except Exception as e:
@@ -14,6 +7,12 @@ except Exception as e:
     print("Couldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
     print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
     sys.exit(1)
+
+import locale
+import const.game as GAME
+import const.keys as KEY
+from io_wrappers.libtcod_dicts import libtcod_color_map
+from io_wrappers.libtcod_dicts import libtcod_key_map
 
 
 class LibTCODWrapper(object):
@@ -27,7 +26,7 @@ class LibTCODWrapper(object):
                                         libtcod.FONT_LAYOUT_ASCII_INROW)
         libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
                                   GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
-        LibTCODWindow.init_class_attributes()
+        LibTCODWindow.init()
 
     def new_window(self, dimensions):
         rows, columns = dimensions
@@ -63,7 +62,7 @@ class LibTCODWindow(object):
     IMPLEMENTATION = GAME.LIBTCOD
 
     @classmethod
-    def init_class_attributes(cls):
+    def init(cls):
         """
         Initialize class attributes.
 

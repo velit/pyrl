@@ -4,9 +4,7 @@ from collections import OrderedDict
 
 import const.slots as SLOT
 import mappings as MAPPING
-from main import io
 from mappings import CANCEL, GROUP_DEFAULT, VIEW_INVENTORY, INVENTORY_KEYS
-
 
 equipment_slots = OrderedDict()
 equipment_slots[MAPPING.EQUIPMENT_SLOT_HEAD] = SLOT.HEAD
@@ -15,7 +13,7 @@ equipment_slots[MAPPING.EQUIPMENT_SLOT_RIGHT_HAND] = SLOT.RIGHT_HAND
 equipment_slots[MAPPING.EQUIPMENT_SLOT_FEET] = SLOT.FEET
 
 
-def equipment(game, creature):
+def equipment(io, game, creature):
     while True:
         header = "Equipment"
         footer = "Press a slot key to (un)equip, {} to view backpack, {} to close"
@@ -26,7 +24,7 @@ def equipment(game, creature):
         if key in equipment_slots:
             slot = equipment_slots[key]
             if creature.get_item(slot) is None:
-                equipped_item = inventory(game, creature, slot)
+                equipped_item = inventory(io, game, creature, slot)
                 if equipped_item is not None:
                     creature.unbag_item(equipped_item)
                     creature.equip(equipped_item, slot)
@@ -34,12 +32,12 @@ def equipment(game, creature):
                 unequipped_item = creature.unequip(equipment_slots[key])
                 creature.bag_item(unequipped_item)
         elif key == VIEW_INVENTORY:
-            inventory(game, creature)
+            inventory(io, game, creature)
         elif key in GROUP_DEFAULT:
             return
 
 
-def inventory(game, creature, slot=None):
+def inventory(io, game, creature, slot=None):
     header = "Inventory"
     footer = "{} to close".format(CANCEL)
     fmt_str = "{0} - {1}"

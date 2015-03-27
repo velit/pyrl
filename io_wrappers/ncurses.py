@@ -1,6 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import curses
+try:
+    import curses
+except ImportError:
+    import sys
+    print("Couldn't import curses. Try running sdlpyrl.py")
+    sys.exit(1)
+
 import curses.ascii
 import locale
 import logging
@@ -11,13 +17,7 @@ from config import debug
 from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 
 
-def _init_curses(curses_root_window=None):
-    if curses_root_window is None:
-        curses_root_window = curses.initscr()
-        curses.start_color()
-    curses.curs_set(0)
-    curses.nonl()
-    return curses_root_window
+_root_win = None
 
 
 class NCursesWrapper(object):
@@ -25,10 +25,10 @@ class NCursesWrapper(object):
     IMPLEMENTATION = GAME.NCURSES
 
     def __init__(self, curses_root_window=None):
-        """Initialize curses if not already and initialize NCursesWindow."""
-        NCursesWindow.init_class_attributes(_init_curses(curses_root_window))
+        """Initialize curses and NCursesWindow."""
+        NCursesWindowWrapper.init(curses_root_window)
 
-    def new_window(self, dimensions):
+    def new_window(cls, dimensions):
         """Create and return an ncurses window wrapper of dimensions = (rows, colums)."""
         rows, columns = dimensions
 
@@ -38,30 +38,35 @@ class NCursesWrapper(object):
         # else. The one thing it affects is there's a line after the last
         # application line where writes don't explicitely error out.
         window = curses.newpad(rows + 1, columns)
-        return NCursesWindow(window)
+        return NCursesWindowWrapper(window)
 
     def flush(self):
         curses.doupdate()
 
-    def suspend(self):
+    @classmethod
+    def suspend(cls):
         curses.def_prog_mode()
         curses.reset_shell_mode()
         curses.endwin()
 
-    def resume(self):
+    @classmethod
+    def resume(cls):
         curses.reset_prog_mode()
 
+    @classmethod
+    def is_ncurses_init(cls):
+        return _root_win is not None
 
-class NCursesWindow(object):
 
-    _root_win = None
+class NCursesWindowWrapper(object):
+
+    IMPLEMENTATION = GAME.NCURSES
     _color_map = None
     _encoding = None
     _key_map = ncurses_key_map
-    IMPLEMENTATION = GAME.NCURSES
 
     @classmethod
-    def init_class_attributes(cls, curses_root_window=None):
+    def init(cls, curses_root_window=None):
         """
         Initialize curses if not already and prepare class attributes.
 
@@ -69,7 +74,9 @@ class NCursesWindow(object):
         instead from NCursesWrapper().new_window(dimensions).
         """
         cls._encoding = locale.getpreferredencoding()
-        cls._root_win = cls(_init_curses(curses_root_window))
+
+        global _root_win
+        _root_win = cls(_init_curses(curses_root_window))
 
         if curses.COLORS == 256:
             cls._color_map = NCurses256ColorDict()
@@ -162,22 +169,42 @@ class NCursesWindow(object):
 
     @classmethod
     def _check_root_window_size(cls):
-        rows, cols = cls._root_win.get_dimensions()
+        rows, cols = _root_win.get_dimensions()
         while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
             message = ("Game needs at least a screen size of {}x{} while the "
                        "current size is {}x{}. Please resize the screen or "
                        "press Q to quit.")
             message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
-            cls._root_win.addstr(0, 0, message.encode(cls._encoding))
-            cls._root_win.win.refresh()
+            _root_win.addstr(0, 0, message.encode(cls._encoding))
+            _root_win.win.refresh()
 
-            if cls._root_win.get_key() == "Q":
-                cls._root_win.clear()
+            if _root_win.get_key() == "Q":
+                _root_win.clear()
                 message = "Confirm quit by pressing Y."
-                cls._root_win.addstr(0, 0, message.encode(cls._encoding))
-                cls._root_win.win.refresh()
-                if cls._root_win.get_key() == "Y":
+                _root_win.addstr(0, 0, message.encode(cls._encoding))
+                _root_win.win.refresh()
+                if _root_win.get_key() == "Y":
                     exit()
-            cls._root_win.clear()
-            cls._root_win.win.refresh()
-            rows, cols = cls._root_win.get_dimensions()
+            _root_win.clear()
+            _root_win.win.refresh()
+            rows, cols = _root_win.get_dimensions()
+
+
+def _init_curses(curses_root_window=None):
+
+    if curses_root_window is None:
+        curses_root_window = curses.initscr()
+
+    curses.noecho()
+    curses.cbreak()                   # no line buffering
+    curses.nonl()                     # allow return key detection in input
+    curses.curs_set(0)                # Remove cursor visibility
+    curses_root_window.keypad(True)
+
+    # see curses.wrapper implementation for reason for try-except
+    try:
+        curses.start_color()
+    except:
+        pass
+
+    return curses_root_window

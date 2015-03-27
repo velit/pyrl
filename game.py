@@ -1,5 +1,4 @@
 """pyrl; Python roguelike by Tapani Kiiskinen."""
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import const.creature_actions as CC
@@ -12,36 +11,35 @@ from combat import get_melee_attack, get_combat_message
 from config import debug
 from fov import get_light_set
 from generic_algorithms import add_vector
-from main import io
 from templates.maps import get_world_template
 from templates.player import Player
 from user_input import UserInput
+from window.window_system import WindowSystem
 from world import World
 from world_template import LevelNotFound
 
 
-# Intentionally global due to Game getting pickled
-
-
 class Game(object):
 
-    def __init__(self):
+    def __init__(self, game_name, cursor_lib):
+        self.game_name = game_name
         self.turn_counter = 0
         self.current_vision = set()
         self.player = Player()
         self.ai = AI()
         self.world = World(get_world_template())
 
+        self.reinit_transient_objects(cursor_lib)
+
         first_level, passage = self.world.get_first_level_info()
         self.move_creature_to_level(self.player, first_level, passage)
-        self.register_status_texts(self.player)
         self.vision_cache = None
+        self.io.msg("{0} for help menu".format(MAPPING.HELP))
 
-        self.init_transient_objects()
-        io.msg("{0} for help menu".format(MAPPING.HELP))
-
-    def init_transient_objects(self):
-        self.user_input = UserInput()
+    def reinit_transient_objects(self, cursor_lib_callback):
+        self.io = WindowSystem(cursor_lib_callback())
+        self.user_input = UserInput(self, self.player, self.io)
+        self.register_status_texts(self.player)
 
     def main_loop(self):
         player = self.player
@@ -63,9 +61,9 @@ class Game(object):
     def player_act(self):
         level = self.player.level
         if debug.show_map:
-            io.draw(level.get_wallhack_data(level.get_coord_iter()))
+            self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(self.player.level, self.player)
-        self.user_input.get_user_input_and_act(self, self.player)
+        self.user_input.get_user_input_and_act()
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
@@ -92,9 +90,9 @@ class Game(object):
             if self.move_creature_to_level(creature, dest_world_loc, dest_passage):
                 creature.update_energy(GAME.MOVEMENT_COST)
                 return True
-            io.msg("This passage doesn't seem to lead anywhere.")
+            self.io.msg("This passage doesn't seem to lead anywhere.")
         else:
-            io.msg("There is no entrance.")
+            self.io.msg("There is no entrance.")
         return False
 
     def creature_move(self, creature, direction):
@@ -107,9 +105,9 @@ class Game(object):
         else:
             if creature is not self.player:
                 if not level.creature_can_move(creature, direction):
-                    io.msg("Creature can't move there.")
+                    self.io.msg("Creature can't move there.")
                 if not creature.can_act():
-                    io.msg("Creature can't act now.")
+                    self.io.msg("Creature can't act now.")
             return False
 
     def creature_teleport(self, creature, target_coord):
@@ -120,7 +118,7 @@ class Game(object):
             return True
         else:
             if creature is not self.player:
-                io.msg("Creature teleport failed.")
+                self.io.msg("Creature teleport failed.")
             return False
 
     def creature_swap(self, creature, direction):
@@ -136,7 +134,7 @@ class Game(object):
                 return True
 
         if creature is not self.player:
-            io.msg("Creature swap failed.")
+            self.io.msg("Creature swap failed.")
         return False
 
     def creature_attack(self, creature, direction):
@@ -158,48 +156,56 @@ class Game(object):
             msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
             if died:
                 self.creature_death(target)
-            io.msg(msg)
+            self.io.msg(msg)
             return True
         else:
             if creature is not self.player:
-                io.msg("Creature attack failed.")
+                self.io.msg("Creature attack failed.")
             return False
 
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
         level = creature.level
         if creature is self.player:
-            io.notify("You die...")
+            self.io.notify("You die...")
             self.endgame(dont_ask=True)
         level.remove_creature(creature)
 
     def register_status_texts(self, creature):
-        io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-        io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-        io.s.add_element(STAT.SIGHT, lambda: creature.sight)
-        io.s.add_element(STAT.AR, lambda: creature.ar)
-        io.s.add_element(STAT.DR, lambda: creature.dr)
-        io.s.add_element(STAT.PV, lambda: creature.pv)
-        io.s.add_element(STAT.SPEED, lambda: creature.speed)
-        io.s.add_element(STAT.ST, lambda: creature.st)
-        io.s.add_element(STAT.DX, lambda: creature.dx)
-        io.s.add_element(STAT.TO, lambda: creature.to)
-        io.s.add_element(STAT.LE, lambda: creature.le)
-        io.s.add_element(STAT.PE, lambda: creature.pe)
-        io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
-        io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
-        io.s.add_element("Turns", lambda: self.turn_counter)
+        self.io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+        self.io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
+        self.io.s.add_element(STAT.SIGHT, lambda: creature.sight)
+        self.io.s.add_element(STAT.AR, lambda: creature.ar)
+        self.io.s.add_element(STAT.DR, lambda: creature.dr)
+        self.io.s.add_element(STAT.PV, lambda: creature.pv)
+        self.io.s.add_element(STAT.SPEED, lambda: creature.speed)
+        self.io.s.add_element(STAT.ST, lambda: creature.st)
+        self.io.s.add_element(STAT.DX, lambda: creature.dx)
+        self.io.s.add_element(STAT.TO, lambda: creature.to)
+        self.io.s.add_element(STAT.LE, lambda: creature.le)
+        self.io.s.add_element(STAT.PE, lambda: creature.pe)
+        self.io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
+        self.io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
+        self.io.s.add_element("Turns", lambda: self.turn_counter)
 
     def endgame(self, dont_ask=True, message=""):
-        io.msg(message)
-        if dont_ask or io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
+        self.io.msg(message)
+        if dont_ask or self.io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
             exit()
 
     def savegame(self, dont_ask=True):
-        if dont_ask or io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
-            io.msg("Saving...")
-            io.refresh()
-            io.msg(state_store.save(self, "pyrl.svg"))
+        if dont_ask or self.io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
+            self.io.msg("Saving...")
+            self.io.refresh()
+
+            try:
+                raw, compressed = state_store.save(self, self.game_name)
+            except IOError as e:
+                msg_str = str(e)
+            else:
+                msg_str = "Saved game '{}', file size: {:,} b, {:,} b compressed. Ratio: {:.2%}"
+                msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
+            self.io.msg(msg_str)
 
     def update_view(self, level, creature):
         old = self.current_vision if not debug.show_map else set()
@@ -208,28 +214,29 @@ class Game(object):
         level.update_visited_locations(new - old)
 
         out_of_sight_memory_data = level.get_memory_data(old - new)
-        io.draw(out_of_sight_memory_data)
+        self.io.draw(out_of_sight_memory_data)
 
         new_visible_data = level.get_visible_data(new - (old - mod))
-        io.draw(new_visible_data, debug.reverse)
+        self.io.draw(new_visible_data, debug.reverse)
 
         self.current_vision = new
 
     def redraw(self):
-        io.l.clear()
+        self.io.l.clear()
         level = self.player.level
         if debug.show_map:
-            io.draw(level.get_wallhack_data(level.get_coord_iter()))
+            self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         memory_data = level.get_memory_data(level.visited_locations)
-        io.draw(memory_data)
+        self.io.draw(memory_data)
         vision_data = level.get_visible_data(self.current_vision)
-        io.draw(vision_data, debug.reverse)
+        self.io.draw(vision_data, debug.reverse)
 
     def __getstate__(self):
+        exclude_state = ('user_input', 'io')
         state = self.__dict__.copy()
-        del state['user_input']
+        for item in exclude_state:
+            del state[item]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.init_transient_objects()

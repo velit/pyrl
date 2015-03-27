@@ -4,7 +4,6 @@ import const.directions as DIR
 import const.game as GAME
 import mappings as MAPPING
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
-from main import io
 
 
 WALK_IN_PLACE = (None, None)
@@ -16,22 +15,22 @@ OPEN = (True, True)
 INTERRUPT_MSG_TIME = 5
 
 
-def walk_mode_init(game, creature, userinput, direction=None):
+def walk_mode_init(io, game, creature, userinput, direction=None):
     if _any_creatures_visible(game, creature):
         io.msg("Not while there are creatures in the vicinity.")
     if direction is None:
-        key_set = MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL
+        key_set = MAPPING.DIRECTIONS.keys() | MAPPING.GROUP_CANCEL
         key = io.ask("Specify walking direction, {} to abort".format(MAPPING.CANCEL), key_set)
         if key in MAPPING.DIRECTIONS:
             direction = MAPPING.DIRECTIONS[key]
 
     if direction is not None:
-        walk_mode_data = _walk_mode_init(game, creature, direction)
+        walk_mode_data = _walk_mode_init(io, game, creature, direction)
         if walk_mode_data is not None:
             userinput.walk_mode_data = walk_mode_data
 
 
-def _walk_mode_init(game, creature, direction):
+def _walk_mode_init(io, game, creature, direction):
     if game.creature_move(creature, direction):
         walk_type = _get_walk_type(creature, direction)
         if walk_type != WALK_IN_PLACE:
@@ -49,7 +48,7 @@ def _walk_mode_init(game, creature, direction):
         return direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME)
 
 
-def walk_mode(game, creature, userinput):
+def walk_mode(io, game, creature, userinput):
     if not _any_creatures_visible(game, creature):
         old_direction, old_walk_type, timestamp, msg_time = userinput.walk_mode_data
         if old_walk_type == WALK_IN_PLACE:
