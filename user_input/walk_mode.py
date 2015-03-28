@@ -15,127 +15,128 @@ OPEN = (True, True)
 INTERRUPT_MSG_TIME = 5
 
 
-def walk_mode_init(io, game, creature, userinput, direction=None):
-    if _any_creatures_visible(game, creature):
-        io.msg("Not while there are creatures in the vicinity.")
-    if direction is None:
-        key_set = MAPPING.DIRECTIONS.keys() | MAPPING.GROUP_CANCEL
-        key = io.ask("Specify walking direction, {} to abort".format(MAPPING.CANCEL), key_set)
-        if key in MAPPING.DIRECTIONS:
-            direction = MAPPING.DIRECTIONS[key]
+class WalkMode(object):
 
-    if direction is not None:
-        walk_mode_data = _walk_mode_init(io, game, creature, direction)
-        if walk_mode_data is not None:
-            userinput.walk_mode_data = walk_mode_data
+    def __init__(self, game, creature, io):
+        self.game = game
+        self.creature = creature
+        self.io = io
+        self.state = None
 
+    def is_walk_mode_active(self):
+        return self.state is not None
 
-def _walk_mode_init(io, game, creature, direction):
-    if game.creature_move(creature, direction):
-        walk_type = _get_walk_type(creature, direction)
-        if walk_type != WALK_IN_PLACE:
-            (forward, upper_left, upper_right, left, right, lower_left,
-                    lower_right) = _get_neighbor_passables(creature, direction)
-            if forward:
-                if (left and not upper_left and not lower_left or
-                        right and not upper_right and not lower_right):
-                    return None
+    def init_walk_mode(self, direction=None):
+        if self._any_creatures_visible():
+            self.io.msg("Not while there are creatures in the vicinity.")
+        if direction is None:
+            key_set = MAPPING.DIRECTIONS.keys() | MAPPING.GROUP_CANCEL
+            key = self.io.ask("Specify walking direction, {} to abort".format(MAPPING.CANCEL), key_set)
+            if key in MAPPING.DIRECTIONS:
+                direction = MAPPING.DIRECTIONS[key]
+
+        if direction is not None:
+            walk_mode_data = self._init_walk_mode(direction)
+            if walk_mode_data is not None:
+                self.state = walk_mode_data
+
+    def continue_walk(self):
+        if not self._any_creatures_visible():
+            old_direction, old_walk_type, timestamp, msg_time = self.state
+            if old_walk_type == WALK_IN_PLACE:
+                result = old_direction, old_walk_type
+            elif old_walk_type == CORRIDOR:
+                result = self._corridor_walk_type(old_direction)
             else:
-                if left and lower_left or right and lower_right:
-                    return None
-                walk_type = CORRIDOR
+                result = self._normal_walk_type(old_direction, old_walk_type)
 
-        return direction, walk_type, io.get_future_time(GAME.ANIMATION_DELAY), io.get_future_time(INTERRUPT_MSG_TIME)
+            if result is not None:
+                new_direction, new_walk_type = result
+                if msg_time < self.io.get_current_time():
+                    message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
+                else:
+                    message = ""
+                key = self.io.ask_until_timestamp(message, timestamp, MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE})
+                if key not in MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE}:
+                    if self.game.creature_move(self.creature, new_direction):
+                        walk_delay = self.io.get_future_time(GAME.ANIMATION_DELAY)
+                        self.state = new_direction, new_walk_type, walk_delay, msg_time
+                        return True
 
+        self.state = None
+        return False
 
-def walk_mode(io, game, creature, userinput):
-    if not _any_creatures_visible(game, creature):
-        old_direction, old_walk_type, timestamp, msg_time = userinput.walk_mode_data
-        if old_walk_type == WALK_IN_PLACE:
-            result = old_direction, old_walk_type
-        elif old_walk_type == CORRIDOR:
-            result = _corridor_walk_type(game, creature, old_direction)
-        else:
-            result = _normal_walk_type(game, creature, old_direction, old_walk_type)
+    def _init_walk_mode(self, direction):
+        if self.game.creature_move(self.creature, direction):
+            walk_type = self._get_walk_type(direction)
+            if walk_type != WALK_IN_PLACE:
+                (forward, upper_left, upper_right, left, right, lower_left,
+                        lower_right) = self._get_neighbor_passables(direction)
+                if forward:
+                    if (left and not upper_left and not lower_left or
+                            right and not upper_right and not lower_right):
+                        return None
+                else:
+                    if left and lower_left or right and lower_right:
+                        return None
+                    walk_type = CORRIDOR
 
-        if result is not None:
-            new_direction, new_walk_type = result
-            if msg_time < io.get_current_time():
-                message = "Press {} to interrupt walk mode".format(MAPPING.WALK_MODE)
-            else:
-                message = ""
-            key = io.ask_until_timestamp(message, timestamp, MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE})
-            if key not in MAPPING.GROUP_CANCEL | {MAPPING.WALK_MODE}:
-                if game.creature_move(creature, new_direction):
-                    walk_delay = io.get_future_time(GAME.ANIMATION_DELAY)
-                    userinput.walk_mode_data = new_direction, new_walk_type, walk_delay, msg_time
-                    return True
+            return direction, walk_type, self.io.get_future_time(GAME.ANIMATION_DELAY), self.io.get_future_time(INTERRUPT_MSG_TIME)
 
-    userinput.walk_mode_data = None
-    return False
-
-
-def _corridor_walk_type(game, creature, origin_direction):
-    forward_dirs, orthogonal_dirs, ignored_dirs = _get_corridor_candidate_dirs(creature, origin_direction)
-    if len(forward_dirs) == 1:
-        direction = forward_dirs.pop()
-        #if clockwise_45(direction) not in ignored_dirs and anticlockwise_45(direction) not in ignored_dirs:
-        return direction, CORRIDOR
-    elif len(forward_dirs) > 1 and len(orthogonal_dirs) == 1:
-        direction = orthogonal_dirs.pop()
-        if all(get_vector(direction, other) in DIR.ALL for other in forward_dirs):
-            #if clockwise_45(direction) not in ignored_dirs and anticlockwise_45(direction) not in ignored_dirs:
+    def _corridor_walk_type(self, origin_direction):
+        forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(origin_direction)
+        if len(forward_dirs) == 1:
+            direction = forward_dirs.pop()
             return direction, CORRIDOR
+        elif len(forward_dirs) > 1 and len(orthogonal_dirs) == 1:
+            direction = orthogonal_dirs.pop()
+            if all(get_vector(direction, other) in DIR.ALL for other in forward_dirs):
+                return direction, CORRIDOR
 
+    def _get_corridor_candidate_dirs(self, direction):
+        reverse = reverse_vector(direction)
+        back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
+        candidate_dirs = set(self.creature.level.get_tile_passable_neighbors(self.creature.coord)) - {reverse}
+        candidate_forward_dirs = candidate_dirs - back_sides
+        candidate_orthogonal_dirs = candidate_dirs & set(DIR.ORTHOGONALS)
+        ignored_dirs = candidate_dirs & back_sides
+        return candidate_forward_dirs, candidate_orthogonal_dirs, ignored_dirs
 
-def _get_corridor_candidate_dirs(creature, direction):
-    reverse = reverse_vector(direction)
-    back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
-    candidate_dirs = set(creature.level.get_tile_passable_neighbors(creature.coord)) - {reverse}
-    candidate_forward_dirs = candidate_dirs - back_sides
-    candidate_orthogonal_dirs = candidate_dirs & set(DIR.ORTHOGONALS)
-    ignored_dirs = candidate_dirs & back_sides
-    return candidate_forward_dirs, candidate_orthogonal_dirs, ignored_dirs
+    def _normal_walk_type(self, direction, old_walk_type):
+        forward = self._passable(direction)
+        new_walk_type = self._get_walk_type(direction)
+        if forward and old_walk_type == new_walk_type:
+            return direction, new_walk_type
 
+    def _passable(self, direction):
+        return self.creature.level.is_passable(add_vector(self.creature.coord, direction))
 
-def _normal_walk_type(game, creature, direction, old_walk_type):
-    forward = _passable(creature, direction)
-    new_walk_type = _get_walk_type(creature, direction)
-    if forward and old_walk_type == new_walk_type:
-        return direction, new_walk_type
+    def _get_neighbor_passables(self, direction):
+            upper_left_dir = anticlockwise_45(direction)
+            upper_right_dir = clockwise_45(direction)
 
+            forward = self._passable(direction)
+            left = self._passable(anticlockwise(direction))
+            right = self._passable(clockwise(direction))
+            upper_left = self._passable(upper_left_dir)
+            lower_left = self._passable(anticlockwise(upper_left_dir))
+            upper_right = self._passable(upper_right_dir)
+            lower_right = self._passable(clockwise(upper_right_dir))
+            return forward, upper_left, upper_right, left, right, lower_left, lower_right
 
-def _passable(creature, direction):
-    return creature.level.is_passable(add_vector(creature.coord, direction))
+    def _get_walk_type(self, direction):
+        if direction in DIR.ORTHOGONALS:
+            left = self._passable(anticlockwise(direction))
+            right = self._passable(clockwise(direction))
+        elif direction in DIR.DIAGONALS:
+            left = self._passable(anticlockwise_45(direction))
+            right = self._passable(clockwise_45(direction))
+        elif direction == DIR.STOP:
+            left = None
+            right = None
+        else:
+            raise Exception("Not a valid moving direction {0}".format(direction))
+        return (left, right)
 
-
-def _get_neighbor_passables(creature, direction):
-        upper_left_dir = anticlockwise_45(direction)
-        upper_right_dir = clockwise_45(direction)
-        forward = _passable(creature, direction)
-        left = _passable(creature, anticlockwise(direction))
-        right = _passable(creature, clockwise(direction))
-        upper_left = _passable(creature, upper_left_dir)
-        lower_left = _passable(creature, anticlockwise(upper_left_dir))
-        upper_right = _passable(creature, upper_right_dir)
-        lower_right = _passable(creature, clockwise(upper_right_dir))
-        return forward, upper_left, upper_right, left, right, lower_left, lower_right
-
-
-def _get_walk_type(creature, direction):
-    if direction in DIR.ORTHOGONALS:
-        left = _passable(creature, anticlockwise(direction))
-        right = _passable(creature, clockwise(direction))
-    elif direction in DIR.DIAGONALS:
-        left = _passable(creature, anticlockwise_45(direction))
-        right = _passable(creature, clockwise_45(direction))
-    elif direction == DIR.STOP:
-        left = None
-        right = None
-    else:
-        raise Exception("Not a valid moving direction {0}".format(direction))
-    return (left, right)
-
-
-def _any_creatures_visible(game, creature):
-    return any(creature.level.has_creature(coord) for coord in game.current_vision if coord != creature.coord)
+    def _any_creatures_visible(self):
+        return any(self.creature.level.has_creature(coord) for coord in self.game.current_vision if coord != self.creature.coord)

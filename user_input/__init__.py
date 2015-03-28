@@ -11,7 +11,7 @@ import mappings as MAPPING
 import rdg
 from functools import partial
 from .inventory import equipment
-from .walk_mode import walk_mode, walk_mode_init
+from .walk_mode import WalkMode
 from config import debug
 from generic_algorithms import add_vector
 
@@ -21,7 +21,7 @@ class UserInput(object):
         self.game = game
         self.creature = creature
         self.io = io_system
-        self.walk_mode_data = None
+        self.walk_mode = WalkMode(self.game, self.creature, self.io)
         self.actions = {
             KEY.CLOSE_WINDOW:   self.endgame,
             MAPPING.QUIT:       self.endgame,
@@ -32,7 +32,7 @@ class UserInput(object):
             MAPPING.LOOK_MODE:  self.look,
             MAPPING.HELP:       self.help_screen,
             MAPPING.INVENTORY:  self.equipment,
-            MAPPING.WALK_MODE:  self.walk_mode,
+            MAPPING.WALK_MODE:  self.init_walk_mode,
             MAPPING.ASCEND:     partial(self.enter, GAME.PASSAGE_UP),
             MAPPING.DESCEND:    partial(self.enter, GAME.PASSAGE_DOWN),
 
@@ -40,15 +40,15 @@ class UserInput(object):
             '+':  partial(self.sight_change, 1),
             '-':  partial(self.sight_change, -1),
         }
-        for key, value in MAPPING.DIRECTIONS.items():
-            self.actions[key] = partial(self.act_to_dir, value)
-        for key, value in MAPPING.INSTANT_WALK_MODE.items():
-            self.actions[key] = partial(self.walk_mode, value)
+        for key, direction in MAPPING.DIRECTIONS.items():
+            self.actions[key] = partial(self.act_to_dir, direction)
+        for key, direction in MAPPING.INSTANT_WALK_MODE.items():
+            self.actions[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
         while self.creature.can_act():
-            if self.walk_mode_data is not None:
-                walk_mode(self.io, self.game, self.creature, self)
+            if self.walk_mode.is_walk_mode_active():
+                self.walk_mode.continue_walk()
             else:
                 key = self.io.get_key()
                 if key in self.actions:
@@ -210,8 +210,8 @@ class UserInput(object):
     def equipment(self):
         return equipment(self.io, self.game, self.creature)
 
-    def walk_mode(self, instant_direction=None):
-        return walk_mode_init(self.io, self.game, self.creature, self, instant_direction)
+    def init_walk_mode(self, instant_direction=None):
+        return self.walk_mode.init_walk_mode(instant_direction)
 
     def help_screen(self):
         header = "Help Screen, ^ means ctrl, ! means alt"

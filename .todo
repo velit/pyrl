@@ -84,6 +84,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1333839359" done="1427482645">
+        Make libtcod keys represent shift/ctrl/alt keys in their __str__
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1334875084" done="1335475471">
         retab project to spaces
         <comment>
@@ -104,6 +110,18 @@
     </note>
     <note priority="veryhigh" time="1402756261" done="1403627050">
         Make rdg.py use a class
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1426806766" done="1427481338">
+        Make mock-io wrapper
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1426898176" done="1427481341">
+        Remove io from being a global thing in main and make it a dependency injection into game
         <comment>
             done
         </comment>
@@ -204,6 +222,12 @@
             d
         </comment>
     </note>
+    <note priority="high" time="1426791146" done="1427481417">
+        Investigate if it's possible to remove the global io-system and make it an attribute in game
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -240,6 +264,12 @@
             donesies
         </comment>
     </note>
+    <note priority="medium" time="1420977210" done="1427481472">
+        Mark things that shouldn't be pickled instead of a hack with global vars to bypass the need. (user_input in Game)
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="low" time="1315155844" done="1355047491">
         wizard/mana, warrior/stamina rogue/focus
         <comment>
@@ -265,13 +295,7 @@
         </comment>
     </note>
     <note priority="veryhigh" time="1315707472">
-        Make print_lines scrollable
-    </note>
-    <note priority="veryhigh" time="1330904930">
-        Add a function that draws the square how it's supposed to be seen
-    </note>
-    <note priority="veryhigh" time="1333839359">
-        Make libtcod keys represent shift/ctrl/alt keys in their __str__
+        Make print_lines scrollable / Improve views
     </note>
     <note priority="veryhigh" time="1335477455">
         Make a priority queue based scheduling
@@ -279,29 +303,26 @@
     <note priority="veryhigh" time="1402783190">
         Add a wrapper that prints to player or messages AI based on processed creature actions
     </note>
-    <note priority="veryhigh" time="1426806766">
-        Make mock-io wrapper
-    </note>
-    <note priority="veryhigh" time="1426898176">
-        Remove io from being a global thing in main and make it a dependency injection into game
-    </note>
-    <note priority="veryhigh" time="1427332689">
+    <note priority="veryhigh" time="1427332689" done="1427502341">
         Make walk mode a frigging class...
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1427497885">
+        Populate creature_actions.py
+    </note>
+    <note priority="high" time="1330904930">
+        Add a function that draws the square how it's supposed to be seen. Used for precise redraws (?)
     </note>
     <note priority="high" time="1331941016">
         Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
     </note>
-    <note priority="high" time="1333062945">
-        Add configurable keybindings
-    </note>
-    <note priority="high" time="1360038167">
-        Implement wait mode
-    </note>
-    <note priority="high" time="1426791146">
-        Investigate if it's possible to remove the global io-system and make it an attribute in game
-    </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
+    </note>
+    <note priority="high" time="1427501653">
+        Add messages when stepping on objects (items, staircases)
     </note>
     <note priority="medium" time="1315691945">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
@@ -309,8 +330,11 @@
     <note priority="medium" time="1329647500">
         Make a curses getstring method
     </note>
-    <note priority="medium" time="1420977210">
-        Mark things that shouldn't be pickled instead of a hack with global vars to bypass the need. (user_input in Game)
+    <note priority="medium" time="1333062945">
+        Make configurable keybindings support shift keys.
+    </note>
+    <note priority="medium" time="1360038167">
+        Implement wait mode
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels
