@@ -32,7 +32,7 @@ class Level(object):
 
         if level_template.use_dynamic_monsters:
             self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
-            for x in range(GAME.MONSTERS_PER_LEVEL):
+            for _ in range(GAME.MONSTERS_PER_LEVEL):
                 self._spawn_random_creature()
 
     # nudge_coord nudges towards a line between this and start_coord

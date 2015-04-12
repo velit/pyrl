@@ -4,6 +4,9 @@ test:
 test-all:
 	py.test-3
 
+future-test:
+	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py
+
 profile-test:
 	python3 -m profile_util.run_profiler
 	less data/profiling_results
