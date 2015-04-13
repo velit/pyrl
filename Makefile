@@ -11,15 +11,7 @@ profile-test:
 	python3 -m profile_util.run_profiler
 	less data/profiling_results
 
-profile-test-2:
-	python2 -m profile_util.run_profiler
-	less data/profiling_results
-
-pypy-profile-test:
-	pypy -m profile_util.run_profiler
-	less data/profiling_results
-
-profile-pyrl:
+profile-in-place:
 	./pyrl.py -p
 	less data/profiling_results
 

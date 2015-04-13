@@ -12,30 +12,29 @@ line of sight of the player.
 Running pyrl
 ============
 
-Execute either 'pyrl.py' or 'sdlpyrl.py' depending on if you want the ncurses or
+Execute either 'pyrl.py' or 'sdlpyrl.py' depending on if you want the terminal or
 SDL version of the game. Windows supports only the SDL version.
 
 ### Windows sdlpyrl.py requirements
 
-* Python 2.7 32-bit (Libtcod forces 32-bit)
+* Python 3.4 32-bit (Libtcod forces 32-bit)
 
 ### \*nix sdlpyrl.py requirements
 
-* Python 2.7
-* libSDL (package name is libsdl1.2debian)
+* Python 3.4
+* libSDL (package name is libsdl1.2debian in debian based distros)
 
 ### \*nix and Mac pyrl.py requirements
 
-* Python 2.7 or Python 3.2 (Works for both, libtcod forces python 2 but pyrl
-  itself supports both)
+* Python 3.4
 * libncurses (Base package should come pre-installed in most \*nixes)
-* A terminal or a terminal emulator
+* Terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
 
 
 Installing SDL
 --------------
 
-A .dll for SDL comes bundled with the game on windows.
+A .dll for SDL comes bundled with the game for windows.
 
 ### Ubuntu or Debian
     sudo apt-get install libsdl1.2debian (if incorrect, don't hesitate to use
