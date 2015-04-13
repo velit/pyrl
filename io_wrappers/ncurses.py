@@ -8,7 +8,6 @@ except ImportError:
     sys.exit(1)
 
 import curses.ascii
-import locale
 import logging
 
 import const.game as GAME
@@ -62,7 +61,6 @@ class NCursesWindowWrapper(object):
 
     IMPLEMENTATION = GAME.NCURSES
     _color_map = None
-    _encoding = None
     _key_map = ncurses_key_map
 
     @classmethod
@@ -73,8 +71,6 @@ class NCursesWindowWrapper(object):
         This function has to be called separately if this class is used directly
         instead from NCursesWrapper().new_window(dimensions).
         """
-        cls._encoding = locale.getpreferredencoding()
-
         global _root_win
         _root_win = cls(_init_curses(curses_root_window))
 
@@ -91,25 +87,25 @@ class NCursesWindowWrapper(object):
 
     def addch(self, y, x, char):
         symbol, color = char
-        self.win.addch(y, x, symbol.encode(self._encoding), self._color_map[color])
+        self.win.addch(y, x, symbol, self._color_map[color])
 
     def addstr(self, y, x, string, color=None):
         if color is None:
-            self.win.addstr(y, x, string.encode(self._encoding))
+            self.win.addstr(y, x, string)
         else:
-            self.win.addstr(y, x, string.encode(self._encoding), self._color_map[color])
+            self.win.addstr(y, x, string, self._color_map[color])
 
     def draw(self, char_payload_sequence):
         d = self.win.addch
         local_color = self._color_map
         for y, x, (symbol, color) in char_payload_sequence:
-            d(y, x, symbol.encode(self._encoding), local_color[color])
+            d(y, x, symbol, local_color[color])
 
     def draw_reverse(self, char_payload_sequence):
         d = self.win.addch
         local_color = self._color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            d(y, x, symbol.encode(self._encoding), local_color[bg, fg])
+            d(y, x, symbol, local_color[bg, fg])
 
     def clear(self):
         self.win.erase()
@@ -175,13 +171,13 @@ class NCursesWindowWrapper(object):
                        "current size is {}x{}. Please resize the screen or "
                        "press Q to quit.")
             message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
-            _root_win.addstr(0, 0, message.encode(cls._encoding))
+            _root_win.addstr(0, 0, message)
             _root_win.win.refresh()
 
             if _root_win.get_key() == "Q":
                 _root_win.clear()
                 message = "Confirm quit by pressing Y."
-                _root_win.addstr(0, 0, message.encode(cls._encoding))
+                _root_win.addstr(0, 0, message)
                 _root_win.win.refresh()
                 if _root_win.get_key() == "Y":
                     exit()

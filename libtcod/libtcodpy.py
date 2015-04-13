@@ -1,5 +1,5 @@
 #
-# libtcod 1.5.1 python wrapper
+# libtcod 1.5.2 python wrapper
 # Copyright (c) 2008,2009,2010 Jice & Mingos
 # All rights reserved.
 #
@@ -78,9 +78,9 @@ else:
     _lib.TCOD_image_get_mipmap_pixel = _lib.TCOD_image_get_mipmap_pixel_wrapper
     _lib.TCOD_parser_get_color_property = _lib.TCOD_parser_get_color_property_wrapper
 
-HEXVERSION = 0x010501
-STRVERSION = "1.5.1"
-TECHVERSION = 0x01050103
+HEXVERSION = 0x010502
+STRVERSION = "1.5.2"
+TECHVERSION = 0x01050200
 
 ############################
 # color module
@@ -479,6 +479,8 @@ class ConsoleBuffer:
 _lib.TCOD_console_credits_render.restype = c_bool
 _lib.TCOD_console_is_fullscreen.restype = c_bool
 _lib.TCOD_console_is_window_closed.restype = c_bool
+_lib.TCOD_console_has_mouse_focus.restype = c_bool
+_lib.TCOD_console_is_active.restype = c_bool
 _lib.TCOD_console_get_default_background.restype = Color
 _lib.TCOD_console_get_default_foreground.restype = Color
 _lib.TCOD_console_get_char_background.restype = Color
@@ -716,7 +718,7 @@ def console_map_ascii_code_to_font(asciiCode, fontCharX, fontCharY):
 
 def console_map_ascii_codes_to_font(firstAsciiCode, nbCodes, fontCharX,
                                     fontCharY):
-    if type(firstAsciiCode) == str or type(asciiCode) == bytes:
+    if type(firstAsciiCode) == str or type(firstAsciiCode) == bytes:
         _lib.TCOD_console_map_ascii_codes_to_font(ord(firstAsciiCode), nbCodes,
                                                   fontCharX, fontCharY)
     else:
@@ -737,6 +739,12 @@ def console_set_fullscreen(fullscreen):
 
 def console_is_window_closed():
     return _lib.TCOD_console_is_window_closed()
+
+def console_has_mouse_focus():
+    return _lib.TCOD_console_has_mouse_focus()
+
+def console_is_active():
+    return _lib.TCOD_console_is_active()
 
 def console_set_window_title(title):
     _lib.TCOD_console_set_window_title(c_char_p(title))
@@ -917,9 +925,9 @@ def console_fill_foreground(con,r,g,b) :
     if (numpy_available and isinstance(r, numpy.ndarray) and
         isinstance(g, numpy.ndarray) and isinstance(b, numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = numpy.ascontiguousarray(r, dtype=numpy.int_)
-        g = numpy.ascontiguousarray(g, dtype=numpy.int_)
-        b = numpy.ascontiguousarray(b, dtype=numpy.int_)
+        r = numpy.ascontiguousarray(r, dtype=numpy.int32)
+        g = numpy.ascontiguousarray(g, dtype=numpy.int32)
+        b = numpy.ascontiguousarray(b, dtype=numpy.int32)
         cr = r.ctypes.data_as(POINTER(c_int))
         cg = g.ctypes.data_as(POINTER(c_int))
         cb = b.ctypes.data_as(POINTER(c_int))
@@ -938,9 +946,9 @@ def console_fill_background(con,r,g,b) :
     if (numpy_available and isinstance(r, numpy.ndarray) and
         isinstance(g, numpy.ndarray) and isinstance(b, numpy.ndarray)):
         #numpy arrays, use numpy's ctypes functions
-        r = numpy.ascontiguousarray(r, dtype=numpy.int_)
-        g = numpy.ascontiguousarray(g, dtype=numpy.int_)
-        b = numpy.ascontiguousarray(b, dtype=numpy.int_)
+        r = numpy.ascontiguousarray(r, dtype=numpy.int32)
+        g = numpy.ascontiguousarray(g, dtype=numpy.int32)
+        b = numpy.ascontiguousarray(b, dtype=numpy.int32)
         cr = r.ctypes.data_as(POINTER(c_int))
         cg = g.ctypes.data_as(POINTER(c_int))
         cb = b.ctypes.data_as(POINTER(c_int))
@@ -955,7 +963,7 @@ def console_fill_background(con,r,g,b) :
 def console_fill_char(con,arr) :
     if (numpy_available and isinstance(arr, numpy.ndarray) ):
         #numpy arrays, use numpy's ctypes functions
-        arr = numpy.ascontiguousarray(arr, dtype=numpy.int_)
+        arr = numpy.ascontiguousarray(arr, dtype=numpy.int32)
         carr = arr.ctypes.data_as(POINTER(c_int))
     else:
         #otherwise convert using the struct module
@@ -1035,6 +1043,7 @@ def sys_register_SDL_renderer(callback):
     _lib.TCOD_sys_register_SDL_renderer(sdl_renderer_func)
 
 # events
+EVENT_NONE=0
 EVENT_KEY_PRESS=1
 EVENT_KEY_RELEASE=2
 EVENT_KEY=EVENT_KEY_PRESS|EVENT_KEY_RELEASE
@@ -1203,6 +1212,7 @@ def mouse_get_status():
 ############################
 _lib.TCOD_struct_get_name.restype = c_char_p
 _lib.TCOD_struct_is_mandatory.restype = c_bool
+_lib.TCOD_parser_has_property.restype = c_bool
 _lib.TCOD_parser_get_bool_property.restype = c_bool
 _lib.TCOD_parser_get_float_property.restype = c_float
 _lib.TCOD_parser_get_string_property.restype = c_char_p
@@ -1363,6 +1373,9 @@ def parser_run(parser, filename, listener=0):
 
 def parser_delete(parser):
     _lib.TCOD_parser_delete(parser)
+
+def parser_has_property(parser, name):
+    return _lib.TCOD_parser_has_property(parser, c_char_p(name))
 
 def parser_get_bool_property(parser, name):
     return _lib.TCOD_parser_get_bool_property(parser, c_char_p(name))
@@ -1859,6 +1872,9 @@ def heightmap_add_hill(hm, x, y, radius, height):
 def heightmap_dig_hill(hm, x, y, radius, height):
     _lib.TCOD_heightmap_dig_hill(hm.p, c_float( x), c_float( y),
                                  c_float( radius), c_float( height))
+
+def heightmap_mid_point_displacement(hm, rng, roughness):
+    _lib.TCOD_heightmap_mid_point_displacement(hm.p, rng, c_float(roughness))
 
 def heightmap_rain_erosion(hm, nbDrops, erosionCoef, sedimentationCoef, rnd=0):
     _lib.TCOD_heightmap_rain_erosion(hm.p, nbDrops, c_float( erosionCoef),

@@ -8,7 +8,6 @@ except Exception as e:
     print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
     sys.exit(1)
 
-import locale
 import const.game as GAME
 import const.keys as KEY
 from io_wrappers.libtcod_dicts import libtcod_color_map
@@ -21,11 +20,10 @@ class LibTCODWrapper(object):
 
     def __init__(self, curses_root_window=None):
         """Init the SDL surface and prepare for draw calls."""
-        libtcod.console_set_custom_font("data/terminal10x18_gs_ro.png",
-                                        libtcod.FONT_TYPE_GREYSCALE |
-                                        libtcod.FONT_LAYOUT_ASCII_INROW)
+        flags = libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW
+        libtcod.console_set_custom_font(b"data/terminal10x18_gs_ro.png", flags)
         libtcod.console_init_root(GAME.SCREEN_COLS, GAME.SCREEN_ROWS,
-                                  GAME.GAME_NAME, False, libtcod.RENDERER_SDL)
+                                  GAME.GAME_NAME.encode(), False, libtcod.RENDERER_SDL)
         LibTCODWindow.init()
 
     def new_window(self, dimensions):
@@ -54,7 +52,6 @@ class LibTCODWrapper(object):
 class LibTCODWindow(object):
 
     _root_win = None
-    _encoding = None
     _default_fg = libtcod.white
     _default_bg = libtcod.black
     _key_map = libtcod_key_map
@@ -70,7 +67,6 @@ class LibTCODWindow(object):
         directly instead of from LibTCODWrapper().new_window(dimensions)
         """
         cls._root_win = 0
-        cls._encoding = locale.getpreferredencoding()
 
     def __init__(self, libtcod_window):
         self.win = libtcod_window
@@ -123,18 +119,17 @@ class LibTCODWindow(object):
 
     def addch(self, y, x, char):
         symbol, (fg, bg) = char
-        libtcod.console_put_char_ex(self.win, x, y,
-                                    symbol.encode(self._encoding),
+        libtcod.console_put_char_ex(self.win, x, y, symbol,
                                     self._color_map[fg], self._color_map[bg])
 
     def addstr(self, y, x, string, color=None):
         if color is None:
-            libtcod.console_print(self.win, x, y, string.encode(self._encoding))
+            libtcod.console_print(self.win, x, y, string)
         else:
             fg, bg = color
             libtcod.console_set_default_foreground(self.win, self._color_map[fg])
             libtcod.console_set_default_background(self.win, self._color_map[bg])
-            libtcod.console_print(self.win, x, y, string.encode(self._encoding))
+            libtcod.console_print(self.win, x, y, string)
             libtcod.console_set_default_foreground(self.win, self._default_fg)
             libtcod.console_set_default_background(self.win, self._default_bg)
 
@@ -142,12 +137,12 @@ class LibTCODWindow(object):
         d = libtcod.console_put_char_ex
         local_color = self._color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.win, x, y, symbol.encode(self._encoding), local_color[fg],
+            d(self.win, x, y, symbol, local_color[fg],
               local_color[bg])
 
     def draw_reverse(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
         local_color = self._color_map
         for y, x, (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.win, x, y, symbol.encode(self._encoding), local_color[bg],
+            d(self.win, x, y, symbol, local_color[bg],
               local_color[fg])
