@@ -3,24 +3,23 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import OrderedDict
 
 import const.slots as SLOT
-import mappings as MAPPING
-from mappings import CANCEL, GROUP_DEFAULT, VIEW_INVENTORY, INVENTORY_KEYS
+from mappings import Mapping
 
 equipment_slots = OrderedDict()
-equipment_slots[MAPPING.EQUIPMENT_SLOT_HEAD] = SLOT.HEAD
-equipment_slots[MAPPING.EQUIPMENT_SLOT_BODY] = SLOT.BODY
-equipment_slots[MAPPING.EQUIPMENT_SLOT_RIGHT_HAND] = SLOT.RIGHT_HAND
-equipment_slots[MAPPING.EQUIPMENT_SLOT_FEET] = SLOT.FEET
+equipment_slots[Mapping.Equipment_Slot_Head] = SLOT.HEAD
+equipment_slots[Mapping.Equipment_Slot_Body] = SLOT.BODY
+equipment_slots[Mapping.Equipment_Slot_Right_Hand] = SLOT.RIGHT_HAND
+equipment_slots[Mapping.Equipment_Slot_Feet] = SLOT.FEET
 
 
 def equipment(io, game, creature):
     while True:
         header = "Equipment"
         footer = "Press a slot key to (un)equip, {} to view backpack, {} to close"
-        footer = footer.format(VIEW_INVENTORY, CANCEL)
+        footer = footer.format(Mapping.View_Inventory, Mapping.Cancel)
         fmt_str = "{0} - {1:11}: {2}"
-        lines = (fmt_str.format(key.upper(), slot, creature.get_item(slot)) for key, slot in equipment_slots.viewitems())
-        key = io.menu(header, lines, footer, equipment_slots.viewkeys() | set((VIEW_INVENTORY, )) | GROUP_DEFAULT)
+        lines = (fmt_str.format(key.upper(), slot, creature.get_item(slot)) for key, slot in equipment_slots.items())
+        key = io.menu(header, lines, footer, equipment_slots.keys() | set((Mapping.View_Inventory, )) | Mapping.Group_Default)
         if key in equipment_slots:
             slot = equipment_slots[key]
             if creature.get_item(slot) is None:
@@ -31,25 +30,25 @@ def equipment(io, game, creature):
             else:
                 unequipped_item = creature.unequip(equipment_slots[key])
                 creature.bag_item(unequipped_item)
-        elif key == VIEW_INVENTORY:
+        elif key == Mapping.View_Inventory:
             inventory(io, game, creature)
-        elif key in GROUP_DEFAULT:
+        elif key in Mapping.Group_Default:
             return
 
 
 def inventory(io, game, creature, slot=None):
     header = "Inventory"
-    footer = "{} to close".format(CANCEL)
+    footer = "{} to close".format(Mapping.Cancel)
     fmt_str = "{0} - {1}"
-    inventory_slice = OrderedDict(zip(INVENTORY_KEYS, creature.get_inventory_items(slot)))
-    lines = (fmt_str.format(key.upper(), item) for key, item in inventory_slice.viewitems())
-    key_set = GROUP_DEFAULT
+    inventory_slice = OrderedDict(zip(Mapping.Inventory_Keys, creature.get_inventory_items(slot)))
+    lines = (fmt_str.format(key.upper(), item) for key, item in inventory_slice.items())
+    key_set = Mapping.Group_Default
     if slot is not None:
-        key_set |= set(inventory_slice.viewkeys())
+        key_set |= set(inventory_slice.keys())
     key = io.menu(header, lines, footer, key_set)
-    if key in inventory_slice.viewkeys():
+    if key in inventory_slice.keys():
         return inventory_slice[key]
-    elif key in GROUP_DEFAULT:
+    elif key in Mapping.Group_Default:
         return
     else:
         assert False

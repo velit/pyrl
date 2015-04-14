@@ -5,7 +5,7 @@ from dice import Dice
 
 
 def get_stats_str(stats):
-    stats_str = ", ".join("{0}:{1}".format(stat, value) for stat, value in stats.viewitems())
+    stats_str = ", ".join("{0}:{1}".format(stat, value) for stat, value in stats.items())
     return "{" + stats_str + "}"
 
 

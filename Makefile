@@ -1,3 +1,6 @@
+test-porcelain-output:
+	py.test-3 -q -k-slow --tb=line
+
 test:
 	py.test-3 -k-slow
 

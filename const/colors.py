@@ -1,63 +1,61 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 
-BASE_RED          = "COLOR_RED"
-BASE_GREEN        = "COLOR_GREEN"
-BASE_BLUE         = "COLOR_BLUE"
+class Color(object):
+    Red          = "Red"
+    Green        = "Green"
+    Blue         = "Blue"
 
-BASE_PURPLE       = "COLOR_PURPLE"
-BASE_CYAN         = "COLOR_CYAN"
-BASE_YELLOW       = "COLOR_YELLOW"
-BASE_BROWN        = "COLOR_BROWN"
+    Purple       = "Purple"
+    Cyan         = "Cyan"
+    Yellow       = "Yellow"
+    Brown        = "Brown"
 
-BASE_DARK_BLUE    = "COLOR_DARK_BLUE"
-BASE_DARK_BROWN   = "COLOR_DARK_BROWN"
+    Dark_Blue    = "Dark Blue"
+    Dark_Brown   = "Dark Brown"
 
-BASE_LIGHT_RED    = "COLOR_LIGHT_RED"
-BASE_LIGHT_GREEN  = "COLOR_LIGHT_GREEN"
-BASE_LIGHT_BLUE   = "COLOR_LIGHT_BLUE"
+    Light_Red    = "Light Red"
+    Light_Green  = "Light Green"
+    Light_Blue   = "Light Blue"
 
-BASE_LIGHT_PURPLE = "COLOR_LIGHT_PURPLE"
-BASE_LIGHT_CYAN   = "COLOR_LIGHT_CYAN"
+    Light_Purple = "Light Purple"
+    Light_Cyan   = "Light Cyan"
 
-BASE_WHITE        = "COLOR_WHITE"      # 255
-BASE_LIGHT        = "COLOR_LIGHT"      # 218
-BASE_NORMAL       = "COLOR_NORMAL"     # 187
-BASE_LIGHT_GRAY   = "COLOR_LIGHT_GRAY" # 168
-BASE_GRAY         = "COLOR_GRAY"       # 138
-BASE_DARK_GRAY    = "COLOR_DARK_GRAY"  # 108
-BASE_DARK         = "COLOR_DARK"       # 78
-BASE_DARKER       = "COLOR_DARKER"     # 48
-BASE_DARKEST      = "COLOR_DARKEST"    # 18
-BASE_BLACK        = "COLOR_BLACK"      # 0
+    White        = "White"       # Brightness 255
+    Light        = "Light"       # 218
+    Normal       = "Normal"      # 187
+    Light_Gray   = "Light Gray"  # 168
+    Gray         = "Gray"        # 138
+    Dark_Gray    = "Dark Gray"   # 108
+    Dark         = "Dark"        # 78
+    Darker       = "Darker"      # 48
+    Darkest      = "Darkest"     # 18
+    Black        = "Black"       # 0
 
-RED          = (BASE_RED, BASE_BLACK)
-GREEN        = (BASE_GREEN, BASE_BLACK)
-BLUE         = (BASE_BLUE, BASE_BLACK)
 
-PURPLE       = (BASE_PURPLE, BASE_BLACK)
-CYAN         = (BASE_CYAN, BASE_BLACK)
-YELLOW       = (BASE_YELLOW, BASE_BLACK)
-BROWN        = (BASE_BROWN, BASE_BLACK)
-
-DARK_BLUE    = (BASE_DARK_BLUE, BASE_BLACK)
-DARK_BROWN   = (BASE_DARK_BROWN, BASE_BLACK)
-
-LIGHT_RED    = (BASE_LIGHT_RED, BASE_BLACK)
-LIGHT_GREEN  = (BASE_LIGHT_GREEN, BASE_BLACK)
-LIGHT_BLUE   = (BASE_LIGHT_BLUE, BASE_BLACK)
-
-LIGHT_PURPLE = (BASE_LIGHT_PURPLE, BASE_BLACK)
-LIGHT_CYAN   = (BASE_LIGHT_CYAN, BASE_BLACK)
-
-WHITE        = (BASE_WHITE, BASE_BLACK)
-LIGHT        = (BASE_LIGHT, BASE_BLACK)
-NORMAL       = (BASE_NORMAL, BASE_BLACK)
-LIGHT_GRAY   = (BASE_LIGHT_GRAY, BASE_BLACK)
-GRAY         = (BASE_GRAY, BASE_BLACK)
-DARK_GRAY    = (BASE_DARK_GRAY, BASE_BLACK)
-DARK         = (BASE_DARK, BASE_BLACK)
-DARKER       = (BASE_DARKER, BASE_BLACK)
-DARKEST      = (BASE_DARKEST, BASE_BLACK)
-DARK         = (BASE_DARK, BASE_BLACK)
-BLACK        = (BASE_BLACK, BASE_BLACK)
+class Pair(object):
+    Red          = (Color.Red,           Color.Black)
+    Green        = (Color.Green,         Color.Black)
+    Blue         = (Color.Blue,          Color.Black)
+    Purple       = (Color.Purple,        Color.Black)
+    Cyan         = (Color.Cyan,          Color.Black)
+    Yellow       = (Color.Yellow,        Color.Black)
+    Brown        = (Color.Brown,         Color.Black)
+    Dark_Blue    = (Color.Dark_Blue,     Color.Black)
+    Dark_Brown   = (Color.Dark_Brown,    Color.Black)
+    Light_Red    = (Color.Light_Red,     Color.Black)
+    Light_Green  = (Color.Light_Green,   Color.Black)
+    Light_Blue   = (Color.Light_Blue,    Color.Black)
+    Light_Purple = (Color.Light_Purple,  Color.Black)
+    Light_Cyan   = (Color.Light_Cyan,    Color.Black)
+    White        = (Color.White,         Color.Black)
+    Light        = (Color.Light,         Color.Black)
+    Normal       = (Color.Normal,        Color.Black)
+    Light_Gray   = (Color.Light_Gray,    Color.Black)
+    Gray         = (Color.Gray,          Color.Black)
+    Dark_Gray    = (Color.Dark_Gray,     Color.Black)
+    Dark         = (Color.Dark,          Color.Black)
+    Darker       = (Color.Darker,        Color.Black)
+    Darkest      = (Color.Darkest,       Color.Black)
+    Dark         = (Color.Dark,          Color.Black)
+    Black        = (Color.Black,         Color.Black)

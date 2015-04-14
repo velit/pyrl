@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-import const.colors as COLOR
+from const.colors import Pair
 import const.game as GAME
-import const.keys as KEY
+from const.keys import Key
 
 
 class BaseWindow(object):
@@ -57,7 +57,7 @@ class BaseWindow(object):
         key = self.check_key()
         while key not in key_set:
             if time.time() >= timestamp:
-                return KEY.NO_INPUT
+                return Key.NO_INPUT
             time.sleep(GAME.INPUT_INTERVAL)
             key = self.check_key()
         return key
@@ -70,7 +70,7 @@ class BaseWindow(object):
         self.blit()
         self.cursor_lib.flush()
 
-    def draw_header(self, header, color=COLOR.BROWN, y=0):
+    def draw_header(self, header, color=Pair.Brown, y=0):
         format_str = "{0:+^" + str(self.cols) + "}"
         header = format_str.format("  " + header + "  ")
         self.addstr(y, 0, header, color)
@@ -79,7 +79,7 @@ class BaseWindow(object):
         for i, line in enumerate(lines):
             self.addstr(y_offset + i, x_offset, line)
 
-    def draw_footer(self, footer, color=COLOR.BROWN, y=0):
+    def draw_footer(self, footer, color=Pair.Brown, y=0):
         format_str = "{0:+^" + str(self.cols) + "}"
         footer = format_str.format("  " + footer + "  ")
         self.addstr((self.rows - 1) - y, 0, footer, color)

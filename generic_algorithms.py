@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import fractions
+from const.directions import Dir
 
 
 def bresenham(coord_a, coord_b):
@@ -89,31 +90,11 @@ def anticlockwise(vector):
 
 
 def anticlockwise_45(vector):
-    turn = {
-        (1, 0):    (1, 1),
-        (1, 1):    (0, 1),
-        (0, 1):    (-1, 1),
-        (-1, 1):   (-1, 0),
-        (-1, 0):   (-1, -1),
-        (-1, -1):  (0, -1),
-        (0, -1):   (1, -1),
-        (1, -1):   (1, 0),
-    }
-    return turn[vector]
+    return Dir.counter_clockwise[vector]
 
 
 def clockwise_45(vector):
-    turn = {
-        (1, 0):    (1, -1),
-        (1, 1):    (1, 0),
-        (0, 1):    (1, 1),
-        (-1, 1):   (0, 1),
-        (-1, 0):   (-1, 1),
-        (-1, -1):  (-1, 0),
-        (0, -1):   (-1, -1),
-        (1, -1):   (0, -1),
-    }
-    return turn[vector]
+    return Dir.clockwise[vector]
 
 
 def resize_vector_to_len(vector, length):

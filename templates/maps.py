@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import const.game as GAME
-from const.colors import PURPLE
+from const.colors import Pair
 from level_template import LevelTemplate
 from monster_template import MonsterTemplate
 from world_template import WorldTemplate
@@ -49,7 +49,7 @@ def get_world_template():
             "################################################################################################"
         ),
         static_monster_seq=(
-            MonsterTemplate("The Crone", ('@', PURPLE)),
+            MonsterTemplate("The Crone", ('@', Pair.Purple)),
         )
     )
     world.add_level(DUNGEON, L0)

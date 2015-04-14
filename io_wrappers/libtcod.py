@@ -9,7 +9,7 @@ except Exception as e:
     sys.exit(1)
 
 import const.game as GAME
-import const.keys as KEY
+from const.keys import Key
 from io_wrappers.libtcod_dicts import libtcod_color_map
 from io_wrappers.libtcod_dicts import libtcod_key_map
 
@@ -80,7 +80,7 @@ class LibTCODWindow(object):
             mouse_event = libtcod.Mouse()
             libtcod.sys_wait_for_event(libtcod.EVENT_KEY_PRESS, key_event, mouse_event, False)
             key = cls._interpret_event(key_event)
-            if key != KEY.NO_INPUT:
+            if key != Key.NO_INPUT:
                 return key
 
     @classmethod
@@ -91,7 +91,7 @@ class LibTCODWindow(object):
     @classmethod
     def _interpret_event(cls, event):
         if libtcod.console_is_window_closed():
-            return KEY.CLOSE_WINDOW
+            return Key.CLOSE_WINDOW
         elif event.vk in cls._key_map:
             return cls._key_map[event.vk]
         elif event.vk == libtcod.KEY_CHAR:
@@ -104,7 +104,7 @@ class LibTCODWindow(object):
                 ch = "!" + ch
             return ch
         else:
-            return KEY.NO_INPUT
+            return Key.NO_INPUT
 
     def clear(self):
         libtcod.console_clear(self.win)

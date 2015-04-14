@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-import const.directions as DIR
+from const.directions import Dir
 import const.game as GAME
 import path
 from config import debug
@@ -45,7 +45,7 @@ class Level(object):
     def _a_star_neighbors(self, coord):
         for direction in self.get_tile_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
-            if direction in DIR.DIAGONALS:
+            if direction in Dir.Diagonals:
                 yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
             else:
                 yield neighbor_coord, self.tiles[coord].movement_cost
@@ -80,7 +80,7 @@ class Level(object):
         self.add_creature(creature)
 
     def get_tile_passable_neighbors(self, coord):
-        for direction in DIR.ALL_MINUS_STOP:
+        for direction in Dir.All:
             neighbor_coord = add_vector(coord, direction)
             if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
@@ -163,11 +163,11 @@ class Level(object):
         return round(path.heuristic(coordA, coordB, GAME.MOVEMENT_COST, GAME.DIAGONAL_MODIFIER))
 
     def movement_cost(self, direction, end_coord):
-        if direction in DIR.ORTHOGONALS:
+        if direction in Dir.Orthogonals:
             value = self.tiles[end_coord].movement_cost
-        elif direction in DIR.DIAGONALS:
+        elif direction in Dir.Diagonals:
             value = round(self.tiles[end_coord].movement_cost * GAME.DIAGONAL_MODIFIER)
-        elif direction == DIR.STOP:
+        elif direction == Dir.Stay:
             value = GAME.MOVEMENT_COST
         else:
             raise ValueError("Invalid direction: {}".format(direction))
@@ -235,13 +235,13 @@ class Level(object):
             return True
         else:
             vector = get_vector(creature.coord, target_coord)
-            if vector in DIR.ALL:
+            if vector in Dir.All:
                 return True
             else:
                 return False
 
     def creature_can_move(self, creature, direction):
-        if direction == DIR.STOP:
+        if direction == Dir.Stay:
             return True
         elif self.legal_coord(creature.coord, direction):
             coord = add_vector(creature.coord, direction)

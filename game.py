@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import const.creature_actions as CC
 import const.game as GAME
 import const.stats as STAT
-import mappings as MAPPING
+from mappings import Mapping
 import state_store
 from ai import AI
 from combat import get_melee_attack, get_combat_message
@@ -34,7 +34,7 @@ class Game(object):
         first_level, passage = self.world.get_first_level_info()
         self.move_creature_to_level(self.player, first_level, passage)
         self.vision_cache = None
-        self.io.msg("{0} for help menu".format(MAPPING.HELP))
+        self.io.msg("{0} for help menu".format(Mapping.Help))
 
     def reinit_transient_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())

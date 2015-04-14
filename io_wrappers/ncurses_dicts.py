@@ -1,78 +1,77 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import curses
-import const.colors as COLOR
-import const.keys as KEY
+from const.colors import Color
+from const.keys import Key
 
 
 ncurses_key_map = {
-    curses.ERR:            KEY.NO_INPUT,
-    curses.KEY_A1:         KEY.NUMPAD_7,
-    curses.KEY_A3:         KEY.NUMPAD_9,
-    curses.KEY_B2:         KEY.NUMPAD_5,
-    curses.KEY_BACKSPACE:  KEY.BACKSPACE,
-    curses.KEY_C1:         KEY.NUMPAD_1,
-    curses.KEY_C3:         KEY.NUMPAD_3,
-    curses.KEY_DC:         KEY.DELETE,
-    curses.KEY_DOWN:       KEY.DOWN,
-    curses.KEY_END:        KEY.END,
-    curses.KEY_F1:         KEY.F1,
-    curses.KEY_F2:         KEY.F2,
-    curses.KEY_F3:         KEY.F3,
-    curses.KEY_F4:         KEY.F4,
-    curses.KEY_F5:         KEY.F5,
-    curses.KEY_F6:         KEY.F6,
-    curses.KEY_F7:         KEY.F7,
-    curses.KEY_F8:         KEY.F8,
-    curses.KEY_F9:         KEY.F9,
-    curses.KEY_F10:        KEY.F10,
-    curses.KEY_F11:        KEY.F11,
-    curses.KEY_F12:        KEY.F12,
-    curses.KEY_FIND:       KEY.NUMPAD_7,
-    curses.KEY_HOME:       KEY.HOME,
-    curses.KEY_IC:         KEY.INSERT,
-    curses.KEY_LEFT:       KEY.LEFT,
-    curses.KEY_NPAGE:      KEY.PAGE_DOWN,
-    curses.KEY_PPAGE:      KEY.PAGE_UP,
-    curses.KEY_RESIZE:     KEY.WINDOW_RESIZE,
-    curses.KEY_RIGHT:      KEY.RIGHT,
-    curses.KEY_SELECT:     KEY.NUMPAD_1,
-    curses.KEY_UP:         KEY.UP,
-    curses.ascii.CR:       KEY.ENTER,
-    curses.ascii.ESC:      KEY.ESC,
-    curses.ascii.SP:       KEY.SPACE,
-    curses.ascii.TAB:      KEY.TAB,
+    curses.ERR:            Key.NO_INPUT,
+    curses.KEY_A1:         Key.NUMPAD_7,
+    curses.KEY_A3:         Key.NUMPAD_9,
+    curses.KEY_B2:         Key.NUMPAD_5,
+    curses.KEY_BACKSPACE:  Key.BACKSPACE,
+    curses.KEY_C1:         Key.NUMPAD_1,
+    curses.KEY_C3:         Key.NUMPAD_3,
+    curses.KEY_DC:         Key.DELETE,
+    curses.KEY_DOWN:       Key.DOWN,
+    curses.KEY_END:        Key.END,
+    curses.KEY_F1:         Key.F1,
+    curses.KEY_F2:         Key.F2,
+    curses.KEY_F3:         Key.F3,
+    curses.KEY_F4:         Key.F4,
+    curses.KEY_F5:         Key.F5,
+    curses.KEY_F6:         Key.F6,
+    curses.KEY_F7:         Key.F7,
+    curses.KEY_F8:         Key.F8,
+    curses.KEY_F9:         Key.F9,
+    curses.KEY_F10:        Key.F10,
+    curses.KEY_F11:        Key.F11,
+    curses.KEY_F12:        Key.F12,
+    curses.KEY_FIND:       Key.NUMPAD_7,
+    curses.KEY_HOME:       Key.HOME,
+    curses.KEY_IC:         Key.INSERT,
+    curses.KEY_LEFT:       Key.LEFT,
+    curses.KEY_NPAGE:      Key.PAGE_DOWN,
+    curses.KEY_PPAGE:      Key.PAGE_UP,
+    curses.KEY_RESIZE:     Key.WINDOW_RESIZE,
+    curses.KEY_RIGHT:      Key.RIGHT,
+    curses.KEY_SELECT:     Key.NUMPAD_1,
+    curses.KEY_UP:         Key.UP,
+    curses.ascii.CR:       Key.ENTER,
+    curses.ascii.ESC:      Key.ESC,
+    curses.ascii.SP:       Key.SPACE,
+    curses.ascii.TAB:      Key.TAB,
 }
 
 
 class NCurses256ColorDict(dict):
 
-    CURSES_ATTR = {
-
-        COLOR.BASE_RED:           124,
-        COLOR.BASE_GREEN:         34,
-        COLOR.BASE_BLUE:          21,
-        COLOR.BASE_PURPLE:        129,
-        COLOR.BASE_CYAN:          37,
-        COLOR.BASE_YELLOW:        227,
-        COLOR.BASE_BROWN:         130,
-        COLOR.BASE_DARK_BLUE:     19,
-        COLOR.BASE_DARK_BROWN:    94,
-        COLOR.BASE_LIGHT_RED:     203,
-        COLOR.BASE_LIGHT_GREEN:   83,
-        COLOR.BASE_LIGHT_BLUE:    63,
-        COLOR.BASE_LIGHT_PURPLE:  207,
-        COLOR.BASE_LIGHT_CYAN:    87,
-        COLOR.BASE_WHITE:         231,
-        COLOR.BASE_LIGHT:         253,
-        COLOR.BASE_NORMAL:        7,
-        COLOR.BASE_LIGHT_GRAY:    248,
-        COLOR.BASE_GRAY:          245,
-        COLOR.BASE_DARK_GRAY:     242,
-        COLOR.BASE_DARK:          239,
-        COLOR.BASE_DARKER:        236,
-        COLOR.BASE_DARKEST:       233,
-        COLOR.BASE_BLACK:         16,
+    color_map = {
+        Color.Red:           124,
+        Color.Green:         34,
+        Color.Blue:          21,
+        Color.Purple:        129,
+        Color.Cyan:          37,
+        Color.Yellow:        227,
+        Color.Brown:         130,
+        Color.Dark_Blue:     19,
+        Color.Dark_Brown:    94,
+        Color.Light_Red:     203,
+        Color.Light_Green:   83,
+        Color.Light_Blue:    63,
+        Color.Light_Purple:  207,
+        Color.Light_Cyan:    87,
+        Color.White:         231,
+        Color.Light:         253,
+        Color.Normal:        7,
+        Color.Light_Gray:    248,
+        Color.Gray:          245,
+        Color.Dark_Gray:     242,
+        Color.Dark:          239,
+        Color.Darker:        236,
+        Color.Darkest:       233,
+        Color.Black:         16,
     }
 
     def __init__(self):
@@ -85,7 +84,7 @@ class NCurses256ColorDict(dict):
             return dict.__getitem__(self, key)
         except KeyError:
             fg, bg = key
-            curses.init_pair(self.pair_nr, self.CURSES_ATTR[fg], self.CURSES_ATTR[bg])
+            curses.init_pair(self.pair_nr, self.color_map[fg], self.color_map[bg])
             color_pair = curses.color_pair(self.pair_nr)
             self[key] = color_pair
             self.pair_nr += 1
@@ -94,47 +93,46 @@ class NCurses256ColorDict(dict):
 
 class NCursesColorDict(dict):
 
-    C = COLOR
-    CURSES_ATTR = {
-        C.BASE_RED:           curses.COLOR_RED,
-        C.BASE_GREEN:         curses.COLOR_GREEN,
-        C.BASE_BLUE:          curses.COLOR_BLUE,
-        C.BASE_PURPLE:        curses.COLOR_MAGENTA,
-        C.BASE_CYAN:          curses.COLOR_CYAN,
-        C.BASE_YELLOW:        curses.COLOR_YELLOW,
-        C.BASE_BROWN:         curses.COLOR_YELLOW,
-        C.BASE_DARK_BLUE:     curses.COLOR_BLUE,
-        C.BASE_DARK_BROWN:    curses.COLOR_YELLOW,
-        C.BASE_LIGHT_RED:     curses.COLOR_RED,
-        C.BASE_LIGHT_GREEN:   curses.COLOR_GREEN,
-        C.BASE_LIGHT_BLUE:    curses.COLOR_BLUE,
-        C.BASE_LIGHT_PURPLE:  curses.COLOR_MAGENTA,
-        C.BASE_LIGHT_CYAN:    curses.COLOR_CYAN,
-        C.BASE_WHITE:         curses.COLOR_WHITE,
-        C.BASE_LIGHT:         curses.COLOR_WHITE,
-        C.BASE_NORMAL:        curses.COLOR_WHITE,
-        C.BASE_LIGHT_GRAY:    curses.COLOR_WHITE,
-        C.BASE_GRAY:          curses.COLOR_WHITE,
-        C.BASE_DARK_GRAY:     curses.COLOR_WHITE,
-        C.BASE_DARK:          curses.COLOR_BLACK,
-        C.BASE_DARKER:        curses.COLOR_BLACK,
-        C.BASE_DARKEST:       curses.COLOR_BLACK,
-        C.BASE_BLACK:         curses.COLOR_BLACK,
+    color_map = {
+        Color.Red:           curses.COLOR_RED,
+        Color.Green:         curses.COLOR_GREEN,
+        Color.Blue:          curses.COLOR_BLUE,
+        Color.Purple:        curses.COLOR_MAGENTA,
+        Color.Cyan:          curses.COLOR_CYAN,
+        Color.Yellow:        curses.COLOR_YELLOW,
+        Color.Brown:         curses.COLOR_YELLOW,
+        Color.Dark_Blue:     curses.COLOR_BLUE,
+        Color.Dark_Brown:    curses.COLOR_YELLOW,
+        Color.Light_Red:     curses.COLOR_RED,
+        Color.Light_Green:   curses.COLOR_GREEN,
+        Color.Light_Blue:    curses.COLOR_BLUE,
+        Color.Light_Purple:  curses.COLOR_MAGENTA,
+        Color.Light_Cyan:    curses.COLOR_CYAN,
+        Color.White:         curses.COLOR_WHITE,
+        Color.Light:         curses.COLOR_WHITE,
+        Color.Normal:        curses.COLOR_WHITE,
+        Color.Light_Gray:    curses.COLOR_WHITE,
+        Color.Gray:          curses.COLOR_WHITE,
+        Color.Dark_Gray:     curses.COLOR_WHITE,
+        Color.Dark:          curses.COLOR_BLACK,
+        Color.Darker:        curses.COLOR_BLACK,
+        Color.Darkest:       curses.COLOR_BLACK,
+        Color.Black:         curses.COLOR_BLACK,
     }
 
-    BASIC_COLORS = {
-        C.BASE_NORMAL,
-        C.BASE_WHITE,
-        C.BASE_BLACK,
-        C.BASE_RED,
-        C.BASE_GREEN,
-        C.BASE_BLUE,
-        C.BASE_PURPLE,
-        C.BASE_CYAN,
-        C.BASE_BROWN,
-        C.BASE_DARK_GRAY,
-        C.BASE_GRAY,
-        C.BASE_LIGHT_GRAY,
+    basic_colors = {
+        Color.Normal,
+        Color.White,
+        Color.Black,
+        Color.Red,
+        Color.Green,
+        Color.Blue,
+        Color.Purple,
+        Color.Cyan,
+        Color.Brown,
+        Color.Dark_Gray,
+        Color.Gray,
+        Color.Light_Gray,
     }
 
     def __init__(self):
@@ -147,8 +145,8 @@ class NCursesColorDict(dict):
             return dict.__getitem__(self, key)
         except KeyError:
             fg, bg = key
-            curses.init_pair(self.pair_nr, self.CURSES_ATTR[fg], self.CURSES_ATTR[bg])
-            if fg not in self.BASIC_COLORS:
+            curses.init_pair(self.pair_nr, self.color_map[fg], self.color_map[bg])
+            if fg not in self.basic_colors:
                 color_pair = curses.color_pair(self.pair_nr) | curses.A_BOLD
             else:
                 color_pair = curses.color_pair(self.pair_nr)

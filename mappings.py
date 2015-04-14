@@ -2,80 +2,90 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import string
 
-import const.directions as DIR
-import const.keys as KEY
+from const.directions import Dir
+from const.keys import Key
 
 
-# general
-CANCEL = 'z'
+class Mapping(object):
 
-GROUP_YES = {'y', 'Y'}
-GROUP_NO = {'n', 'N'}
-GROUP_CANCEL = {CANCEL, KEY.ESC}
-GROUP_MORE = {KEY.ENTER, KEY.SPACE}
-GROUP_DEFAULT = GROUP_CANCEL | GROUP_MORE
-GROUP_ALL = GROUP_YES | GROUP_NO | GROUP_DEFAULT
+    """
+    Modify this class to define the mappings you want.
 
-DIRECTIONS = {
-    '1': DIR.SW,
-    '2': DIR.SO,
-    '3': DIR.SE,
-    '4': DIR.WE,
-    '5': DIR.STOP,
-    '6': DIR.EA,
-    '7': DIR.NW,
-    '8': DIR.NO,
-    '9': DIR.NE,
-    'h': DIR.WE,
-    'j': DIR.SO,
-    'k': DIR.NO,
-    'l': DIR.EA,
-    '.': DIR.STOP,
-    'y': DIR.NW,
-    'u': DIR.NE,
-    'b': DIR.SW,
-    'n': DIR.SE,
-    KEY.NUMPAD_1: DIR.SW,
-    KEY.NUMPAD_2: DIR.SO,
-    KEY.NUMPAD_3: DIR.SE,
-    KEY.NUMPAD_4: DIR.WE,
-    KEY.NUMPAD_5: DIR.STOP,
-    KEY.NUMPAD_6: DIR.EA,
-    KEY.NUMPAD_7: DIR.NW,
-    KEY.NUMPAD_8: DIR.NO,
-    KEY.NUMPAD_9: DIR.NE,
-}
+    Check const/keys.py to see the names of special keys. For other keys use a string
+    representing that character. Character keys can also have a modifier before the
+    character. ^ means ctrl and ! means alt. Shift is achieved just by uppercasing the
+    letter.
+    """
 
-INSTANT_WALK_MODE = {
-    KEY.UP: DIR.NO,
-    KEY.DOWN: DIR.SO,
-    KEY.LEFT: DIR.WE,
-    KEY.RIGHT: DIR.EA,
-    KEY.END: DIR.SW,
-    KEY.HOME: DIR.NW,
-    KEY.PAGE_UP: DIR.NE,
-    KEY.PAGE_DOWN: DIR.SE,
-}
+    # general
+    Cancel = 'z'
 
-# main view
-HELP = KEY.F1
-LOOK_MODE = 'q'
-INVENTORY = 'i'
-DESCEND = 'X'
-ASCEND = 'x'
-QUIT = 'Q'
-SAVE = 'S'
-ATTACK = 'a'
-REDRAW = '^r'
-HISTORY = 'p'
-WALK_MODE = 'w'
+    Group_Yes = {'y', 'Y'}
+    Group_No = {'n', 'N'}
+    Group_Cancel = {Cancel, Key.ESC}
+    Group_More = {Key.ENTER, Key.SPACE}
+    Group_Default = Group_Cancel | Group_More
+    Group_All = Group_Yes | Group_No | Group_Default
 
-# inventory
-VIEW_INVENTORY = 'v'
+    Directions = {
+        '1': Dir.SouthWest,
+        '2': Dir.South,
+        '3': Dir.SouthEast,
+        '4': Dir.West,
+        '5': Dir.Stay,
+        '6': Dir.East,
+        '7': Dir.NorthWest,
+        '8': Dir.North,
+        '9': Dir.NorthEast,
+        'h': Dir.West,
+        'j': Dir.South,
+        'k': Dir.North,
+        'l': Dir.East,
+        '.': Dir.Stay,
+        'u': Dir.NorthWest,
+        'o': Dir.NorthEast,
+        'n': Dir.SouthWest,
+        'm': Dir.SouthEast,
+        Key.NUMPAD_1: Dir.SouthWest,
+        Key.NUMPAD_2: Dir.South,
+        Key.NUMPAD_3: Dir.SouthEast,
+        Key.NUMPAD_4: Dir.West,
+        Key.NUMPAD_5: Dir.Stay,
+        Key.NUMPAD_6: Dir.East,
+        Key.NUMPAD_7: Dir.NorthWest,
+        Key.NUMPAD_8: Dir.North,
+        Key.NUMPAD_9: Dir.NorthEast,
+    }
 
-EQUIPMENT_SLOT_HEAD = 'h'
-EQUIPMENT_SLOT_BODY = 'b'
-EQUIPMENT_SLOT_RIGHT_HAND = 'r'
-EQUIPMENT_SLOT_FEET = 'f'
+    Instant_Walk_Mode = {
+        Key.UP: Dir.North,
+        Key.DOWN: Dir.South,
+        Key.LEFT: Dir.West,
+        Key.RIGHT: Dir.East,
+        Key.END: Dir.SouthWest,
+        Key.HOME: Dir.NorthWest,
+        Key.PAGE_UP: Dir.NorthEast,
+        Key.PAGE_DOWN: Dir.SouthEast,
+    }
 
-INVENTORY_KEYS = tuple(filter(lambda c: c != CANCEL, string.ascii_lowercase))
+    # main view
+    Help = Key.F1
+    Look_Mode = 'q'
+    Inventory = 'i'
+    Descend = 'X'
+    Ascend = 'x'
+    Quit = 'Q'
+    Save = 'S'
+    Attack = 'a'
+    Redraw = '^r'
+    History = 'p'
+    Walk_Mode = 'w'
+
+    # inventory
+    View_Inventory = 'v'
+    Equipment_Slot_Head = 'h'
+    Equipment_Slot_Body = 'b'
+    Equipment_Slot_Right_Hand = 'r'
+    Equipment_Slot_Feet = 'f'
+
+    Inventory_Keys = tuple(string.ascii_lowercase.replace(Cancel, ''))

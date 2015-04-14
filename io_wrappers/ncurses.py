@@ -11,7 +11,7 @@ import curses.ascii
 import logging
 
 import const.game as GAME
-import const.keys as KEY
+from const.keys import Key
 from config import debug
 from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 
@@ -136,7 +136,7 @@ class NCursesWindowWrapper(object):
         if ch != curses.ERR:
             return ch
         else:
-            return KEY.NO_INPUT
+            return Key.NO_INPUT
 
     def _interpret_ch(self, ch):
 
@@ -149,7 +149,7 @@ class NCursesWindowWrapper(object):
             if '^' in ch:
                 ch = ch.lower()
 
-        if debug.show_keycodes and ch != KEY.NO_INPUT:
+        if debug.show_keycodes and ch != Key.NO_INPUT:
             logging.debug("User input: {}".format(ch))
 
         return ch

@@ -5,7 +5,7 @@ from random import randrange, random, choice
 
 import const.game as GAME
 import templates.tiles as TILE
-from const.directions import NORTH, SOUTH, WEST, EAST
+from const.directions import Dir
 from generic_algorithms import add_vector
 from templates.tiles import WALL as W, ROCK as R, FLOOR as F
 
@@ -250,10 +250,10 @@ class RDG(object):
             return False
 
         neighbors = self.get_up_down_left_right_neighbors(coord)
-        dir_map = {(R, F, W, W): NORTH,
-                   (F, R, W, W): SOUTH,
-                   (W, W, R, F): WEST,
-                   (W, W, F, R): EAST}
+        dir_map = {(R, F, W, W): Dir.North,
+                   (F, R, W, W): Dir.South,
+                   (W, W, R, F): Dir.West,
+                   (W, W, F, R): Dir.East}
         try:
             return dir_map[neighbors]
         except KeyError:
@@ -262,10 +262,10 @@ class RDG(object):
     def get_up_down_left_right_neighbors(self, coord):
 
         get = self.level_template.get_tile_handle
-        neighbors = (get(add_vector(coord, NORTH)),
-                     get(add_vector(coord, SOUTH)),
-                     get(add_vector(coord, WEST)),
-                     get(add_vector(coord, EAST)),)
+        neighbors = (get(add_vector(coord, Dir.North)),
+                     get(add_vector(coord, Dir.South)),
+                     get(add_vector(coord, Dir.West)),
+                     get(add_vector(coord, Dir.East)),)
         return neighbors
 
     def is_legal(self, coord):

@@ -2,17 +2,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import code
 
-import const.colors as COLOR
-import const.directions as DIR
+from const.colors import Color, Pair
+from const.directions import Dir
 import const.game as GAME
-import const.keys as KEY
 import level_template
-import mappings as MAPPING
+from mappings import Mapping
 import rdg
 from functools import partial
 from .inventory import equipment
 from .walk_mode import WalkMode
 from config import debug
+from const.keys import Key
 from generic_algorithms import add_vector
 
 
@@ -23,26 +23,26 @@ class UserInput(object):
         self.io = io_system
         self.walk_mode = WalkMode(self.game, self.creature, self.io)
         self.actions = {
-            KEY.CLOSE_WINDOW:   self.endgame,
-            MAPPING.QUIT:       self.endgame,
-            MAPPING.SAVE:       self.savegame,
-            MAPPING.ATTACK:     self.attack,
-            MAPPING.REDRAW:     self.redraw,
-            MAPPING.HISTORY:    self.print_history,
-            MAPPING.LOOK_MODE:  self.look,
-            MAPPING.HELP:       self.help_screen,
-            MAPPING.INVENTORY:  self.equipment,
-            MAPPING.WALK_MODE:  self.init_walk_mode,
-            MAPPING.ASCEND:     partial(self.enter, GAME.PASSAGE_UP),
-            MAPPING.DESCEND:    partial(self.enter, GAME.PASSAGE_DOWN),
+            Key.CLOSE_WINDOW:   self.endgame,
+            Mapping.Quit:       self.endgame,
+            Mapping.Save:       self.savegame,
+            Mapping.Attack:     self.attack,
+            Mapping.Redraw:     self.redraw,
+            Mapping.History:    self.print_history,
+            Mapping.Look_Mode:  self.look,
+            Mapping.Help:       self.help_screen,
+            Mapping.Inventory:  self.equipment,
+            Mapping.Walk_Mode:  self.init_walk_mode,
+            Mapping.Ascend:     partial(self.enter, GAME.PASSAGE_UP),
+            Mapping.Descend:    partial(self.enter, GAME.PASSAGE_DOWN),
 
             'd':  self.debug_action,
             '+':  partial(self.sight_change, 1),
             '-':  partial(self.sight_change, -1),
         }
-        for key, direction in MAPPING.DIRECTIONS.items():
+        for key, direction in Mapping.Directions.items():
             self.actions[key] = partial(self.act_to_dir, direction)
-        for key, direction in MAPPING.INSTANT_WALK_MODE.items():
+        for key, direction in Mapping.Instant_Walk_Mode.items():
             self.actions[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
@@ -74,26 +74,26 @@ class UserInput(object):
         coord = self.creature.coord
         level = self.creature.level
         drawline_flag = False
-        direction = DIR.STOP
+        direction = Dir.Stay
         while True:
             new_coord = add_vector(coord, direction)
             if level.legal_coord(new_coord):
                 coord = new_coord
             self.io.msg(level.look_information(coord))
             if drawline_flag:
-                self.io.draw_line(self.creature.coord, coord, ("*", COLOR.YELLOW))
-                self.io.draw_line(coord, self.creature.coord, ("*", COLOR.YELLOW))
+                self.io.draw_line(self.creature.coord, coord, ("*", Pair.Yellow))
+                self.io.draw_line(coord, self.creature.coord, ("*", Pair.Yellow))
                 self.io.msg("LoS: {}".format(level.check_los(self.creature.coord, coord)))
             if coord != self.creature.coord:
                 char = level._get_visible_char(coord)
-                char = char[0], (COLOR.BASE_BLACK, COLOR.BASE_GREEN)
+                char = char[0], (Color.Black, Color.Green)
                 self.io.draw_char(coord, char)
                 self.io.draw_char(self.creature.coord, level._get_visible_char(self.creature.coord), reverse=True)
             c = self.io.get_key()
             self.game.redraw()
-            direction = DIR.STOP
-            if c in MAPPING.DIRECTIONS:
-                direction = MAPPING.DIRECTIONS[c]
+            direction = Dir.Stay
+            if c in Mapping.Directions:
+                direction = Mapping.Directions[c]
             elif c == 'd':
                 drawline_flag = not drawline_flag
             elif c == 'b':
@@ -103,7 +103,7 @@ class UserInput(object):
             elif c == 's':
                 if level.has_creature(coord):
                     self.game.register_status_texts(level.get_creature(coord))
-            elif c in MAPPING.GROUP_CANCEL or c == MAPPING.LOOK_MODE:
+            elif c in Mapping.Group_Cancel or c == Mapping.Look_Mode:
                 break
 
     def endgame(self, *a, **k):
@@ -113,10 +113,10 @@ class UserInput(object):
         self.game.savegame(*a, **k)
 
     def attack(self):
-        msg = "Specify attack direction, {} to abort".format(MAPPING.CANCEL)
-        key = self.io.ask(msg, MAPPING.DIRECTIONS.viewkeys() | MAPPING.GROUP_CANCEL)
-        if key in MAPPING.DIRECTIONS:
-            self.game.creature_attack(self.creature, MAPPING.DIRECTIONS[key])
+        msg = "Specify attack direction, {} to abort".format(Mapping.Cancel)
+        key = self.io.ask(msg, Mapping.Directions.keys() | Mapping.Group_Cancel)
+        if key in Mapping.Directions:
+            self.game.creature_attack(self.creature, Mapping.Directions[key])
 
     def redraw(self):
         self.game.redraw()
@@ -216,17 +216,17 @@ class UserInput(object):
     def help_screen(self):
         header = "Help Screen, ^ means ctrl, ! means alt"
         help_lines = [
-            "Help           {0}".format(MAPPING.HELP),
-            "Look Mode      {0}".format(MAPPING.LOOK_MODE),
-            "Inventory      {0}".format(MAPPING.INVENTORY),
-            "Descend        {0}".format(MAPPING.DESCEND),
-            "Ascend         {0}".format(MAPPING.ASCEND),
-            "Quit           {0}".format(MAPPING.QUIT),
-            "Save           {0}".format(MAPPING.SAVE),
-            "Manual Attack  {0}".format(MAPPING.ATTACK),
-            "Redraw Screen  {0}".format(MAPPING.REDRAW),
-            "Print History  {0}".format(MAPPING.HISTORY),
-            "Walk Mode      {0}".format(MAPPING.WALK_MODE),
+            "Help           {0}".format(Mapping.Help),
+            "Look Mode      {0}".format(Mapping.Look_Mode),
+            "Inventory      {0}".format(Mapping.Inventory),
+            "Descend        {0}".format(Mapping.Descend),
+            "Ascend         {0}".format(Mapping.Ascend),
+            "Quit           {0}".format(Mapping.Quit),
+            "Save           {0}".format(Mapping.Save),
+            "Manual Attack  {0}".format(Mapping.Attack),
+            "Redraw Screen  {0}".format(Mapping.Redraw),
+            "Print History  {0}".format(Mapping.History),
+            "Walk Mode      {0}".format(Mapping.Walk_Mode),
             "",
             "Direction keys used for movement, implicit attacking, walk mode, et cetera:",
             "  Numpad keys",
@@ -241,6 +241,6 @@ class UserInput(object):
             "",
             "Colors available     dc (only on ncurses ie. pyrl.py)",
         ]
-        footer = "{0} to close".format(MAPPING.CANCEL)
-        self.io.menu(header, help_lines, footer, MAPPING.GROUP_CANCEL)
+        footer = "{0} to close".format(Mapping.Cancel)
+        self.io.menu(header, help_lines, footer, Mapping.Group_Cancel)
         self.game.redraw()

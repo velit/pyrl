@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.directions as DIR
+from const.directions import Dir
 import const.game as GAME
 import rdg
 import templates.tiles as TILE
@@ -94,7 +94,7 @@ class LevelTemplate(object):
         if tile_handle != TILE.DYNAMIC_WALL:
             return False
         coord = loc // self.cols, loc % self.cols
-        neighbor_coords = (add_vector(coord, direction) for direction in DIR.ALL_MINUS_STOP)
+        neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
         valid_handles = (self.get_tile_handle(coord) for coord in neighbor_coords if self.legal_coord(coord))
         return any(handle not in (TILE.DYNAMIC_WALL, TILE.WALL, TILE.ROCK) for handle in valid_handles)
 

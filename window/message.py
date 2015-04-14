@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import textwrap
 
-import const.keys as KEY
-import mappings as MAPPING
-from const.colors import GREEN
+from const.keys import Key
+from mappings import Mapping
+from const.colors import Pair
 from window.base_window import BaseWindow
 
 
@@ -41,8 +41,8 @@ class MessageBar(BaseWindow):
         for i, line in enumerate(lines):
             self.addstr(i % self.rows, 0, line)
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-                self.addstr(self.rows - 1, self.cols - MORE_STR_LEN, MORE_STR, GREEN)
-                if self.selective_get_key(MAPPING.GROUP_MORE, refresh=True) == KEY.ENTER:
+                self.addstr(self.rows - 1, self.cols - MORE_STR_LEN, MORE_STR, Pair.Green)
+                if self.selective_get_key(Mapping.Group_More, refresh=True) == Key.ENTER:
                     skip = True
                     break
                 self.clear()
@@ -54,4 +54,4 @@ class MessageBar(BaseWindow):
     def print_history(self):
         for i, event in enumerate(self.history):
             self.print_event(["History line {}:".format(i)] + event)
-            self.selective_get_key(MAPPING.GROUP_MORE)
+            self.selective_get_key(Mapping.Group_More, refresh=True)

@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.colors as COLOR
+from const.colors import Color
 import const.slots as SL
 import const.stats as ST
 from advanced_creature import AdvancedCreature
@@ -9,7 +9,7 @@ from monster_template import MonsterTemplate
 
 
 def Player():
-    monster_template = MonsterTemplate("tappi", ('@', (COLOR.BASE_BLACK, COLOR.BASE_GREEN)), 0, 0)
+    monster_template = MonsterTemplate("tappi", ('@', (Color.Green, Color.Black)), 0, 0)
     player = AdvancedCreature(monster_template)
 
     armor = Item("Armor of Kings")

@@ -2,8 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-import const.colors as COLOR
-import mappings as MAPPING
+from const.colors import Pair
+from mappings import Mapping
 from config import debug
 from window.base_window import BaseWindow
 from window.level import LevelWindow
@@ -33,13 +33,13 @@ class WindowSystem(object):
     def msg(self, *a):
         self.m.queue_msg(*a)
 
-    def ask(self, message, keys=MAPPING.GROUP_ALL):
+    def ask(self, message, keys=Mapping.Group_All):
         self.msg(message)
         self.refresh()
         return self.l.selective_get_key(keys)
 
     def notify(self, print_str):
-        return self.ask(print_str, MAPPING.GROUP_MORE)
+        return self.ask(print_str, Mapping.Group_More)
 
     def refresh(self):
         self.m.update()
@@ -70,7 +70,7 @@ class WindowSystem(object):
 
     def draw_path(self, path):
         for coord in path:
-            self.draw_char(coord, (" ", COLOR.GREEN), reverse=True)
+            self.draw_char(coord, (" ", Pair.Green), reverse=True)
             if debug.path_step:
                 self.l.get_key(refresh=True)
         if not debug.path_step:

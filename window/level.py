@@ -1,12 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from const.colors import YELLOW
+from const.colors import Pair
 from generic_algorithms import bresenham
 from window.base_window import BaseWindow
 
 
 class LevelWindow(BaseWindow):
-    """Handles the level display"""
+
+    """Handles the level display."""
 
     def __init__(self, *a, **k):
         BaseWindow.__init__(self, *a, **k)
@@ -21,7 +22,7 @@ class LevelWindow(BaseWindow):
             char = symbol, (bg, fg)
         self.addch(y, x, char)
 
-    def draw_line(self, coordA, coordB, char=('*', YELLOW), includeFirst=False):
+    def draw_line(self, coordA, coordB, char=('*', Pair.Yellow), includeFirst=False):
         if includeFirst:
             for y, x in bresenham(coordA, coordB):
                 self.addch(y, x, char)
