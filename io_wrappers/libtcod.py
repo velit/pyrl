@@ -9,7 +9,7 @@ except Exception as e:
     sys.exit(1)
 
 import const.game as GAME
-from const.keys import Key
+from enums.keys import Key
 from io_wrappers.libtcod_dicts import libtcod_color_map
 from io_wrappers.libtcod_dicts import libtcod_key_map
 

@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import textwrap
 
-from const.keys import Key
+from enums.keys import Key
 from mappings import Mapping
-from const.colors import Pair
+from enums.colors import Pair
 from window.base_window import BaseWindow
 
 

@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-from const.colors import Pair
 import const.game as GAME
-from const.keys import Key
+from enums.colors import Pair
+from enums.keys import Key
 
 
 class BaseWindow(object):

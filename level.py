@@ -2,11 +2,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-from const.directions import Dir
 import const.game as GAME
 import path
 from config import debug
 from creature.creature import Creature
+from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
 from generic_structures import List2D
 from turn_scheduler import TurnScheduler

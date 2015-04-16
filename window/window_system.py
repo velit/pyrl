@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-from const.colors import Pair
+from enums.colors import Pair
 from mappings import Mapping
 from config import debug
 from window.base_window import BaseWindow

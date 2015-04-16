@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from const.directions import Dir
 import const.game as GAME
-from mappings import Mapping
+from enums.directions import Dir
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
+from mappings import Mapping
 
 
 WALK_IN_PLACE = (None, None)

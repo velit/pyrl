@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import fractions
-from const.directions import Dir
+from enums.directions import Dir
 
 
 def bresenham(coord_a, coord_b):

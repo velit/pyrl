@@ -1,19 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import code
+from functools import partial
 
-from const.colors import Color, Pair
-from const.directions import Dir
 import const.game as GAME
 import level_template
-from mappings import Mapping
 import rdg
-from functools import partial
 from .inventory import equipment
 from .walk_mode import WalkMode
 from config import debug
-from const.keys import Key
+from enums.colors import Color, Pair
+from enums.directions import Dir
+from enums.keys import Key
 from generic_algorithms import add_vector
+from mappings import Mapping
 
 
 class UserInput(object):
@@ -138,9 +138,7 @@ class UserInput(object):
                     self.io.msg("Teleport failed.")
 
     def sight_change(self, amount):
-        from const.slots import BODY
-        from const.stats import SIGHT
-        self.creature.get_item(BODY).stats[SIGHT] += amount
+        self.creature.base_perception += amount
         return True
 
     def print_history(self):
@@ -175,7 +173,7 @@ class UserInput(object):
             self.game.redraw()
             self.io.msg("Reverse set to {}".format(debug.reverse))
         elif c == 'k':
-            creature_list = level.creatures.values()
+            creature_list = list(level.creatures.values())
             creature_list.remove(self.creature)
             for i in creature_list:
                 level.remove_creature(i)
@@ -208,7 +206,7 @@ class UserInput(object):
             self.io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
 
     def equipment(self):
-        return equipment(self.io, self.game, self.creature)
+        return equipment(self.io, self.creature.equipment)
 
     def init_walk_mode(self, instant_direction=None):
         return self.walk_mode.init_walk_mode(instant_direction)

@@ -16,7 +16,7 @@ def _add_equipment_properties(cls):
 def _get_equipment_property(stat):
 
     def get_stat(self):
-        return getattr(super(AdvancedCreature, self), stat.name) + self.equipment.stats[stat]
+        return getattr(super(AdvancedCreature, self), stat.name) + self.equipment.applied_stats[stat]
     get_stat.__name__ = stat.name
 
     return property(get_stat)
@@ -27,7 +27,6 @@ class AdvancedCreature(Creature):
 
     def __init__(self, creature_file):
         self.equipment = Equipment()
-        self.inventory = []
         self.last_action_energy = 0
 
         super().__init__(creature_file)
@@ -43,12 +42,6 @@ class AdvancedCreature(Creature):
             addition = self.damage
         return dices, sides, addition
 
-    def get_item(self, slot):
-        return self.equipment.items[slot]
-
-    def get_item_stats(self, stat):
-        return self.equipment.stats[stat]
-
     def update_energy(self, amount):
         super().update_energy(amount)
         self.last_action_energy = amount
@@ -58,28 +51,3 @@ class AdvancedCreature(Creature):
 
     def is_idle(self):
         return False
-
-    def equip(self, item, slot):
-        self.equipment.equip(slot, item)
-
-    def unequip(self, slot):
-        item = self.equipment.items[slot]
-        self.equipment.unequip(slot)
-        return item
-
-    def bag_item(self, item):
-        self.inventory.append(item)
-
-    def unbag_item(self, item):
-        self.inventory.remove(item)
-
-    def get_inventory_lines(self):
-        f = "{1}. {0.name} {0.stats}"
-        for i, item in enumerate(self.inventory):
-            yield f.format(item, (i + 1) % 10)
-
-    def get_inventory_items(self, slot=None):
-        if slot is not None:
-            return (item for item in self.inventory if item.fits_to_slot(slot))
-        else:
-            return self.inventory

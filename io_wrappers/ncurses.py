@@ -11,7 +11,7 @@ import curses.ascii
 import logging
 
 import const.game as GAME
-from const.keys import Key
+from enums.keys import Key
 from config import debug
 from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 

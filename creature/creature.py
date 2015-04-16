@@ -78,7 +78,7 @@ class Creature(object):
 
     @property
     def sight(self):
-        return int((2 * self.perception) ** 0.5 + 1)
+        return min(self.perception // 2, int((self.perception * 5) ** 0.5))
 
     @property
     def max_hp(self):

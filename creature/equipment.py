@@ -17,9 +17,10 @@ class Equipment(object):
 
     def __init__(self):
 
-        self.stats = {stat: 0 for stat in Stat}
+        self.applied_stats = {stat: 0 for stat in Stat}
 
-        self.items = {
+        self.bag_of_holding = set()
+        self.worn_items = {
             Slot.head:        None,
             Slot.body:        None,
             Slot.right_hand:  None,
@@ -27,31 +28,55 @@ class Equipment(object):
             Slot.feet:        None,
         }
 
-    def equip(self, slot, item):
-        if self.items[slot] is not None:
-            assert False
-        self.items[slot] = item
-        self.add_item_stats(item)
+    def get_item(self, slot):
+        return self.worn_items[slot]
+
+    def equip(self, item, slot):
+        if slot not in item.compatible_slots:
+            raise AssertionError("Item {} does not fit into slot {}".format(item, slot))
+        self.unbag_item(item)
+        if self.worn_items[slot] is not None:
+            self.unequip(slot)
+        self._equip_item(item, slot)
 
     def unequip(self, slot):
-        item = self.items[slot]
-        if self.items[slot] is None:
-            assert False
-        self.items[slot] = None
-        self.remove_item_stats(item)
+        item = self.worn_items[slot]
+        if self.worn_items[slot] is None:
+            raise AssertionError("Slot is already empty")
+        self._unequip_item(item, slot)
+        self.bag_item(item)
 
-    def add_item_stats(self, item):
-        for stat, value in item.stats:
-            self.stats[stat] += value
+    def bag_item(self, item):
+        self.bag_of_holding.add(item)
 
-    def remove_item_stats(self, item):
-        for stat, value in item.stats:
-            self.stats[stat] -= value
+    def unbag_item(self, item):
+        self.bag_of_holding.remove(item)
 
     def get_damage_info(self):
-        if self.items[Slot.right_hand] is not None:
-            return self.items[Slot.right_hand].get_damage()
-        elif self.items[Slot.left_hand] is not None:
-            return self.items[Slot.left_hand].get_damage()
+        if self.worn_items[Slot.right_hand] is not None:
+            return self.worn_items[Slot.right_hand].get_damage()
+        elif self.worn_items[Slot.left_hand] is not None:
+            return self.worn_items[Slot.left_hand].get_damage()
         else:
             return None
+
+    def get_inventory_lines(self):
+        f = "{1}. {0.name} {0.stats}"
+        for i, item in enumerate(self.bag_of_holding):
+            yield f.format(item, (i + 1) % 10)
+
+    def get_inventory_items(self, slot=None):
+        if slot is not None:
+            return (item for item in sorted(self.bag_of_holding) if item.fits_to_slot(slot))
+        else:
+            return self.bag_of_holding
+
+    def _equip_item(self, item, slot):
+        self.worn_items[slot] = item
+        for stat, value in item.stats:
+            self.applied_stats[stat] += value
+
+    def _unequip_item(self, item, slot):
+        self.worn_items[slot] = None
+        for stat, value in item.stats:
+            self.applied_stats[stat] -= value

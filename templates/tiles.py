@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from const.colors import Pair
+from enums.colors import Pair
 import const.game as GAME
 from tile import Tile
 

@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import random
 
 from creature.actions import Action
-from const.directions import Dir
+from enums.directions import Dir
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 

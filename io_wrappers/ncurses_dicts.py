@@ -1,8 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import curses
-from const.colors import Color
-from const.keys import Key
+from enums.colors import Color
+from enums.keys import Key
 
 
 ncurses_key_map = {

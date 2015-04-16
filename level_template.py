@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from const.directions import Dir
+from enums.directions import Dir
 import const.game as GAME
 import rdg
 import templates.tiles as TILE

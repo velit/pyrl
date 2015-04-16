@@ -5,7 +5,7 @@ from random import randrange, random, choice
 
 import const.game as GAME
 import templates.tiles as TILE
-from const.directions import Dir
+from enums.directions import Dir
 from generic_algorithms import add_vector
 from templates.tiles import WALL as W, ROCK as R, FLOOR as F
 

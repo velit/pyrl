@@ -12,8 +12,8 @@ def get_stats_str(stats):
 class Item(object):
     def __init__(self, name, stats=(), compatible_slots=()):
         self.name = name
-        self.stats = stats
-        self.compatible_slots = compatible_slots
+        self.stats = tuple(stats)
+        self.compatible_slots = tuple(compatible_slots)
 
     def __str__(self):
         if self.stats:
@@ -28,6 +28,9 @@ class Item(object):
 
     def fits_to_slot(self, slot):
         return slot in self.compatible_slots
+
+    def __lt__(self, other):
+        return (self.name, len(self.stats)) < (other.name, len(other.stats))
 
 
 class Weapon(Item):

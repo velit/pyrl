@@ -2,8 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import string
 
-from const.directions import Dir
-from const.keys import Key
+from enums.directions import Dir
+from enums.keys import Key
 
 
 class Mapping(object):
@@ -11,7 +11,7 @@ class Mapping(object):
     """
     Modify this class to define the mappings you want.
 
-    Check const/keys.py to see the names of special keys. For other keys use a string
+    Check enums/keys.py to see the names of special keys. For other keys use a string
     representing that character. Character keys can also have a modifier before the
     character. ^ means ctrl and ! means alt. Shift is achieved just by uppercasing the
     letter.
