@@ -86,6 +86,7 @@ class Mapping(object):
     Equipment_Slot_Head = 'h'
     Equipment_Slot_Body = 'b'
     Equipment_Slot_Right_Hand = 'r'
+    Equipment_Slot_Left_Hand = 'l'
     Equipment_Slot_Feet = 'f'
 
     Inventory_Keys = tuple(string.ascii_lowercase.replace(Cancel, ''))

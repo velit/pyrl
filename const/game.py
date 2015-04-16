@@ -38,6 +38,3 @@ SAVE_FILE_COMPRESSION_LEVEL = 6  # valid in range(1, 10)
 PASSAGE_UP = "up"
 PASSAGE_DOWN = "down"
 PASSAGE_RANDOM = "random"
-
-NCURSES = "ncurses"
-LIBTCOD = "libtcod"

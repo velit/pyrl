@@ -1,19 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.slots as SLOT
 from dice import Dice
+from .equipment import Slot
 
 
 def get_stats_str(stats):
-    stats_str = ", ".join("{0}:{1}".format(stat, value) for stat, value in stats.items())
+    stats_str = ", ".join("{0}:{1}".format(stat.value, value) for stat, value in stats)
     return "{" + stats_str + "}"
 
 
 class Item(object):
-    def __init__(self, name):
+    def __init__(self, name, stats=(), compatible_slots=()):
         self.name = name
-        self.stats = {}
-        self.compatible_slots = set()
+        self.stats = stats
+        self.compatible_slots = compatible_slots
 
     def __str__(self):
         if self.stats:
@@ -23,28 +23,18 @@ class Item(object):
             return "{0.name}".format(self)
 
     def add_stat(self, stat, value):
-        self.stats[stat] = value
+        self.stats += ((stat, value), )
         return self
-
-    def add_slot(self, slot):
-        self.compatible_slots.add(slot)
-        return self
-
-    def get_stat_bonus(self, stat):
-        if stat in self.stats:
-            return self.stats[stat]
-        else:
-            return 0
 
     def fits_to_slot(self, slot):
         return slot in self.compatible_slots
 
 
 class Weapon(Item):
-    def __init__(self, name, dice=1, sides=6, addition=0):
-        super(Weapon, self).__init__(name)
+    def __init__(self, name, dice, sides, addition, stats=(),
+                 compatible_slots=(Slot.right_hand, Slot.left_hand)):
+        super().__init__(name, stats, compatible_slots)
         self.damage = Dice(dice, sides, addition)
-        self.add_slot(SLOT.RIGHT_HAND)
 
     def roll(self):
         return self.damage.roll()

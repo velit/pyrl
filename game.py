@@ -1,16 +1,16 @@
 """pyrl; Python roguelike by Tapani Kiiskinen."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.creature_actions as CC
 import const.game as GAME
-import const.stats as STAT
-from mappings import Mapping
 import state_store
 from ai import AI
-from combat import get_melee_attack, get_combat_message
+from combat import get_melee_attack_cr, get_combat_message
 from config import debug
+from creature.actions import Action
+from creature.stats import Stat
 from fov import get_light_set
 from generic_algorithms import add_vector
+from mappings import Mapping
 from templates.maps import get_world_template
 from templates.player import Player
 from user_input import UserInput
@@ -140,13 +140,13 @@ class Game(object):
     def creature_attack(self, creature, direction):
         level = creature.level
         if creature.can_act():
-            creature.update_energy_action(CC.ATTACK)
+            creature.update_energy_action(Action.Attack)
             target_coord = add_vector(creature.coord, direction)
             if level.has_creature(target_coord):
                 target = level.get_creature(target_coord)
             else:
                 target = level.tiles[target_coord]
-            succeeds, damage = get_melee_attack(creature.ar, creature.get_damage_info(), target.dr, target.pv)
+            succeeds, damage = get_melee_attack_cr(creature, target)
             if damage:
                 target.receive_damage(damage)
                 died = target.is_dead()
@@ -172,18 +172,18 @@ class Game(object):
         level.remove_creature(creature)
 
     def register_status_texts(self, creature):
-        self.io.s.add_element(STAT.DMG, lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+        self.io.s.add_element("Dmg", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
         self.io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-        self.io.s.add_element(STAT.SIGHT, lambda: creature.sight)
-        self.io.s.add_element(STAT.AR, lambda: creature.ar)
-        self.io.s.add_element(STAT.DR, lambda: creature.dr)
-        self.io.s.add_element(STAT.PV, lambda: creature.pv)
-        self.io.s.add_element(STAT.SPEED, lambda: creature.speed)
-        self.io.s.add_element(STAT.ST, lambda: creature.st)
-        self.io.s.add_element(STAT.DX, lambda: creature.dx)
-        self.io.s.add_element(STAT.TO, lambda: creature.to)
-        self.io.s.add_element(STAT.LE, lambda: creature.le)
-        self.io.s.add_element(STAT.PE, lambda: creature.pe)
+        self.io.s.add_element(Stat.sight.value, lambda: creature.sight)
+        self.io.s.add_element(Stat.attack_rating.value, lambda: creature.attack_rating)
+        self.io.s.add_element(Stat.defense_rating.value, lambda: creature.defense_rating)
+        self.io.s.add_element(Stat.armor.value, lambda: creature.armor)
+        self.io.s.add_element(Stat.speed.value, lambda: creature.speed)
+        self.io.s.add_element(Stat.strength.value, lambda: creature.strength)
+        self.io.s.add_element(Stat.dexterity.value, lambda: creature.dexterity)
+        self.io.s.add_element(Stat.intelligence.value, lambda: creature.intelligence)
+        self.io.s.add_element(Stat.endurance.value, lambda: creature.endurance)
+        self.io.s.add_element(Stat.perception.value, lambda: creature.perception)
         self.io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
         self.io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
         self.io.s.add_element("Turns", lambda: self.turn_counter)

@@ -2,14 +2,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import OrderedDict
 
-import const.slots as SLOT
+from creature.equipment import Slot
 from mappings import Mapping
 
 equipment_slots = OrderedDict()
-equipment_slots[Mapping.Equipment_Slot_Head] = SLOT.HEAD
-equipment_slots[Mapping.Equipment_Slot_Body] = SLOT.BODY
-equipment_slots[Mapping.Equipment_Slot_Right_Hand] = SLOT.RIGHT_HAND
-equipment_slots[Mapping.Equipment_Slot_Feet] = SLOT.FEET
+equipment_slots[Mapping.Equipment_Slot_Head]       = Slot.head
+equipment_slots[Mapping.Equipment_Slot_Body]       = Slot.body
+equipment_slots[Mapping.Equipment_Slot_Right_Hand] = Slot.right_hand
+equipment_slots[Mapping.Equipment_Slot_Left_Hand]  = Slot.left_hand
+equipment_slots[Mapping.Equipment_Slot_Feet]       = Slot.feet
 
 
 def equipment(io, game, creature):
@@ -18,7 +19,7 @@ def equipment(io, game, creature):
         footer = "Press a slot key to (un)equip, {} to view backpack, {} to close"
         footer = footer.format(Mapping.View_Inventory, Mapping.Cancel)
         fmt_str = "{0} - {1:11}: {2}"
-        lines = (fmt_str.format(key.upper(), slot, creature.get_item(slot)) for key, slot in equipment_slots.items())
+        lines = (fmt_str.format(key.upper(), slot.value, creature.get_item(slot)) for key, slot in equipment_slots.items())
         key = io.menu(header, lines, footer, equipment_slots.keys() | set((Mapping.View_Inventory, )) | Mapping.Group_Default)
         if key in equipment_slots:
             slot = equipment_slots[key]

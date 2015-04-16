@@ -228,7 +228,7 @@ class UserInput(object):
             "Print History  {0}".format(Mapping.History),
             "Walk Mode      {0}".format(Mapping.Walk_Mode),
             "",
-            "Direction keys used for movement, implicit attacking, walk mode, et cetera:",
+            "Direction keys used for movement, implicit attacking, walk mode, etc:",
             "  Numpad keys",
             "  So called vi-keys (hjklyubn.)",
             "",

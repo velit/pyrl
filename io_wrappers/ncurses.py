@@ -21,7 +21,7 @@ _root_win = None
 
 class NCursesWrapper(object):
 
-    IMPLEMENTATION = GAME.NCURSES
+    implementation = "ncurses"
 
     def __init__(self, curses_root_window=None):
         """Initialize curses and NCursesWindow."""
@@ -59,7 +59,7 @@ class NCursesWrapper(object):
 
 class NCursesWindowWrapper(object):
 
-    IMPLEMENTATION = GAME.NCURSES
+    implementation = NCursesWrapper.implementation
     _color_map = None
     _key_map = ncurses_key_map
 

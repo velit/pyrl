@@ -5,10 +5,15 @@ from random import randint
 from dice import dice_roll
 
 
-def get_melee_attack(ar, damage_info, dr, pv):
-    roll = randint(1, 100) + ar - dr
+def get_melee_attack_cr(creature, target):
+    return get_melee_attack(creature.attack_rating, creature.get_damage_info(),
+                            target.defense_rating, target.armor)
+
+
+def get_melee_attack(attack_rating, damage_info, defense_rating, armor):
+    roll = randint(1, 100) + attack_rating - defense_rating
     if roll > 25:
-        return (True, max(dice_roll(*damage_info) - pv, 0))
+        return (True, max(dice_roll(*damage_info) - armor, 0))
     else:
         return (False, 0)
 

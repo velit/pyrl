@@ -16,7 +16,7 @@ from io_wrappers.libtcod_dicts import libtcod_key_map
 
 class LibTCODWrapper(object):
 
-    IMPLEMENTATION = GAME.LIBTCOD
+    implementation = "libtcod"
 
     def __init__(self, curses_root_window=None):
         """Init the SDL surface and prepare for draw calls."""
@@ -56,7 +56,7 @@ class LibTCODWindow(object):
     _default_bg = libtcod.black
     _key_map = libtcod_key_map
     _color_map = libtcod_color_map
-    IMPLEMENTATION = GAME.LIBTCOD
+    implementation = LibTCODWrapper.implementation
 
     @classmethod
     def init(cls):

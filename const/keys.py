@@ -1,7 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from enum import Enum
 
-class Key(object):
+
+class Key(str, Enum):
     LEFT          = "Left"
     RIGHT         = "Right"
     UP            = "Up"

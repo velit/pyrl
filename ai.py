@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-import const.creature_actions as ACTIONS
+from creature.actions import Action
 from const.directions import Dir
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
@@ -62,15 +62,15 @@ class AI(object):
 
     def move_towards(self, game, creature, target_coord):
         level = creature.level
-        best_action = ACTIONS.MOVE
+        best_action = Action.Move
         best_direction = Dir.Stay
         best_cost = None
         for direction in Dir.AllPlusStay:
             coord = add_vector(creature.coord, direction)
             if level.is_passable(coord):
-                action = ACTIONS.MOVE
+                action = Action.Move
             elif level.has_creature(coord) and self.willing_to_swap(level.get_creature(coord), creature):
-                action = ACTIONS.SWAP
+                action = Action.Swap
             else:
                 continue
 
@@ -80,9 +80,9 @@ class AI(object):
                 best_direction = direction
                 best_cost = cost
 
-        if best_action == ACTIONS.MOVE:
+        if best_action == Action.Move:
             game.creature_move(creature, best_direction)
-        elif best_action == ACTIONS.SWAP:
+        elif best_action == Action.Swap:
             game.creature_swap(creature, best_direction)
         else:
             assert False
