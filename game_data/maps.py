@@ -1,7 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.game import GameConf
+from enums.level_locations import LevelLocation
 from enums.colors import Pair
+from game_data.tiles import TileImpl
 from level_template import LevelTemplate
 from monster_template import MonsterTemplate
 from world_template import WorldTemplate
@@ -10,17 +11,28 @@ from world_template import WorldTemplate
 DUNGEON = "dungeon"
 FIRST_LEVEL = (DUNGEON, 1)
 
+tiles = {
+    '.': TileImpl.Floor.value,
+    'w': TileImpl.Wall.value,
+    '#': TileImpl.Dynamic_Wall.value,
+    'r': TileImpl.Rock.value,
+    '/': TileImpl.Open_Door.value,
+    '+': TileImpl.Closed_Door.value,
+    '"': TileImpl.Grass.value,
+    '>': TileImpl.Stairs_Down.value,
+    '<': TileImpl.Stairs_Up.value,
+}
+
 
 def get_world_template():
 
     world = WorldTemplate()
-    world.add_first_level_info(FIRST_LEVEL, GameConf.PASSAGE_UP)
+    world.add_first_level_info(FIRST_LEVEL, LevelLocation.Passage_Up)
 
     L0 = LevelTemplate(
         danger_level=1,
-        static_level=True,
         use_dynamic_monsters=False,
-        tilemap_template=list(
+        tilemap=to_tiles(
             "################################################################################################"
             "#######################..##################.#.#.#######.....####################################"
             "######...##############.#.################.#.#.#.#####.####.###......###########################"
@@ -60,27 +72,5 @@ def get_world_template():
     return world
 
 
-#first = [
-    #"ggggggggggggggggggggggggggggg",
-    #"ggggggggggggggggggg#########w",
-    #"ggggggggggggggggggg#====#...w",
-    #"ggggggggggggggggggg#..../...w",
-    #"ggg##ooo############....#####",
-    #"ggg#.cc.===#==cc=../.==./.==#",
-    #"ggg#S....../.......####/#...#",
-    #"ggg#O--...p#--.cc..<###.#...#",
-    #"ggg#F--.--p###/##=.####.#.|.#",
-    #"ggg#A..###.#s..T#=.>#####|C|#",
-    #"ggg#.c.#.#.#=.tU#=.######|A|#",
-    #"ggg#cTc###.####B##.######|R|#",
-    #"ggg#cAc==TV..###==.#====#|^|#",
-    #"ggg#cBc....../...../....#...#",
-    #"gggocLc......#=...#=....#...#",
-    #"gggocEc..cc.-#=..=#=.---#...#",
-    #"ggg#.c.==...-#=..=#=.BED#+++#",
-    #"ggg###########=..=#=.---#gggg",
-    #"ggggggggggggg#=--=#=....#gggg",
-    #"gggggggggggggo=--=#=.---ogggg",
-    #"ggggggggggggg#ooo####ooo#gggg",
-    #"ggggggggggggggggggggggggggggg",
-#]
+def to_tiles(charmap):
+    return [tiles[char] for char in charmap]

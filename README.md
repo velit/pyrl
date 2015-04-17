@@ -1,7 +1,7 @@
 pyrl
 ====
 
-![Image](data/screenshot.png?raw=true)
+![Image](resources/screenshot.png?raw=true)
 
 The dots are floor tiles, the # dungeon walls and < and > entrances to other
 levels. The @ is the player character and the brown walls and bold dots are in

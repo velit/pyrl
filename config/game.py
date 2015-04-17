@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from os.path import join
-
 
 class GameConf(object):
 
@@ -22,15 +20,11 @@ class GameConf(object):
     ### Data section, don't modify ###
     ##################################
 
-    DATA_FOLDER = "data"
+    DATA_FOLDER = "save_data"
     LEVEL_DIMENSIONS = (game_dimensions[0] - message_bar_height - status_bar_height, game_dimensions[1])
     ANIMATION_INPUT_PERIOD = min(animation_period / 10, 0.01)
 
     # prune out
-    PASSAGE_UP = "up"
-    PASSAGE_DOWN = "down"
-    PASSAGE_RANDOM = "random"
-
     MOVEMENT_COST = 1000
     ATTACK_COST = 1000
 

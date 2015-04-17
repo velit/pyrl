@@ -17,9 +17,9 @@ class Tile(object):
         self.exit_point = exit_point
 
     @property
-    def dr(self):
+    def defense_rating(self):
         return 0
 
     @property
-    def pv(self):
+    def armor(self):
         return 100 if self.is_passable else 40

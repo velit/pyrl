@@ -58,7 +58,7 @@ class BaseWindow(object):
         while key not in key_set:
             if time.time() >= timestamp:
                 return Key.NO_INPUT
-            time.sleep(GameConf.INPUT_INTERVAL)
+            time.sleep(GameConf.ANIMATION_INPUT_PERIOD)
             key = self.check_key()
         return key
 

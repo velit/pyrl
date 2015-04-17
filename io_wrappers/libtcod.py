@@ -21,7 +21,7 @@ class LibTCODWrapper(object):
     def __init__(self, curses_root_window=None):
         """Init the SDL surface and prepare for draw calls."""
         flags = libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW
-        libtcod.console_set_custom_font(b"data/terminal10x18_gs_ro.png", flags)
+        libtcod.console_set_custom_font(b"resources/terminal10x18_gs_ro.png", flags)
         rows, cols = GameConf.game_dimensions
         libtcod.console_init_root(cols, rows, GameConf.default_game_name.encode(), False, libtcod.RENDERER_SDL)
         LibTCODWindow.init()

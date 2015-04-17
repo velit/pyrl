@@ -3,17 +3,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import code
 from functools import partial
 
-from rdg import GenLevelType
-from config.game import GameConf
-from level_template import LevelTemplate
 from .inventory import equipment
 from .walk_mode import WalkMode
 from config.debug import Debug
+from config.mappings import Mapping
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
 from generic_algorithms import add_vector
-from config.mappings import Mapping
+from level_template import LevelTemplate, LevelLocation
+from rdg import GenLevelType
 
 
 class UserInput(object):
@@ -33,8 +32,8 @@ class UserInput(object):
             Mapping.Help:       self.help_screen,
             Mapping.Inventory:  self.equipment,
             Mapping.Walk_Mode:  self.init_walk_mode,
-            Mapping.Ascend:     partial(self.enter, GameConf.PASSAGE_UP),
-            Mapping.Descend:    partial(self.enter, GameConf.PASSAGE_DOWN),
+            Mapping.Ascend:     partial(self.enter, LevelLocation.Passage_Up),
+            Mapping.Descend:    partial(self.enter, LevelLocation.Passage_Down),
 
             'd':  self.debug_action,
             '+':  partial(self.sight_change, 1),
@@ -183,12 +182,12 @@ class UserInput(object):
             self.io.msg("Abrakadabra.")
             return True
         elif c == 'o':
-            passage_down = level.get_passage_coord(GameConf.PASSAGE_DOWN)
+            passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(self.creature.coord, passage_down))
             self.game.redraw()
         elif c == 'p':
-            passage_up = level.get_passage_coord(GameConf.PASSAGE_UP)
-            passage_down = level.get_passage_coord(GameConf.PASSAGE_DOWN)
+            passage_up = level.get_passage_coord(LevelLocation.Passage_Up)
+            passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(passage_up, passage_down))
             self.game.redraw()
         elif c == 'i':

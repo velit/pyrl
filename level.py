@@ -2,9 +2,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-from config.game import GameConf
 import path
 from config.debug import Debug
+from config.game import GameConf
+from enums.level_locations import LevelLocation
 from creature.creature import Creature
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
@@ -21,7 +22,7 @@ class Level(object):
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
-        self.tiles = List2D(level_template.tilemap(), self.cols)
+        self.tiles = List2D(level_template.tilemap, self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
         self.turn_scheduler = TurnScheduler()
@@ -112,7 +113,7 @@ class Level(object):
             yield y, x, self.tiles[y, x].memory_char
 
     def get_passage_coord(self, passage):
-        if passage == GameConf.PASSAGE_RANDOM:
+        if passage == LevelLocation.Passage_Random:
             return self.get_free_coord()
         else:
             return self.passage_locations[passage]

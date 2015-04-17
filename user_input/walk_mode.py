@@ -12,7 +12,7 @@ LEFT = (True, False)
 RIGHT = (False, True)
 OPEN = (True, True)
 
-INTERRUPT_MSG_TIME = 5
+INTERRUPT_MSG_TIME = 1
 
 
 class WalkMode(object):
@@ -131,7 +131,7 @@ class WalkMode(object):
         elif direction in Dir.Diagonals:
             left = self._passable(anticlockwise_45(direction))
             right = self._passable(clockwise_45(direction))
-        elif direction == Dir.STOP:
+        elif direction == Dir.Stay:
             left = None
             right = None
         else:

@@ -1,59 +1,49 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
-import templates.tiles as TILE
+from game_data.tiles import TileImpl
 from config.game import GameConf
 from enums.directions import Dir
+from enums.level_locations import LevelLocation
 from generic_algorithms import add_vector
-from rdg import GenLevelType, generate_tilemap_template
-from templates.monsters import monster_templates
+from rdg import GenLevelType, generate_tilemap
+from game_data.monsters import monster_templates
 
 
 class LevelTemplate(object):
 
     default_level_type = GenLevelType.Dungeon
 
-    def __init__(self, danger_level=0, static_level=False,
-                 use_dynamic_monsters=True, tilemap_template=None,
+    def __init__(self, danger_level=0, use_dynamic_monsters=True, tilemap=None,
                  static_monster_seq=(), dimensions=GameConf.LEVEL_DIMENSIONS):
         self.danger_level = danger_level
-        self.tilemap_template = tilemap_template
-        self.static_level = static_level
+        self.tilemap = tilemap
         self.use_dynamic_monsters = use_dynamic_monsters
         self.rows, self.cols = dimensions
         self.passage_locations = {}
         self.passage_destination_infos = {}
         self.static_monster_templates = list(static_monster_seq)
-        self.tile_dict = {}
         self.dynamic_monster_amount = 99
 
     def finalize(self):
-        if self.static_level:
-            self._finalize_manual_tilemap_template()
+        if self.tilemap is None:
+            generate_tilemap(self, self.default_level_type)
         else:
-            generate_tilemap_template(self, self.default_level_type)
+            self._finalize_manual_tilemap()
 
-    def get_tile_handle(self, coord):
+    def is_legal(self, coord):
         y, x = coord
-        return self.tilemap_template[y * self.cols + x]
+        return (0 <= y < self.rows) and (0 <= x < self.cols)
 
-    def set_tile_handle(self, coord, tile_id):
+    def get_tile(self, coord):
         y, x = coord
-        self.tilemap_template[y * self.cols + x] = tile_id
+        return self.tilemap[y * self.cols + x]
 
-    def get_tile_from_coord(self, coord):
-        return self._gettile(self.get_tile_handle(coord))
-
-    def tilemap(self):
-        for handle in self.tilemap_template:
-            yield self._gettile(handle)
+    def set_tile(self, coord, tile):
+        y, x = coord
+        self.tilemap[y * self.cols + x] = tile
 
     def add_monster_template(self, monster):
         self.static_monster_templates.append(monster)
-
-    def legal_coord(self, coord):
-        y, x = coord
-        return (0 <= y < self.rows) and (0 <= x < self.cols)
 
     def get_dynamic_monster_spawn_list(self):
         monster_list = []
@@ -64,38 +54,30 @@ class LevelTemplate(object):
                 monster_list.extend((monster, ) * weight_coeff)
         return monster_list
 
-    def _gettile(self, handle, tile_dict=None):
-        if tile_dict is not None and handle in tile_dict:
-            return tile_dict[handle]
-        elif handle in self.tile_dict:
-            return self.tile_dict[handle]
-        elif handle in TILE.tiles:
-            return TILE.tiles[handle]
-        else:
-            raise KeyError("Handle '{}' not in global tiles nor in '{}'".format(handle, tile_dict))
-
-    def _finalize_manual_tilemap_template(self):
-        for loc, tile in enumerate(self.tilemap_template):
-            coord = loc // self.cols, loc % self.cols
-            if tile == TILE.STAIRS_UP:
-                self.passage_locations[GameConf.PASSAGE_UP] = coord
-            elif tile == TILE.STAIRS_DOWN:
-                self.passage_locations[GameConf.PASSAGE_DOWN] = coord
+    def _finalize_manual_tilemap(self):
+        for index, tile in enumerate(self.tilemap):
+            coord = index // self.cols, index % self.cols
+            if tile == TileImpl.Stairs_Up.value:
+                self.passage_locations[LevelLocation.Passage_Up] = coord
+            elif tile == TileImpl.Stairs_Down.value:
+                self.passage_locations[LevelLocation.Passage_Down] = coord
 
         self._transform_dynamic_walls()
         self._fill_rock()
 
     def _transform_dynamic_walls(self):
-        self.tilemap_template = [TILE.WALL if self._tile_qualifies_as_wall(loc, tile)
-                                 else tile for loc, tile in enumerate(self.tilemap_template)]
+        self.tilemap = [TileImpl.Wall.value if self._dynamic_wall_qualifies_as_wall(tile, index)
+                                    else tile for index, tile in enumerate(self.tilemap)]
 
-    def _tile_qualifies_as_wall(self, loc, tile_handle):
-        if tile_handle != TILE.DYNAMIC_WALL:
+    def _dynamic_wall_qualifies_as_wall(self, tile, index):
+        if tile != TileImpl.Dynamic_Wall.value:
             return False
-        coord = loc // self.cols, loc % self.cols
+        coord = index // self.cols, index % self.cols
         neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
-        valid_handles = (self.get_tile_handle(coord) for coord in neighbor_coords if self.legal_coord(coord))
-        return any(handle not in (TILE.DYNAMIC_WALL, TILE.WALL, TILE.ROCK) for handle in valid_handles)
+        valid_tiles = (self.get_tile(coord) for coord in neighbor_coords if self.is_legal(coord))
+        return any(handle not in (TileImpl.Dynamic_Wall.value,
+                                  TileImpl.Wall.value,
+                                  TileImpl.Rock.value) for handle in valid_tiles)
 
     def _fill_rock(self):
-        self.tilemap_template = [TILE.ROCK if tile == TILE.DYNAMIC_WALL else tile for tile in self.tilemap_template]
+        self.tilemap = [TileImpl.Rock.value if tile == TileImpl.Dynamic_Wall.value else tile for tile in self.tilemap]

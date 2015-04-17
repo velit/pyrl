@@ -1,18 +1,18 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-    ./pyrl.py 2> data/errors.err
+    ./pyrl.py 2> save_data/errors.err
 else
-    $@ 2> data/errors.err
+    $@ 2> save_data/errors.err
 fi
 
-if [ -s data/errors.err ]; then
+if [ -s save_data/errors.err ]; then
     if [ $# -eq 0 ]; then
-        vim -q data/errors.err
-        rm data/errors.err
+        vim -q save_data/errors.err
+        rm save_data/errors.err
     else
-        cat data/errors.err
+        cat save_data/errors.err
     fi
 else
-    rm data/errors.err
+    rm save_data/errors.err
 fi

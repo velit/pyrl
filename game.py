@@ -11,8 +11,8 @@ from creature.stats import Stat
 from fov import get_light_set
 from generic_algorithms import add_vector
 from config.mappings import Mapping
-from templates.maps import get_world_template
-from templates.player import Player
+from game_data.maps import get_world_template
+from game_data.player import Player
 from user_input import UserInput
 from window.window_system import WindowSystem
 from world import World

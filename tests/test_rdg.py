@@ -4,6 +4,7 @@ import pytest
 
 import rdg
 from level_template import LevelTemplate
+from game_data.maps import to_tiles
 
 
 def pp_tm(tm, cols):
@@ -35,7 +36,7 @@ def generator():
 
     level_template = LevelTemplate(dimensions=(10, 10))
     generator = rdg.RDG(level_template)
-    generator.init_tilemap_template()
+    generator.init_tilemap()
     return generator
 
 
@@ -43,7 +44,7 @@ def test_dungeon_generation(rectangles, generator):
     rect = rectangles[0]
 
     generator.attempt_room(rect, (0, 1))
-    room = list(
+    room = to_tiles(
         "w.wwwrrrrr"
         "w...wrrrrr"
         "w...wrrrrr"
@@ -55,10 +56,10 @@ def test_dungeon_generation(rectangles, generator):
         "w...wrrrrr"
         "wwwwwrrrrr"
     )
-    assert generator.level_template.tilemap_template == room
+    assert generator.level_template.tilemap == room
 
     generator.attempt_corridor((4, 4), (0, 1), 6)
-    room = list(
+    room = to_tiles(
         "w.wwwrrrrr"
         "w...wrrrrr"
         "w...wrrrrr"
@@ -70,4 +71,4 @@ def test_dungeon_generation(rectangles, generator):
         "w...wrrrrr"
         "wwwwwrrrrr"
     )
-    assert generator.level_template.tilemap_template == room
+    assert generator.level_template.tilemap == room

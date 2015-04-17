@@ -2,8 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import defaultdict
 
-from config.game import GameConf
-from level_template import LevelTemplate
+from level_template import LevelTemplate, LevelLocation
 
 
 class LevelNotFound(Exception):
@@ -32,8 +31,8 @@ class WorldTemplate(object):
             level_template = LevelTemplate(level_i)
 
         infos = level_template.passage_destination_infos
-        infos[GameConf.PASSAGE_UP] = (dungeon_key, level_i - 1), GameConf.PASSAGE_DOWN
-        infos[GameConf.PASSAGE_DOWN] = (dungeon_key, level_i + 1), GameConf.PASSAGE_UP
+        infos[LevelLocation.Passage_Up] = (dungeon_key, level_i - 1), LevelLocation.Passage_Down
+        infos[LevelLocation.Passage_Down] = (dungeon_key, level_i + 1), LevelLocation.Passage_Up
 
         self.level_templates[dungeon_key, level_i] = level_template
 
