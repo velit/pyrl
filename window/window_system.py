@@ -3,8 +3,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 
 from enums.colors import Pair
-from mappings import Mapping
-from config import debug
+from config.mappings import Mapping
+from config.game import GameConf
+from config.debug import Debug
 from window.base_window import BaseWindow
 from window.level import LevelWindow
 from window.message import MessageBar
@@ -14,14 +15,21 @@ from window.status import StatusBar
 class WindowSystem(object):
 
     def __init__(self, cursor_lib):
-        from const.game import MSG_BAR_HEIGHT, STATUS_BAR_HEIGHT, LEVEL_HEIGHT, LEVEL_WIDTH
-        from const.game import SCREEN_ROWS, SCREEN_COLS
-
         self.cursor_lib = cursor_lib
-        self.a = BaseWindow(cursor_lib, (SCREEN_ROWS, SCREEN_COLS), (0, 0))
-        self.m = MessageBar(cursor_lib, (MSG_BAR_HEIGHT, LEVEL_WIDTH), (0, 0))
-        self.l = LevelWindow(cursor_lib, (LEVEL_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT, 0))
-        self.s = StatusBar(cursor_lib, (STATUS_BAR_HEIGHT, LEVEL_WIDTH), (MSG_BAR_HEIGHT + LEVEL_HEIGHT, 0))
+
+        msg_rows = GameConf.message_bar_height
+        lvl_rows, lvl_cols = GameConf.LEVEL_DIMENSIONS
+        sts_rows = GameConf.status_bar_height
+
+        msg_bar_dims = (msg_rows, lvl_cols)
+        lvl_bar_dims = (lvl_rows, lvl_cols)
+        sts_bar_dims = (sts_rows, lvl_cols)
+
+        self.a = BaseWindow(cursor_lib, GameConf.game_dimensions, (0, 0))
+
+        self.m = MessageBar(cursor_lib,   msg_bar_dims, (0, 0))
+        self.l = LevelWindow(cursor_lib,  lvl_bar_dims, (self.m.screen_position[0] + self.m.rows, 0))
+        self.s = StatusBar(cursor_lib,    sts_bar_dims, (self.l.screen_position[0] + self.l.rows, 0))
 
     def get_key(self, message=None, refresh=True):
         if message is not None:
@@ -71,9 +79,9 @@ class WindowSystem(object):
     def draw_path(self, path):
         for coord in path:
             self.draw_char(coord, (" ", Pair.Green), reverse=True)
-            if debug.path_step:
+            if Debug.path_step:
                 self.l.get_key(refresh=True)
-        if not debug.path_step:
+        if not Debug.path_step:
             self.l.get_key(refresh=True)
 
     def suspend(self):

@@ -10,9 +10,9 @@ except ImportError:
 import curses.ascii
 import logging
 
-import const.game as GAME
+from config.game import GameConf
 from enums.keys import Key
-from config import debug
+from config.debug import Debug
 from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
 
 
@@ -149,7 +149,7 @@ class NCursesWindowWrapper(object):
             if '^' in ch:
                 ch = ch.lower()
 
-        if debug.show_keycodes and ch != Key.NO_INPUT:
+        if Debug.show_keycodes and ch != Key.NO_INPUT:
             logging.debug("User input: {}".format(ch))
 
         return ch
@@ -166,11 +166,12 @@ class NCursesWindowWrapper(object):
     @classmethod
     def _check_root_window_size(cls):
         rows, cols = _root_win.get_dimensions()
-        while rows < GAME.SCREEN_ROWS or cols < GAME.SCREEN_COLS:
+        min_rows, min_cols = GameConf.game_dimensions
+        while rows < min_rows or cols < min_cols:
             message = ("Game needs at least a screen size of {}x{} while the "
                        "current size is {}x{}. Please resize the screen or "
                        "press Q to quit.")
-            message = message.format(GAME.SCREEN_COLS, GAME.SCREEN_ROWS, cols, rows)
+            message = message.format(min_cols, min_rows, cols, rows)
             _root_win.addstr(0, 0, message)
             _root_win.win.refresh()
 

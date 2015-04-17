@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.game as GAME
+from config.game import GameConf
 from .actions import Action
 from .stats import ensure_stats
 
@@ -114,4 +114,4 @@ class Creature(object):
 
     @property
     def attack_energy_cost(self):
-        return GAME.ATTACK_COST
+        return GameConf.ATTACK_COST

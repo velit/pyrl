@@ -2,18 +2,18 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import time
 
-import const.game as GAME
+from config.game import GameConf
 from enums.colors import Pair
 from enums.keys import Key
 
 
 class BaseWindow(object):
 
-    def __init__(self, cursor_lib, size, screen_position):
+    def __init__(self, cursor_lib, dimensions, screen_position):
         self.cursor_lib = cursor_lib
-        self.cursor_win = cursor_lib.new_window(size)
-        self.rows, self.cols = size
+        self.rows, self.cols = dimensions
         self.screen_position = screen_position
+        self.cursor_win = cursor_lib.new_window(dimensions)
 
     def addch(self, y, x, char):
         self.cursor_win.addch(y, x, char)
@@ -58,13 +58,12 @@ class BaseWindow(object):
         while key not in key_set:
             if time.time() >= timestamp:
                 return Key.NO_INPUT
-            time.sleep(GAME.INPUT_INTERVAL)
+            time.sleep(GameConf.INPUT_INTERVAL)
             key = self.check_key()
         return key
 
     def blit(self):
-        size = self.rows, self.cols
-        self.cursor_win.blit(size, self.screen_position)
+        self.cursor_win.blit((self.rows, self.cols), self.screen_position)
 
     def refresh(self):
         self.blit()

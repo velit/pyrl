@@ -33,7 +33,7 @@ def test_Rectangle(rectangles):
 @pytest.fixture
 def generator():
 
-    level_template = LevelTemplate(rows=10, cols=10)
+    level_template = LevelTemplate(dimensions=(10, 10))
     generator = rdg.RDG(level_template)
     generator.init_tilemap_template()
     return generator

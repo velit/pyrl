@@ -3,17 +3,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import code
 from functools import partial
 
-import const.game as GAME
-import level_template
-import rdg
+from rdg import GenLevelType
+from config.game import GameConf
+from level_template import LevelTemplate
 from .inventory import equipment
 from .walk_mode import WalkMode
-from config import debug
+from config.debug import Debug
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
 from generic_algorithms import add_vector
-from mappings import Mapping
+from config.mappings import Mapping
 
 
 class UserInput(object):
@@ -33,8 +33,8 @@ class UserInput(object):
             Mapping.Help:       self.help_screen,
             Mapping.Inventory:  self.equipment,
             Mapping.Walk_Mode:  self.init_walk_mode,
-            Mapping.Ascend:     partial(self.enter, GAME.PASSAGE_UP),
-            Mapping.Descend:    partial(self.enter, GAME.PASSAGE_DOWN),
+            Mapping.Ascend:     partial(self.enter, GameConf.PASSAGE_UP),
+            Mapping.Descend:    partial(self.enter, GameConf.PASSAGE_DOWN),
 
             'd':  self.debug_action,
             '+':  partial(self.sight_change, 1),
@@ -148,30 +148,33 @@ class UserInput(object):
         level = self.creature.level
         c = self.io.get_key("Avail cmds: bcdhikloprsvy+-")
         if c == 'v':
-            debug.show_map = not debug.show_map
+            Debug.show_map = not Debug.show_map
             self.game.redraw()
-            self.io.msg("Show map set to {}".format(debug.show_map))
+            self.io.msg("Show map set to {}".format(Debug.show_map))
         elif c == 'r':
-            debug.cross = not debug.cross
-            self.io.msg("Path heuristic cross set to {}".format(debug.cross))
+            Debug.cross = not Debug.cross
+            self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
         elif c == 'l':
-            level_template.DEFAULT_LEVEL_TYPE = rdg.ARENA if level_template.DEFAULT_LEVEL_TYPE == rdg.DUNGEON else rdg.DUNGEON
-            self.io.msg("Level type set to {}".format(level_template.DEFAULT_LEVEL_TYPE))
+            if LevelTemplate.default_level_type == GenLevelType.Dungeon:
+                LevelTemplate.default_level_type = GenLevelType.Arena
+            else:
+                LevelTemplate.default_level_type = GenLevelType.Dungeon
+            self.io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
         elif c == 'd':
-            if not debug.path:
-                debug.path = True
+            if not Debug.path:
+                Debug.path = True
                 self.io.msg("Path debug set")
-            elif not debug.path_step:
-                debug.path_step = True
+            elif not Debug.path_step:
+                Debug.path_step = True
                 self.io.msg("Path debug and stepping set")
             else:
-                debug.path = False
-                debug.path_step = False
+                Debug.path = False
+                Debug.path_step = False
                 self.io.msg("Path debug unset")
         elif c == 'h':
-            debug.reverse = not debug.reverse
+            Debug.reverse = not Debug.reverse
             self.game.redraw()
-            self.io.msg("Reverse set to {}".format(debug.reverse))
+            self.io.msg("Reverse set to {}".format(Debug.reverse))
         elif c == 'k':
             creature_list = list(level.creatures.values())
             creature_list.remove(self.creature)
@@ -180,12 +183,12 @@ class UserInput(object):
             self.io.msg("Abrakadabra.")
             return True
         elif c == 'o':
-            passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
+            passage_down = level.get_passage_coord(GameConf.PASSAGE_DOWN)
             self.io.draw_path(level.path(self.creature.coord, passage_down))
             self.game.redraw()
         elif c == 'p':
-            passage_up = level.get_passage_coord(GAME.PASSAGE_UP)
-            passage_down = level.get_passage_coord(GAME.PASSAGE_DOWN)
+            passage_up = level.get_passage_coord(GameConf.PASSAGE_UP)
+            passage_down = level.get_passage_coord(GameConf.PASSAGE_DOWN)
             self.io.draw_path(level.path(passage_up, passage_down))
             self.game.redraw()
         elif c == 'i':
@@ -193,15 +196,15 @@ class UserInput(object):
             code.interact(local=locals())
             self.io.resume()
         elif c == 'y':
-            debug.show_keycodes = not debug.show_keycodes
-            self.io.msg("Input code debug set to {}".format(debug.show_keycodes))
+            Debug.show_keycodes = not Debug.show_keycodes
+            self.io.msg("Input code debug set to {}".format(Debug.show_keycodes))
         elif c == 'c':
             import curses
             self.io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
             self.io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
                 curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
         elif c == 'm':
-            self.io.msg(debug.debug_string)
+            self.io.msg(Debug.debug_string)
         else:
             self.io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
 

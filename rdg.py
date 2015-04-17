@@ -2,16 +2,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from functools import partial
 from random import randrange, random, choice
+from enum import Enum
 
-import const.game as GAME
+from config.game import GameConf
 import templates.tiles as TILE
 from enums.directions import Dir
 from generic_algorithms import add_vector
 from templates.tiles import WALL as W, ROCK as R, FLOOR as F
 
-
-DUNGEON = "GENERATED_LEVEL_TYPE_DUNGEON"
-ARENA = "GENERATED_LEVEL_TYPE_ARENA"
 
 ROOM_Y_RANGE = (5, 11)
 ROOM_X_RANGE = (7, 14)
@@ -25,7 +23,12 @@ CORRIDOR_CHANCE_RANGE = (0, 0.3)
 ROOM_CHANCE_RANGE = (0.3, 1)
 
 
-def generate_tilemap_template(level_template, level_type=DUNGEON):
+class GenLevelType(str, Enum):
+    Dungeon = "Level type Dungeon"
+    Arena = "Level type Arena"
+
+
+def generate_tilemap_template(level_template, level_type):
     return RDG(level_template, level_type).generate_tilemap_template()
 
 
@@ -69,7 +72,7 @@ class _Rectangle(tuple):
 
 class RDG(object):
 
-    def __init__(self, level_template, level_type=ARENA):
+    def __init__(self, level_template, level_type=GenLevelType.Arena):
 
         self.level_template = level_template
         self.rows = level_template.rows
@@ -82,21 +85,21 @@ class RDG(object):
 
     def generate_tilemap_template(self):
 
-        if self.level_type == DUNGEON:
+        if self.level_type == GenLevelType.Dungeon:
             if self.level_template.tilemap_template is None:
                 self.init_tilemap_template()
                 self.make_initial_room()
 
             self.generator_loop()
 
-        elif self.level_type == ARENA:
+        elif self.level_type == GenLevelType.Arena:
             self.init_tilemap_template()
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
-        if GAME.PASSAGE_UP not in self.level_template.passage_locations:
-            self.add_passageway(GAME.PASSAGE_UP, TILE.STAIRS_UP)
-        if GAME.PASSAGE_DOWN not in self.level_template.passage_locations:
-            self.add_passageway(GAME.PASSAGE_DOWN, TILE.STAIRS_DOWN)
+        if GameConf.PASSAGE_UP not in self.level_template.passage_locations:
+            self.add_passageway(GameConf.PASSAGE_UP, TILE.STAIRS_UP)
+        if GameConf.PASSAGE_DOWN not in self.level_template.passage_locations:
+            self.add_passageway(GameConf.PASSAGE_DOWN, TILE.STAIRS_DOWN)
 
     def generator_loop(self):
 

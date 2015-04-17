@@ -9,7 +9,8 @@ from cProfile import Profile
 
 import profile_util
 import state_store
-from const.game import LOG_FILE, LOG_LEVEL, GAME_NAME
+from config.game import GameConf
+from config.debug import Debug
 
 
 def start(cursor_lib_callback):
@@ -44,7 +45,7 @@ def prepare_game(cursor_lib_callback, cmdline_args=None):
 
 
 def init_logger_system():
-    logging.basicConfig(filename=LOG_FILE, level=LOG_LEVEL)
+    logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
 
 
 def get_commandline_options(args=None):
@@ -52,8 +53,8 @@ def get_commandline_options(args=None):
     parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
     start_group = parser.add_mutually_exclusive_group()
     start_group.add_argument("-g", "--game", help="Specify the name for a new game.",
-                             nargs="?", const=GAME_NAME, default=GAME_NAME)
-    start_group.add_argument("-l", "--load", help="Specify the game to be loaded.", nargs="?", const=GAME_NAME)
+                             nargs="?", const=GameConf.default_game_name, default=GameConf.default_game_name)
+    start_group.add_argument("-l", "--load", help="Specify the game to be loaded.", nargs="?", const=GameConf.default_game_name)
     parser.add_argument("-p", "--profile", help="Generate profiling data during the game.", action="store_true")
 
     return parser.parse_args(args)

@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-import const.game as GAME
+from config.game import GameConf
 import path
-from config import debug
+from config.debug import Debug
 from creature.creature import Creature
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
@@ -32,21 +32,20 @@ class Level(object):
 
         if level_template.use_dynamic_monsters:
             self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
-            for _ in range(GAME.MONSTERS_PER_LEVEL):
-                self._spawn_random_creature()
+            self._spawn_random_creature(level_template.dynamic_monster_amount)
 
     # nudge_coord nudges towards a line between this and start_coord
     def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
         cost = self.distance_heuristic(start_coord, end_coord)
-        if debug.cross:
-            cost += cross_product(start_coord, end_coord, nudge_coord) / debug.cross_mod
+        if Debug.cross:
+            cost += cross_product(start_coord, end_coord, nudge_coord) / Debug.cross_mod
         return cost
 
     def _a_star_neighbors(self, coord):
         for direction in self.get_tile_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             if direction in Dir.Diagonals:
-                yield neighbor_coord, round(self.tiles[coord].movement_cost * GAME.DIAGONAL_MODIFIER)
+                yield neighbor_coord, round(self.tiles[coord].movement_cost * GameConf.DIAGONAL_MODIFIER)
             else:
                 yield neighbor_coord, self.tiles[coord].movement_cost
 
@@ -71,9 +70,10 @@ class Level(object):
         else:
             return self.tiles[coord].memory_char
 
-    def _spawn_random_creature(self):
-        monster_file = random.choice(self.creature_spawn_list)
-        self.add_creature(Creature(monster_file))
+    def _spawn_random_creature(self, amount=1):
+        for _ in range(amount):
+            monster_file = random.choice(self.creature_spawn_list)
+            self.add_creature(Creature(monster_file))
 
     def _spawn_predefined_creature(self, mons_file):
         creature = Creature(mons_file)
@@ -112,7 +112,7 @@ class Level(object):
             yield y, x, self.tiles[y, x].memory_char
 
     def get_passage_coord(self, passage):
-        if passage == GAME.PASSAGE_RANDOM:
+        if passage == GameConf.PASSAGE_RANDOM:
             return self.get_free_coord()
         else:
             return self.passage_locations[passage]
@@ -160,15 +160,15 @@ class Level(object):
         return last
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, GAME.MOVEMENT_COST, GAME.DIAGONAL_MODIFIER))
+        return round(path.heuristic(coordA, coordB, GameConf.MOVEMENT_COST, GameConf.DIAGONAL_MODIFIER))
 
     def movement_cost(self, direction, end_coord):
         if direction in Dir.Orthogonals:
             value = self.tiles[end_coord].movement_cost
         elif direction in Dir.Diagonals:
-            value = round(self.tiles[end_coord].movement_cost * GAME.DIAGONAL_MODIFIER)
+            value = round(self.tiles[end_coord].movement_cost * GameConf.DIAGONAL_MODIFIER)
         elif direction == Dir.Stay:
-            value = GAME.MOVEMENT_COST
+            value = GameConf.MOVEMENT_COST
         else:
             raise ValueError("Invalid direction: {}".format(direction))
         return value

@@ -1,38 +1,37 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from enums.directions import Dir
-import const.game as GAME
-import rdg
+
 import templates.tiles as TILE
+from config.game import GameConf
+from enums.directions import Dir
 from generic_algorithms import add_vector
+from rdg import GenLevelType, generate_tilemap_template
 from templates.monsters import monster_templates
-
-
-DEFAULT_LEVEL_TYPE = rdg.DUNGEON
 
 
 class LevelTemplate(object):
 
+    default_level_type = GenLevelType.Dungeon
+
     def __init__(self, danger_level=0, static_level=False,
                  use_dynamic_monsters=True, tilemap_template=None,
-                 static_monster_seq=(), rows=GAME.LEVEL_HEIGHT,
-                 cols=GAME.LEVEL_WIDTH):
+                 static_monster_seq=(), dimensions=GameConf.LEVEL_DIMENSIONS):
         self.danger_level = danger_level
         self.tilemap_template = tilemap_template
         self.static_level = static_level
         self.use_dynamic_monsters = use_dynamic_monsters
-        self.rows = rows
-        self.cols = cols
+        self.rows, self.cols = dimensions
         self.passage_locations = {}
         self.passage_destination_infos = {}
         self.static_monster_templates = list(static_monster_seq)
         self.tile_dict = {}
+        self.dynamic_monster_amount = 99
 
     def finalize(self):
         if self.static_level:
             self._finalize_manual_tilemap_template()
         else:
-            rdg.generate_tilemap_template(self, DEFAULT_LEVEL_TYPE)
+            generate_tilemap_template(self, self.default_level_type)
 
     def get_tile_handle(self, coord):
         y, x = coord
@@ -79,9 +78,9 @@ class LevelTemplate(object):
         for loc, tile in enumerate(self.tilemap_template):
             coord = loc // self.cols, loc % self.cols
             if tile == TILE.STAIRS_UP:
-                self.passage_locations[GAME.PASSAGE_UP] = coord
+                self.passage_locations[GameConf.PASSAGE_UP] = coord
             elif tile == TILE.STAIRS_DOWN:
-                self.passage_locations[GAME.PASSAGE_DOWN] = coord
+                self.passage_locations[GameConf.PASSAGE_DOWN] = coord
 
         self._transform_dynamic_walls()
         self._fill_rock()

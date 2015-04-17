@@ -4,7 +4,7 @@ import pytest
 from io_wrappers.mock import MockInputEndError
 
 
-TEST_GAME_NAME = "test"
+TEST_GameConf_NAME = "test"
 
 
 @pytest.fixture
@@ -17,13 +17,13 @@ def mockwrapper():
 def game(mockwrapper):
 
     import main
-    return main.prepare_game(mockwrapper, cmdline_args=("-g", TEST_GAME_NAME))
+    return main.prepare_game(mockwrapper, cmdline_args=("-g", TEST_GameConf_NAME))
 
 
 def load_game(mockwrapper):
 
     import main
-    return main.prepare_game(mockwrapper, cmdline_args=("-l", TEST_GAME_NAME))
+    return main.prepare_game(mockwrapper, cmdline_args=("-l", TEST_GameConf_NAME))
 
 
 def prepare_input_and_exe(mockwrapper, game, input_seq):

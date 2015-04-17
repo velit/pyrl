@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.game as GAME
+from config.game import GameConf
 from enums.colors import Pair
 from level_template import LevelTemplate
 from monster_template import MonsterTemplate
@@ -14,7 +14,7 @@ FIRST_LEVEL = (DUNGEON, 1)
 def get_world_template():
 
     world = WorldTemplate()
-    world.add_first_level_info(FIRST_LEVEL, GAME.PASSAGE_UP)
+    world.add_first_level_info(FIRST_LEVEL, GameConf.PASSAGE_UP)
 
     L0 = LevelTemplate(
         danger_level=1,
@@ -54,7 +54,7 @@ def get_world_template():
     )
     world.add_level(DUNGEON, L0)
 
-    for x in range(GAME.LEVELS_PER_DUNGEON - 1):
+    for x in range(99 - 1):
         world.add_level(DUNGEON)
 
     return world

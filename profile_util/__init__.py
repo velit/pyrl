@@ -2,12 +2,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from pstats import Stats
 
-from const.game import PROFILE_DATA_PATH
+from config.debug import Debug
 
 
 def write_profiler_results(profiler):
 
-    with open(PROFILE_DATA_PATH, "w") as f:
+    with open(Debug.profiling_output_file, "w") as f:
         st = Stats(profiler, stream=f)
         st.strip_dirs()
 

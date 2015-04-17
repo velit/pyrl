@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import OrderedDict
 
 from creature.equipment import Slot
-from mappings import Mapping
+from config.mappings import Mapping
 
 equipment_slots = OrderedDict()
 equipment_slots[Mapping.Equipment_Slot_Head]       = Slot.head

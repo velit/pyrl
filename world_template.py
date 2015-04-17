@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import defaultdict
 
-import const.game as GAME
+from config.game import GameConf
 from level_template import LevelTemplate
 
 
@@ -32,8 +32,8 @@ class WorldTemplate(object):
             level_template = LevelTemplate(level_i)
 
         infos = level_template.passage_destination_infos
-        infos[GAME.PASSAGE_UP] = (dungeon_key, level_i - 1), GAME.PASSAGE_DOWN
-        infos[GAME.PASSAGE_DOWN] = (dungeon_key, level_i + 1), GAME.PASSAGE_UP
+        infos[GameConf.PASSAGE_UP] = (dungeon_key, level_i - 1), GameConf.PASSAGE_DOWN
+        infos[GameConf.PASSAGE_DOWN] = (dungeon_key, level_i + 1), GameConf.PASSAGE_UP
 
         self.level_templates[dungeon_key, level_i] = level_template
 

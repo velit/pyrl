@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import textwrap
 
 from enums.keys import Key
-from mappings import Mapping
+from config.mappings import Mapping
 from enums.colors import Pair
 from window.base_window import BaseWindow
 

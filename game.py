@@ -1,16 +1,16 @@
 """pyrl; Python roguelike by Tapani Kiiskinen."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import const.game as GAME
+from config.game import GameConf
 import state_store
 from ai import AI
 from combat import get_melee_attack_cr, get_combat_message
-from config import debug
+from config.debug import Debug
 from creature.actions import Action
 from creature.stats import Stat
 from fov import get_light_set
 from generic_algorithms import add_vector
-from mappings import Mapping
+from config.mappings import Mapping
 from templates.maps import get_world_template
 from templates.player import Player
 from user_input import UserInput
@@ -60,7 +60,7 @@ class Game(object):
 
     def player_act(self):
         level = self.player.level
-        if debug.show_map:
+        if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(self.player.level, self.player)
         self.user_input.get_user_input_and_act()
@@ -88,7 +88,7 @@ class Game(object):
             passage = level.get_exit(creature.coord)
             dest_world_loc, dest_passage = level.get_destination_info(passage)
             if self.move_creature_to_level(creature, dest_world_loc, dest_passage):
-                creature.update_energy(GAME.MOVEMENT_COST)
+                creature.update_energy(GameConf.MOVEMENT_COST)
                 return True
             self.io.msg("This passage doesn't seem to lead anywhere.")
         else:
@@ -113,7 +113,7 @@ class Game(object):
     def creature_teleport(self, creature, target_coord):
         level = creature.level
         if level.is_passable(target_coord) and creature.can_act():
-            creature.update_energy(GAME.MOVEMENT_COST)
+            creature.update_energy(GameConf.MOVEMENT_COST)
             level.move_creature(creature, target_coord)
             return True
         else:
@@ -190,11 +190,11 @@ class Game(object):
 
     def endgame(self, dont_ask=True, message=""):
         self.io.msg(message)
-        if dont_ask or self.io.ask("Do you wish to end the game? [y/N]") in GAME.YES:
+        if dont_ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
             exit()
 
     def savegame(self, dont_ask=True):
-        if dont_ask or self.io.ask("Do you wish to save the game? [y/N]") in GAME.YES:
+        if dont_ask or self.io.ask("Do you wish to save the game? [y/N]") in GameConf.YES:
             self.io.msg("Saving...")
             self.io.refresh()
 
@@ -208,7 +208,7 @@ class Game(object):
             self.io.msg(msg_str)
 
     def update_view(self, level, creature):
-        old = self.current_vision if not debug.show_map else set()
+        old = self.current_vision if not Debug.show_map else set()
         new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
         mod = level.pop_modified_locations()
         level.update_visited_locations(new - old)
@@ -217,19 +217,19 @@ class Game(object):
         self.io.draw(out_of_sight_memory_data)
 
         new_visible_data = level.get_visible_data(new - (old - mod))
-        self.io.draw(new_visible_data, debug.reverse)
+        self.io.draw(new_visible_data, Debug.reverse)
 
         self.current_vision = new
 
     def redraw(self):
         self.io.l.clear()
         level = self.player.level
-        if debug.show_map:
+        if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         memory_data = level.get_memory_data(level.visited_locations)
         self.io.draw(memory_data)
         vision_data = level.get_visible_data(self.current_vision)
-        self.io.draw(vision_data, debug.reverse)
+        self.io.draw(vision_data, Debug.reverse)
 
     def __getstate__(self):
         exclude_state = ('user_input', 'io')
