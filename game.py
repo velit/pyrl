@@ -6,7 +6,7 @@ import state_store
 from ai import AI
 from combat import get_melee_attack_cr, get_combat_message
 from config.debug import Debug
-from creature.actions import Action
+from creature.actions import Cost
 from creature.stats import Stat
 from fov import get_light_set
 from generic_algorithms import add_vector
@@ -44,26 +44,24 @@ class Game(object):
     def main_loop(self):
         player = self.player
         while True:
-            creature, newcycle = player.level.turn_scheduler.get_actor_and_is_newcycle()
-
-            #if newcycle:
-            # do cycle based stuff
+            creature, time, _ = player.level.turn_scheduler.pop()
+            player.level.time = time
 
             if creature is player:
-                if creature.can_act():
-                    self.player_act()
-                    self.turn_counter += 1
+                action_cost = self.player_act()
+                self.turn_counter += 1
             else:
-                self.ai.act_alert(self, creature, self.player.coord)
-
-            creature.recover_energy()
+                action_cost = self.ai.act_alert(self, creature, self.player.coord)
+            if not action_cost:
+                raise Exception(action_cost)
+            player.level.turn_scheduler.add(creature, time + action_cost)
 
     def player_act(self):
         level = self.player.level
         if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(self.player.level, self.player)
-        self.user_input.get_user_input_and_act()
+        return self.user_input.get_user_input_and_act()
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
@@ -88,34 +86,30 @@ class Game(object):
             passage = level.get_exit(creature.coord)
             dest_world_loc, dest_passage = level.get_destination_info(passage)
             if self.move_creature_to_level(creature, dest_world_loc, dest_passage):
-                creature.update_energy(GameConf.MOVEMENT_COST)
-                return True
-            self.io.msg("This passage doesn't seem to lead anywhere.")
+                return round(creature.speed_mult * Cost.Move)
+            else:
+                self.io.msg("This passage doesn't seem to lead anywhere.")
         else:
             self.io.msg("There is no entrance.")
         return False
 
     def creature_move(self, creature, direction):
         level = creature.level
-        if level.creature_can_move(creature, direction) and creature.can_act():
+        if level.creature_can_move(creature, direction):
             target_coord = add_vector(creature.coord, direction)
-            creature.update_energy(level.movement_cost(direction, target_coord))
             level.move_creature(creature, target_coord)
-            return True
+            return round(level.movement_multiplier(direction, target_coord) * creature.speed_mult * Cost.Move)
         else:
             if creature is not self.player:
                 if not level.creature_can_move(creature, direction):
                     self.io.msg("Creature can't move there.")
-                if not creature.can_act():
-                    self.io.msg("Creature can't act now.")
             return False
 
     def creature_teleport(self, creature, target_coord):
         level = creature.level
-        if level.is_passable(target_coord) and creature.can_act():
-            creature.update_energy(GameConf.MOVEMENT_COST)
+        if level.is_passable(target_coord):
             level.move_creature(creature, target_coord)
-            return True
+            return round(creature.speed_mult * Cost.Move)
         else:
             if creature is not self.player:
                 self.io.msg("Creature teleport failed.")
@@ -124,14 +118,11 @@ class Game(object):
     def creature_swap(self, creature, direction):
         target_coord = add_vector(creature.coord, direction)
         level = creature.level
-        if creature.can_act() and level.has_creature(target_coord):
+        if level.has_creature(target_coord):
             target_creature = level.get_creature(target_coord)
             if self.ai.willing_to_swap(target_creature, creature, self.player):
-                energy_cost = level.movement_cost(direction, target_coord)
-                creature.update_energy(energy_cost)
-                target_creature.update_energy(energy_cost)
                 level.swap_creature(creature, target_creature)
-                return True
+                return round(level.movement_multiplier(direction, target_coord) * creature.speed_mult * Cost.Move)
 
         if creature is not self.player:
             self.io.msg("Creature swap failed.")
@@ -139,29 +130,23 @@ class Game(object):
 
     def creature_attack(self, creature, direction):
         level = creature.level
-        if creature.can_act():
-            creature.update_energy_action(Action.Attack)
-            target_coord = add_vector(creature.coord, direction)
-            if level.has_creature(target_coord):
-                target = level.get_creature(target_coord)
-            else:
-                target = level.tiles[target_coord]
-            succeeds, damage = get_melee_attack_cr(creature, target)
-            if damage:
-                target.receive_damage(damage)
-                died = target.is_dead()
-            else:
-                died = False
-            personity = (creature is self.player, target is self.player)
-            msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
-            if died:
-                self.creature_death(target)
-            self.io.msg(msg)
-            return True
+        target_coord = add_vector(creature.coord, direction)
+        if level.has_creature(target_coord):
+            target = level.get_creature(target_coord)
         else:
-            if creature is not self.player:
-                self.io.msg("Creature attack failed.")
-            return False
+            target = level.tiles[target_coord]
+        succeeds, damage = get_melee_attack_cr(creature, target)
+        if damage:
+            target.receive_damage(damage)
+            died = target.is_dead()
+        else:
+            died = False
+        personity = (creature is self.player, target is self.player)
+        msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
+        if died:
+            self.creature_death(target)
+        self.io.msg(msg)
+        return round(creature.speed_mult * Cost.Attack)
 
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
@@ -187,6 +172,7 @@ class Game(object):
         self.io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
         self.io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
         self.io.s.add_element("Turns", lambda: self.turn_counter)
+        self.io.s.add_element("Time", lambda: self.player.level.time)
 
     def endgame(self, dont_ask=True, message=""):
         self.io.msg(message)

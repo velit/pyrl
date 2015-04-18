@@ -27,7 +27,6 @@ class AdvancedCreature(Creature):
 
     def __init__(self, creature_file):
         self.equipment = Equipment()
-        self.last_action_energy = 0
 
         super().__init__(creature_file)
 
@@ -41,13 +40,6 @@ class AdvancedCreature(Creature):
             sides = self.unarmed_sides
             addition = self.damage
         return dices, sides, addition
-
-    def update_energy(self, amount):
-        super().update_energy(amount)
-        self.last_action_energy = amount
-
-    def update_energy_action(self, action):
-        self.last_action_energy = super().update_energy_action(action)
 
     def is_idle(self):
         return False

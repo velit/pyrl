@@ -4,13 +4,12 @@ import random
 
 import path
 from config.debug import Debug
-from config.game import GameConf
 from enums.level_locations import LevelLocation
 from creature.creature import Creature
+from creature.actions import Action, Multiplier, Cost
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
-from generic_structures import List2D
-from turn_scheduler import TurnScheduler
+from generic_structures import List2D, PriorityQueue
 
 
 class Level(object):
@@ -25,8 +24,9 @@ class Level(object):
         self.tiles = List2D(level_template.tilemap, self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
-        self.turn_scheduler = TurnScheduler()
+        self.turn_scheduler = PriorityQueue()
         self.creatures = {}
+        self.time = 0
 
         for monster_file in level_template.static_monster_templates:
             self._spawn_predefined_creature(monster_file)
@@ -45,10 +45,12 @@ class Level(object):
     def _a_star_neighbors(self, coord):
         for direction in self.get_tile_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
+            multiplier = self.tiles[coord].movement_multiplier
             if direction in Dir.Diagonals:
-                yield neighbor_coord, round(self.tiles[coord].movement_cost * GameConf.DIAGONAL_MODIFIER)
-            else:
-                yield neighbor_coord, self.tiles[coord].movement_cost
+                multiplier *= Multiplier.Diagonal
+            elif direction in Dir.Orthogonals:
+                multiplier *= Multiplier.Orthogonal
+            yield neighbor_coord, round(multiplier * Cost.Move)
 
     def _get_free_coord(self):
         while True:
@@ -161,18 +163,18 @@ class Level(object):
         return last
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, GameConf.MOVEMENT_COST, GameConf.DIAGONAL_MODIFIER))
+        return round(path.heuristic(coordA, coordB, Cost.Move, Multiplier.Diagonal))
 
-    def movement_cost(self, direction, end_coord):
+    def movement_multiplier(self, direction, end_coord):
+        tile_multiplier = self.tiles[end_coord].movement_multiplier
         if direction in Dir.Orthogonals:
-            value = self.tiles[end_coord].movement_cost
+            return tile_multiplier * Multiplier.Orthogonal
         elif direction in Dir.Diagonals:
-            value = round(self.tiles[end_coord].movement_cost * GameConf.DIAGONAL_MODIFIER)
+            return tile_multiplier * Multiplier.Diagonal
         elif direction == Dir.Stay:
-            value = GameConf.MOVEMENT_COST
+            return tile_multiplier * Multiplier.Stay
         else:
             raise ValueError("Invalid direction: {}".format(direction))
-        return value
 
     def path(self, start_coord, goal_coord):
         return path.path(start_coord, goal_coord, self._a_star_neighbors, self._a_star_heuristic)
@@ -195,7 +197,7 @@ class Level(object):
         #   return "You don't know anything about this place."
 
     def add_creature_to_passage(self, creature, passage):
-        self.add_creature(creature, self.get_passage_coord(passage))
+        self.add_creature(creature, coord=self.get_passage_coord(passage))
 
     def add_creature(self, creature, coord=None):
         if coord is None:
@@ -207,7 +209,7 @@ class Level(object):
         self.modified_locations.add(coord)
         creature.coord = coord
         creature.level = self
-        self.turn_scheduler.add(creature)
+        self.turn_scheduler.add(creature, self.time + round(creature.speed_mult * Cost.Move))
 
     def remove_creature(self, creature):
         coord = creature.coord

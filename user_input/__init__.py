@@ -45,29 +45,32 @@ class UserInput(object):
             self.actions[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
-        while self.creature.can_act():
+        while True:
             if self.walk_mode.is_walk_mode_active():
-                self.walk_mode.continue_walk()
+                action_cost = self.walk_mode.continue_walk()
             else:
                 key = self.io.get_key()
-                if key in self.actions:
-                    action_not_free = self.actions[key]
-                    if action_not_free():
-                        return
-                else:
+                if key not in self.actions:
                     self.io.msg("Undefined key: {}".format(key))
+                    continue
+
+                action = self.actions[key]
+                action_cost = action()
+
+            if action_cost:
+                return action_cost
 
     def act_to_dir(self, direction):
         target_coord = add_vector(self.creature.coord, direction)
         level = self.creature.level
+        cost = None
         if level.creature_can_move(self.creature, direction):
-            self.game.creature_move(self.creature, direction)
+            cost = self.game.creature_move(self.creature, direction)
         elif level.has_creature(target_coord):
-            self.game.creature_attack(self.creature, direction)
-        elif not self.creature.can_act():
-            self.io.msg("You're out of energy.")
-        else:
+            cost = self.game.creature_attack(self.creature, direction)
+        if not cost:
             self.io.msg("You can't move there.")
+        return cost
 
     def look(self):
         coord = self.creature.coord
@@ -115,7 +118,7 @@ class UserInput(object):
         msg = "Specify attack direction, {} to abort".format(Mapping.Cancel)
         key = self.io.ask(msg, Mapping.Directions.keys() | Mapping.Group_Cancel)
         if key in Mapping.Directions:
-            self.game.creature_attack(self.creature, Mapping.Directions[key])
+            return self.game.creature_attack(self.creature, Mapping.Directions[key])
 
     def redraw(self):
         self.game.redraw()
@@ -124,7 +127,7 @@ class UserInput(object):
         coord = self.game.player.coord
         level = self.creature.level
         if level.is_exit(coord) and level.get_exit(coord) == passage:
-            self.game.creature_enter_passage(self.creature)
+            return self.game.creature_enter_passage(self.creature)
         else:
             try:
                 new_coord = level.get_passage_coord(passage)
@@ -133,12 +136,13 @@ class UserInput(object):
             else:
                 if not level.is_passable(new_coord):
                     level.remove_creature(level.get_creature(new_coord))
-                if not self.game.creature_teleport(self.creature, new_coord):
+                cost = self.game.creature_teleport(self.creature, new_coord)
+                if not cost:
                     self.io.msg("Teleport failed.")
+                return cost
 
     def sight_change(self, amount):
         self.creature.base_perception += amount
-        return True
 
     def print_history(self):
         self.io.m.print_history()

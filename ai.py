@@ -13,6 +13,7 @@ class AI(object):
         self.ai_state = {}
 
     def act_alert(self, game, creature, alert_coord):
+        cost = None
         level = creature.level
         if creature in self.ai_state:
             chase_coord, chase_vector = self.ai_state[creature]
@@ -26,13 +27,12 @@ class AI(object):
             chase_coord = alert_coord
 
             # actions
-            if creature.can_act():
-                if level.creature_can_reach(creature, alert_coord):
-                    game.creature_attack(creature, get_vector(creature.coord, alert_coord))
-                else:
-                    self.move_towards(game, creature, alert_coord)
+            if level.creature_can_reach(creature, alert_coord):
+                cost = game.creature_attack(creature, get_vector(creature.coord, alert_coord))
+            else:
+                cost = self.move_towards(game, creature, alert_coord)
 
-        elif creature.can_act():
+        else:
             # chasing and already at the target square and has a chase vector to pursue
             if chase_coord == creature.coord:
                 if chase_vector is not None:
@@ -51,14 +51,15 @@ class AI(object):
 
             # actions
             if chase_coord is not None:
-                self.move_towards(game, creature, chase_coord)
+                cost = self.move_towards(game, creature, chase_coord)
             else:
-                self.move_random(game, creature)
+                cost = self.move_random(game, creature)
 
         if chase_coord is not None or chase_vector is not None:
             self.ai_state[creature] = chase_coord, chase_vector
         else:
             self.remove_creature_state(creature)
+        return cost
 
     def move_towards(self, game, creature, target_coord):
         level = creature.level
@@ -81,18 +82,18 @@ class AI(object):
                 best_cost = cost
 
         if best_action == Action.Move:
-            game.creature_move(creature, best_direction)
+            return game.creature_move(creature, best_direction)
         elif best_action == Action.Swap:
-            game.creature_swap(creature, best_direction)
+            return game.creature_swap(creature, best_direction)
         else:
             assert False
 
     def move_random(self, game, creature):
         valid_dirs = [direction for direction in Dir.All if creature.level.creature_can_move(creature, direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
-            game.creature_move(creature, random.choice(valid_dirs))
+            return game.creature_move(creature, random.choice(valid_dirs))
         else:
-            game.creature_move(creature, Dir.Stay)
+            return game.creature_move(creature, Dir.Stay)
 
     def willing_to_swap(self, creature, target_creature, player=None):
         return target_creature is not player and creature not in self.ai_state

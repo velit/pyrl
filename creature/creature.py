@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.game import GameConf
-from .actions import Action
 from .stats import ensure_stats
 
 
@@ -14,7 +12,6 @@ class Creature(object):
 
         self.level = None
         self.coord = None
-        self.energy = 0
 
         self.base_strength     = 10
         self.base_dexterity    = 10
@@ -36,25 +33,6 @@ class Creature(object):
 
     def is_dead(self):
         return self.hp <= 0
-
-    def recover_energy(self):
-        self.energy += self.speed
-        if self.energy > 0:
-            self.energy = 0
-
-    def can_act(self):
-        return self.energy >= 0
-
-    def update_energy(self, amount):
-        self.energy -= amount
-
-    def update_energy_action(self, action):
-        if action == Action.Attack:
-            amount = self.attack_energy_cost
-        else:
-            assert False
-        self.energy -= amount
-        return amount
 
     @property
     def strength(self):
@@ -113,5 +91,5 @@ class Creature(object):
         return 93 + self.dexterity // 2 + self.strength // 5
 
     @property
-    def attack_energy_cost(self):
-        return GameConf.ATTACK_COST
+    def speed_mult(self):
+        return 100 / self.speed

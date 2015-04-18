@@ -36,9 +36,10 @@ class WalkMode(object):
                 direction = Mapping.Directions[key]
 
         if direction is not None:
-            walk_mode_data = self._init_walk_mode(direction)
+            cost, walk_mode_data = self._init_walk_mode(direction)
             if walk_mode_data is not None:
                 self.state = walk_mode_data
+            return cost
 
     def continue_walk(self):
         if not self._any_creatures_visible():
@@ -58,16 +59,18 @@ class WalkMode(object):
                     message = ""
                 key = self.io.ask_until_timestamp(message, timestamp, Mapping.Group_Cancel | {Mapping.Walk_Mode})
                 if key not in Mapping.Group_Cancel | {Mapping.Walk_Mode}:
-                    if self.game.creature_move(self.creature, new_direction):
+                    cost = self.game.creature_move(self.creature, new_direction)
+                    if cost:
                         walk_delay = self.io.get_future_time(GameConf.animation_period)
                         self.state = new_direction, new_walk_type, walk_delay, msg_time
-                        return True
+                        return cost
 
         self.state = None
         return False
 
     def _init_walk_mode(self, direction):
-        if self.game.creature_move(self.creature, direction):
+        cost = self.game.creature_move(self.creature, direction)
+        if cost:
             walk_type = self._get_walk_type(direction)
             if walk_type != WALK_IN_PLACE:
                 (forward, upper_left, upper_right, left, right, lower_left,
@@ -75,13 +78,15 @@ class WalkMode(object):
                 if forward:
                     if (left and not upper_left and not lower_left or
                             right and not upper_right and not lower_right):
-                        return None
+                        return cost, None
                 else:
                     if left and lower_left or right and lower_right:
-                        return None
+                        return cost, None
                     walk_type = CORRIDOR
 
-            return direction, walk_type, self.io.get_future_time(GameConf.animation_period), self.io.get_future_time(INTERRUPT_MSG_TIME)
+            return (cost, (direction, walk_type,
+                    self.io.get_future_time(GameConf.animation_period),
+                    self.io.get_future_time(INTERRUPT_MSG_TIME)))
 
     def _corridor_walk_type(self, origin_direction):
         forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(origin_direction)
