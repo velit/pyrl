@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from collections import deque
 
 
-class MockInputEndError(Exception):
+class MockInputEnd(Exception):
     pass
 
 
@@ -38,13 +38,13 @@ class MockWrapper():
         try:
             return self._prepared_input.popleft()
         except IndexError:
-            raise MockInputEndError()
+            raise MockInputEnd()
 
     def check_key(self):
         try:
             return self._prepare_input.popleft()
         except IndexError:
-            raise MockInputEndError()
+            raise MockInputEnd()
 
     def clear(self):
         pass

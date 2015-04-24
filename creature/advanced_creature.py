@@ -29,6 +29,7 @@ class AdvancedCreature(Creature):
         self.equipment = Equipment()
 
         super().__init__(creature_file)
+        self.current_vision = set()
 
     def get_damage_info(self):
         damage_info = self.equipment.get_damage_info()

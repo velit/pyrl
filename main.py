@@ -67,6 +67,6 @@ def load_game(game_name, cursor_lib_callback):
     except IOError:
         print("Game '{}' not found.".format(game_name), file=sys.stderr)
         sys.exit(1)
-    game.reinit_transient_objects(cursor_lib_callback)
+    game.init_nonserialized_objects(cursor_lib_callback)
     game.redraw()
     return game

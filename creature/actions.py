@@ -15,7 +15,7 @@ class Multiplier(object):
     Stay = 1
 
 
-class Cost(object):
+class Cost(Enum):
     Move = 1000
     Attack = 1000
     Swap = 1000

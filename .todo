@@ -102,6 +102,12 @@
             didn't move the state, instead made the attributes dynamic
         </comment>
     </note>
+    <note priority="veryhigh" time="1335477455" done="1429835471">
+        Make a priority queue based scheduling
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1385064782" done="1402792313">
         Make LevelFile into LevelTemplate and the other Files as well
         <comment>
@@ -112,6 +118,12 @@
         Make rdg.py use a class
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1402783190" done="1429835486">
+        Add a wrapper that prints to player or messages AI based on processed creature actions
+        <comment>
+            Instead now game_actions just returns errors as feedback.
         </comment>
     </note>
     <note priority="veryhigh" time="1426806766" done="1427481338">
@@ -130,6 +142,12 @@
         Make walk mode a frigging class...
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1427497885" done="1429835520">
+        Populate creature_actions.py
+        <comment>
+            done, ended up named as game_actions
         </comment>
     </note>
     <note priority="veryhigh" time="1427559301" done="1427583816">
@@ -309,17 +327,20 @@
     <note priority="veryhigh" time="1315707472">
         Make print_lines scrollable / Improve views
     </note>
-    <note priority="veryhigh" time="1335477455">
-        Make a priority queue based scheduling
-    </note>
-    <note priority="veryhigh" time="1402783190">
-        Add a wrapper that prints to player or messages AI based on processed creature actions
-    </note>
-    <note priority="veryhigh" time="1427497885">
-        Populate creature_actions.py
-    </note>
     <note priority="veryhigh" time="1429309937">
         Fix double action bug when changing levels
+    </note>
+    <note priority="veryhigh" time="1429750446" done="1429835550">
+        Move current_vision from game to player
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1429821381">
+        Make level memory be in creature instead of level
+    </note>
+    <note priority="veryhigh" time="1429823187">
+        Overhaul walk mode
     </note>
     <note priority="high" time="1330904930">
         Add a function that draws the square how it's supposed to be seen. Used for precise redraws (?)

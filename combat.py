@@ -18,35 +18,42 @@ def get_melee_attack(attack_rating, damage_info, defense_rating, armor):
         return (False, 0)
 
 
-def get_combat_message(attack_succeeds, damage, dies, personity, attacker_name=None, defender_name=None):
-    subject_is_player, object_is_player = personity
-    message = ""
-    if subject_is_player:
-        A = "You"
-        s = ""
-        s2 = ""
-    else:
-        A = "The {}".format(attacker_name)
-        s = "s"
-        s2 = "es"
-    if object_is_player:
-        t = "you"
-        i = "you"
-    else:
-        t = "the {}".format(defender_name)
-        i = "it"
-    if subject_is_player and object_is_player:
-        t = "yourself"
-        i = "yourself"
-        mv = "trying to hit "
-    else:
-        mv = ""
+def get_combat_message(attack_succeeds, damage, dies, personity, attacker_name, defender_name):
+    attacker_is_player, target_is_player = personity
 
-    if damage:
-        message += "{} hit{} {} for {} damage".format(A, s, t, damage)
-        message += " and kill{} {}.".format(s, i) if dies else "."
-    elif attack_succeeds:
-        message += "{} fail{} to hurt {}.".format(A, s, t)
+    if attacker_is_player:
+        attacker = "You"
+        third_person_singular = False
     else:
-        message += "{} miss{} {}{}.".format(A, s2, mv, t)
+        attacker = "The {}".format(attacker_name)
+        third_person_singular = True
+
+    if attacker_is_player and target_is_player:
+        target = "yourself"
+        indirect_target = "yourself"
+    elif target_is_player:
+        target = "you"
+        indirect_target = "you"
+    else:
+        target = "the {}".format(defender_name)
+        indirect_target = "it"
+
+    if third_person_singular:
+        s = "s"
+        es = "es"
+    else:
+        s = ""
+        es = ""
+
+    message = ""
+    if damage:
+        message += "{} hit{} {} for {} damage".format(attacker, s, target, damage)
+        if dies:
+            message += " and kill{} {}.".format(s, indirect_target)
+        else:
+            message += "."
+    elif attack_succeeds:
+        message += "{} fail{} to hurt {}.".format(attacker, s, target)
+    else:
+        message += "{} miss{} {}.".format(attacker, es, target)
     return message

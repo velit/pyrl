@@ -4,12 +4,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from config.game import GameConf
 import state_store
 from ai import AI
-from combat import get_melee_attack_cr, get_combat_message
 from config.debug import Debug
-from creature.actions import Cost
 from creature.stats import Stat
+from game_actions import GameActions
 from fov import get_light_set
-from generic_algorithms import add_vector
 from config.mappings import Mapping
 from game_data.maps import get_world_template
 from game_data.player import Player
@@ -24,163 +22,114 @@ class Game(object):
     def __init__(self, game_name, cursor_lib):
         self.game_name = game_name
         self.turn_counter = 0
-        self.current_vision = set()
         self.player = Player()
         self.ai = AI()
         self.world = World(get_world_template())
+        self.time = 0
 
-        self.reinit_transient_objects(cursor_lib)
+        self.init_nonserialized_objects(cursor_lib)
 
         first_level, passage = self.world.get_first_level_info()
-        self.move_creature_to_level(self.player, first_level, passage)
+        self.move_creature_to_level(self.player, first_level, passage, turnscheduler_add=True)
         self.vision_cache = None
         self.io.msg("{0} for help menu".format(Mapping.Help))
+        self.save_mark = False
 
-    def reinit_transient_objects(self, cursor_lib_callback):
+    def init_nonserialized_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_input = UserInput(self, self.player, self.io)
+        self.user_input = UserInput(GameActions(self, self.player), self.io)
         self.register_status_texts(self.player)
 
     def main_loop(self):
-        player = self.player
+        ai_game_actions = GameActions(self)
         while True:
-            creature, time, _ = player.level.turn_scheduler.pop()
-            player.level.time = time
+            if self.save_mark:
+                self.savegame(ask=False)
+                self.save_mark = False
 
-            if creature is player:
-                action_cost = self.player_act()
-                self.turn_counter += 1
+            creature, time_delta = self.player.level.turn_scheduler.advance_time()
+            self.time += time_delta
+
+            if creature is self.player:
+                self.user_input.game_actions.clear_action()
+                self.player_act()
+                action_cost = self.user_input.game_actions.action_cost
+
+                if action_cost > 0:
+                    self.turn_counter += 1
             else:
-                action_cost = self.ai.act_alert(self, creature, self.player.coord)
-            if not action_cost:
-                raise Exception(action_cost)
-            player.level.turn_scheduler.add(creature, time + action_cost)
+                ai_game_actions.clear_action(and_associate_creature=creature)
+                self.ai.act_alert(ai_game_actions, self.player.coord)
+                action_cost = ai_game_actions.action_cost
+
+            if action_cost < 0:
+                raise ValueError("Negative cost actions are not allowed.")
+            creature.level.turn_scheduler.add(creature, action_cost)
 
     def player_act(self):
         level = self.player.level
         if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
-        self.update_view(self.player.level, self.player)
-        return self.user_input.get_user_input_and_act()
+        self.update_view(level, self.player)
+        self.user_input.get_user_input_and_act()
 
-    def move_creature_to_level(self, creature, world_loc, passage):
+    def register_status_texts(self, creature):
+        add_element = self.io.s.add_element
+        add_element("Dmg",                      lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+        add_element("HP",                       lambda: "{}/{}".format(creature.hp, creature.max_hp))
+        add_element(Stat.sight.value,           lambda: creature.sight)
+        add_element(Stat.attack_rating.value,   lambda: creature.attack_rating)
+        add_element(Stat.defense_rating.value,  lambda: creature.defense_rating)
+        add_element(Stat.armor.value,           lambda: creature.armor)
+        add_element(Stat.speed.value,           lambda: creature.speed)
+        add_element(Stat.strength.value,        lambda: creature.strength)
+        add_element(Stat.dexterity.value,       lambda: creature.dexterity)
+        add_element(Stat.intelligence.value,    lambda: creature.intelligence)
+        add_element(Stat.endurance.value,       lambda: creature.endurance)
+        add_element(Stat.perception.value,      lambda: creature.perception)
+        add_element("Wloc",                     lambda: "{}/{}".format(*self.player.level.world_loc))
+        add_element("Loc",                      lambda: "{0:02},{1:02}".format(*creature.coord))
+        add_element("Turns",                    lambda: self.turn_counter)
+        add_element("Game Time",                lambda: self.time)
+        add_element("Level Time",               lambda: self.player.level.turn_scheduler.time)
+
+    def move_creature_to_level(self, creature, world_loc, passage, turnscheduler_add=False):
         try:
             target_level = self.world.get_level(world_loc)
         except LevelNotFound:
             return False
 
         if creature.level is not None:
-            creature.level.remove_creature(creature)
+            creature.level.remove_creature(creature, turnscheduler_remove=False)
 
-        target_level.add_creature_to_passage(creature, passage)
+        target_level.add_creature_to_passage(creature, passage, turnscheduler_add)
 
-        if creature is self.player:
-            self.current_vision = set()
+        try:
+            creature.current_vision.clear()
+        except AttributeError:
+            pass
+        else:
             self.redraw()
 
         return True
-
-    def creature_enter_passage(self, creature):
-        level = creature.level
-        if level.is_exit(creature.coord):
-            passage = level.get_exit(creature.coord)
-            dest_world_loc, dest_passage = level.get_destination_info(passage)
-            if self.move_creature_to_level(creature, dest_world_loc, dest_passage):
-                return round(creature.speed_mult * Cost.Move)
-            else:
-                self.io.msg("This passage doesn't seem to lead anywhere.")
-        else:
-            self.io.msg("There is no entrance.")
-        return False
-
-    def creature_move(self, creature, direction):
-        level = creature.level
-        if level.creature_can_move(creature, direction):
-            target_coord = add_vector(creature.coord, direction)
-            level.move_creature(creature, target_coord)
-            return round(level.movement_multiplier(direction, target_coord) * creature.speed_mult * Cost.Move)
-        else:
-            if creature is not self.player:
-                if not level.creature_can_move(creature, direction):
-                    self.io.msg("Creature can't move there.")
-            return False
-
-    def creature_teleport(self, creature, target_coord):
-        level = creature.level
-        if level.is_passable(target_coord):
-            level.move_creature(creature, target_coord)
-            return round(creature.speed_mult * Cost.Move)
-        else:
-            if creature is not self.player:
-                self.io.msg("Creature teleport failed.")
-            return False
-
-    def creature_swap(self, creature, direction):
-        target_coord = add_vector(creature.coord, direction)
-        level = creature.level
-        if level.has_creature(target_coord):
-            target_creature = level.get_creature(target_coord)
-            if self.ai.willing_to_swap(target_creature, creature, self.player):
-                level.swap_creature(creature, target_creature)
-                return round(level.movement_multiplier(direction, target_coord) * creature.speed_mult * Cost.Move)
-
-        if creature is not self.player:
-            self.io.msg("Creature swap failed.")
-        return False
-
-    def creature_attack(self, creature, direction):
-        level = creature.level
-        target_coord = add_vector(creature.coord, direction)
-        if level.has_creature(target_coord):
-            target = level.get_creature(target_coord)
-        else:
-            target = level.tiles[target_coord]
-        succeeds, damage = get_melee_attack_cr(creature, target)
-        if damage:
-            target.receive_damage(damage)
-            died = target.is_dead()
-        else:
-            died = False
-        personity = (creature is self.player, target is self.player)
-        msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
-        if died:
-            self.creature_death(target)
-        self.io.msg(msg)
-        return round(creature.speed_mult * Cost.Attack)
 
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
         level = creature.level
         if creature is self.player:
             self.io.notify("You die...")
-            self.endgame(dont_ask=True)
+            self.endgame(ask=False)
         level.remove_creature(creature)
 
-    def register_status_texts(self, creature):
-        self.io.s.add_element("Dmg", lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-        self.io.s.add_element("HP", lambda: "{}/{}".format(creature.hp, creature.max_hp))
-        self.io.s.add_element(Stat.sight.value, lambda: creature.sight)
-        self.io.s.add_element(Stat.attack_rating.value, lambda: creature.attack_rating)
-        self.io.s.add_element(Stat.defense_rating.value, lambda: creature.defense_rating)
-        self.io.s.add_element(Stat.armor.value, lambda: creature.armor)
-        self.io.s.add_element(Stat.speed.value, lambda: creature.speed)
-        self.io.s.add_element(Stat.strength.value, lambda: creature.strength)
-        self.io.s.add_element(Stat.dexterity.value, lambda: creature.dexterity)
-        self.io.s.add_element(Stat.intelligence.value, lambda: creature.intelligence)
-        self.io.s.add_element(Stat.endurance.value, lambda: creature.endurance)
-        self.io.s.add_element(Stat.perception.value, lambda: creature.perception)
-        self.io.s.add_element("Wloc", lambda: "{}/{}".format(*self.player.level.world_loc))
-        self.io.s.add_element("Loc", lambda: "{0:02},{1:02}".format(*creature.coord))
-        self.io.s.add_element("Turns", lambda: self.turn_counter)
-        self.io.s.add_element("Time", lambda: self.player.level.time)
-
-    def endgame(self, dont_ask=True, message=""):
-        self.io.msg(message)
-        if dont_ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
+    def endgame(self, ask=True):
+        if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
             exit()
 
-    def savegame(self, dont_ask=True):
-        if dont_ask or self.io.ask("Do you wish to save the game? [y/N]") in GameConf.YES:
+    def mark_save(self):
+        self.save_mark = True
+
+    def savegame(self, ask=True):
+        if not ask or self.io.ask("Do you wish to save the game? [y/N]") in GameConf.YES:
             self.io.msg("Saving...")
             self.io.refresh()
 
@@ -194,10 +143,18 @@ class Game(object):
             self.io.msg(msg_str)
 
     def update_view(self, level, creature):
-        old = self.current_vision if not Debug.show_map else set()
+        """
+        Update the current_vision set of the creature.
+
+        This operation should only be done on creatures that have the .current_vision
+        attribute ie. AdvancedCreatures for instance.
+        """
+        if Debug.show_map:
+            creature.current_vision.clear()
+        old = creature.current_vision
         new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
         mod = level.pop_modified_locations()
-        level.update_visited_locations(new - old)
+        level.update_visited_locations(new)
 
         out_of_sight_memory_data = level.get_memory_data(old - new)
         self.io.draw(out_of_sight_memory_data)
@@ -205,7 +162,7 @@ class Game(object):
         new_visible_data = level.get_visible_data(new - (old - mod))
         self.io.draw(new_visible_data, Debug.reverse)
 
-        self.current_vision = new
+        creature.current_vision = new
 
     def redraw(self):
         self.io.l.clear()
@@ -214,7 +171,7 @@ class Game(object):
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         memory_data = level.get_memory_data(level.visited_locations)
         self.io.draw(memory_data)
-        vision_data = level.get_visible_data(self.current_vision)
+        vision_data = level.get_visible_data(self.player.current_vision)
         self.io.draw(vision_data, Debug.reverse)
 
     def __getstate__(self):
@@ -225,4 +182,4 @@ class Game(object):
         return state
 
     def __setstate__(self, state):
-        self.__dict__.update(state)
+        vars(self).update(state)

@@ -17,10 +17,8 @@ INTERRUPT_MSG_TIME = 1
 
 class WalkMode(object):
 
-    def __init__(self, game, creature, io):
-        self.game = game
-        self.creature = creature
-        self.io = io
+    def __init__(self, user_input):
+        self.user_input = user_input
         self.state = None
 
     def is_walk_mode_active(self):
@@ -28,18 +26,18 @@ class WalkMode(object):
 
     def init_walk_mode(self, direction=None):
         if self._any_creatures_visible():
-            self.io.msg("Not while there are creatures in the vicinity.")
+            self.user_input.io.msg("Not while there are creatures in the vicinity.")
         if direction is None:
             key_set = Mapping.Directions.keys() | Mapping.Group_Cancel
-            key = self.io.ask("Specify walking direction, {} to abort".format(Mapping.Cancel), key_set)
+            key = self.user_input.io.ask("Specify walking direction, {} to abort".format(Mapping.Cancel), key_set)
             if key in Mapping.Directions:
                 direction = Mapping.Directions[key]
 
         if direction is not None:
-            cost, walk_mode_data = self._init_walk_mode(direction)
+            error, walk_mode_data = self._init_walk_mode(direction)
             if walk_mode_data is not None:
                 self.state = walk_mode_data
-            return cost
+            return error
 
     def continue_walk(self):
         if not self._any_creatures_visible():
@@ -53,24 +51,25 @@ class WalkMode(object):
 
             if result is not None:
                 new_direction, new_walk_type = result
-                if msg_time < self.io.get_current_time():
+                if msg_time < self.user_input.io.get_current_time():
                     message = "Press {} to interrupt walk mode".format(Mapping.Walk_Mode)
                 else:
                     message = ""
-                key = self.io.ask_until_timestamp(message, timestamp, Mapping.Group_Cancel | {Mapping.Walk_Mode})
+                key = self.user_input.io.ask_until_timestamp(message, timestamp, Mapping.Group_Cancel | {Mapping.Walk_Mode})
                 if key not in Mapping.Group_Cancel | {Mapping.Walk_Mode}:
-                    cost = self.game.creature_move(self.creature, new_direction)
-                    if cost:
-                        walk_delay = self.io.get_future_time(GameConf.animation_period)
+                    error = self.user_input.game_actions.move(new_direction)
+                    if not error:
+                        walk_delay = self.user_input.io.get_future_time(GameConf.animation_period)
                         self.state = new_direction, new_walk_type, walk_delay, msg_time
-                        return cost
+                    return error
 
         self.state = None
-        return False
 
     def _init_walk_mode(self, direction):
-        cost = self.game.creature_move(self.creature, direction)
-        if cost:
+        error = self.user_input.game_actions.move(direction)
+        if error:
+            return error, None
+        else:
             walk_type = self._get_walk_type(direction)
             if walk_type != WALK_IN_PLACE:
                 (forward, upper_left, upper_right, left, right, lower_left,
@@ -78,15 +77,15 @@ class WalkMode(object):
                 if forward:
                     if (left and not upper_left and not lower_left or
                             right and not upper_right and not lower_right):
-                        return cost, None
+                        return None, None
                 else:
                     if left and lower_left or right and lower_right:
-                        return cost, None
+                        return None, None
                     walk_type = CORRIDOR
 
-            return (cost, (direction, walk_type,
-                    self.io.get_future_time(GameConf.animation_period),
-                    self.io.get_future_time(INTERRUPT_MSG_TIME)))
+            return (error, (direction, walk_type,
+                    self.user_input.io.get_future_time(GameConf.animation_period),
+                    self.user_input.io.get_future_time(INTERRUPT_MSG_TIME)))
 
     def _corridor_walk_type(self, origin_direction):
         forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(origin_direction)
@@ -101,7 +100,7 @@ class WalkMode(object):
     def _get_corridor_candidate_dirs(self, direction):
         reverse = reverse_vector(direction)
         back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
-        candidate_dirs = set(self.creature.level.get_tile_passable_neighbors(self.creature.coord)) - {reverse}
+        candidate_dirs = set(self.user_input.creature.level.get_tile_passable_neighbors(self.user_input.creature.coord)) - {reverse}
         candidate_forward_dirs = candidate_dirs - back_sides
         candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides
@@ -114,7 +113,7 @@ class WalkMode(object):
             return direction, new_walk_type
 
     def _passable(self, direction):
-        return self.creature.level.is_passable(add_vector(self.creature.coord, direction))
+        return self.user_input.creature.level.is_passable(add_vector(self.user_input.creature.coord, direction))
 
     def _get_neighbor_passables(self, direction):
             upper_left_dir = anticlockwise_45(direction)
@@ -144,4 +143,4 @@ class WalkMode(object):
         return (left, right)
 
     def _any_creatures_visible(self):
-        return any(self.creature.level.has_creature(coord) for coord in self.game.current_vision if coord != self.creature.coord)
+        return any(self.user_input.creature.level.has_creature(coord) for coord in self.user_input.creature.current_vision if coord != self.user_input.creature.coord)

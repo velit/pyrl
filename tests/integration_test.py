@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pytest
-from io_wrappers.mock import MockInputEndError
+from io_wrappers.mock import MockInputEnd
 
 
 TEST_GameConf_NAME = "test"
@@ -31,7 +31,7 @@ def prepare_input_and_exe(mockwrapper, game, input_seq):
     try:
         game.main_loop()
         assert False
-    except MockInputEndError:
+    except MockInputEnd:
         return game
 
 

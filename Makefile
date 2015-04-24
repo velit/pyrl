@@ -12,20 +12,23 @@ future-test:
 
 profile-test:
 	python3 -m profile_util.run_profiler
-	less data/profiling_results
+	less save_data/profiling_results
 
 profile-in-place:
 	./pyrl.py -p
-	less data/profiling_results
+	less save_data/profiling_results
 
 debug:
 	python3 -m pdb pyrl.py
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -f data/errors.err data/profiling_results
+	rm -f save_data/errors.err save_data/profiling_results save_data/pyrl.log
 	rm -f MANIFEST
 	rm -rf dist
 
 release:
 	python3 setup.py sdist
+
+log:
+	tail -n 50 save_data/pyrl.log

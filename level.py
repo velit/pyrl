@@ -9,7 +9,8 @@ from creature.creature import Creature
 from creature.actions import Action, Multiplier, Cost
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
-from generic_structures import List2D, PriorityQueue
+from generic_structures import List2D
+from turn_scheduler import TurnScheduler
 
 
 class Level(object):
@@ -24,9 +25,8 @@ class Level(object):
         self.tiles = List2D(level_template.tilemap, self.cols)
         self.modified_locations = set()
         self.visited_locations = set()
-        self.turn_scheduler = PriorityQueue()
+        self.turn_scheduler = TurnScheduler()
         self.creatures = {}
-        self.time = 0
 
         for monster_file in level_template.static_monster_templates:
             self._spawn_predefined_creature(monster_file)
@@ -50,7 +50,7 @@ class Level(object):
                 multiplier *= Multiplier.Diagonal
             elif direction in Dir.Orthogonals:
                 multiplier *= Multiplier.Orthogonal
-            yield neighbor_coord, round(multiplier * Cost.Move)
+            yield neighbor_coord, round(multiplier * Cost.Move.value)
 
     def _get_free_coord(self):
         while True:
@@ -163,10 +163,15 @@ class Level(object):
         return last
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, Cost.Move, Multiplier.Diagonal))
+        return round(path.heuristic(coordA, coordB, Cost.Move.value, Multiplier.Diagonal))
 
-    def movement_multiplier(self, direction, end_coord):
-        tile_multiplier = self.tiles[end_coord].movement_multiplier
+    def movement_multiplier(self, coord, direction):
+        origin_multiplier = self.tiles[coord].movement_multiplier
+        target_coord = add_vector(coord, direction)
+        target_multiplier = self.tiles[target_coord].movement_multiplier
+
+        tile_multiplier = (origin_multiplier + target_multiplier) / 2
+
         if direction in Dir.Orthogonals:
             return tile_multiplier * Multiplier.Orthogonal
         elif direction in Dir.Diagonals:
@@ -196,10 +201,11 @@ class Level(object):
         #else:
         #   return "You don't know anything about this place."
 
-    def add_creature_to_passage(self, creature, passage):
-        self.add_creature(creature, coord=self.get_passage_coord(passage))
+    def add_creature_to_passage(self, creature, passage, turnscheduler_add=False):
+        self.add_creature(creature, coord=self.get_passage_coord(passage),
+                          turnscheduler_add=turnscheduler_add)
 
-    def add_creature(self, creature, coord=None):
+    def add_creature(self, creature, coord=None, turnscheduler_add=True):
         if coord is None:
             coord = self._get_free_coord()
         elif coord in self.creatures:
@@ -209,15 +215,18 @@ class Level(object):
         self.modified_locations.add(coord)
         creature.coord = coord
         creature.level = self
-        self.turn_scheduler.add(creature, self.time + round(creature.speed_mult * Cost.Move))
 
-    def remove_creature(self, creature):
+        if turnscheduler_add:
+            self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
+
+    def remove_creature(self, creature, turnscheduler_remove=True):
         coord = creature.coord
         del self.creatures[coord]
         self.modified_locations.add(coord)
         creature.coord = None
         creature.level = None
-        self.turn_scheduler.remove(creature)
+        if turnscheduler_remove:
+            self.turn_scheduler.remove(creature)
 
     def move_creature(self, creature, new_coord):
         self.modified_locations.add(creature.coord)
@@ -225,6 +234,10 @@ class Level(object):
         del self.creatures[creature.coord]
         self.creatures[new_coord] = creature
         creature.coord = new_coord
+
+    def move_creature_to_dir(self, creature, direction):
+        target_coord = add_vector(creature.coord, direction)
+        self.move_creature(creature, target_coord)
 
     def swap_creature(self, creatureA, creatureB):
         self.modified_locations.add(creatureA.coord)
@@ -244,7 +257,9 @@ class Level(object):
                 return False
 
     def creature_can_move(self, creature, direction):
-        if direction == Dir.Stay:
+        if direction not in Dir.AllPlusStay:
+            raise ValueError("Illegal movement direction: {}".format(direction))
+        elif direction == Dir.Stay:
             return True
         elif self.legal_coord(creature.coord, direction):
             coord = add_vector(creature.coord, direction)

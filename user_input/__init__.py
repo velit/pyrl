@@ -5,6 +5,7 @@ from functools import partial
 
 from .inventory import equipment
 from .walk_mode import WalkMode
+from game_actions import ActionError
 from config.debug import Debug
 from config.mappings import Mapping
 from enums.colors import Color, Pair
@@ -16,15 +17,30 @@ from rdg import GenLevelType
 
 
 class UserInput(object):
-    def __init__(self, game, creature, io_system):
-        self.game = game
-        self.creature = creature
+    error_messages = {
+        ActionError.AlreadyActed:         "You already acted.",
+        ActionError.IllegalMove:          "You can't move there.",
+        ActionError.IllegalTeleport:      "You can't teleport there.",
+        ActionError.SwapTargetResists:    "The creature resists your swap attempt.",
+        ActionError.NoSwapTarget:         "There isn't a creature there to swap with.",
+        ActionError.PassageLeadsNoWhere:  "This passage doesn't seem to lead anywhere.",
+        ActionError.NoPassage:            "This location doesn't have a passage.",
+        ActionError.PlayerAction:         "Only the player can do this action.",
+    }
+
+    def __init__(self, game_actions, io_system):
+        self.game_actions = game_actions
+        self.creature = game_actions.creature
         self.io = io_system
-        self.walk_mode = WalkMode(self.game, self.creature, self.io)
-        self.actions = {
-            Key.CLOSE_WINDOW:   self.endgame,
-            Mapping.Quit:       self.endgame,
-            Mapping.Save:       self.savegame,
+        self.walk_mode = WalkMode(self)
+        self.action_mapping = {
+            'd':  self.debug_action,
+            '+':  partial(self.sight_change, 1),
+            '-':  partial(self.sight_change, -1),
+
+            Key.CLOSE_WINDOW:   self.quit,
+            Mapping.Quit:       self.quit,
+            Mapping.Save:       self.save,
             Mapping.Attack:     self.attack,
             Mapping.Redraw:     self.redraw,
             Mapping.History:    self.print_history,
@@ -34,43 +50,48 @@ class UserInput(object):
             Mapping.Walk_Mode:  self.init_walk_mode,
             Mapping.Ascend:     partial(self.enter, LevelLocation.Passage_Up),
             Mapping.Descend:    partial(self.enter, LevelLocation.Passage_Down),
-
-            'd':  self.debug_action,
-            '+':  partial(self.sight_change, 1),
-            '-':  partial(self.sight_change, -1),
         }
         for key, direction in Mapping.Directions.items():
-            self.actions[key] = partial(self.act_to_dir, direction)
+            self.action_mapping[key] = partial(self.act_to_dir, direction)
         for key, direction in Mapping.Instant_Walk_Mode.items():
-            self.actions[key] = partial(self.init_walk_mode, direction)
+            self.action_mapping[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
         while True:
             if self.walk_mode.is_walk_mode_active():
-                action_cost = self.walk_mode.continue_walk()
+                error = self.walk_mode.continue_walk()
             else:
                 key = self.io.get_key()
-                if key not in self.actions:
+                if key not in self.action_mapping:
                     self.io.msg("Undefined key: {}".format(key))
                     continue
 
-                action = self.actions[key]
-                action_cost = action()
+                error = self.action_mapping[key]()
 
-            if action_cost:
-                return action_cost
+            if error is not None:
+                if error == ActionError.AlreadyActed:
+                    raise AssertionError("Player attempted to act twice.")
+                elif error == ActionError.PlayerAction:
+                    raise AssertionError("Player was denied a player only action.")
+                elif error in self.error_messages:
+                    self.io.msg(self.error_messages[error])
+                else:
+                    self.io.msg(error)
+
+            if self.game_actions.already_acted():
+                return
 
     def act_to_dir(self, direction):
         target_coord = add_vector(self.creature.coord, direction)
         level = self.creature.level
-        cost = None
+        error = None
         if level.creature_can_move(self.creature, direction):
-            cost = self.game.creature_move(self.creature, direction)
+            error = self.game_actions.move(direction)
         elif level.has_creature(target_coord):
-            cost = self.game.creature_attack(self.creature, direction)
-        if not cost:
-            self.io.msg("You can't move there.")
-        return cost
+            error = self.game_actions.attack(direction)
+        else:
+            error = ActionError.IllegalMove
+        return error
 
     def look(self):
         coord = self.creature.coord
@@ -92,7 +113,7 @@ class UserInput(object):
                 self.io.draw_char(coord, char)
                 self.io.draw_char(self.creature.coord, level._get_visible_char(self.creature.coord), reverse=True)
             c = self.io.get_key()
-            self.game.redraw()
+            self.game_actions.redraw()
             direction = Dir.Stay
             if c in Mapping.Directions:
                 direction = Mapping.Directions[c]
@@ -104,42 +125,41 @@ class UserInput(object):
                     self.io.msg(coord)
             elif c == 's':
                 if level.has_creature(coord):
-                    self.game.register_status_texts(level.get_creature(coord))
+                    self.game_actions.game.register_status_texts(level.get_creature(coord))
             elif c in Mapping.Group_Cancel or c == Mapping.Look_Mode:
                 break
 
-    def endgame(self, *a, **k):
-        self.game.endgame(*a, **k)
+    def quit(self):
+        self.game_actions.quit()
 
-    def savegame(self, *a, **k):
-        self.game.savegame(*a, **k)
+    def save(self):
+        self.game_actions.save()
 
     def attack(self):
         msg = "Specify attack direction, {} to abort".format(Mapping.Cancel)
         key = self.io.ask(msg, Mapping.Directions.keys() | Mapping.Group_Cancel)
         if key in Mapping.Directions:
-            return self.game.creature_attack(self.creature, Mapping.Directions[key])
+            return self.game_actions.attack(Mapping.Directions[key])
 
     def redraw(self):
-        self.game.redraw()
+        self.game_actions.redraw()
 
     def enter(self, passage):
-        coord = self.game.player.coord
+        coord = self.creature.coord
         level = self.creature.level
         if level.is_exit(coord) and level.get_exit(coord) == passage:
-            return self.game.creature_enter_passage(self.creature)
+            return self.game_actions.enter_passage()
         else:
+            # debug use
             try:
                 new_coord = level.get_passage_coord(passage)
             except KeyError:
-                self.io.msg("This level doesn't seem to have a corresponding passage.")
+                self.io.msg("This level doesn't seem to have a passage that way.")
             else:
                 if not level.is_passable(new_coord):
                     level.remove_creature(level.get_creature(new_coord))
-                cost = self.game.creature_teleport(self.creature, new_coord)
-                if not cost:
-                    self.io.msg("Teleport failed.")
-                return cost
+                error = self.game_actions.teleport(new_coord)
+                return error
 
     def sight_change(self, amount):
         self.creature.base_perception += amount
@@ -152,7 +172,7 @@ class UserInput(object):
         c = self.io.get_key("Avail cmds: bcdhikloprsvy+-")
         if c == 'v':
             Debug.show_map = not Debug.show_map
-            self.game.redraw()
+            self.game_actions.redraw()
             self.io.msg("Show map set to {}".format(Debug.show_map))
         elif c == 'r':
             Debug.cross = not Debug.cross
@@ -176,7 +196,7 @@ class UserInput(object):
                 self.io.msg("Path debug unset")
         elif c == 'h':
             Debug.reverse = not Debug.reverse
-            self.game.redraw()
+            self.game_actions.redraw()
             self.io.msg("Reverse set to {}".format(Debug.reverse))
         elif c == 'k':
             creature_list = list(level.creatures.values())
@@ -184,16 +204,15 @@ class UserInput(object):
             for i in creature_list:
                 level.remove_creature(i)
             self.io.msg("Abrakadabra.")
-            return True
         elif c == 'o':
             passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(self.creature.coord, passage_down))
-            self.game.redraw()
+            self.game_actions.redraw()
         elif c == 'p':
             passage_up = level.get_passage_coord(LevelLocation.Passage_Up)
             passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(passage_up, passage_down))
-            self.game.redraw()
+            self.game_actions.redraw()
         elif c == 'i':
             self.io.suspend()
             code.interact(local=locals())
@@ -208,8 +227,8 @@ class UserInput(object):
                 curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
         elif c == 'm':
             self.io.msg(Debug.debug_string)
-        else:
-            self.io.msg("Undefined debug key: {}".format(chr(c) if 0 < c < 128 else c))
+        elif isinstance(c, str):
+            self.io.msg("Undefined debug key: {}".format(c))
 
     def equipment(self):
         return equipment(self.io, self.creature.equipment)
@@ -247,4 +266,4 @@ class UserInput(object):
         ]
         footer = "{0} to close".format(Mapping.Cancel)
         self.io.menu(header, help_lines, footer, Mapping.Group_Cancel)
-        self.game.redraw()
+        self.game_actions.redraw()
