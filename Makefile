@@ -4,6 +4,9 @@ test-porcelain-output:
 test:
 	py.test-3 -k-slow
 
+test-debug:
+	py.test-3 -k-slow -x --pdb
+
 test-all:
 	py.test-3
 

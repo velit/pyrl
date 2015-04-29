@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pytest
 from io_wrappers.mock import MockInputEnd
+from enums.keys import Key
 
 
 TEST_GameConf_NAME = "test"
@@ -47,3 +48,16 @@ def test_save_and_load_game(mockwrapper, game):
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 8
     assert game.player.level.world_loc[1] == 5
+
+
+def test_subsystems(mockwrapper, game):
+
+    look_system = tuple("q4862q")
+    message_system = ('d', 'm', Key.ENTER)
+    whole_map = tuple("dv")
+    path_to_staircase = ('d', 'o', Key.ENTER)
+    inventory = tuple("ivzbrlaz")
+    walk_mode = tuple("w6")
+    input_seq = look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
+    game = prepare_input_and_exe(mockwrapper, game, input_seq)
+    assert game.turn_counter == 4

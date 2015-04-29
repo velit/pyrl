@@ -1,5 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import defaultdict
+
 from .stats import Stat
 from .creature import Creature
 from .equipment import Equipment
@@ -30,6 +32,7 @@ class AdvancedCreature(Creature):
 
         super().__init__(creature_file)
         self.current_vision = set()
+        self.visited_coordinates = defaultdict(set)
 
     def get_damage_info(self):
         damage_info = self.equipment.get_damage_info()
@@ -44,3 +47,6 @@ class AdvancedCreature(Creature):
 
     def is_idle(self):
         return False
+
+    def update_visited_coordinates(self, level, coordinates):
+        self.visited_coordinates[level] |= coordinates

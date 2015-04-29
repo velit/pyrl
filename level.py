@@ -24,7 +24,6 @@ class Level(object):
         self.passage_destination_infos = level_template.passage_destination_infos
         self.tiles = List2D(level_template.tilemap, self.cols)
         self.modified_locations = set()
-        self.visited_locations = set()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
@@ -146,9 +145,6 @@ class Level(object):
         self.modified_locations = set()
         return mod_locs
 
-    def update_visited_locations(self, locations):
-        self.visited_locations |= locations
-
     def check_los(self, coordA, coordB):
         return not (any(not self.is_see_through(coord) for coord in bresenham(coordA, coordB)) and
                     any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
@@ -185,12 +181,13 @@ class Level(object):
         return path.path(start_coord, goal_coord, self._a_star_neighbors, self._a_star_heuristic)
 
     def look_information(self, coord):
-        #if coord in self.visited_locations:
+        #if coord in creature.visited_locations:
         information = "{}x{} ".format(*coord)
         if self.has_creature(coord):
             c = self.get_creature(coord)
-            creature_stats = "{} hp:{}/{} sight:{} pv:{} dr:{} ar:{} attack:{}D{}+{}"
-            information += creature_stats.format(c.name, c.hp, c.max_hp, c.sight, c.pv, c.dr, c.ar, *c.get_damage_info())
+            msg = "{} hp:{}/{} sight:{} armor:{} dr:{} ar:{} attack:{}D{}+{}"
+            information += msg.format(c.name, c.hp, c.max_hp, c.sight, c.armor,
+                                      c.defense_rating, c.attack_rating, *c.get_damage_info())
             if hasattr(c, "target_coord"):
                 information += " target:{}".format(c.target_coord)
             if hasattr(c, "chase_vector"):

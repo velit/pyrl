@@ -2,6 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import deque
 
+from enums.keys import Key
+
 
 class MockInputEnd(Exception):
     pass
@@ -41,10 +43,7 @@ class MockWrapper():
             raise MockInputEnd()
 
     def check_key(self):
-        try:
-            return self._prepare_input.popleft()
-        except IndexError:
-            raise MockInputEnd()
+        return Key.NO_INPUT
 
     def clear(self):
         pass

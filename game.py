@@ -154,7 +154,7 @@ class Game(object):
         old = creature.current_vision
         new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
         mod = level.pop_modified_locations()
-        level.update_visited_locations(new)
+        creature.update_visited_coordinates(level, new)
 
         out_of_sight_memory_data = level.get_memory_data(old - new)
         self.io.draw(out_of_sight_memory_data)
@@ -169,7 +169,7 @@ class Game(object):
         level = self.player.level
         if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
-        memory_data = level.get_memory_data(level.visited_locations)
+        memory_data = level.get_memory_data(self.player.visited_coordinates[level])
         self.io.draw(memory_data)
         vision_data = level.get_visible_data(self.player.current_vision)
         self.io.draw(vision_data, Debug.reverse)
