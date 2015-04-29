@@ -5,18 +5,18 @@ from functools import partial
 
 from .inventory import equipment
 from .walk_mode import WalkMode
-from game_actions import ActionError
 from config.debug import Debug
 from config.mappings import Mapping
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
+from game_actions import ActionError
 from generic_algorithms import add_vector
 from level_template import LevelTemplate, LevelLocation
 from rdg import GenLevelType
 
 
-class UserInput(object):
+class UserController(object):
     error_messages = {
         ActionError.AlreadyActed:         "You already acted.",
         ActionError.IllegalMove:          "You can't move there.",
@@ -169,21 +169,24 @@ class UserInput(object):
 
     def debug_action(self):
         level = self.creature.level
-        c = self.io.get_key("Avail cmds: bcdhikloprsvy+-")
-        if c == 'v':
+
+        def show_map():
             Debug.show_map = not Debug.show_map
             self.game_actions.redraw()
             self.io.msg("Show map set to {}".format(Debug.show_map))
-        elif c == 'r':
+
+        def toggle_path_heuristic_cross():
             Debug.cross = not Debug.cross
             self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
-        elif c == 'l':
+
+        def cycle_level_type():
             if LevelTemplate.default_level_type == GenLevelType.Dungeon:
                 LevelTemplate.default_level_type = GenLevelType.Arena
             else:
                 LevelTemplate.default_level_type = GenLevelType.Dungeon
             self.io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
-        elif c == 'd':
+
+        def show_path_debug():
             if not Debug.path:
                 Debug.path = True
                 self.io.msg("Path debug set")
@@ -194,40 +197,67 @@ class UserInput(object):
                 Debug.path = False
                 Debug.path_step = False
                 self.io.msg("Path debug unset")
-        elif c == 'h':
+
+        def show_fov_debug():
             Debug.reverse = not Debug.reverse
             self.game_actions.redraw()
             self.io.msg("Reverse set to {}".format(Debug.reverse))
-        elif c == 'k':
+
+        def kill_creatures_in_level():
             creature_list = list(level.creatures.values())
             creature_list.remove(self.creature)
             for i in creature_list:
                 level.remove_creature(i)
             self.io.msg("Abrakadabra.")
-        elif c == 'o':
+
+        def draw_path_to_passage_down():
             passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(self.creature.coord, passage_down))
             self.game_actions.redraw()
-        elif c == 'p':
+
+        def draw_path_from_up_to_down():
             passage_up = level.get_passage_coord(LevelLocation.Passage_Up)
             passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
             self.io.draw_path(level.path(passage_up, passage_down))
             self.game_actions.redraw()
-        elif c == 'i':
+
+        def interactive_console():
             self.io.suspend()
             code.interact(local=locals())
             self.io.resume()
-        elif c == 'y':
+
+        def toggle_log_keycodes():
             Debug.show_keycodes = not Debug.show_keycodes
             self.io.msg("Input code debug set to {}".format(Debug.show_keycodes))
-        elif c == 'c':
+
+        def display_curses_color_info():
             import curses
             self.io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
             self.io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
                 curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
-        elif c == 'm':
+
+        def print_message_debug_string():
             self.io.msg(Debug.debug_string)
-        elif isinstance(c, str):
+
+        debug_actions = {
+            'v': show_map,
+            'r': toggle_path_heuristic_cross,
+            'l': cycle_level_type,
+            'd': show_path_debug,
+            'h': show_fov_debug,
+            'k': kill_creatures_in_level,
+            'o': draw_path_to_passage_down,
+            'p': draw_path_from_up_to_down,
+            'i': interactive_console,
+            'y': toggle_log_keycodes,
+            'c': display_curses_color_info,
+            'm': print_message_debug_string,
+        }
+        c = self.io.get_key("Avail cmds: " + "".join(sorted(debug_actions.keys())))
+
+        if c in debug_actions:
+            debug_actions[c]()
+        else:
             self.io.msg("Undefined debug key: {}".format(c))
 
     def equipment(self):

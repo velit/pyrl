@@ -11,7 +11,7 @@ from fov import get_light_set
 from config.mappings import Mapping
 from game_data.maps import get_world_template
 from game_data.player import Player
-from user_input import UserInput
+from user_controller.controller import UserController
 from window.window_system import WindowSystem
 from world import World
 from world_template import LevelNotFound
@@ -27,7 +27,7 @@ class Game(object):
         self.world = World(get_world_template())
         self.time = 0
 
-        self.init_nonserialized_objects(cursor_lib)
+        self.init_nonserial_objects(cursor_lib)
 
         first_level, passage = self.world.get_first_level_info()
         self.move_creature_to_level(self.player, first_level, passage, turnscheduler_add=True)
@@ -35,9 +35,9 @@ class Game(object):
         self.io.msg("{0} for help menu".format(Mapping.Help))
         self.save_mark = False
 
-    def init_nonserialized_objects(self, cursor_lib_callback):
+    def init_nonserial_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_input = UserInput(GameActions(self, self.player), self.io)
+        self.user_input = UserController(GameActions(self, self.player), self.io)
         self.register_status_texts(self.player)
 
     def main_loop(self):
