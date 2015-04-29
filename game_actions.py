@@ -123,7 +123,7 @@ class GameActions(object):
         if self.creature is not self.game.player:
             return ActionError.PlayerAction
 
-        self.game.mark_save()
+        self.game.save_mark = True
         self.do_action(0)
 
     def quit(self):

@@ -58,35 +58,35 @@ class Mapping(object):
     }
 
     Instant_Walk_Mode = {
-        Key.UP: Dir.North,
-        Key.DOWN: Dir.South,
-        Key.LEFT: Dir.West,
-        Key.RIGHT: Dir.East,
-        Key.END: Dir.SouthWest,
-        Key.HOME: Dir.NorthWest,
-        Key.PAGE_UP: Dir.NorthEast,
+        Key.UP:        Dir.North,
+        Key.DOWN:      Dir.South,
+        Key.LEFT:      Dir.West,
+        Key.RIGHT:     Dir.East,
+        Key.END:       Dir.SouthWest,
+        Key.HOME:      Dir.NorthWest,
+        Key.PAGE_UP:   Dir.NorthEast,
         Key.PAGE_DOWN: Dir.SouthEast,
     }
 
     # main view
-    Help = Key.F1
+    Help      = Key.F1
     Look_Mode = 'q'
     Inventory = 'i'
-    Descend = 'X'
-    Ascend = 'x'
-    Quit = 'Q'
-    Save = 'S'
-    Attack = 'a'
-    Redraw = '^r'
-    History = 'p'
+    Descend   = 'X'
+    Ascend    = 'x'
+    Quit      = 'Q'
+    Save      = 'S'
+    Attack    = 'a'
+    Redraw    = '^r'
+    History   = 'p'
     Walk_Mode = 'w'
 
     # inventory
-    View_Inventory = 'v'
-    Equipment_Slot_Head = 'h'
-    Equipment_Slot_Body = 'b'
+    View_Inventory            = 'v'
+    Equipment_Slot_Head       = 'h'
+    Equipment_Slot_Body       = 'b'
     Equipment_Slot_Right_Hand = 'r'
-    Equipment_Slot_Left_Hand = 'l'
-    Equipment_Slot_Feet = 'f'
+    Equipment_Slot_Left_Hand  = 'l'
+    Equipment_Slot_Feet       = 'f'
 
     Inventory_Keys = tuple(string.ascii_lowercase.replace(Cancel, ''))

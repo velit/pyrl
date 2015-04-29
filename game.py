@@ -53,8 +53,9 @@ class Game(object):
             self.time += time_delta
 
             if creature is self.player:
+                self.update_view(creature.level, creature)
                 self.user_input.game_actions.clear_action()
-                self.player_act()
+                self.user_input.get_user_input_and_act()
                 action_cost = self.user_input.game_actions.action_cost
 
                 if action_cost > 0:
@@ -65,15 +66,8 @@ class Game(object):
                 action_cost = ai_game_actions.action_cost
 
             if action_cost < 0:
-                raise ValueError("Negative cost actions are not allowed.")
+                raise AssertionError("Negative cost actions are not allowed.  {}".format(action_cost))
             creature.level.turn_scheduler.add(creature, action_cost)
-
-    def player_act(self):
-        level = self.player.level
-        if Debug.show_map:
-            self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
-        self.update_view(level, self.player)
-        self.user_input.get_user_input_and_act()
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
@@ -107,9 +101,6 @@ class Game(object):
         if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
             exit()
 
-    def mark_save(self):
-        self.save_mark = True
-
     def savegame(self, ask=True):
         if not ask or self.io.ask("Do you wish to save the game? [y/N]") in GameConf.YES:
             self.io.msg("Saving...")
@@ -139,30 +130,41 @@ class Game(object):
         This operation should only be done on creatures that have the .current_vision
         attribute ie. AdvancedCreatures for instance.
         """
-        if Debug.show_map:
-            creature.current_vision.clear()
-        old = creature.current_vision
-        new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
-        mod = self.pop_modified_locations()
-        creature.update_visited_locations(level, new)
+        old_vision = creature.current_vision
+        modified = self.pop_modified_locations()
+        new_vision = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
 
-        out_of_sight_memory_data = level.get_memory_data(old - new)
-        self.io.draw(out_of_sight_memory_data)
+        creature.current_vision = new_vision
+        creature.update_visited_locations(level, new_vision)
 
-        new_visible_data = level.get_visible_data(new - (old - mod))
-        self.io.draw(new_visible_data, Debug.reverse)
+        if not Debug.show_map:
+            # new ^ old is the set of new squares in view and squares that were left # behind.
+            # new & old & modified is the set of squares still in view which had changes
+            # since last turn.
+            update_set = (new_vision ^ old_vision) | (new_vision & old_vision & modified)
+            vision_data = level.get_vision_information(update_set, new_vision)
+        else:
+            update_set = (new_vision ^ old_vision) | modified
+            vision_data = level.get_vision_information(update_set, new_vision, show_creatures=True)
+        self.io.draw(vision_data)
 
-        creature.current_vision = new
+        if Debug.reverse:
+            reverse_data = level.get_vision_information(creature.current_vision, creature.current_vision)
+            self.io.draw(reverse_data, Debug.reverse)
 
     def redraw(self):
         self.io.l.clear()
         level = self.player.level
+
         if Debug.show_map:
-            self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
-        memory_data = level.get_memory_data(self.player.visited_locations[level])
-        self.io.draw(memory_data)
-        vision_data = level.get_visible_data(self.player.current_vision)
-        self.io.draw(vision_data, Debug.reverse)
+            self.io.draw(level.get_vision_information(level.get_coord_iter(), self.player.current_vision, show_creatures=True))
+        else:
+            draw_set = self.player.visited_locations[level] | self.player.current_vision
+            self.io.draw(level.get_vision_information(draw_set, self.player.current_vision))
+
+        if Debug.reverse:
+            reverse_data = level.get_vision_information(self.player.current_vision, self.player.current_vision)
+            self.io.draw(reverse_data, Debug.reverse)
 
     def __getstate__(self):
         exclude_state = ('user_input', 'io')

@@ -63,6 +63,7 @@ def debug_action(io, game_actions):
         game_actions.redraw()
 
     def interactive_console():
+        game = game_actions.game
         io.suspend()
         code.interact(local=locals())
         io.resume()

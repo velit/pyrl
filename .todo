@@ -258,6 +258,18 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1330904930" done="1430306100">
+        Add a function that draws the square how it's supposed to be seen. Used for precise redraws (?)
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="high" time="1331941016" done="1430306750">
+        Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1331954520" done="1332721910">
         Rename draw in game.py to something like update_view(creature) oslt
         <comment>
@@ -330,6 +342,12 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1429216494" done="1430307294">
+        Bug in inventory, fg. a cancels view
+        <comment>
+            fixed
+        </comment>
+    </note>
     <note priority="low" time="1315155844" done="1355047491">
         wizard/mana, warrior/stamina rogue/focus
         <comment>
@@ -360,12 +378,6 @@
     <note priority="veryhigh" time="1429823187">
         Overhaul walk mode
     </note>
-    <note priority="high" time="1330904930">
-        Add a function that draws the square how it's supposed to be seen. Used for precise redraws (?)
-    </note>
-    <note priority="high" time="1331941016">
-        Make level_file figure out more stuff dynamically (existence of stairs in tilefile, tilefile not None etc.)
-    </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
     </note>
@@ -378,17 +390,20 @@
     <note priority="high" time="1429224251">
         Add regeneration
     </note>
-    <note priority="medium" time="1315691945">
+    <note priority="high" time="1430306212">
+        Finalize history display/printing.
+    </note>
+    <note priority="medium" time="1315691945" done="1430307347">
         Make some of the const/ stuff json loaded, like tiles.py or maps.py or monsters.py
+        <comment>
+            Wont implement
+        </comment>
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method
     </note>
     <note priority="medium" time="1333062945">
         Make configurable keybindings support shift keys.
-    </note>
-    <note priority="medium" time="1429216494">
-        Bug in inventory, fg. a cancels view
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels

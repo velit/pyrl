@@ -20,7 +20,7 @@ def equipment(io, char_equipment):
         footer = footer.format(Mapping.View_Inventory, Mapping.Cancel)
         fmt_str = "{0} - {1:11}: {2}"
         lines = (fmt_str.format(key.upper(), slot.value, char_equipment.get_item(slot)) for key, slot in equipment_slots.items())
-        key = io.menu(header, lines, footer, equipment_slots.keys() | set((Mapping.View_Inventory, )) | Mapping.Group_Default)
+        key = io.menu(header, lines, footer, equipment_slots.keys() | {Mapping.View_Inventory} | Mapping.Group_Default)
         if key in equipment_slots:
             slot = equipment_slots[key]
             if char_equipment.get_item(slot) is None:

@@ -69,21 +69,15 @@ class Level(object):
     def get_memory_char(self, coord):
         return self.tiles[coord].memory_char
 
-    def get_visible_data(self, coord_set):
+    def get_vision_information(self, coord_set, visible_coord_set, show_creatures=False):
         for coord in coord_set:
-            yield coord, self.get_visible_char(coord)
-
-    def get_wallhack_data(self, coord_set):
-        for coord in coord_set:
-            if self.has_creature(coord):
-                char = self.get_creature(coord).char
+            if coord in visible_coord_set:
+                yield coord, self.get_visible_char(coord)
             else:
-                char = self.get_memory_char(coord)
-            yield coord, char
-
-    def get_memory_data(self, coord_set):
-        for coord in coord_set:
-            yield coord, self.get_memory_char(coord)
+                if show_creatures and self.has_creature(coord):
+                    yield coord, self.get_creature(coord).char
+                else:
+                    yield coord, self.get_memory_char(coord)
 
     def get_passage_coord(self, passage):
         if passage == LevelLocation.Passage_Random:
