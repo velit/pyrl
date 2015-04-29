@@ -24,13 +24,15 @@ class Game(object):
         self.turn_counter = 0
         self.player = Player()
         self.ai = AI()
-        self.world = World(get_world_template())
+        self.world = World(get_world_template(), self.add_modified_location)
         self.time = 0
+        self.modified_locations = set()
 
         self.init_nonserial_objects(cursor_lib)
 
-        first_level, passage = self.world.get_first_level_info()
-        self.move_creature_to_level(self.player, first_level, passage, turnscheduler_add=True)
+        first_level_wloc, passage = self.world.get_first_level_info()
+        first_level = self.world.get_level(first_level_wloc)
+        first_level.spawn_creature(self.player, passage)
         self.vision_cache = None
         self.io.msg("{0} for help menu".format(Mapping.Help))
         self.save_mark = False
@@ -93,22 +95,22 @@ class Game(object):
         add_element("Game Time",                lambda: self.time)
         add_element("Level Time",               lambda: self.player.level.turn_scheduler.time)
 
-    def move_creature_to_level(self, creature, world_loc, passage, turnscheduler_add=False):
+    def move_creature_to_level(self, creature, world_loc, passage):
         try:
             target_level = self.world.get_level(world_loc)
         except LevelNotFound:
             return False
 
-        if creature.level is not None:
-            creature.level.remove_creature(creature, turnscheduler_remove=False)
-
-        target_level.add_creature_to_passage(creature, passage, turnscheduler_add)
+        creature.level.remove_creature(creature, turnscheduler_remove=False)
+        target_level.add_creature_to_passage(creature, passage)
 
         try:
             creature.current_vision.clear()
         except AttributeError:
             pass
-        else:
+
+        if creature is self.player:
+            self.pop_modified_locations()
             self.redraw()
 
         return True
@@ -119,7 +121,7 @@ class Game(object):
         if creature is self.player:
             self.io.notify("You die...")
             self.endgame(ask=False)
-        level.remove_creature(creature)
+        level.remove_creature(creature, turnscheduler_remove=True)
 
     def endgame(self, ask=True):
         if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
@@ -142,6 +144,14 @@ class Game(object):
                 msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
             self.io.msg(msg_str)
 
+    def add_modified_location(self, coord):
+        self.modified_locations.add(coord)
+
+    def pop_modified_locations(self):
+        locations = self.modified_locations
+        self.modified_locations = set()
+        return locations
+
     def update_view(self, level, creature):
         """
         Update the current_vision set of the creature.
@@ -153,8 +163,8 @@ class Game(object):
             creature.current_vision.clear()
         old = creature.current_vision
         new = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
-        mod = level.pop_modified_locations()
-        creature.update_visited_coordinates(level, new)
+        mod = self.pop_modified_locations()
+        creature.update_visited_locations(level, new)
 
         out_of_sight_memory_data = level.get_memory_data(old - new)
         self.io.draw(out_of_sight_memory_data)
@@ -169,7 +179,7 @@ class Game(object):
         level = self.player.level
         if Debug.show_map:
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
-        memory_data = level.get_memory_data(self.player.visited_coordinates[level])
+        memory_data = level.get_memory_data(self.player.visited_locations[level])
         self.io.draw(memory_data)
         vision_data = level.get_visible_data(self.player.current_vision)
         self.io.draw(vision_data, Debug.reverse)

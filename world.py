@@ -5,7 +5,8 @@ from level import Level
 
 class World(object):
 
-    def __init__(self, world_template):
+    def __init__(self, world_template, visible_change_callback):
+        self.visible_change_callback = visible_change_callback
         self.world_template = world_template
         self.levels = {}
 
@@ -15,7 +16,7 @@ class World(object):
         except KeyError:
             level_template = self.world_template.get_level_template(world_loc)
             level_template.finalize()
-            level = Level(world_loc, level_template)
+            level = Level(world_loc, level_template, [self.visible_change_callback])
             self.levels[world_loc] = level
             return level
 

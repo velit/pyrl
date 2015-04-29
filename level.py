@@ -15,7 +15,7 @@ from turn_scheduler import TurnScheduler
 
 class Level(object):
 
-    def __init__(self, world_loc, level_template):
+    def __init__(self, world_loc, level_template, visible_change_callbacks=()):
         self.world_loc = world_loc
         self.rows = level_template.rows
         self.cols = level_template.cols
@@ -23,20 +23,22 @@ class Level(object):
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
         self.tiles = List2D(level_template.tilemap, self.cols)
-        #self.visible_change_observers = []
-        self.modified_locations = set()
+        self.visible_change_observers = []
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
         for monster_file in level_template.static_monster_templates:
-            self.add_creature(Creature(monster_file))
+            self.spawn_creature(Creature(monster_file))
 
         if level_template.use_dynamic_monsters:
             self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
 
             for _ in range(level_template.dynamic_monster_amount):
                 monster_file = random.choice(self.creature_spawn_list)
-                self.add_creature(Creature(monster_file))
+                self.spawn_creature(Creature(monster_file))
+
+        for callback in visible_change_callbacks:
+            self.visible_change_subscribe(callback)
 
     def legal_coord(self, coord, direction=(0, 0)):
         return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
@@ -101,7 +103,7 @@ class Level(object):
                 break
         return last
 
-    def get_neighbor_coords_and_costs(self, coord):
+    def get_neighbor_locations_and_costs(self, coord):
         for direction in self.get_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             multiplier = self.movement_multiplier(coord, direction)
@@ -130,11 +132,6 @@ class Level(object):
 
     def is_see_through(self, coord):
         return self.tiles[coord].is_see_through
-
-    def pop_modified_locations(self):
-        mod_locs = self.modified_locations
-        self.modified_locations = set()
-        return mod_locs
 
     def check_los(self, coordA, coordB):
         return not (any(not self.is_see_through(coord) for coord in bresenham(coordA, coordB)) and
@@ -167,7 +164,7 @@ class Level(object):
         return cost
 
     def path(self, start_coord, goal_coord):
-        return path.path(start_coord, goal_coord, self.get_neighbor_coords_and_costs, self._a_star_heuristic)
+        return path.path(start_coord, goal_coord, self.get_neighbor_locations_and_costs, self._a_star_heuristic)
 
     def look_information(self, coord):
         #if coord in creature.visited_locations:
@@ -187,50 +184,68 @@ class Level(object):
         #else:
         #   return "You don't know anything about this place."
 
-    def add_creature_to_passage(self, creature, passage, turnscheduler_add=False):
-        self.add_creature(creature, coord=self.get_passage_coord(passage),
-                          turnscheduler_add=turnscheduler_add)
+    def visible_change_subscribe(self, function):
+        self.visible_change_observers.append(function)
 
-    def add_creature(self, creature, coord=None, turnscheduler_add=True):
+    def visible_change_unsubscribe(self, function):
+        self.visible_change_observers.remove(function)
+
+    def visible_change_event(self, coord):
+        for observer in self.visible_change_observers:
+            observer(coord)
+
+    def spawn_creature(self, creature, passage=None):
+        if passage is None:
+            self.add_creature(creature)
+        else:
+            self.add_creature(creature, coord=self.get_passage_coord(passage))
+        self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
+
+    def add_creature_to_passage(self, creature, passage):
+        self.add_creature(creature, coord=self.get_passage_coord(passage))
+
+    def add_creature(self, creature, coord=None):
         if coord is None:
             coord = self.get_free_coord()
         elif self.has_creature(coord):
             blocking_creature = self.creatures[coord]
             self.move_creature(blocking_creature, self.get_free_coord())
         self.creatures[coord] = creature
-        self.modified_locations.add(coord)
         creature.coord = coord
         creature.level = self
 
-        if turnscheduler_add:
-            self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
+        self.visible_change_event(coord)
 
     def remove_creature(self, creature, turnscheduler_remove=True):
         coord = creature.coord
         del self.creatures[coord]
-        self.modified_locations.add(coord)
         creature.coord = None
         creature.level = None
+
         if turnscheduler_remove:
             self.turn_scheduler.remove(creature)
 
+        self.visible_change_event(coord)
+
     def move_creature(self, creature, new_coord):
-        self.modified_locations.add(creature.coord)
-        self.modified_locations.add(new_coord)
-        del self.creatures[creature.coord]
+        old_coord = creature.coord
+        del self.creatures[old_coord]
         self.creatures[new_coord] = creature
         creature.coord = new_coord
+
+        self.visible_change_event(old_coord)
+        self.visible_change_event(new_coord)
 
     def move_creature_to_dir(self, creature, direction):
         target_coord = add_vector(creature.coord, direction)
         self.move_creature(creature, target_coord)
 
     def swap_creature(self, creatureA, creatureB):
-        self.modified_locations.add(creatureA.coord)
-        self.modified_locations.add(creatureB.coord)
-        self.creatures[creatureA.coord] = creatureB
-        self.creatures[creatureB.coord] = creatureA
         creatureA.coord, creatureB.coord = creatureB.coord, creatureA.coord
+        self.creatures[creatureA.coord] = creatureA
+        self.creatures[creatureB.coord] = creatureB
+        self.visible_change_event(creatureA.coord)
+        self.visible_change_event(creatureB.coord)
 
     def creature_can_reach(self, creature, target_coord):
         if creature.coord == target_coord:
