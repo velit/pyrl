@@ -1,17 +1,17 @@
 """pyrl; Python roguelike by Tapani Kiiskinen."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.game import GameConf
 import state_store
 from ai import AI
 from config.debug import Debug
-from creature.stats import Stat
-from game_actions import GameActions
-from fov import get_light_set
+from config.game import GameConf
 from config.mappings import Mapping
+from fov import get_light_set
+from game_actions import GameActions
 from game_data.maps import get_world_template
 from game_data.player import Player
-from user_controller.controller import UserController
+from interface.status_texts import register_status_texts
+from user_controller import UserController
 from window.window_system import WindowSystem
 from world import World
 from world_template import LevelNotFound
@@ -40,7 +40,7 @@ class Game(object):
     def init_nonserial_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
         self.user_input = UserController(GameActions(self, self.player), self.io)
-        self.register_status_texts(self.player)
+        register_status_texts(self, self.player)
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
@@ -74,26 +74,6 @@ class Game(object):
             self.io.draw(level.get_wallhack_data(level.get_coord_iter()))
         self.update_view(level, self.player)
         self.user_input.get_user_input_and_act()
-
-    def register_status_texts(self, creature):
-        add_element = self.io.s.add_element
-        add_element("Dmg",                      lambda: "{}D{}+{}".format(*creature.get_damage_info()))
-        add_element("HP",                       lambda: "{}/{}".format(creature.hp, creature.max_hp))
-        add_element(Stat.sight.value,           lambda: creature.sight)
-        add_element(Stat.attack_rating.value,   lambda: creature.attack_rating)
-        add_element(Stat.defense_rating.value,  lambda: creature.defense_rating)
-        add_element(Stat.armor.value,           lambda: creature.armor)
-        add_element(Stat.speed.value,           lambda: creature.speed)
-        add_element(Stat.strength.value,        lambda: creature.strength)
-        add_element(Stat.dexterity.value,       lambda: creature.dexterity)
-        add_element(Stat.intelligence.value,    lambda: creature.intelligence)
-        add_element(Stat.endurance.value,       lambda: creature.endurance)
-        add_element(Stat.perception.value,      lambda: creature.perception)
-        add_element("Wloc",                     lambda: "{}/{}".format(*self.player.level.world_loc))
-        add_element("Loc",                      lambda: "{0:02},{1:02}".format(*creature.coord))
-        add_element("Turns",                    lambda: self.turn_counter)
-        add_element("Game Time",                lambda: self.time)
-        add_element("Level Time",               lambda: self.player.level.turn_scheduler.time)
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
