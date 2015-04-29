@@ -136,13 +136,13 @@ class LibTCODWindow(object):
     def draw(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
         local_color = self._color_map
-        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+        for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
             d(self.win, x, y, symbol, local_color[fg],
               local_color[bg])
 
     def draw_reverse(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
         local_color = self._color_map
-        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+        for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
             d(self.win, x, y, symbol, local_color[bg],
               local_color[fg])

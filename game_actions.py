@@ -42,7 +42,7 @@ class GameActions(object):
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not level.is_exit(creature.coord):
+        if not level.has_exit(creature.coord):
             return ActionError.NoEntrance
 
         passage = level.get_exit(creature.coord)

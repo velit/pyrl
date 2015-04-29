@@ -23,72 +23,34 @@ class Level(object):
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
         self.tiles = List2D(level_template.tilemap, self.cols)
+        #self.visible_change_observers = []
         self.modified_locations = set()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
         for monster_file in level_template.static_monster_templates:
-            self._spawn_predefined_creature(monster_file)
+            self.add_creature(Creature(monster_file))
 
         if level_template.use_dynamic_monsters:
             self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
-            self._spawn_random_creature(level_template.dynamic_monster_amount)
 
-    # nudge_coord nudges towards a line between this and start_coord
-    def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
-        cost = self.distance_heuristic(start_coord, end_coord)
-        if Debug.cross:
-            cost += cross_product(start_coord, end_coord, nudge_coord) / Debug.cross_mod
-        return cost
-
-    def _a_star_neighbors(self, coord):
-        for direction in self.get_tile_passable_neighbors(coord):
-            neighbor_coord = add_vector(coord, direction)
-            multiplier = self.tiles[coord].movement_multiplier
-            if direction in Dir.Diagonals:
-                multiplier *= Multiplier.Diagonal
-            elif direction in Dir.Orthogonals:
-                multiplier *= Multiplier.Orthogonal
-            yield neighbor_coord, round(multiplier * Cost.Move.value)
-
-    def _get_free_coord(self):
-        while True:
-            coord = self._get_random_coord()
-            if self.is_passable(coord):
-                return coord
-
-    def _get_random_coord(self):
-        return random.randrange(self.rows), random.randrange(self.cols)
-
-    def _get_visible_char(self, coord):
-        if coord in self.creatures:
-            return self.get_creature(coord).char
-        else:
-            return self.tiles[coord].visible_char
-
-    def _get_memory_char(self, coord):
-        if coord in self.creatures:
-            return self.get_creature(coord).char
-        else:
-            return self.tiles[coord].memory_char
-
-    def _spawn_random_creature(self, amount=1):
-        for _ in range(amount):
-            monster_file = random.choice(self.creature_spawn_list)
-            self.add_creature(Creature(monster_file))
-
-    def _spawn_predefined_creature(self, mons_file):
-        creature = Creature(mons_file)
-        self.add_creature(creature)
-
-    def get_tile_passable_neighbors(self, coord):
-        for direction in Dir.All:
-            neighbor_coord = add_vector(coord, direction)
-            if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
-                yield direction
+            for _ in range(level_template.dynamic_monster_amount):
+                monster_file = random.choice(self.creature_spawn_list)
+                self.add_creature(Creature(monster_file))
 
     def legal_coord(self, coord, direction=(0, 0)):
         return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
+
+    def get_free_coord(self):
+        while True:
+            coord = random.randrange(self.rows), random.randrange(self.cols)
+            if self.is_passable(coord):
+                return coord
+
+    def get_coord_iter(self):
+        for y in range(self.rows):
+            for x in range(self.cols):
+                yield y, x
 
     def get_exit(self, coord):
         return self.tiles[coord].exit_point
@@ -96,22 +58,30 @@ class Level(object):
     def get_creature(self, coord):
         return self.creatures[coord]
 
-    def get_coord_iter(self):
-        for y in range(self.rows):
-            for x in range(self.cols):
-                yield y, x
+    def get_visible_char(self, coord):
+        if self.has_creature(coord):
+            return self.get_creature(coord).char
+        else:
+            return self.tiles[coord].visible_char
 
-    def get_visible_data(self, location_set):
-        for (y, x) in location_set:
-            yield y, x, self._get_visible_char((y, x))
+    def get_memory_char(self, coord):
+        return self.tiles[coord].memory_char
 
-    def get_wallhack_data(self, location_set):
-        for (y, x) in location_set:
-            yield y, x, self._get_memory_char((y, x))
+    def get_visible_data(self, coord_set):
+        for coord in coord_set:
+            yield coord, self.get_visible_char(coord)
 
-    def get_memory_data(self, location_set):
-        for (y, x) in location_set:
-            yield y, x, self.tiles[y, x].memory_char
+    def get_wallhack_data(self, coord_set):
+        for coord in coord_set:
+            if self.has_creature(coord):
+                char = self.get_creature(coord).char
+            else:
+                char = self.get_memory_char(coord)
+            yield coord, char
+
+    def get_memory_data(self, coord_set):
+        for coord in coord_set:
+            yield coord, self.get_memory_char(coord)
 
     def get_passage_coord(self, passage):
         if passage == LevelLocation.Passage_Random:
@@ -122,11 +92,35 @@ class Level(object):
     def get_destination_info(self, passage):
         return self.passage_destination_infos[passage]
 
+    def get_last_pathable_coord(self, coord_start, coord_end):
+        last = coord_start
+        for coord in bresenham(coord_start, coord_end):
+            if self.is_pathable(coord):
+                last = coord
+            else:
+                break
+        return last
+
+    def get_neighbor_coords_and_costs(self, coord):
+        for direction in self.get_passable_neighbors(coord):
+            neighbor_coord = add_vector(coord, direction)
+            multiplier = self.movement_multiplier(coord, direction)
+            yield neighbor_coord, round(multiplier * Cost.Move.value)
+
+    def get_passable_neighbors(self, coord):
+        for direction in Dir.All:
+            neighbor_coord = add_vector(coord, direction)
+            if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
+                yield direction
+
     def has_creature(self, coord):
         return coord in self.creatures
 
+    def has_exit(self, coord):
+        return self.tiles[coord].exit_point is not None
+
     def is_passable(self, coord):
-        if coord in self.creatures:
+        if self.has_creature(coord):
             return False
         else:
             return self.tiles[coord].is_passable
@@ -137,9 +131,6 @@ class Level(object):
     def is_see_through(self, coord):
         return self.tiles[coord].is_see_through
 
-    def is_exit(self, coord):
-        return self.tiles[coord].exit_point is not None
-
     def pop_modified_locations(self):
         mod_locs = self.modified_locations
         self.modified_locations = set()
@@ -148,15 +139,6 @@ class Level(object):
     def check_los(self, coordA, coordB):
         return not (any(not self.is_see_through(coord) for coord in bresenham(coordA, coordB)) and
                     any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
-
-    def get_last_pathable_coord(self, coord_start, coord_end):
-        last = coord_start
-        for coord in bresenham(coord_start, coord_end):
-            if self.is_pathable(coord):
-                last = coord
-            else:
-                break
-        return last
 
     def distance_heuristic(self, coordA, coordB):
         return round(path.heuristic(coordA, coordB, Cost.Move.value, Multiplier.Diagonal))
@@ -177,8 +159,15 @@ class Level(object):
         else:
             raise ValueError("Invalid direction: {}".format(direction))
 
+    # nudge_coord nudges towards a line between end_coord and nudge_coord
+    def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
+        cost = self.distance_heuristic(start_coord, end_coord)
+        if Debug.cross:
+            cost += cross_product(start_coord, end_coord, nudge_coord) / Debug.cross_mod
+        return cost
+
     def path(self, start_coord, goal_coord):
-        return path.path(start_coord, goal_coord, self._a_star_neighbors, self._a_star_heuristic)
+        return path.path(start_coord, goal_coord, self.get_neighbor_coords_and_costs, self._a_star_heuristic)
 
     def look_information(self, coord):
         #if coord in creature.visited_locations:
@@ -204,10 +193,10 @@ class Level(object):
 
     def add_creature(self, creature, coord=None, turnscheduler_add=True):
         if coord is None:
-            coord = self._get_free_coord()
-        elif coord in self.creatures:
+            coord = self.get_free_coord()
+        elif self.has_creature(coord):
             blocking_creature = self.creatures[coord]
-            self.move_creature(blocking_creature, self._get_free_coord())
+            self.move_creature(blocking_creature, self.get_free_coord())
         self.creatures[coord] = creature
         self.modified_locations.add(coord)
         creature.coord = coord

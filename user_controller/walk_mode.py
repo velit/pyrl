@@ -100,7 +100,7 @@ class WalkMode(object):
     def _get_corridor_candidate_dirs(self, direction):
         reverse = reverse_vector(direction)
         back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
-        candidate_dirs = set(self.user_input.creature.level.get_tile_passable_neighbors(self.user_input.creature.coord)) - {reverse}
+        candidate_dirs = set(self.user_input.creature.level.get_passable_neighbors(self.user_input.creature.coord)) - {reverse}
         candidate_forward_dirs = candidate_dirs - back_sides
         candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides

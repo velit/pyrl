@@ -98,13 +98,13 @@ class NCursesWindowWrapper(object):
     def draw(self, char_payload_sequence):
         d = self.win.addch
         local_color = self._color_map
-        for y, x, (symbol, color) in char_payload_sequence:
+        for (y, x), (symbol, color) in char_payload_sequence:
             d(y, x, symbol, local_color[color])
 
     def draw_reverse(self, char_payload_sequence):
         d = self.win.addch
         local_color = self._color_map
-        for y, x, (symbol, (fg, bg)) in char_payload_sequence:
+        for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
             d(y, x, symbol, local_color[bg, fg])
 
     def clear(self):

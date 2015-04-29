@@ -108,10 +108,10 @@ class UserController(object):
                 self.io.draw_line(coord, self.creature.coord, ("*", Pair.Yellow))
                 self.io.msg("LoS: {}".format(level.check_los(self.creature.coord, coord)))
             if coord != self.creature.coord:
-                char = level._get_visible_char(coord)
+                char = level.get_visible_char(coord)
                 char = char[0], (Color.Black, Color.Green)
                 self.io.draw_char(coord, char)
-                self.io.draw_char(self.creature.coord, level._get_visible_char(self.creature.coord), reverse=True)
+                self.io.draw_char(self.creature.coord, level.get_visible_char(self.creature.coord), reverse=True)
             c = self.io.get_key()
             self.game_actions.redraw()
             direction = Dir.Stay
@@ -147,7 +147,7 @@ class UserController(object):
     def enter(self, passage):
         coord = self.creature.coord
         level = self.creature.level
-        if level.is_exit(coord) and level.get_exit(coord) == passage:
+        if level.has_exit(coord) and level.get_exit(coord) == passage:
             return self.game_actions.enter_passage()
         else:
             # debug use
