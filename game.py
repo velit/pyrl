@@ -53,7 +53,7 @@ class Game(object):
             self.time += time_delta
 
             if creature is self.player:
-                self.update_view(creature.level, creature)
+                self.update_view(creature)
                 self.user_input.game_actions.clear_action()
                 self.user_input.get_user_input_and_act()
                 action_cost = self.user_input.game_actions.action_cost
@@ -123,19 +123,19 @@ class Game(object):
         self.modified_locations = set()
         return locations
 
-    def update_view(self, level, creature):
+    def update_view(self, creature):
         """
         Update the vision set of the creature.
 
         This operation should only be done on creatures that have the .vision
         attribute ie. AdvancedCreatures for instance.
         """
+        level = creature.level
         new_vision = ShadowCast.get_light_set(level.is_see_through, creature.coord,
                                               creature.sight, level.rows, level.cols)
 
         modified = self.pop_modified_locations()
         creature.vision, old_vision = new_vision, creature.vision
-        creature.update_visited_locations(level, new_vision)
 
         if not Debug.show_map:
             # new ^ old is the set of new squares in view and squares that were left # behind.
@@ -158,7 +158,7 @@ class Game(object):
         level = self.player.level
 
         if not Debug.show_map:
-            draw_set = self.player.visited_locations[level] | self.player.vision
+            draw_set = self.player.get_visited_locations() | self.player.vision
             draw_data = level.get_vision_information(draw_set, self.player.vision)
         else:
             draw_set = level.get_coord_iter()
