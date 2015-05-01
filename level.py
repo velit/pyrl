@@ -69,12 +69,12 @@ class Level(object):
     def get_memory_char(self, coord):
         return self.tiles[coord].memory_char
 
-    def get_vision_information(self, coord_set, visible_coord_set, show_creatures=False):
-        for coord in coord_set:
-            if coord in visible_coord_set:
+    def get_vision_information(self, coords, visible_coords, always_show_creatures=False):
+        for coord in coords:
+            if coord in visible_coords:
                 yield coord, self.get_visible_char(coord)
             else:
-                if show_creatures and self.has_creature(coord):
+                if always_show_creatures and self.has_creature(coord):
                     yield coord, self.get_creature(coord).char
                 else:
                     yield coord, self.get_memory_char(coord)

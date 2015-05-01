@@ -6,7 +6,7 @@ from ai import AI
 from config.debug import Debug
 from config.game import GameConf
 from config.mappings import Mapping
-from fov import get_light_set
+from fov import ShadowCast
 from game_actions import GameActions
 from game_data.maps import get_world_template
 from game_data.player import Player
@@ -79,7 +79,7 @@ class Game(object):
         target_level.add_creature_to_passage(creature, passage)
 
         try:
-            creature.current_vision.clear()
+            creature.vision.clear()
         except AttributeError:
             pass
 
@@ -125,16 +125,16 @@ class Game(object):
 
     def update_view(self, level, creature):
         """
-        Update the current_vision set of the creature.
+        Update the vision set of the creature.
 
-        This operation should only be done on creatures that have the .current_vision
+        This operation should only be done on creatures that have the .vision
         attribute ie. AdvancedCreatures for instance.
         """
-        old_vision = creature.current_vision
-        modified = self.pop_modified_locations()
-        new_vision = get_light_set(level.is_see_through, creature.coord, creature.sight, level.rows, level.cols)
+        new_vision = ShadowCast.get_light_set(level.is_see_through, creature.coord,
+                                              creature.sight, level.rows, level.cols)
 
-        creature.current_vision = new_vision
+        modified = self.pop_modified_locations()
+        creature.vision, old_vision = new_vision, creature.vision
         creature.update_visited_locations(level, new_vision)
 
         if not Debug.show_map:
@@ -142,28 +142,33 @@ class Game(object):
             # new & old & modified is the set of squares still in view which had changes
             # since last turn.
             update_set = (new_vision ^ old_vision) | (new_vision & old_vision & modified)
-            vision_data = level.get_vision_information(update_set, new_vision)
+            updated_vision_data = level.get_vision_information(update_set, new_vision)
         else:
             update_set = (new_vision ^ old_vision) | modified
-            vision_data = level.get_vision_information(update_set, new_vision, show_creatures=True)
-        self.io.draw(vision_data)
+            updated_vision_data = level.get_vision_information(update_set, new_vision, always_show_creatures=True)
+
+        self.io.draw(updated_vision_data)
 
         if Debug.reverse:
-            reverse_data = level.get_vision_information(creature.current_vision, creature.current_vision)
+            reverse_data = level.get_vision_information(new_vision, new_vision)
             self.io.draw(reverse_data, Debug.reverse)
 
     def redraw(self):
         self.io.l.clear()
         level = self.player.level
 
-        if Debug.show_map:
-            self.io.draw(level.get_vision_information(level.get_coord_iter(), self.player.current_vision, show_creatures=True))
+        if not Debug.show_map:
+            draw_set = self.player.visited_locations[level] | self.player.vision
+            draw_data = level.get_vision_information(draw_set, self.player.vision)
         else:
-            draw_set = self.player.visited_locations[level] | self.player.current_vision
-            self.io.draw(level.get_vision_information(draw_set, self.player.current_vision))
+            draw_set = level.get_coord_iter()
+            draw_data = level.get_vision_information(draw_set, self.player.vision,
+                                                     always_show_creatures=True)
+        self.io.draw(draw_data)
 
         if Debug.reverse:
-            reverse_data = level.get_vision_information(self.player.current_vision, self.player.current_vision)
+            reverse_data = level.get_vision_information(self.player.vision,
+                                                        self.player.vision)
             self.io.draw(reverse_data, Debug.reverse)
 
     def __getstate__(self):

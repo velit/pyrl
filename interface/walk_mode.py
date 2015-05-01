@@ -143,4 +143,4 @@ class WalkMode(object):
         return (left, right)
 
     def _any_creatures_visible(self):
-        return any(self.user_input.creature.level.has_creature(coord) for coord in self.user_input.creature.current_vision if coord != self.user_input.creature.coord)
+        return any(self.user_input.creature.level.has_creature(coord) for coord in self.user_input.creature.vision if coord != self.user_input.creature.coord)

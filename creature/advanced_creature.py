@@ -29,9 +29,9 @@ class AdvancedCreature(Creature):
 
     def __init__(self, creature_file):
         self.equipment = Equipment()
-
         super().__init__(creature_file)
-        self.current_vision = set()
+
+        self.vision = set()
         self.visited_locations = defaultdict(set)
 
     def get_damage_info(self):
