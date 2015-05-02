@@ -154,7 +154,7 @@ class Game(object):
             self.io.draw(reverse_data, Debug.reverse)
 
     def redraw(self):
-        self.io.l.clear()
+        self.io.level_window.clear()
         level = self.player.level
 
         if not Debug.show_map:

@@ -30,7 +30,7 @@ class Item(object):
         return slot in self.compatible_slots
 
     def __lt__(self, other):
-        return (self.name, len(self.stats)) < (other.name, len(other.stats))
+        return str(self) < str(other)
 
 
 class Weapon(Item):

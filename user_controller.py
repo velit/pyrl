@@ -164,7 +164,7 @@ class UserController(object):
         self.creature.base_perception += amount
 
     def print_history(self):
-        self.io.m.print_history()
+        self.io.message_bar.print_history()
 
     def debug_action(self):
         debug_action(self.io, self.game_actions)

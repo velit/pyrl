@@ -3,7 +3,7 @@ from creature.stats import Stat
 
 
 def register_status_texts(game, creature):
-    add_element = game.io.s.add_element
+    add_element = game.io.status_bar.add_element
     add_element("Dmg",                      lambda: "{}D{}+{}".format(*creature.get_damage_info()))
     add_element("HP",                       lambda: "{}/{}".format(creature.hp, creature.max_hp))
     add_element(Stat.sight.value,           lambda: creature.sight)

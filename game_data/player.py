@@ -29,17 +29,18 @@ def Player():
     player.equipment.equip(weapon, Slot.right_hand)
 
     itams = (
-        Weapon("short sword +1", 1, 6, 1),
-        Weapon("long sword", 1, 8, 0),
-        Weapon("short sword +1", 1, 6, 1),
-        Weapon("short sword +2", 1, 6, 2),
-        Weapon("long sword +1", 1, 8, 1),
-        Weapon("short sword -1", 1, 6, -1),
-        Weapon("short sword +3", 1, 6, 3),
-        Weapon("short sword", 1, 6, 0),
-        Weapon("long sword +2", 1, 8, 2),
-        Weapon("Lance of longinus", 4, 8, 8).add_stat(Stat.endurance, 8),
+        Weapon("short sword +1",     1,  6,  1),
+        Weapon("long sword",         1,  8,  0),
+        Weapon("short sword +1",     1,  6,  1),
+        Weapon("short sword +2",     1,  6,  2),
+        Weapon("long sword +1",      1,  8,  1),
+        Weapon("short sword -1",     1,  6,  -1),
+        Weapon("short sword +3",     1,  6,  3),
+        Weapon("short sword",        1,  6,  0),
+        Weapon("long sword +2",      1,  8,  2),
+        Weapon("Lance of longinus",  4,  8,  8).add_stat(Stat.endurance,  8),
     )
+    itams = itams + tuple(Weapon("short sword +" + str(i), 1, 6, i) for i in range(60))
     for itam in itams:
         player.equipment.bag_item(itam)
 

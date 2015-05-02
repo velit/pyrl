@@ -69,16 +69,14 @@ class BaseWindow(object):
         self.blit()
         self.cursor_lib.flush()
 
-    def draw_header(self, header, color=Pair.Brown, y=0):
-        format_str = "{0:+^" + str(self.cols) + "}"
-        header = format_str.format("  " + header + "  ")
-        self.addstr(y, 0, header, color)
-
-    def draw_lines(self, lines, y_offset=2, x_offset=0):
+    def draw_lines(self, lines, y_offset=0, x_offset=0):
         for i, line in enumerate(lines):
-            self.addstr(y_offset + i, x_offset, line)
+            self.addstr(i + y_offset, x_offset, line)
 
-    def draw_footer(self, footer, color=Pair.Brown, y=0):
+    def draw_banner(self, banner_text, y_offset=0, color=Pair.Brown):
         format_str = "{0:+^" + str(self.cols) + "}"
-        footer = format_str.format("  " + footer + "  ")
-        self.addstr((self.rows - 1) - y, 0, footer, color)
+        banner_text = format_str.format("  " + banner_text + "  ")
+        if y_offset < 0:
+            self.addstr(self.rows + y_offset, 0, banner_text, color)
+        else:
+            self.addstr(y_offset, 0, banner_text, color)

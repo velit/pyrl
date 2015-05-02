@@ -69,7 +69,7 @@ class Equipment(object):
         if slot is not None:
             return (item for item in sorted(self.bag_of_holding) if item.fits_to_slot(slot))
         else:
-            return self.bag_of_holding
+            return sorted(self.bag_of_holding)
 
     def _equip_item(self, item, slot):
         self.worn_items[slot] = item

@@ -27,6 +27,14 @@ class Mapping(object):
     Group_Default = Group_Cancel | Group_More
     Group_All = Group_Yes | Group_No | Group_Default
 
+    # scrollable views
+    Next_Line     = '^n'
+    Previous_Line = '^p'
+    Next_Page     = '^d'
+    Previous_Page = '^u'
+
+    Scroll_View_Group = {Next_Line, Previous_Line, Next_Page, Previous_Page}
+
     Directions = {
         '1': Dir.SouthWest,
         '2': Dir.South,
@@ -89,4 +97,4 @@ class Mapping(object):
     Equipment_Slot_Left_Hand  = 'l'
     Equipment_Slot_Feet       = 'f'
 
-    Inventory_Keys = tuple(string.ascii_lowercase.replace(Cancel, ''))
+    Inventory_Keys = (lambda g=Group_Default: tuple(char for char in string.ascii_lowercase if char not in g))()
