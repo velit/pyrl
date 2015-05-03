@@ -1,22 +1,42 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.mappings import Mapping
+from config.bindings import Bind
 
 
 def help_screen(io):
     header = "Help Screen, ^ means ctrl, ! means alt"
-    help_lines = [
-        "Help           {0}".format(Mapping.Help),
-        "Look Mode      {0}".format(Mapping.Look_Mode),
-        "Inventory      {0}".format(Mapping.Inventory),
-        "Descend        {0}".format(Mapping.Descend),
-        "Ascend         {0}".format(Mapping.Ascend),
-        "Quit           {0}".format(Mapping.Quit),
-        "Save           {0}".format(Mapping.Save),
-        "Manual Attack  {0}".format(Mapping.Attack),
-        "Redraw Screen  {0}".format(Mapping.Redraw),
-        "Print History  {0}".format(Mapping.History),
-        "Walk Mode      {0}".format(Mapping.Walk_Mode),
+    first_column = (
+        "{:32}".format("Main View:"),
+        "",
+        "Help            {0!s:16.16}".format(Bind.Help),
+        "Look Mode       {0!s:16.16}".format(Bind.Look_Mode),
+        "Inventory       {0!s:16.16}".format(Bind.Inventory),
+        "Descend         {0!s:16.16}".format(Bind.Descend),
+        "Ascend          {0!s:16.16}".format(Bind.Ascend),
+        "Quit            {0!s:16.16}".format(Bind.Quit),
+        "Save            {0!s:16.16}".format(Bind.Save),
+        "Manual Attack   {0!s:16.16}".format(Bind.Attack),
+        "Redraw Screen   {0!s:16.16}".format(Bind.Redraw),
+        "Print History   {0!s:16.16}".format(Bind.History),
+        "Walk Mode       {0!s:16.16}".format(Bind.Walk_Mode),
+    )
+    second_column = (
+        "General:",
+        "",
+        "Cancel          {0!s:16.16}".format(Bind.Cancel),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+        "                {0!s:16.16}".format(""),
+    )
+    columns = tuple(cells[0] + cells[1] for cells in zip(first_column, second_column))
+    bottom = (
         "",
         "Direction keys used for movement, implicit attacking, walk mode, etc:",
         "  Numpad keys",
@@ -30,6 +50,7 @@ def help_screen(io):
         "Print debug string  dm        Set cross heuristic in path  dr",
         "",
         "Colors available     dc (only on ncurses ie. pyrl.py)",
-    ]
-    footer = "{0} to close".format(Mapping.Cancel)
-    io.menu(header, help_lines, footer, Mapping.Group_Cancel)
+    )
+    help_lines = columns + bottom
+    footer = "{0} to close".format(Bind.Cancel.key)
+    io.menu(header, help_lines, footer, Bind.Cancel)

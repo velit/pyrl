@@ -3,14 +3,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from config.game import GameConf
 from enums.directions import Dir
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
-from config.mappings import Mapping
+from config.bindings import Bind
+from enums.keys import Key
 
 
 WALK_IN_PLACE = (None, None)
-CORRIDOR = (False, False)
-LEFT = (True, False)
-RIGHT = (False, True)
-OPEN = (True, True)
+CORRIDOR      = (False, False)
+LEFT          = (True, False)
+RIGHT         = (False, True)
+OPEN          = (True, True)
 
 INTERRUPT_MSG_TIME = 1
 
@@ -27,17 +28,21 @@ class WalkMode(object):
     def init_walk_mode(self, direction=None):
         if self._any_creatures_visible():
             self.user_input.io.msg("Not while there are creatures in the vicinity.")
-        if direction is None:
-            key_set = Mapping.Directions.keys() | Mapping.Group_Cancel
-            key = self.user_input.io.ask("Specify walking direction, {} to abort".format(Mapping.Cancel), key_set)
-            if key in Mapping.Directions:
-                direction = Mapping.Directions[key]
+            return None
 
-        if direction is not None:
-            error, walk_mode_data = self._init_walk_mode(direction)
-            if walk_mode_data is not None:
-                self.state = walk_mode_data
-            return error
+        if direction is None:
+            user_query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
+            key_seq = tuple(Bind.action_direction.keys()) + Bind.Cancel
+            key = self.user_input.io.ask(user_query, key_seq)
+            if key in Bind.action_direction:
+                direction = Bind.action_direction[key]
+            else:
+                return None
+
+        error, walk_mode_data = self._init_walk_mode(direction)
+        if walk_mode_data is not None:
+            self.state = walk_mode_data
+        return error
 
     def continue_walk(self):
         if not self._any_creatures_visible():
@@ -52,11 +57,12 @@ class WalkMode(object):
             if result is not None:
                 new_direction, new_walk_type = result
                 if msg_time < self.user_input.io.get_current_time():
-                    message = "Press {} to interrupt walk mode".format(Mapping.Walk_Mode)
+                    message = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
                 else:
                     message = ""
-                key = self.user_input.io.ask_until_timestamp(message, timestamp, Mapping.Group_Cancel | {Mapping.Walk_Mode})
-                if key not in Mapping.Group_Cancel | {Mapping.Walk_Mode}:
+                key_seq = Bind.Walk_Mode + Bind.Cancel
+                key = self.user_input.io.selective_ask_until_timestamp(message, timestamp, key_seq)
+                if key == Key.NO_INPUT:
                     error = self.user_input.game_actions.move(new_direction)
                     if not error:
                         walk_delay = self.user_input.io.get_future_time(GameConf.animation_period)
@@ -136,11 +142,13 @@ class WalkMode(object):
             left = self._passable(anticlockwise_45(direction))
             right = self._passable(clockwise_45(direction))
         elif direction == Dir.Stay:
-            left = None
-            right = None
+            left, right = WALK_IN_PLACE
         else:
-            raise Exception("Not a valid moving direction {0}".format(direction))
-        return (left, right)
+            raise Exception("Not a valid direction: {0}".format(direction))
+        return left, right
 
     def _any_creatures_visible(self):
-        return any(self.user_input.creature.level.has_creature(coord) for coord in self.user_input.creature.vision if coord != self.user_input.creature.coord)
+        has_creature = self.user_input.creature.level.has_creature
+        vision = self.user_input.creature.vision
+        not_self = lambda coord: coord != self.user_input.creature.coord
+        return any(has_creature(coord) for coord in vision if not_self(coord))

@@ -40,22 +40,35 @@ class BaseWindow(object):
     def check_key(self):
         return self.cursor_win.check_key()
 
-    # Blocking
-    def selective_get_key(self, key_set, refresh=False):
-        if refresh:
-            self.refresh()
-        while True:
-            key = self.get_key()
-            if key in key_set:
-                return key
-
     # Half-blocking
-    def selective_get_key_until_timestamp(self, timestamp, key_set, refresh=False):
+    def get_key_until_timestamp(self, timestamp, refresh=False):
         if refresh:
             self.refresh()
 
         key = self.check_key()
-        while key not in key_set:
+        while key == Key.NO_INPUT:
+            if time.time() >= timestamp:
+                break
+            time.sleep(GameConf.ANIMATION_INPUT_PERIOD)
+            key = self.check_key()
+        return key
+
+    # Blocking
+    def selective_get_key(self, key_seq, refresh=False):
+        if refresh:
+            self.refresh()
+        while True:
+            key = self.get_key()
+            if key in key_seq:
+                return key
+
+    # Half-blocking
+    def selective_get_key_until_timestamp(self, timestamp, key_seq, refresh=False):
+        if refresh:
+            self.refresh()
+
+        key = self.check_key()
+        while key not in key_seq:
             if time.time() >= timestamp:
                 return Key.NO_INPUT
             time.sleep(GameConf.ANIMATION_INPUT_PERIOD)

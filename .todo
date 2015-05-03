@@ -174,6 +174,18 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1430498770" done="1430676253">
+        Bug: Inventory_Keys in mappings depends on default cancel being alphanumeric (string)
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1430503222" done="1430676293">
+        Make mappings.py / game support multiple keys in every mapping
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -384,11 +396,11 @@
     <note priority="veryhigh" time="1429823187">
         Overhaul walk mode
     </note>
-    <note priority="veryhigh" time="1430498770">
-        Bug: Inventory_Keys in mappings depends on default cancel being alphanumeric (string)
+    <note priority="veryhigh" time="1430306212">
+        Finalize history display/printing. Re-use item_view system.
     </note>
-    <note priority="veryhigh" time="1430503222">
-        Make mappings.py / game support multiple keys in every mapping
+    <note priority="veryhigh" time="1430678850">
+        Update integration_test to use Binds instead of hardcoded keys.
     </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
@@ -402,8 +414,14 @@
     <note priority="high" time="1429224251">
         Add regeneration
     </note>
-    <note priority="high" time="1430306212">
-        Finalize history display/printing.
+    <note priority="high" time="1430586353">
+        Add numpad 5 support to ncurses_wrapper
+    </note>
+    <note priority="high" time="1430678659">
+        Update help_screen
+    </note>
+    <note priority="high" time="1430680379">
+        Consider moving key_groups / direction dicts out of config.finalize.py to game code modules.
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method

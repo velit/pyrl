@@ -2,8 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import textwrap
 
-from enums.keys import Key
-from config.mappings import Mapping
+from config.bindings import Bind
 from enums.colors import Pair
 from window.base_window import BaseWindow
 
@@ -42,7 +41,7 @@ class MessageBar(BaseWindow):
             self.addstr(i % self.rows, 0, line)
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
                 self.addstr(self.rows - 1, self.cols - MORE_STR_LEN, MORE_STR, Pair.Green)
-                if self.selective_get_key(Mapping.Group_More, refresh=True) == Key.ENTER:
+                if self.selective_get_key(Bind.Last_Message + Bind.Cancel, refresh=True) in Bind.Last_Message:
                     skip = True
                     break
                 self.clear()
@@ -52,6 +51,8 @@ class MessageBar(BaseWindow):
                 self.addstr(i, 0, lines[i - self.rows])
 
     def print_history(self):
+        keep_asking = True
         for i, event in enumerate(self.history):
             self.print_event(["History line {}:".format(i)] + event)
-            self.selective_get_key(Mapping.Group_More, refresh=True)
+            if keep_asking and self.selective_get_key(Bind.Cancel + Bind.Last_Message, refresh=True) in Bind.Last_Message:
+                keep_asking = False

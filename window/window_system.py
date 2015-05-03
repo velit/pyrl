@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 
 from enums.colors import Pair
-from config.mappings import Mapping
+from config.bindings import Bind
 from config.game import GameConf
 from config.debug import Debug
 from window.base_window import BaseWindow
@@ -43,13 +43,13 @@ class WindowSystem(object):
     def msg(self, *a):
         self.message_bar.queue_msg(*a)
 
-    def ask(self, message, keys=Mapping.Group_All):
+    def ask(self, message, keys=Bind.query_keys):
         self.msg(message)
         self.refresh()
         return self.level_window.selective_get_key(keys)
 
     def notify(self, print_str):
-        return self.ask(print_str, Mapping.Group_More)
+        return self.ask(print_str, Bind.Cancel)
 
     def refresh(self):
         self.message_bar.update()
@@ -92,10 +92,15 @@ class WindowSystem(object):
     def resume(self):
         self.cursor_lib.resume()
 
-    def ask_until_timestamp(self, message, timestamp, key_set):
+    def ask_until_timestamp(self, message, timestamp):
         self.msg(message)
         self.refresh()
-        return self.level_window.selective_get_key_until_timestamp(timestamp, key_set)
+        return self.level_window.get_key_until_timestamp(timestamp)
+
+    def selective_ask_until_timestamp(self, message, timestamp, key_seq):
+        self.msg(message)
+        self.refresh()
+        return self.level_window.selective_get_key_until_timestamp(timestamp, key_seq)
 
     def get_future_time(self, delay):
         return time.time() + delay

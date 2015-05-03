@@ -140,6 +140,9 @@ class NCursesWindowWrapper(object):
 
     def _interpret_ch(self, ch):
 
+        if Debug.show_keycodes and ch != Key.NO_INPUT:
+            pre_conversion = ch
+
         if ch == curses.KEY_RESIZE:
             self._check_root_window_size()
         elif ch in self._key_map:
@@ -150,7 +153,7 @@ class NCursesWindowWrapper(object):
                 ch = ch.lower()
 
         if Debug.show_keycodes and ch != Key.NO_INPUT:
-            logging.debug("User input: {}".format(ch))
+            logging.debug("User input: {} {}".format(ch, pre_conversion))
 
         return ch
 

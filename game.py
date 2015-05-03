@@ -5,7 +5,7 @@ import state_store
 from ai import AI
 from config.debug import Debug
 from config.game import GameConf
-from config.mappings import Mapping
+from config.bindings import Bind
 from fov import ShadowCast
 from game_actions import GameActions
 from game_data.maps import get_world_template
@@ -34,7 +34,7 @@ class Game(object):
         first_level = self.world.get_level(first_level_wloc)
         first_level.spawn_creature(self.player, passage)
         self.vision_cache = None
-        self.io.msg("{0} for help menu".format(Mapping.Help))
+        self.io.msg("{0} for help menu".format(Bind.Help.key))
         self.save_mark = False
 
     def init_nonserial_objects(self, cursor_lib_callback):

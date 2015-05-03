@@ -53,11 +53,12 @@ def test_save_and_load_game(mockwrapper, game):
 def test_subsystems(mockwrapper, game):
 
     look_system = tuple("q4862q")
+    help_system = (Key.F1, "z")
     message_system = ('d', 'm', Key.ENTER)
     whole_map = tuple("dv")
     path_to_staircase = ('d', 'o', Key.ENTER)
     inventory = tuple("ivzbrlaz")
     walk_mode = tuple("w6")
-    input_seq = look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
+    input_seq = help_system + look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 4

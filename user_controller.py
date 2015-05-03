@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from functools import partial
 
-from config.mappings import Mapping
+from config.bindings import Bind
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
@@ -37,22 +37,22 @@ class UserController(object):
             '+':  partial(self.sight_change, 1),
             '-':  partial(self.sight_change, -1),
 
-            Key.CLOSE_WINDOW:   self.quit,
-            Mapping.Quit:       self.quit,
-            Mapping.Save:       self.save,
-            Mapping.Attack:     self.attack,
-            Mapping.Redraw:     self.redraw,
-            Mapping.History:    self.print_history,
-            Mapping.Look_Mode:  self.look,
-            Mapping.Help:       self.help_screen,
-            Mapping.Inventory:  self.equipment,
-            Mapping.Walk_Mode:  self.init_walk_mode,
-            Mapping.Ascend:     partial(self.enter, LevelLocation.Passage_Up),
-            Mapping.Descend:    partial(self.enter, LevelLocation.Passage_Down),
+            Key.CLOSE_WINDOW:    self.quit,
+            Bind.Quit.key:       self.quit,
+            Bind.Save.key:       self.save,
+            Bind.Attack.key:     self.attack,
+            Bind.Redraw.key:     self.redraw,
+            Bind.History.key:    self.print_history,
+            Bind.Look_Mode.key:  self.look,
+            Bind.Help.key:       self.help_screen,
+            Bind.Inventory.key:  self.equipment,
+            Bind.Walk_Mode.key:  self.init_walk_mode,
+            Bind.Ascend.key:     partial(self.enter, LevelLocation.Passage_Up),
+            Bind.Descend.key:    partial(self.enter, LevelLocation.Passage_Down),
         }
-        for key, direction in Mapping.Directions.items():
+        for key, direction in Bind.action_direction.items():
             self.action_mapping[key] = partial(self.act_to_dir, direction)
-        for key, direction in Mapping.Instant_Walk_Mode.items():
+        for key, direction in Bind.walk_mode_direction.items():
             self.action_mapping[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
@@ -114,8 +114,8 @@ class UserController(object):
             c = self.io.get_key()
             self.game_actions.redraw()
             direction = Dir.Stay
-            if c in Mapping.Directions:
-                direction = Mapping.Directions[c]
+            if c in Bind.action_direction:
+                direction = Bind.action_direction[c]
             elif c == 'd':
                 drawline_flag = not drawline_flag
             elif c == 'b':
@@ -125,7 +125,7 @@ class UserController(object):
             elif c == 's':
                 if level.has_creature(coord):
                     self.game_actions.game.register_status_texts(level.get_creature(coord))
-            elif c in Mapping.Group_Cancel or c == Mapping.Look_Mode:
+            elif c in Bind.Cancel or c in Bind.Look_Mode:
                 break
 
     def quit(self):
@@ -135,10 +135,10 @@ class UserController(object):
         self.game_actions.save()
 
     def attack(self):
-        msg = "Specify attack direction, {} to abort".format(Mapping.Cancel)
-        key = self.io.ask(msg, Mapping.Directions.keys() | Mapping.Group_Cancel)
-        if key in Mapping.Directions:
-            return self.game_actions.attack(Mapping.Directions[key])
+        msg = "Specify attack direction, {} to abort".format(Bind.Cancel.key)
+        key = self.io.ask(msg, Bind.action_direction.keys() | set(Bind.Cancel))
+        if key in Bind.action_direction:
+            return self.game_actions.attack(Bind.action_direction[key])
 
     def redraw(self):
         self.game_actions.redraw()

@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from config.mappings import Mapping
+from config.bindings import Bind
 
 
 def items_view(items, base_window, header="", footer="", selectable_items=False):
@@ -19,14 +19,14 @@ class ItemsView(object):
 
     def render(self, items, header="", footer="", selectable_items=True):
         items = tuple(items)
-        keys = Mapping.Inventory_Keys
+        keys = Bind.item_select_keys
         items_len = len(items)
         keys_len = len(keys)
 
         str_items = tuple(str(item) for item in items)
-        key_set = Mapping.Group_Default | Mapping.Scroll_View_Group
+        key_seq = Bind.Cancel + Bind.item_view_keys
         if selectable_items:
-            key_set |= set(Mapping.Inventory_Keys)
+            key_seq += keys
 
         i = 0
         while True:
@@ -37,19 +37,19 @@ class ItemsView(object):
             print_lines = (fmt_str.format(*line) for line in zip(keys, self._iter_slice(str_items, i)))
             self.print_view(header, print_lines, footer)
 
-            key = self.window.selective_get_key(key_set, refresh=True)
+            key = self.window.selective_get_key(key_seq, refresh=True)
 
-            if key in Mapping.Group_Default:
+            if key in Bind.Cancel:
                 return None
             elif key in keys:
                 return items[keys.index(key) + i]
-            elif key == Mapping.Next_Line:
+            elif key in Bind.Next_Line:
                 i += 1
-            elif key == Mapping.Previous_Line:
+            elif key in Bind.Previous_Line:
                 i -= 1
-            elif key == Mapping.Next_Page:
+            elif key in Bind.Next_Page:
                 i += keys_len - 1
-            elif key == Mapping.Previous_Page:
+            elif key in Bind.Previous_Page:
                 i -= keys_len - 1
             i = self._apply_limits(i, items_len, keys_len)
 
