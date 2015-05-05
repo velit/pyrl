@@ -1,8 +1,0 @@
-p	player
-l	level
-g	game
-m	map
-tm	tilemap
-tl	template level
-loc integer, a location in the map
-coord, y and x pair either separately or as a tuple, can be made to a loc by multiplying y with columns and adding x
