@@ -4,25 +4,17 @@ test-porcelain-output:
 test:
 	py.test-3 -k-slow
 
+slow-test:
+	py.test-3
+
 test-debug:
 	py.test-3 -k-slow -x --pdb
 
-test-all:
-	py.test-3
-
-future-test:
-	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py
-
-profile-test:
-	python3 -m profile_util.run_profiler
-	less save_data/profiling_results
-
-profile-in-place:
-	./pyrl.py -p
-	less save_data/profiling_results
-
 debug:
 	python3 -m pdb pyrl.py
+
+log:
+	tail -n 50 save_data/pyrl.log
 
 clean:
 	find . -name '*.pyc' -delete
@@ -30,8 +22,17 @@ clean:
 	rm -f MANIFEST
 	rm -rf dist
 
+profile-test:
+	py.test-3 tests/profile_test.py && less save_data/profiling_results
+
+profile-in-place:
+	./pyrl.py -p && less save_data/profiling_results
+
+profile-log:
+	less save_data/profiling_results
+
 release:
 	python3 setup.py sdist
 
-log:
-	tail -n 50 save_data/pyrl.log
+future-test:
+	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py

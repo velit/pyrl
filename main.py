@@ -7,10 +7,10 @@ import logging
 import sys
 from cProfile import Profile
 
-import profile_util
 import state_store
 from config.game import GameConf
 from config.debug import Debug
+from tools import profile_util
 
 
 def start(cursor_lib_callback):
@@ -37,7 +37,7 @@ def prepare_game(cursor_lib_callback, cmdline_args=None):
 
         def write_profile():
             profiler.disable()
-            profile_util.write_profile_results(profiler)
+            profile_util.write_results_log(profiler)
 
         atexit.register(write_profile)
 
