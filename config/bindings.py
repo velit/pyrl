@@ -13,18 +13,20 @@ class Bind(object):
     For multiple bindings for the same action, write a comma separated list:
         Cancel = 'z', Key.ESC
     The first binding in a list is used for printing the key in menus.
+    If you wish to unbind a key, use the Key.NONE special key.
 
     Special key names:
 
-    Key.LEFT, Key.RIGHT, Key.UP, Key.DOWN, Key.ESC, Key.TAB, Key.BACKSPACE, Key.SPACE,
-    Key.ENTER, Key.INSERT, Key.DELETE, Key.HOME, Key.END, Key.PAGE_UP, Key.PAGE_DOWN
+    Key.LEFT, Key.RIGHT, Key.UP, Key.DOWN, Key.ESC, Key.TAB, Key.SHIFT_TAB, Key.BACKSPACE,
+    Key.SPACE, Key.ENTER, Key.INSERT, Key.DELETE, Key.HOME, Key.END, Key.PAGE_UP, Key.PAGE_DOWN
     Key.F1 - Key.F12
-    Key.NUMPAD_0 - Key.NUMPAD_9
+    Key.NUMPAD_0 - Key.NUMPAD_9 #  mostly for sdl version of the game
+    Key.NONE #  use this to unbind a key
 
     For other keys use a string representing that character. To use shift just write the
     character that comes out of the shift combination directly (eg. Q or #). For alt/meta
     prepend a ! character and for ctrl prepend a ^ character. Some rules:
-        -If you use ^ use lower case letters for it to work (eg. ^d or ^n).
+        -If you use ^ use lower case letters for it to work (eg. ^D or ^N).
         -If you use both ! and ^ in the same bind put ! before ^ for it to work.
         -Modifiers do not work with special keys.
     """
@@ -42,22 +44,22 @@ class Bind(object):
     Previous_Page = '^u'
 
     # Directions used in moving/attacking/targetting
-    SouthWest = '1', 'n'
-    South     = '2', 'j'
-    SouthEast = '3', 'm'
-    West      = '4', 'h'
-    Stay      = '5', '.'
-    East      = '6', 'l'
-    NorthWest = '7', 'u'
-    North     = '8', 'k'
-    NorthEast = '9', 'o'
+    SouthWest = '1', 'n', Key.NUMPAD_1
+    South     = '2', 'j', Key.NUMPAD_2
+    SouthEast = '3', 'm', Key.NUMPAD_3
+    West      = '4', 'h', Key.NUMPAD_4
+    Stay      = '5', '.', Key.NUMPAD_5
+    East      = '6', 'l', Key.NUMPAD_6
+    NorthWest = '7', 'u', Key.NUMPAD_7
+    North     = '8', 'k', Key.NUMPAD_8
+    NorthEast = '9', 'o', Key.NUMPAD_9
 
     # Initiates walk mode into direction
     Instant_SouthWest = Key.END
     Instant_South     = Key.DOWN
     Instant_SouthEast = Key.PAGE_DOWN
     Instant_West      = Key.LEFT
-    Instant_Stay      = Key.NUMPAD_5
+    Instant_Stay      = Key.NONE
     Instant_East      = Key.RIGHT
     Instant_NorthWest = Key.HOME
     Instant_North     = Key.UP

@@ -22,6 +22,7 @@ class Key(object):
     F12           = "F12"
     ESC           = "Esc"
     TAB           = "Tab"
+    SHIFT_TAB     = "Shift+Tab"
     BACKSPACE     = "Backspace"
     SPACE         = "Space"
     ENTER         = "Enter"
@@ -41,6 +42,11 @@ class Key(object):
     NUMPAD_7      = "Numpad 7"
     NUMPAD_8      = "Numpad 8"
     NUMPAD_9      = "Numpad 9"
-    NO_INPUT      = "No input"
     WINDOW_RESIZE = "Window resize"
     CLOSE_WINDOW  = "Close window"
+
+    # Use this one to unbind keys
+    NONE          = "Unbound"
+
+    # Bindings user don't use this one
+    NO_INPUT = "No Input"

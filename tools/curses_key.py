@@ -7,6 +7,7 @@ _MSG = "Press key to test, Q to quit."
 
 
 def main(w):
+    curses.raw()
     curses.meta(True)
     w.keypad(True)
 
@@ -40,11 +41,16 @@ def get_key(w):
     key = w.get_wch()
     if key == chr(ascii.ESC):
         w.nodelay(True)
-        second_key = w.get_wch()
-        w.nodelay(False)
-        if second_key != curses.ERR:
+        try:
+            second_key = w.get_wch()
+        except curses.error:
+            pass
+        else:
             key = second_key
             alt = True
+        finally:
+            w.nodelay(False)
+
     return key, alt
 
 if __name__ == '__main__':

@@ -126,45 +126,49 @@ class NCursesWindowWrapper(object):
         return self.win.getyx()
 
     def get_key(self):
-        return self._interpret_ch(self._esc_key_handler(self.win.getch()))
+        return self._interpret_ch(*self._handle_alt(self.win.get_wch()))
 
     def check_key(self):
         """Non-blocking version of get_key."""
         self.win.nodelay(True)
-        ch = self.get_key()
-        self.win.nodelay(False)
-        if ch != curses.ERR:
-            return ch
-        else:
+        try:
+            return self.win.get_wch()
+        except curses.error:
             return Key.NO_INPUT
-
-    def _interpret_ch(self, ch):
-
-        if Debug.show_keycodes and ch != Key.NO_INPUT:
-            pre_conversion = ch
-
-        if ch == curses.KEY_RESIZE:
-            self._check_root_window_size()
-        elif ch in self._key_map:
-            ch = self._key_map[ch]
-        else:
-            ch = curses.ascii.unctrl(ch)
-            if '^' in ch:
-                ch = ch.lower()
-
-        if Debug.show_keycodes and ch != Key.NO_INPUT:
-            logging.debug("User input: {} {}".format(ch, pre_conversion))
-
-        return ch
-
-    def _esc_key_handler(self, ch):
-        if ch == curses.ascii.ESC:
-            self.win.nodelay(True)
-            second_ch = self.win.getch()
+        finally:
             self.win.nodelay(False)
-            if second_ch != curses.ERR:
-                return curses.ascii.alt(second_ch)
-        return ch
+
+    def _interpret_ch(self, key, alt):
+
+        if Debug.show_keycodes and key != Key.NO_INPUT:
+            raw = key
+
+        if key == curses.KEY_RESIZE:
+            self._check_root_window_size()
+        elif key in self._key_map:
+            key = self._key_map[key]
+        else:
+            nr = ord(key)
+            if nr < 128:
+                key = alt * "!" + curses.ascii.unctrl(key)
+                if "^" in key:
+                    key = key.lower()
+            else:
+                key = alt * "!" + key
+
+        if Debug.show_keycodes and key != Key.NO_INPUT:
+            logging.debug("User input: raw: {} interp: {}{}".format(raw, key, " alt:yes" * alt))
+
+        return key
+
+    def _handle_alt(self, key):
+        alt = False
+        if key == chr(curses.ascii.ESC):
+            second_key = self.check_key()
+            if second_key != Key.NO_INPUT:
+                key = second_key
+                alt = True
+        return key, alt
 
     @classmethod
     def _check_root_window_size(cls):
