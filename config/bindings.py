@@ -38,10 +38,15 @@ class Bind(object):
     Last_Message = Key.ENTER
 
     # scrollable views
-    Next_Line     = '^n'
-    Previous_Line = '^p'
-    Next_Page     = '^d'
-    Previous_Page = '^u'
+    Next_Line     = '+', '^n'
+    Previous_Line = '-', '^p'
+    Next_Page     = Key.PAGE_DOWN, '^d'
+    Previous_Page = Key.PAGE_UP, '^u'
+
+    # This is the same as doing Item_Select_Keys = 'a', 'b', 'c' ...
+    # But it wont work if you want modifiers like ^ or !.
+    # You have to write the whole thing out then
+    Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Directions used in moving/attacking/targetting
     SouthWest = '1', 'n', Key.NUMPAD_1

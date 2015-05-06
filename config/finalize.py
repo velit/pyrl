@@ -1,8 +1,6 @@
 """To user: even though this module is in the config folder, don't modify anything here."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from string import ascii_lowercase
-
 from enums.directions import Dir
 
 
@@ -20,11 +18,8 @@ def finalize_bindings(cls):
 
     _BindingTuplefy_attributes(cls)
 
-    cls.item_view_keys = cls.Next_Line + cls.Previous_Line + cls.Next_Page + cls.Previous_Page
+    cls.scroll_keys = cls.Next_Line + cls.Previous_Line + cls.Next_Page + cls.Previous_Page
     cls.query_keys = cls.Yes + cls.No + cls.Default_Yes + cls.Default_No + cls.Default_Query
-
-    select_filter = cls.Cancel + cls.item_view_keys
-    cls.item_select_keys = tuple(key for key in ascii_lowercase if key not in select_filter)
 
     action_tuple = (
         (cls.SouthWest,  Dir.SouthWest),

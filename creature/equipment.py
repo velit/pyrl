@@ -66,10 +66,11 @@ class Equipment(object):
             yield f.format(item, (i + 1) % 10)
 
     def get_inventory_items(self, slot=None):
+        """Return a sorted tuple of inventory items in given slot, if None return all items."""
         if slot is not None:
-            return (item for item in sorted(self.bag_of_holding) if item.fits_to_slot(slot))
+            return tuple(sorted(item for item in self.bag_of_holding if item.fits_to_slot(slot)))
         else:
-            return sorted(self.bag_of_holding)
+            return tuple(sorted(self.bag_of_holding))
 
     def _equip_item(self, item, slot):
         self.worn_items[slot] = item

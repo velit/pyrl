@@ -30,6 +30,12 @@
             simply redid ai.move_towards
         </comment>
     </note>
+    <note priority="veryhigh" time="1315707472" done="1430944091">
+        Make print_lines scrollable / Improve views
+        <comment>
+            implemented interface.lines_view for this
+        </comment>
+    </note>
     <note priority="veryhigh" time="1315776610" done="1315861782">
         make creatures stop chasing
         <comment>
@@ -182,6 +188,12 @@
     </note>
     <note priority="veryhigh" time="1430503222" done="1430676293">
         Make mappings.py / game support multiple keys in every mapping
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1430936886" done="1430944039">
+        Add Item_Select_Keys support to bindings
         <comment>
             done
         </comment>
@@ -390,9 +402,6 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
-    <note priority="veryhigh" time="1315707472">
-        Make print_lines scrollable / Improve views
-    </note>
     <note priority="veryhigh" time="1429823187">
         Overhaul walk mode
     </note>
@@ -401,6 +410,9 @@
     </note>
     <note priority="veryhigh" time="1430678850">
         Update integration_test to use Binds instead of hardcoded keys.
+    </note>
+    <note priority="veryhigh" time="1430944118">
+        Add regex/search to lines_view
     </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
