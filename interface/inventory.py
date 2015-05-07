@@ -1,54 +1,58 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from collections import OrderedDict
-
 from .lines_view import lines_view
 from config.bindings import Bind
 from creature.equipment import Slot
+from collections import namedtuple
 
-
-equipment_slots = OrderedDict()
-equipment_slots[Bind.Equipment_Slot_Head.key]       = Slot.head
-equipment_slots[Bind.Equipment_Slot_Body.key]       = Slot.body
-equipment_slots[Bind.Equipment_Slot_Right_Hand.key] = Slot.right_hand
-equipment_slots[Bind.Equipment_Slot_Left_Hand.key]  = Slot.left_hand
-equipment_slots[Bind.Equipment_Slot_Feet.key]       = Slot.feet
+EquipmentRow = namedtuple('EquipmentRow', ('key', 'slot'))
+equipment_rows = (
+    EquipmentRow(Bind.Equipment_Slot_Head.key,       Slot.head),
+    EquipmentRow(Bind.Equipment_Slot_Body.key,       Slot.body),
+    EquipmentRow(Bind.Equipment_Slot_Right_Hand.key, Slot.right_hand),
+    EquipmentRow(Bind.Equipment_Slot_Left_Hand.key,  Slot.left_hand),
+    EquipmentRow(Bind.Equipment_Slot_Feet.key,       Slot.feet),
+)
 
 
 def equipment(io, char_equipment):
-    while True:
-        header = "Equipment"
-        footer = "Press a slot key to (un)equip  {} to view backpack  {} to close"
-        footer = footer.format(Bind.View_Inventory.key, Bind.Cancel.key)
-        fmt_str = "{0} - {1:11}: {2}"
-        lines = (fmt_str.format(key.upper(), slot.value, char_equipment.get_item(slot)) for key, slot in equipment_slots.items())
-        key_seq = tuple(equipment_slots.keys()) + Bind.View_Inventory + Bind.Cancel + ('c',)
-        key = io.menu(header, lines, footer, key_seq)
+    select_keys = tuple(row.key for row in equipment_rows)
+    return_keys = Bind.View_Inventory
+    header = "Equipment"
+    footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
+    footer = footer_fmt.format(Bind.View_Inventory.key, Bind.Cancel.key)
 
-        if key in Bind.Cancel:
+    while True:
+        lines = ("{0:11}: {1}".format(row.slot.value, char_equipment.get_item(row.slot)) for row in equipment_rows)
+        retval = lines_view(io.whole_window, lines, select_keys, return_keys, header, footer)
+
+        if retval is None:
             return
-        elif key in Bind.View_Inventory:
+        elif retval in Bind.View_Inventory:
             inventory(io, char_equipment)
-        elif key in equipment_slots:
-            slot = equipment_slots[key]
+        elif retval in range(len(equipment_rows)):
+            slot = equipment_rows[retval].slot
             if char_equipment.get_item(slot) is None:
-                equipped_item = inventory(io, char_equipment, slot)
-                if equipped_item is not None:
-                    char_equipment.equip(equipped_item, slot)
+                equip_item = inventory(io, char_equipment, slot)
+                if equip_item is not None:
+                    char_equipment.equip(equip_item, slot)
             else:
-                char_equipment.unequip(equipment_slots[key])
+                char_equipment.unequip(slot)
+        else:
+            assert False, "Got unhandled return value as input {}".format(retval)
 
 
 def inventory(io, char_equipment, slot=None):
-    if slot is None:
-        header = "Inventory"
-        use_selectable_items = False
-    else:
-        header = "Select item to equip"
-        use_selectable_items = True
 
     items = char_equipment.get_inventory_items(slot)
-    lines = tuple(str(item) for item in items)
-    index = lines_view(io.whole_window, lines, header, use_selectable_items)
-    if index is not None:
-        return items[index]
+    lines = (str(item) for item in items)
+
+    if slot is None:
+        header = "Inventory"
+        lines_view(io.whole_window, lines, header=header)
+    else:
+        header = "Select item to equip"
+        index = lines_view(io.whole_window, lines, select_keys=Bind.Item_Select_Keys,
+                           header=header)
+        if index is not None:
+            return items[index]
