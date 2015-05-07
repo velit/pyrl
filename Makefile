@@ -18,9 +18,8 @@ log:
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -f save_data/errors.err save_data/profiling_results save_data/pyrl.log
-	rm -f MANIFEST
-	rm -rf dist
+	rm -rf save_data dist
+	rm -f MANIFEST errors.err
 
 profile-test:
 	py.test-3 tests/profile_test.py && less save_data/profiling_results

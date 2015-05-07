@@ -5,6 +5,7 @@ import atexit
 import locale
 import logging
 import sys
+import os
 from cProfile import Profile
 
 import state_store
@@ -21,6 +22,7 @@ def start(cursor_lib_callback):
 def prepare_game(cursor_lib_callback, cmdline_args=None):
 
     options = get_commandline_options(cmdline_args)
+    initialize_files_and_folders()
 
     locale.setlocale(locale.LC_ALL, "")
     init_logger_system()
@@ -70,3 +72,8 @@ def load_game(game_name, cursor_lib_callback):
     game.init_nonserial_objects(cursor_lib_callback)
     game.redraw()
     return game
+
+
+def initialize_files_and_folders():
+    if not os.path.exists(GameConf.DATA_FOLDER):
+        os.makedirs(GameConf.DATA_FOLDER)
