@@ -65,11 +65,10 @@ def get_commandline_options(args=None):
 def load_game(game_name, cursor_lib_callback):
     try:
         game = state_store.load(game_name)
-    # python3: use FileNotFoundError here instead
-    except IOError:
+    except FileNotFoundError:
         print("Game '{}' not found.".format(game_name), file=sys.stderr)
         sys.exit(1)
-    game.init_nonserial_objects(cursor_lib_callback)
+    game.init_nonserial_objects(cursor_lib_callback, game.player)
     game.redraw()
     return game
 

@@ -22,25 +22,29 @@ class Game(object):
     def __init__(self, game_name, cursor_lib):
         self.game_name = game_name
         self.turn_counter = 0
-        self.player = Player()
         self.ai = AI()
-        self.world = World(get_world_template(), self.add_modified_location)
         self.time = 0
         self.modified_locations = set()
-
-        self.init_nonserial_objects(cursor_lib)
-
-        first_level_wloc, passage = self.world.get_first_level_info()
-        first_level = self.world.get_level(first_level_wloc)
-        first_level.spawn_creature(self.player, passage)
         self.vision_cache = None
-        self.io.msg("{0} for help menu".format(Bind.Help.key))
         self.save_mark = False
 
-    def init_nonserial_objects(self, cursor_lib_callback):
+        self.player = Player()
+        self.world = World(get_world_template(), self.add_modified_location)
+
+        self.init_nonserial_objects(cursor_lib, self.player)
+        self._init_first_level(self.world, self.player)
+
+        self.io.msg("{0} for help menu".format(Bind.Help.key))
+
+    def _init_first_level(self, world, player):
+        first_level_wloc, passage = world.get_first_level_info()
+        first_level = world.get_level(first_level_wloc)
+        first_level.spawn_creature(player, passage)
+
+    def init_nonserial_objects(self, cursor_lib_callback, player):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_input = UserController(GameActions(self, self.player), self.io)
-        register_status_texts(self, self.player)
+        self.user_input = UserController(GameActions(self, player), self.io)
+        register_status_texts(self, player)
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
@@ -173,7 +177,7 @@ class Game(object):
 
     def __getstate__(self):
         exclude_state = ('user_input', 'io')
-        state = self.__dict__.copy()
+        state = vars(self).copy()
         for item in exclude_state:
             del state[item]
         return state
