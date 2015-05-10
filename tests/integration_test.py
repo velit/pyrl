@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pytest
 from io_wrappers.mock import MockInputEnd
-from enums.keys import Key
+from config.bindings import Bind
 
 
 TEST_GameConf_NAME = "test"
@@ -38,13 +38,13 @@ def prepare_input_and_exe(mockwrapper, game, input_seq):
 
 def test_save_and_load_game(mockwrapper, game):
 
-    input_seq = "X" * 4 + "S"
+    input_seq = [Bind.Descend.key] * 4 + [Bind.Save.key]
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 4
     assert game.player.level.world_loc[1] == 3
 
     game = load_game(mockwrapper)
-    input_seq = "X" * 4
+    input_seq = [Bind.Descend.key] * 4
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 8
     assert game.player.level.world_loc[1] == 5
@@ -52,13 +52,41 @@ def test_save_and_load_game(mockwrapper, game):
 
 def test_subsystems(mockwrapper, game):
 
-    look_system = tuple("q4862q")
-    help_system = (Key.F1, "z")
-    message_system = ('d', 'm', Key.ENTER)
-    whole_map = tuple("dv")
-    path_to_staircase = ('d', 'o', Key.ENTER)
-    inventory = tuple("ivzbrlaz")
-    walk_mode = tuple("w6")
-    input_seq = help_system + look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
+    help_system = (Bind.Help, Bind.Cancel)
+
+    movement_and_look_system = (
+        Bind.Look_Mode,
+        Bind.North,
+        Bind.South,
+        Bind.NorthEast,
+        Bind.SouthWest,
+        Bind.West,
+        Bind.East,
+        Bind.SouthEast,
+        Bind.NorthWest,
+        Bind.Stay,
+        Bind.Look_Mode,
+    )
+
+    # debug_actions enabled ones
+    message_system = ('d', 'm', Bind.Last_Message)
+    whole_map = ('d', 'v')
+    path_to_staircase = ('d', 'o', Bind.Last_Message)
+
+    inventory = (
+        Bind.Inventory,
+        Bind.View_Inventory,
+        Bind.Cancel,
+        Bind.Equipment_Slot_Body,
+        Bind.Equipment_Slot_Right_Hand,
+        Bind.Equipment_Slot_Left_Hand,
+        Bind.Item_Select_Keys[0],
+        Bind.Cancel,
+    )
+
+    walk_mode = (Bind.Walk_Mode, Bind.East, Bind.Instant_West)
+
+    input_seq = help_system + movement_and_look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
+    input_seq = (action if isinstance(action, str) else action.key for action in input_seq)
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 4
