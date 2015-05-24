@@ -8,14 +8,19 @@ class Action(Enum):
     Attack = 2
     Swap = 3
 
+    @property
+    def cost(self):
+        return action_cost[self]
+
+
+action_cost = {
+    Action.Move: 1000,
+    Action.Attack: 1000,
+    Action.Swap: 1000,
+}
+
 
 class Multiplier(object):
     Orthogonal = 1
     Diagonal = 2 ** 0.5
     Stay = 1
-
-
-class Cost(Enum):
-    Move = 1000
-    Attack = 1000
-    Swap = 1000

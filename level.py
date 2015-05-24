@@ -6,39 +6,36 @@ import path
 from config.debug import Debug
 from enums.level_locations import LevelLocation
 from creature.creature import Creature
-from creature.actions import Action, Multiplier, Cost
+from creature.actions import Action, Multiplier
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
-from generic_structures import List2D
 from turn_scheduler import TurnScheduler
 
 
 class Level(object):
 
-    def __init__(self, world_loc, level_template, visible_change_callbacks=()):
+    def __init__(self, world_loc, level_template, visible_change_callback):
         self.world_loc = world_loc
-        self.rows = level_template.rows
-        self.cols = level_template.cols
+        self.tiles = level_template.tiles
+        self.rows, self.cols = self.tiles.get_dimensions()
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
-        self.tiles = List2D(level_template.tilemap, self.cols)
         self.visible_change_observers = []
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
-        for monster_file in level_template.static_monster_templates:
-            self.spawn_creature(Creature(monster_file))
+        for creature in level_template.static_creatures:
+            self.spawn_creature(creature)
 
-        if level_template.use_dynamic_monsters:
-            self.creature_spawn_list = level_template.get_dynamic_monster_spawn_list()
+        if level_template.creature_spawning:
+            self.creature_spawn_list = level_template.get_creature_spawn_list()
 
-            for _ in range(level_template.dynamic_monster_amount):
-                monster_file = random.choice(self.creature_spawn_list)
-                self.spawn_creature(Creature(monster_file))
+            for _ in range(level_template.creature_spawn_count):
+                creature = Creature(random.choice(self.creature_spawn_list))
+                self.spawn_creature(creature)
 
-        for callback in visible_change_callbacks:
-            self.visible_change_subscribe(callback)
+        self.visible_change_subscribe(visible_change_callback)
 
     def legal_coord(self, coord, direction=(0, 0)):
         return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
@@ -101,7 +98,7 @@ class Level(object):
         for direction in self.get_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             multiplier = self.movement_multiplier(coord, direction)
-            yield neighbor_coord, round(multiplier * Cost.Move.value)
+            yield neighbor_coord, round(multiplier * Action.Move.cost)
 
     def get_passable_neighbors(self, coord):
         for direction in Dir.All:
@@ -132,7 +129,7 @@ class Level(object):
                     any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, Cost.Move.value, Multiplier.Diagonal))
+        return round(path.heuristic(coordA, coordB, Action.Move.cost, Multiplier.Diagonal))
 
     def movement_multiplier(self, coord, direction):
         origin_multiplier = self.tiles[coord].movement_multiplier
@@ -188,26 +185,31 @@ class Level(object):
         for observer in self.visible_change_observers:
             observer(coord)
 
-    def spawn_creature(self, creature, passage=None):
-        if passage is None:
-            self.add_creature(creature)
-        else:
-            self.add_creature(creature, coord=self.get_passage_coord(passage))
+    def spawn_creature(self, creature):
+        coord = None
+        if creature.coord is not None:
+            if not self.is_passable(creature.coord):
+                fmt = "Attempting to spawn creature to already occupied square: {}"
+                raise AssertionError(fmt.format(creature.coord))
+            coord = creature.coord
+
+        self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
 
     def add_creature_to_passage(self, creature, passage):
-        self.add_creature(creature, coord=self.get_passage_coord(passage))
+        coord = self.get_passage_coord(passage)
+        self.add_creature(creature, coord)
 
     def add_creature(self, creature, coord=None):
         if coord is None:
             coord = self.get_free_coord()
+
         elif self.has_creature(coord):
             blocking_creature = self.creatures[coord]
             self.move_creature(blocking_creature, self.get_free_coord())
         self.creatures[coord] = creature
         creature.coord = coord
         creature.level = self
-
         self.visible_change_event(coord)
 
     def remove_creature(self, creature, turnscheduler_remove=True):

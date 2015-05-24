@@ -4,7 +4,7 @@ from enums.colors import Pair
 from monster_template import MonsterTemplate
 
 
-monster_templates = (
+creature_templates = (
     MonsterTemplate("zombie", ('z', Pair.Cyan), -3, 0),
     MonsterTemplate("kobold", ('k', Pair.Light_Green), -3, 0),
     MonsterTemplate("goblin", ('g', Pair.Green), -2, 0),

@@ -2,19 +2,17 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import state_store
+from game_data.world import get_world
 from ai import AI
 from config.debug import Debug
 from config.game import GameConf
 from config.bindings import Bind
 from fov import ShadowCast
 from game_actions import GameActions
-from game_data.maps import get_world_template
-from game_data.player import Player
 from interface.status_texts import register_status_texts
 from user_controller import UserController
 from window.window_system import WindowSystem
-from world import World
-from world_template import LevelNotFound
+from world import LevelNotFound
 
 
 class Game(object):
@@ -28,18 +26,11 @@ class Game(object):
         self.vision_cache = None
         self.save_mark = False
 
-        self.player = Player()
-        self.world = World(get_world_template(), self.add_modified_location)
+        self.world = get_world()
+        self.player = self.world.player
+        self.world.get_level(self.world.start_level, self.add_modified_location)
 
         self.init_nonserial_objects(cursor_lib, self.player)
-        self._init_first_level(self.world, self.player)
-
-        self.io.msg("{0} for help menu".format(Bind.Help.key))
-
-    def _init_first_level(self, world, player):
-        first_level_wloc, passage = world.get_first_level_info()
-        first_level = world.get_level(first_level_wloc)
-        first_level.spawn_creature(player, passage)
 
     def init_nonserial_objects(self, cursor_lib_callback, player):
         self.io = WindowSystem(cursor_lib_callback())
@@ -48,6 +39,7 @@ class Game(object):
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
+        self.io.msg("{0} for help menu".format(Bind.Help.key))
         while True:
             if self.save_mark:
                 self.savegame(ask=False)
@@ -75,7 +67,7 @@ class Game(object):
 
     def move_creature_to_level(self, creature, world_loc, passage):
         try:
-            target_level = self.world.get_level(world_loc)
+            target_level = self.world.get_level(world_loc, self.add_modified_location)
         except LevelNotFound:
             return False
 

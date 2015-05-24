@@ -1,14 +1,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from enum import Enum
-
 from enums.colors import Pair
 from enums.level_locations import LevelLocation
 from tile import Tile
 
 
-class TileImpl(Enum):
-    #name             Description                 Visible char        Memory char          Passable Transparency
+class PyrlTile(object):
+    #Name          Description                     Visible char        Memory char          Passable Transparency
     Unknown      = Tile("nothing",                 (' ', Pair.Normal), (' ', Pair.Normal),  False,   False,                       )
     Floor        = Tile("dungeon floor",           ('.', Pair.Light),  ('.', Pair.Gray),    True,    True,                        )
     Black_Floor  = Tile("obisidian dungeon floor", ('.', Pair.Red),    ('.', Pair.Red),     True,    True,                        )

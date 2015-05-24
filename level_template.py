@@ -1,83 +1,69 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from game_data.tiles import TileImpl
-from config.game import GameConf
 from enums.directions import Dir
 from enums.level_locations import LevelLocation
+from game_data.creatures import creature_templates
+from game_data.tiles import PyrlTile
 from generic_algorithms import add_vector
-from rdg import GenLevelType, generate_tilemap
-from game_data.monsters import monster_templates
+from rdg import GenLevelType, generate_tiles
+from generic_structures import List2D
+from config.game import GameConf
 
 
 class LevelTemplate(object):
 
     default_level_type = GenLevelType.Dungeon
 
-    def __init__(self, danger_level=0, use_dynamic_monsters=True, tilemap=None,
-                 static_monster_seq=(), dimensions=GameConf.LEVEL_DIMENSIONS):
+    def __init__(self, danger_level=0, dimensions=GameConf.LEVEL_DIMENSIONS, tiles=None,
+                 static_creatures=(), creature_spawning=True):
         self.danger_level = danger_level
-        self.tilemap = tilemap
-        self.use_dynamic_monsters = use_dynamic_monsters
+        self.tiles = tiles
         self.rows, self.cols = dimensions
         self.passage_locations = {}
         self.passage_destination_infos = {}
-        self.static_monster_templates = list(static_monster_seq)
-        self.dynamic_monster_amount = 99
+        self.static_creatures = list(static_creatures)
+        self.creature_spawning = creature_spawning
+        self.creature_spawn_count = 99
 
     def finalize(self):
-        if self.tilemap is None:
-            generate_tilemap(self, self.default_level_type)
+        if self.tiles is None:
+            generate_tiles(self, self.default_level_type)
         else:
-            self._finalize_manual_tilemap()
+            self._finalize_manual_tiles()
 
-    def is_legal(self, coord):
-        y, x = coord
-        return (0 <= y < self.rows) and (0 <= x < self.cols)
-
-    def get_tile(self, coord):
-        y, x = coord
-        return self.tilemap[y * self.cols + x]
-
-    def set_tile(self, coord, tile):
-        y, x = coord
-        self.tilemap[y * self.cols + x] = tile
-
-    def add_monster_template(self, monster):
-        self.static_monster_templates.append(monster)
-
-    def get_dynamic_monster_spawn_list(self):
-        monster_list = []
-        for monster in monster_templates:
-            start = monster.speciation_lvl
+    def get_creature_spawn_list(self):
+        creature_list = []
+        for creature in creature_templates:
+            start = creature.speciation_lvl
             if start <= self.danger_level:
-                weight_coeff = self.danger_level - monster.speciation_lvl
-                monster_list.extend((monster, ) * weight_coeff)
-        return monster_list
+                weight_coeff = self.danger_level - creature.speciation_lvl
+                creature_list.extend((creature, ) * weight_coeff)
+        return creature_list
 
-    def _finalize_manual_tilemap(self):
-        for index, tile in enumerate(self.tilemap):
+    def _finalize_manual_tiles(self):
+        for index, tile in enumerate(self.tiles):
             coord = index // self.cols, index % self.cols
-            if tile == TileImpl.Stairs_Up.value:
+            if tile == PyrlTile.Stairs_Up:
                 self.passage_locations[LevelLocation.Passage_Up] = coord
-            elif tile == TileImpl.Stairs_Down.value:
+            elif tile == PyrlTile.Stairs_Down:
                 self.passage_locations[LevelLocation.Passage_Down] = coord
 
         self._transform_dynamic_walls()
         self._fill_rock()
 
     def _transform_dynamic_walls(self):
-        self.tilemap = [TileImpl.Wall.value if self._dynamic_wall_qualifies_as_wall(tile, index)
-                                    else tile for index, tile in enumerate(self.tilemap)]
+        self.tiles = List2D((PyrlTile.Wall if self._dynamic_wall_qualifies_as_wall(tile, index)
+                                    else tile for index, tile in enumerate(self.tiles)), self.tiles._bound)
 
     def _dynamic_wall_qualifies_as_wall(self, tile, index):
-        if tile != TileImpl.Dynamic_Wall.value:
+        if tile != PyrlTile.Dynamic_Wall:
             return False
         coord = index // self.cols, index % self.cols
         neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
-        valid_tiles = (self.get_tile(coord) for coord in neighbor_coords if self.is_legal(coord))
-        return any(handle not in (TileImpl.Dynamic_Wall.value,
-                                  TileImpl.Wall.value,
-                                  TileImpl.Rock.value) for handle in valid_tiles)
+        valid_tiles = (self.tiles[coord] for coord in neighbor_coords if self.tiles.is_legal(coord))
+        return any(handle not in (PyrlTile.Dynamic_Wall,
+                                  PyrlTile.Wall,
+                                  PyrlTile.Rock) for handle in valid_tiles)
 
     def _fill_rock(self):
-        self.tilemap = [TileImpl.Rock.value if tile == TileImpl.Dynamic_Wall.value else tile for tile in self.tilemap]
+        self.tiles = List2D((PyrlTile.Rock if tile == PyrlTile.Dynamic_Wall else tile for tile in self.tiles), self.tiles._bound)

@@ -4,14 +4,14 @@ test-porcelain-output:
 test:
 	py.test-3 -k-slow
 
-slow-test:
+all-tests:
 	py.test-3
-
-test-debug:
-	py.test-3 -k-slow -x --pdb
 
 debug:
 	python3 -m pdb pyrl.py
+
+test-debug:
+	py.test-3 -k-slow -x --pdb
 
 log:
 	tail -n 50 save_data/pyrl.log
@@ -29,9 +29,6 @@ profile-in-place:
 
 profile-log:
 	less save_data/profiling_results
-
-release:
-	python3 setup.py sdist
 
 future-test:
 	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py

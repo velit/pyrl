@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from .stats import ensure_stats
-from .actions import Cost
 
 
 @ensure_stats
@@ -36,8 +35,7 @@ class Creature(object):
         return self.hp <= 0
 
     def action_cost(self, action, multiplier=1):
-        action_cost = Cost[action.name].value
-        return round(action_cost * multiplier * self.speed_multiplier)
+        return round(action.cost * multiplier * self.speed_multiplier)
 
     @property
     def strength(self):

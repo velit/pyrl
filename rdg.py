@@ -7,7 +7,8 @@ from enum import Enum
 from enums.level_locations import LevelLocation
 from enums.directions import Dir
 from generic_algorithms import add_vector
-from game_data.tiles import TileImpl
+from game_data.tiles import PyrlTile
+from generic_structures import List2D
 
 
 class GenLevelType(Enum):
@@ -21,13 +22,13 @@ _corridor_x_range = (7, 20)
 _rdg_level_passes = 300
 _corridor_chance_range = (0, 0.3)
 _room_chance_range = (0.3, 1)
-F = TileImpl.Floor.value
-W = TileImpl.Wall.value
-R = TileImpl.Rock.value
+F = PyrlTile.Floor
+W = PyrlTile.Wall
+R = PyrlTile.Rock
 
 
-def generate_tilemap(level_template, level_type):
-    RDG(level_template, level_type).generate_tilemap()
+def generate_tiles(level_template, level_type):
+    RDG(level_template, level_type).generate_tiles()
 
 
 def Rectangle(y, x, height, width):
@@ -71,7 +72,6 @@ class _Rectangle(tuple):
 class RDG(object):
 
     def __init__(self, level_template, level_type=GenLevelType.Arena):
-
         self.level_template = level_template
         self.rows = level_template.rows
         self.cols = level_template.cols
@@ -81,26 +81,24 @@ class RDG(object):
         self.wall_coords_cache = tuple()
         self.is_wall_coords_dirty = True
 
-    def generate_tilemap(self):
-
+    def generate_tiles(self):
         if self.level_type == GenLevelType.Dungeon:
-            if self.level_template.tilemap is None:
-                self.init_tilemap()
+            if self.level_template.tiles is None:
+                self.init_tiles()
                 self.make_initial_room()
 
             self.generator_loop()
 
         elif self.level_type == GenLevelType.Arena:
-            self.init_tilemap()
+            self.init_tiles()
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
         if LevelLocation.Passage_Up not in self.level_template.passage_locations:
-            self.add_passageway(LevelLocation.Passage_Up, TileImpl.Stairs_Up.value)
+            self.add_passageway(LevelLocation.Passage_Up, PyrlTile.Stairs_Up)
         if LevelLocation.Passage_Down not in self.level_template.passage_locations:
-            self.add_passageway(LevelLocation.Passage_Down, TileImpl.Stairs_Down.value)
+            self.add_passageway(LevelLocation.Passage_Down, PyrlTile.Stairs_Down)
 
     def generator_loop(self):
-
         rand_room_height = partial(randrange, *_room_y_range)
         rand_room_width = partial(randrange, *_room_x_range)
         rand_corridor_height = partial(randrange, *_corridor_y_range)
@@ -141,25 +139,22 @@ class RDG(object):
             else:
                 assert False
 
-    def init_tilemap(self):
-
-        self.level_template.tilemap = [R for _ in range(self.rows * self.cols)]
+    def init_tiles(self):
+        self.level_template.tiles = List2D((R for _ in range(self.rows * self.cols)), self.cols)
 
     def add_passageway(self, passage, passage_tile_id):
-
         while True:
             coord = self.get_free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
-            tile = self.level_template.get_tile(coord)
+            tile = self.level_template.tiles[coord]
 
             if neighbors == (F, F, F, F) and tile == F:
                 break
 
-        self.level_template.set_tile(coord, passage_tile_id)
+        self.level_template.tiles[coord] = passage_tile_id
         self.level_template.passage_locations[passage] = coord
 
     def make_initial_room(self):
-
         while True:
             height, width = randrange(5, 11), randrange(7, 14)
             if height * width <= 8 * 8:
@@ -177,10 +172,9 @@ class RDG(object):
                 break
 
         self.make_room(Rectangle(y, x, height, width))
-        self.level_template.set_tile((y + 2, x + 2), TileImpl.Black_Floor.value)
+        self.level_template.tiles[y + 2, x + 2] = PyrlTile.Black_Floor
 
     def attempt_corridor(self, door_coord, direction, length):
-
         y, x = door_coord
         y_dir, x_dir = direction
 
@@ -199,27 +193,23 @@ class RDG(object):
             return False
 
     def attempt_room(self, rectangle, door_coord):
-
         if self.rectangle_consists_of_tiles(rectangle, (W, R)):
             self.make_room(rectangle)
-            self.level_template.set_tile(door_coord, F)
+            self.level_template.tiles[door_coord] = F
             return True
         else:
             return False
 
     def get_free_coord(self):
-
         while True:
             coord = self.get_random_coord()
-            if self.level_template.get_tile(coord).is_passable:
+            if self.level_template.tiles[coord].is_passable:
                 return coord
 
     def get_random_coord(self):
-
         return randrange(self.rows), randrange(self.cols)
 
     def get_random_wall_coord(self):
-
         if self.is_wall_coords_dirty:
             self.wall_coords_cache = tuple(self.wall_coords)
             self.is_wall_coords_dirty = False
@@ -227,7 +217,6 @@ class RDG(object):
         return choice(self.wall_coords_cache)
 
     def mark_wall(self, coord):
-
         if coord in self.wall_coords:
             self.wall_coords.remove(coord)
         else:
@@ -261,31 +250,30 @@ class RDG(object):
             return False
 
     def get_up_down_left_right_neighbors(self, coord):
-
-        get = self.level_template.get_tile
-        neighbors = (get(add_vector(coord, Dir.North)),
-                     get(add_vector(coord, Dir.South)),
-                     get(add_vector(coord, Dir.West)),
-                     get(add_vector(coord, Dir.East)),)
+        tiles = self.level_template.tiles
+        neighbors = (
+            tiles[add_vector(coord, Dir.North)],
+            tiles[add_vector(coord, Dir.South)],
+            tiles[add_vector(coord, Dir.West)],
+            tiles[add_vector(coord, Dir.East)],
+        )
         return neighbors
 
     def make_room(self, rectangle):
-
         y_start, x_start, y_limit, x_limit = rectangle
 
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):
                 if y in (y_start, y_limit - 1) or x in (x_start, x_limit - 1):
-                    self.level_template.set_tile((y, x), W)
+                    self.level_template.tiles[y, x] = W
                     self.mark_wall((y, x))
                 else:
-                    self.level_template.set_tile((y, x), F)
+                    self.level_template.tiles[y, x] = F
 
     def rectangle_consists_of_tiles(self, rectangle, tile_seq):
-
-        get_tile = self.level_template.get_tile
+        template = self.level_template
         for coord in rectangle.iterate():
-            if not self.level_template.is_legal(coord) or get_tile(coord) not in tile_seq:
+            if not template.tiles.is_legal(coord) or template.tiles[coord] not in tile_seq:
                 return False
         return True
 
@@ -293,11 +281,12 @@ class RDG(object):
         """Set all the tiles in rectangle to given tile."""
         if tile == W:
             for coord in rectangle.iterate():
-                self.level_template.set_tile(coord, tile)
+                self.level_template.tiles[coord] = tile
                 self.mark_wall(coord)
         else:
             for coord in rectangle.iterate():
-                self.level_template.set_tile(coord, tile)
+                self.level_template.tiles[coord] = tile
 
     def turn_rock_to_wall(self):
-        self.level_template.tilemap = [t if t != R else W for t in self.level_template.tilemap]
+        new_tiles = (t if t != R else W for t in self.level_template.tiles)
+        self.level_template.tiles = List2D(new_tiles, self.cols)

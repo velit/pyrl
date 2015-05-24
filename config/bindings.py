@@ -49,14 +49,14 @@ class Bind(object):
     Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Directions used in moving/attacking/targetting
-    SouthWest = '1', 'n', Key.NUMPAD_1
-    South     = '2', 'j', Key.NUMPAD_2
-    SouthEast = '3', 'm', Key.NUMPAD_3
-    West      = '4', 'h', Key.NUMPAD_4
-    Stay      = '5', '.', Key.NUMPAD_5
+    SouthWest = '1', 'm', Key.NUMPAD_1
+    South     = '2', ',', Key.NUMPAD_2
+    SouthEast = '3', '.', Key.NUMPAD_3
+    West      = '4', 'j', Key.NUMPAD_4
+    Stay      = '5', 'k', Key.NUMPAD_5
     East      = '6', 'l', Key.NUMPAD_6
     NorthWest = '7', 'u', Key.NUMPAD_7
-    North     = '8', 'k', Key.NUMPAD_8
+    North     = '8', 'i', Key.NUMPAD_8
     NorthEast = '9', 'o', Key.NUMPAD_9
 
     # Initiates walk mode into direction
@@ -86,7 +86,7 @@ class Bind(object):
     # main view
     Help      = Key.F1, Key.F2
     Look_Mode = 'q'
-    Inventory = 'i'
+    Inventory = 'I'
     Descend   = 'X'
     Ascend    = 'x'
     Quit      = 'Q'

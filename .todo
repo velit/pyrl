@@ -420,6 +420,12 @@
     <note priority="veryhigh" time="1431204591">
         implement world map
     </note>
+    <note priority="veryhigh" time="1432457603">
+        Change monster to creature
+    </note>
+    <note priority="veryhigh" time="1432458449">
+        Move coordinate specific code to a mix-in.
+    </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
     </note>
@@ -440,6 +446,12 @@
     </note>
     <note priority="high" time="1430680379">
         Consider moving key_groups / direction dicts out of config.finalize.py to game code modules.
+    </note>
+    <note priority="high" time="1432475550">
+        Consider making coord type/namedtuple.
+    </note>
+    <note priority="high" time="1432483779">
+        Make it possible to spawn multiple different static monsters.
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method

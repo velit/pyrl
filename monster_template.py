@@ -2,8 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 class MonsterTemplate(object):
-    def __init__(self, name, char, speciation_lvl=0, extinction_lvl=0):
+    def __init__(self, name, char, speciation_lvl=0, extinction_lvl=0, coord=None):
         self.name = name
         self.char = char
         self.speciation_lvl = speciation_lvl
         self.extinction_lvl = extinction_lvl
+        self.coord = coord

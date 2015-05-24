@@ -18,25 +18,45 @@ class List2D(list):
     dimension bounded to two are: (0, 0), (0, 1), (1, 0), (1, 1).
     """
 
+    @staticmethod
+    def get_index_from_coord(coord, second_dim_bound):
+        first_dim, second_dim = coord
+        if second_dim < second_dim_bound:
+            return first_dim * second_dim_bound + second_dim
+        else:
+            msg = "Second dimension index out of range: {} < {}"
+            raise IndexError(msg.format(second_dim, second_dim_bound))
+
+    @staticmethod
+    def get_coord_from_index(index, second_dim_bound):
+        return index // second_dim_bound, index % second_dim_bound
+
     def __init__(self, iterable, second_dimension_bound):
         super(List2D, self).__init__(iterable)
-        self._second_dim_bound = second_dimension_bound
-
-    def _get_index(self, coord):
-        first_dim, second_dim = coord
-        if second_dim < self._second_dim_bound:
-            return first_dim * self._second_dim_bound + second_dim
-        else:
-            raise IndexError("second dimension index out of range.")
+        self._bound = second_dimension_bound
 
     def __getitem__(self, coord):
-        return super(List2D, self).__getitem__(self._get_index(coord))
+        return super().__getitem__(self.get_index(coord))
 
     def __setitem__(self, coord, value):
-        return super(List2D, self).__setitem__(self._get_index(coord), value)
+        return super().__setitem__(self.get_index(coord), value)
 
     def __delitem__(self, coord):
-        return super(List2D, self).__delitem__(self._get_index(coord))
+        return super().__delitem__(self.get_index(coord))
+
+    def get_dimensions(self):
+        return ((len(self) - 1) // self._bound) + 1, self._bound
+
+    def get_coord(self, index):
+        return self.get_coord_from_index(index, self._bound)
+
+    def get_index(self, coord):
+        return self.get_index_from_coord(coord, self._bound)
+
+    def is_legal(self, coord):
+        y, x = coord
+        rows, cols = self.get_dimensions()
+        return (0 <= y < rows) and (0 <= x < cols)
 
 
 class PriorityQueue(object):

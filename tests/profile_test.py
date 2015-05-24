@@ -4,7 +4,7 @@ from cProfile import Profile
 import pytest
 
 from level_template import LevelTemplate
-from rdg import generate_tilemap, GenLevelType
+from rdg import generate_tiles, GenLevelType
 from tools import profile_util
 
 
@@ -15,7 +15,7 @@ def test_rdg_generation():
 
     for _ in range(300):
         lt = LevelTemplate()
-        generate_tilemap(lt, GenLevelType.Arena)
+        generate_tiles(lt, GenLevelType.Arena)
 
     profiler.disable()
     profile_util.write_results_log(profiler)
