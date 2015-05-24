@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from heapq import heappush, heappop
 
+from generic_algorithms import add_vector
+
 
 class List2D(list):
 
@@ -53,8 +55,8 @@ class List2D(list):
     def get_index(self, coord):
         return self.get_index_from_coord(coord, self._bound)
 
-    def is_legal(self, coord):
-        y, x = coord
+    def is_legal(self, coord, direction=(0, 0)):
+        y, x = add_vector(coord, direction)
         rows, cols = self.get_dimensions()
         return (0 <= y < rows) and (0 <= x < cols)
 
@@ -81,3 +83,19 @@ class PriorityQueue(object):
                 return task, priority, count
             else:
                 self.remove_set.remove(task)
+
+
+class Event(object):
+
+    def __init__(self):
+        self.observers = []
+
+    def subscribe(self, function):
+        self.observers.append(function)
+
+    def unsubscribe(self, function):
+        self.observers.remove(function)
+
+    def trigger(self, *args, **keys):
+        for observer in self.observers:
+            observer(*args, **keys)

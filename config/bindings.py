@@ -49,26 +49,26 @@ class Bind(object):
     Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Directions used in moving/attacking/targetting
-    SouthWest = '1', 'm', Key.NUMPAD_1
-    South     = '2', ',', Key.NUMPAD_2
-    SouthEast = '3', '.', Key.NUMPAD_3
-    West      = '4', 'j', Key.NUMPAD_4
-    Stay      = '5', 'k', Key.NUMPAD_5
-    East      = '6', 'l', Key.NUMPAD_6
-    NorthWest = '7', 'u', Key.NUMPAD_7
-    North     = '8', 'i', Key.NUMPAD_8
-    NorthEast = '9', 'o', Key.NUMPAD_9
+    SouthWest = '1',  'm',  Key.NUMPAD_1,  Key.END
+    South     = '2',  ',',  Key.NUMPAD_2,  Key.DOWN
+    SouthEast = '3',  '.',  Key.NUMPAD_3,  Key.PAGE_DOWN
+    West      = '4',  'j',  Key.NUMPAD_4,  Key.LEFT
+    Stay      = '5',  'k',  Key.NUMPAD_5,  Key.NONE
+    East      = '6',  'l',  Key.NUMPAD_6,  Key.RIGHT
+    NorthWest = '7',  'u',  Key.NUMPAD_7,  Key.HOME
+    North     = '8',  'i',  Key.NUMPAD_8,  Key.UP
+    NorthEast = '9',  'o',  Key.NUMPAD_9,  Key.PAGE_UP
 
     # Initiates walk mode into direction
-    Instant_SouthWest = Key.END
-    Instant_South     = Key.DOWN
-    Instant_SouthEast = Key.PAGE_DOWN
-    Instant_West      = Key.LEFT
-    Instant_Stay      = Key.NONE
-    Instant_East      = Key.RIGHT
-    Instant_NorthWest = Key.HOME
-    Instant_North     = Key.UP
-    Instant_NorthEast = Key.PAGE_UP
+    Instant_SouthWest = Key.NONE  # Key.END
+    Instant_South     = Key.NONE  # Key.DOWN
+    Instant_SouthEast = Key.NONE  # Key.PAGE_DOWN
+    Instant_West      = Key.NONE  # Key.LEFT
+    Instant_Stay      = Key.NONE  # Key.NONE
+    Instant_East      = Key.NONE  # Key.RIGHT
+    Instant_NorthWest = Key.NONE  # Key.HOME
+    Instant_North     = Key.NONE  # Key.UP
+    Instant_NorthEast = Key.NONE  # Key.PAGE_UP
 
     # queries
     Yes = 'y'

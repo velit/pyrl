@@ -5,12 +5,12 @@ from creature.equipment import Slot
 from creature.stats import Stat
 from creature.advanced_creature import AdvancedCreature
 from creature.item import Item, Weapon
-from monster_template import MonsterTemplate
+from creature.template import CreatureTemplate
 
 
 def Player():
-    monster_template = MonsterTemplate("tappi", ('@', (Color.Green, Color.Black)), 0, 0)
-    player = AdvancedCreature(monster_template)
+    template = CreatureTemplate("tappi", ('@', (Color.Green, Color.Black)), 0, 0)
+    player = AdvancedCreature(template)
 
     armor_stats = (
         (Stat.armor, 4),
@@ -28,7 +28,7 @@ def Player():
     player.equipment.bag_item(weapon)
     player.equipment.equip(weapon, Slot.right_hand)
 
-    itams = (
+    items = (
         Weapon("short sword +1",     1,  6,  1),
         Weapon("long sword",         1,  8,  0),
         Weapon("short sword +1",     1,  6,  1),
@@ -40,8 +40,8 @@ def Player():
         Weapon("long sword +2",      1,  8,  2),
         Weapon("Lance of longinus",  4,  8,  8).add_stat(Stat.endurance,  8),
     )
-    itams = itams + tuple(Weapon("short sword +" + str(i), 1, 6, i) for i in range(60))
-    for itam in itams:
+    items = items + tuple(Weapon("short sword +" + str(i), 1, 6, i) for i in range(60))
+    for itam in items:
         player.equipment.bag_item(itam)
 
     return player

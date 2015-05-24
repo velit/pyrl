@@ -10,16 +10,22 @@ base_tiles = {
     'r': PyrlTile.Rock,
     '/': PyrlTile.Open_Door,
     '+': PyrlTile.Closed_Door,
-    '"': PyrlTile.Grass,
     '>': PyrlTile.Stairs_Down,
     '<': PyrlTile.Stairs_Up,
-    'P': PyrlTile.Stairs_Up,
-    '@': PyrlTile.Floor,
 }
 
 
-def finalize_tiles(chars):
-    return List2D((base_tiles[char] for char in chars), chars._bound)
+def finalize_tiles(chars, override_dict=None):
+    if override_dict is None:
+        return List2D((base_tiles[char] for char in chars), chars._bound)
+    else:
+        tiles = List2D([], chars._bound)
+        for char in chars:
+            if char in override_dict:
+                tiles.append(override_dict[char])
+            else:
+                tiles.append(base_tiles[char])
+        return tiles
 
 
 def finalize_creatures(creature_dict, chars):

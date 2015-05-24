@@ -41,7 +41,8 @@ class World(object):
                 raise LevelNotFound("Nonexistant level key: {}".format(world_loc))
             level_template = self.level_templates[world_loc]
             level_template.finalize()
-            level = Level(world_loc, level_template, visible_change_callback)
+            level = Level(world_loc, level_template)
+            level.visible_change.subscribe(visible_change_callback)
             self.levels[world_loc] = level
 
         return self.levels[world_loc]

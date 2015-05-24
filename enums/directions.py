@@ -39,3 +39,17 @@ class Dir(object):
         NorthEast:  North,
         North:      NorthWest,
     }
+
+    OrthogonalMoveMult = 1
+    DiagonalMoveMult = 2 ** 0.5
+    StayMoveMult = 1
+
+    @classmethod
+    def move_mult(cls, direction):
+        if direction in cls.Orthogonals:
+            return cls.OrthogonalMoveMult
+        elif direction in cls.Diagonals:
+            return cls.DiagonalMoveMult
+        elif direction == cls.Stay:
+            return cls.StayMoveMult
+        assert False, "Invalid direction: {}".format(direction)

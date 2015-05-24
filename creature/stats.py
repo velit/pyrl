@@ -22,7 +22,5 @@ class Stat(Enum):
 
 def ensure_stats(obj):
     for stat in Stat:
-        if not hasattr(obj, stat.name):
-            error_msg = "Attribute {} must be found in {}".format(stat.name, obj)
-            raise AssertionError(error_msg)
+        assert hasattr(obj, stat.name), "Attribute {} must be found in {}".format(stat.name, obj)
     return obj

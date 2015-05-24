@@ -62,8 +62,7 @@ class AI(object):
         else:
             self.remove_creature_state(creature)
 
-        if error is not None:
-            raise AssertionError("AI state bug. Got error from game: {}".format(error))
+        assert error is None, "AI state bug. Got error from game: {}".format(error)
 
     def move_towards(self, game_actions, target_coord):
         creature = game_actions.creature
@@ -91,7 +90,7 @@ class AI(object):
         elif best_action == Action.Swap:
             return game_actions.swap(best_direction)
         else:
-            raise AssertionError("AI state bug. Best action was: {}".format(best_action))
+            assert False, "AI state bug. Best action was: {}".format(best_action)
 
     def move_random(self, game_actions):
         creature = game_actions.creature

@@ -6,22 +6,23 @@ import path
 from config.debug import Debug
 from enums.level_locations import LevelLocation
 from creature.creature import Creature
-from creature.actions import Action, Multiplier
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
 from turn_scheduler import TurnScheduler
+from generic_structures import Event
+from creature.actions import Action
 
 
 class Level(object):
 
-    def __init__(self, world_loc, level_template, visible_change_callback):
+    def __init__(self, world_loc, level_template):
         self.world_loc = world_loc
         self.tiles = level_template.tiles
         self.rows, self.cols = self.tiles.get_dimensions()
         self.danger_level = level_template.danger_level
         self.passage_locations = level_template.passage_locations
         self.passage_destination_infos = level_template.passage_destination_infos
-        self.visible_change_observers = []
+        self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
 
@@ -35,21 +36,15 @@ class Level(object):
                 creature = Creature(random.choice(self.creature_spawn_list))
                 self.spawn_creature(creature)
 
-        self.visible_change_subscribe(visible_change_callback)
-
-    def legal_coord(self, coord, direction=(0, 0)):
-        return (0 <= (coord[0] + direction[0]) < self.rows) and (0 <= (coord[1] + direction[1]) < self.cols)
-
     def get_free_coord(self):
+        # TODO: improve this at some point
         while True:
             coord = random.randrange(self.rows), random.randrange(self.cols)
             if self.is_passable(coord):
                 return coord
 
     def get_coord_iter(self):
-        for y in range(self.rows):
-            for x in range(self.cols):
-                yield y, x
+        return ((y, x) for y in range(self.rows) for x in range(self.cols))
 
     def get_exit(self, coord):
         return self.tiles[coord].exit_point
@@ -86,13 +81,11 @@ class Level(object):
         return self.passage_destination_infos[passage]
 
     def get_last_pathable_coord(self, coord_start, coord_end):
-        last = coord_start
+        last = None
         for coord in bresenham(coord_start, coord_end):
-            if self.is_pathable(coord):
-                last = coord
-            else:
-                break
-        return last
+            if not self.is_pathable(coord):
+                return last
+            last = coord
 
     def get_neighbor_locations_and_costs(self, coord):
         for direction in self.get_passable_neighbors(coord):
@@ -103,7 +96,7 @@ class Level(object):
     def get_passable_neighbors(self, coord):
         for direction in Dir.All:
             neighbor_coord = add_vector(coord, direction)
-            if self.legal_coord(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
+            if self.is_legal(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
 
     def has_creature(self, coord):
@@ -111,6 +104,9 @@ class Level(object):
 
     def has_exit(self, coord):
         return self.tiles[coord].exit_point is not None
+
+    def is_legal(self, *args, **keys):
+        return self.tiles.is_legal(*args, **keys)
 
     def is_passable(self, coord):
         if self.has_creature(coord):
@@ -129,7 +125,7 @@ class Level(object):
                     any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, Action.Move.cost, Multiplier.Diagonal))
+        return round(path.heuristic(coordA, coordB, Action.Move.cost, Dir.DiagonalMoveMult))
 
     def movement_multiplier(self, coord, direction):
         origin_multiplier = self.tiles[coord].movement_multiplier
@@ -137,15 +133,7 @@ class Level(object):
         target_multiplier = self.tiles[target_coord].movement_multiplier
 
         tile_multiplier = (origin_multiplier + target_multiplier) / 2
-
-        if direction in Dir.Orthogonals:
-            return tile_multiplier * Multiplier.Orthogonal
-        elif direction in Dir.Diagonals:
-            return tile_multiplier * Multiplier.Diagonal
-        elif direction == Dir.Stay:
-            return tile_multiplier * Multiplier.Stay
-        else:
-            raise ValueError("Invalid direction: {}".format(direction))
+        return tile_multiplier * Dir.move_mult(direction)
 
     # nudge_coord nudges towards a line between end_coord and nudge_coord
     def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
@@ -175,22 +163,12 @@ class Level(object):
         #else:
         #   return "You don't know anything about this place."
 
-    def visible_change_subscribe(self, function):
-        self.visible_change_observers.append(function)
-
-    def visible_change_unsubscribe(self, function):
-        self.visible_change_observers.remove(function)
-
-    def visible_change_event(self, coord):
-        for observer in self.visible_change_observers:
-            observer(coord)
-
     def spawn_creature(self, creature):
         coord = None
         if creature.coord is not None:
             if not self.is_passable(creature.coord):
-                fmt = "Attempting to spawn creature to already occupied square: {}"
-                raise AssertionError(fmt.format(creature.coord))
+                fmt = "Attempting to spawn creature {} to already occupied square: {}"
+                raise AssertionError(fmt.format(creature.name, creature.coord))
             coord = creature.coord
 
         self.add_creature(creature, coord)
@@ -210,7 +188,7 @@ class Level(object):
         self.creatures[coord] = creature
         creature.coord = coord
         creature.level = self
-        self.visible_change_event(coord)
+        self.visible_change.trigger(coord)
 
     def remove_creature(self, creature, turnscheduler_remove=True):
         coord = creature.coord
@@ -221,7 +199,7 @@ class Level(object):
         if turnscheduler_remove:
             self.turn_scheduler.remove(creature)
 
-        self.visible_change_event(coord)
+        self.visible_change.trigger(coord)
 
     def move_creature(self, creature, new_coord):
         old_coord = creature.coord
@@ -229,8 +207,8 @@ class Level(object):
         self.creatures[new_coord] = creature
         creature.coord = new_coord
 
-        self.visible_change_event(old_coord)
-        self.visible_change_event(new_coord)
+        self.visible_change.trigger(old_coord)
+        self.visible_change.trigger(new_coord)
 
     def move_creature_to_dir(self, creature, direction):
         target_coord = add_vector(creature.coord, direction)
@@ -240,8 +218,8 @@ class Level(object):
         creatureA.coord, creatureB.coord = creatureB.coord, creatureA.coord
         self.creatures[creatureA.coord] = creatureA
         self.creatures[creatureB.coord] = creatureB
-        self.visible_change_event(creatureA.coord)
-        self.visible_change_event(creatureB.coord)
+        self.visible_change.trigger(creatureA.coord)
+        self.visible_change.trigger(creatureB.coord)
 
     def creature_can_reach(self, creature, target_coord):
         if creature.coord == target_coord:
@@ -258,7 +236,7 @@ class Level(object):
             raise ValueError("Illegal movement direction: {}".format(direction))
         elif direction == Dir.Stay:
             return True
-        elif self.legal_coord(creature.coord, direction):
+        elif self.is_legal(creature.coord, direction):
             coord = add_vector(creature.coord, direction)
             return self.is_passable(coord)
         else:

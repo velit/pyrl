@@ -41,29 +41,21 @@ class LevelTemplate(object):
         return creature_list
 
     def _finalize_manual_tiles(self):
-        for index, tile in enumerate(self.tiles):
-            coord = index // self.cols, index % self.cols
-            if tile == PyrlTile.Stairs_Up:
-                self.passage_locations[LevelLocation.Passage_Up] = coord
-            elif tile == PyrlTile.Stairs_Down:
-                self.passage_locations[LevelLocation.Passage_Down] = coord
+        self.tiles = List2D((self._finalize_tile(tile, self.tiles, index) for
+                             index, tile in enumerate(self.tiles)), self.tiles._bound)
 
-        self._transform_dynamic_walls()
-        self._fill_rock()
+    def _finalize_tile(self, tile, tiles, index):
+        coord = self.tiles.get_coord(index)
+        if tile.exit_point is not None:
+            self.passage_locations[tile.exit_point] = coord
 
-    def _transform_dynamic_walls(self):
-        self.tiles = List2D((PyrlTile.Wall if self._dynamic_wall_qualifies_as_wall(tile, index)
-                                    else tile for index, tile in enumerate(self.tiles)), self.tiles._bound)
-
-    def _dynamic_wall_qualifies_as_wall(self, tile, index):
         if tile != PyrlTile.Dynamic_Wall:
-            return False
-        coord = index // self.cols, index % self.cols
-        neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
-        valid_tiles = (self.tiles[coord] for coord in neighbor_coords if self.tiles.is_legal(coord))
-        return any(handle not in (PyrlTile.Dynamic_Wall,
-                                  PyrlTile.Wall,
-                                  PyrlTile.Rock) for handle in valid_tiles)
+            return tile
 
-    def _fill_rock(self):
-        self.tiles = List2D((PyrlTile.Rock if tile == PyrlTile.Dynamic_Wall else tile for tile in self.tiles), self.tiles._bound)
+        neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
+        neighbor_tiles = (tiles[coord] for coord in neighbor_coords if tiles.is_legal(coord))
+        rocks = (PyrlTile.Dynamic_Wall, PyrlTile.Wall, PyrlTile.Rock)
+        if any(handle not in rocks for handle in neighbor_tiles):
+            return PyrlTile.Wall
+        else:
+            return PyrlTile.Rock

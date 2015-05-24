@@ -68,11 +68,10 @@ class UserController(object):
                 error = self.action_mapping[key]()
 
             if error is not None:
-                if error == ActionError.AlreadyActed:
-                    raise AssertionError("Player attempted to act twice.")
-                elif error == ActionError.PlayerAction:
-                    raise AssertionError("Player was denied a player only action.")
-                elif error in self.error_messages:
+                assert error != ActionError.AlreadyActed, "Player attempted to act twice."
+                assert error != ActionError.PlayerAction, "Player was denied a player only action."
+
+                if error in self.error_messages:
                     self.io.msg(self.error_messages[error])
                 else:
                     self.io.msg(error)
@@ -99,7 +98,7 @@ class UserController(object):
         direction = Dir.Stay
         while True:
             new_coord = add_vector(coord, direction)
-            if level.legal_coord(new_coord):
+            if level.is_legal(new_coord):
                 coord = new_coord
             self.io.msg(level.look_information(coord))
             if drawline_flag:

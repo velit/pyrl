@@ -192,10 +192,34 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1430678850" done="1432491804">
+        Update integration_test to use Binds instead of hardcoded keys.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1430936886" done="1430944039">
         Add Item_Select_Keys support to bindings
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1431034577" done="1432492785">
+        Change raise AssertionErrors to assert thing, error
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1432457603" done="1432492792">
+        Change monster to creature
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1432458449" done="1432492820">
+        Move coordinate specific code to a mix-in.
+        <comment>
+            done, just used List2D
         </comment>
     </note>
     <note priority="high" time="1315155829" done="1328980645">
@@ -408,23 +432,14 @@
     <note priority="veryhigh" time="1430306212">
         Finalize history display/printing. Re-use item_view system.
     </note>
-    <note priority="veryhigh" time="1430678850">
-        Update integration_test to use Binds instead of hardcoded keys.
-    </note>
     <note priority="veryhigh" time="1430944118">
         Add regex/search to lines_view
-    </note>
-    <note priority="veryhigh" time="1431034577">
-        Change raise AssertionErrors to assert thing, error
     </note>
     <note priority="veryhigh" time="1431204591">
         implement world map
     </note>
-    <note priority="veryhigh" time="1432457603">
-        Change monster to creature
-    </note>
-    <note priority="veryhigh" time="1432458449">
-        Move coordinate specific code to a mix-in.
+    <note priority="veryhigh" time="1432492857">
+        Add item dropping, picking up.
     </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
@@ -456,8 +471,11 @@
     <note priority="medium" time="1329647500">
         Make a curses getstring method
     </note>
-    <note priority="medium" time="1333062945">
+    <note priority="medium" time="1333062945" done="1432492941">
         Make configurable keybindings support shift keys.
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels

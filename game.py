@@ -61,8 +61,8 @@ class Game(object):
                 self.ai.act_alert(ai_game_actions, self.player.coord)
                 action_cost = ai_game_actions.action_cost
 
-            if action_cost < 0:
-                raise AssertionError("Negative cost actions are not allowed.  {}".format(action_cost))
+            assert action_cost >= 0, "Negative cost actions are not allowed.  {}".format(action_cost)
+
             creature.level.turn_scheduler.add(creature, action_cost)
 
     def move_creature_to_level(self, creature, world_loc, passage):

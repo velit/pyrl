@@ -18,9 +18,3 @@ action_cost = {
     Action.Attack: 1000,
     Action.Swap: 1000,
 }
-
-
-class Multiplier(object):
-    Orthogonal = 1
-    Diagonal = 2 ** 0.5
-    Stay = 1

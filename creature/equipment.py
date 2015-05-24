@@ -32,8 +32,8 @@ class Equipment(object):
         return self.worn_items[slot]
 
     def equip(self, item, slot):
-        if slot not in item.compatible_slots:
-            raise AssertionError("Item {} does not fit into slot {}".format(item, slot))
+        assert slot in item.compatible_slots, "Item {} does not fit into slot {}".format(item, slot)
+
         self.unbag_item(item)
         if self.worn_items[slot] is not None:
             self.unequip(slot)
@@ -41,8 +41,7 @@ class Equipment(object):
 
     def unequip(self, slot):
         item = self.worn_items[slot]
-        if self.worn_items[slot] is None:
-            raise AssertionError("Slot is already empty")
+        assert item is not None, "Slot is already empty"
         self._unequip_item(item, slot)
         self.bag_item(item)
 
