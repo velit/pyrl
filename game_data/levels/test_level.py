@@ -1,17 +1,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from enums.colors import Pair
-from level_template import LevelTemplate
-from creature.template import CreatureTemplate
-from generic_structures import List2D
-from game_data.levels.shared_assets import finalize_creatures, finalize_tiles
+from config.game import GameConf
 from creature.creature import Creature
+from creature.template import CreatureTemplate
+from enums.colors import Pair
+from game_data.levels.shared_assets import construct_data
 from game_data.tiles import PyrlTile
+from level_template import LevelTemplate, LevelGen
+from level import LevelLocation
 
 
-def get_template(world):
+def get_template(player):
 
-    chars = List2D(
+    dimensions = GameConf.LEVEL_DIMENSIONS
+    charstr = (
         '################################################################################################'
         '#######################..##################.#.#.#######.....#################################.##'
         '######...##############.#.################.#.#.#.#####.####.###......#######################.@.#'
@@ -37,29 +39,27 @@ def get_template(world):
         '###############.###...##############################.....................#######################'
         '###############P...###...................................................#######################'
         '#######################################..................................#######################'
-        '################################################################################################',
-
-    len('------------------------------------------------------------------------------------------------')
+        '################################################################################################'
     )
-
-    tile_dict = {
+    custom_tiles = {
         'P': PyrlTile.Stairs_Up,
         '@': PyrlTile.Floor,
     }
-
-    tiles = finalize_tiles(chars, tile_dict)
-
-    creature_dict = {
-        '@': Creature(CreatureTemplate("The Crone", ('@', Pair.Purple))),
-        'P': world.player,
+    custom_locations = {
+        'P': LevelLocation.Passage_Up,
     }
-
-    creatures = finalize_creatures(creature_dict, chars)
+    custom_creatures = {
+        '@': Creature(CreatureTemplate("The Crone", ('@', Pair.Purple))),
+        'P': player,
+    }
+    level_data = custom_tiles, custom_locations, custom_creatures
+    tiles, location_coords, creatures = construct_data(dimensions, charstr, *level_data)
 
     return LevelTemplate(
         danger_level=1,
-        dimensions=tiles.get_dimensions(),
+        generation_type=LevelGen.NoGeneration,
         tiles=tiles,
-        static_creatures=creatures,
+        location_coords=location_coords,
+        custom_creatures=creatures,
         creature_spawning=False,
     )

@@ -210,6 +210,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1431204591" done="1433373576">
+        implement world map. Change level exit points to enum locations.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1432457603" done="1432492792">
         Change monster to creature
         <comment>
@@ -220,6 +226,12 @@
         Move coordinate specific code to a mix-in.
         <comment>
             done, just used List2D
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1433354085" done="1433373564">
+        Change List2D to have both bounds.
+        <comment>
+            done
         </comment>
     </note>
     <note priority="high" time="1315155829" done="1328980645">
@@ -384,6 +396,12 @@
             done
         </comment>
     </note>
+    <note priority="medium" time="1333062945" done="1432492941">
+        Make configurable keybindings support shift keys.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1360038167" done="1430294724">
         Implement wait mode
         <comment>
@@ -426,6 +444,9 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
+    <note priority="veryhigh" time="1427501653">
+        Add messages when stepping on objects (items, staircases)
+    </note>
     <note priority="veryhigh" time="1429823187">
         Overhaul walk mode
     </note>
@@ -435,17 +456,14 @@
     <note priority="veryhigh" time="1430944118">
         Add regex/search to lines_view
     </note>
-    <note priority="veryhigh" time="1431204591">
-        implement world map
-    </note>
     <note priority="veryhigh" time="1432492857">
         Add item dropping, picking up.
     </note>
+    <note priority="veryhigh" time="1433373678">
+        Fix entering/exiting arbitrary exit_points.
+    </note>
     <note priority="high" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
-    </note>
-    <note priority="high" time="1427501653">
-        Add messages when stepping on objects (items, staircases)
     </note>
     <note priority="high" time="1429217226">
         Add explicit key support for non-special keys as well.
@@ -470,12 +488,6 @@
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method
-    </note>
-    <note priority="medium" time="1333062945" done="1432492941">
-        Make configurable keybindings support shift keys.
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels

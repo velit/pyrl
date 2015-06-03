@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import state_store
-from game_data.world import get_world
+from game_data.pyrl_world import get_world
 from ai import AI
 from config.debug import Debug
 from config.game import GameConf
@@ -65,14 +65,14 @@ class Game(object):
 
             creature.level.turn_scheduler.add(creature, action_cost)
 
-    def move_creature_to_level(self, creature, world_loc, passage):
+    def move_creature_to_level(self, creature, world_location, level_location):
         try:
-            target_level = self.world.get_level(world_loc, self.add_modified_location)
+            target_level = self.world.get_level(world_location, self.add_modified_location)
         except LevelNotFound:
             return False
 
         creature.level.remove_creature(creature, turnscheduler_remove=False)
-        target_level.add_creature_to_passage(creature, passage)
+        target_level.add_creature_to_location(creature, level_location)
 
         try:
             creature.vision.clear()

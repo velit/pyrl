@@ -2,22 +2,32 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 from heapq import heappush, heappop
+from itertools import zip_longest
 
-from generic_algorithms import add_vector
+
+def _disable_list_dynamicness(cls):
+    _disabled_methods = ('append', 'copy', 'extend', 'insert', 'pop', 'remove', 'reverse',
+                         'sort', '__delitem__', '__iadd__', '__imul__')
+    for method in _disabled_methods:
+        def disabled(not_implemented):
+            raise NotImplementedError
+        disabled.__name__ = method
+        disabled.__doc__ = "This method isn't implemented in a non-dynamic array."
+        setattr(cls, method, disabled)
+    return cls
 
 
-class List2D(list):
+@_disable_list_dynamicness
+class Array2D(list):
 
     """
-    Sub-class of list which overrides accessor methods with 2D ones.
+    Mutable non-dynamic array with two-dimensional get- and setitem methods.
 
-    The second dimension is bounded by constructor parameter, first dimension is
-    bounded by the amount of items given to the list divided by the second
-    dimension bound.
+    Iterating over the whole array gives all items directly by iterating the second
+    dimension tighter ie. 'line-wise' if second dimension is x.
 
-    Iterating the flat list gives items that increase quicker in the second
-    dimension. In other words the first four items in a list with the second
-    dimension bounded to two are: (0, 0), (0, 1), (1, 0), (1, 1).
+    Underlying implementation is a one-dimensional dynamic list with dynamic methods
+    disabled.
     """
 
     @staticmethod
@@ -33,9 +43,13 @@ class List2D(list):
     def get_coord_from_index(index, second_dim_bound):
         return index // second_dim_bound, index % second_dim_bound
 
-    def __init__(self, iterable, second_dimension_bound):
-        super(List2D, self).__init__(iterable)
-        self._bound = second_dimension_bound
+    def __init__(self, dimensions, init_values=(), fillvalue=None):
+        self.dimensions = dimensions
+        size = self.dimensions[0] * self.dimensions[1]
+        assert len(init_values) <= size, \
+            "Given init_values ({}) exceed size by dimensions ({}).".format(len(init_values, size))
+        init_seq = (value for _, value in zip_longest(range(size), init_values, fillvalue=fillvalue))
+        super().__init__(init_seq)
 
     def __getitem__(self, coord):
         return super().__getitem__(self.get_index(coord))
@@ -43,22 +57,24 @@ class List2D(list):
     def __setitem__(self, coord, value):
         return super().__setitem__(self.get_index(coord), value)
 
-    def __delitem__(self, coord):
-        return super().__delitem__(self.get_index(coord))
-
-    def get_dimensions(self):
-        return ((len(self) - 1) // self._bound) + 1, self._bound
-
     def get_coord(self, index):
-        return self.get_coord_from_index(index, self._bound)
+        return self.get_coord_from_index(index, self.dimensions[1])
 
     def get_index(self, coord):
-        return self.get_index_from_coord(coord, self._bound)
+        return self.get_index_from_coord(coord, self.dimensions[1])
 
-    def is_legal(self, coord, direction=(0, 0)):
-        y, x = add_vector(coord, direction)
-        rows, cols = self.get_dimensions()
+    def is_legal(self, coord):
+        y, x = coord
+        rows, cols = self.dimensions
         return (0 <= y < rows) and (0 <= x < cols)
+
+    def clear(self):
+        for i in range(self.dimensions[0] * self.dimensions[1]):
+            super().__setitem__(self, i, None)
+
+    def enumerate(self):
+        for i, item in enumerate(self):
+            yield self.get_coord(i), item
 
 
 class PriorityQueue(object):

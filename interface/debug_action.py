@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import code
 from config.debug import Debug
 from level_template import LevelTemplate
-from rdg import GenLevelType
-from enums.level_locations import LevelLocation
+from rdg import LevelGen
+from level import LevelLocation
 
 
 def debug_action(io, game_actions):
@@ -21,10 +21,10 @@ def debug_action(io, game_actions):
         io.msg("Path heuristic cross set to {}".format(Debug.cross))
 
     def cycle_level_type():
-        if LevelTemplate.default_level_type == GenLevelType.Dungeon:
-            LevelTemplate.default_level_type = GenLevelType.Arena
+        if LevelTemplate.default_level_type == LevelGen.Dungeon:
+            LevelTemplate.default_level_type = LevelGen.Arena
         else:
-            LevelTemplate.default_level_type = GenLevelType.Dungeon
+            LevelTemplate.default_level_type = LevelGen.Dungeon
         io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
 
     def show_path_debug():
@@ -52,13 +52,13 @@ def debug_action(io, game_actions):
         io.msg("Abrakadabra.")
 
     def draw_path_to_passage_down():
-        passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
+        passage_down = level.get_location_coord(LevelLocation.Passage_Down)
         io.draw_path(level.path(creature.coord, passage_down))
         game_actions.redraw()
 
     def draw_path_from_up_to_down():
-        passage_up = level.get_passage_coord(LevelLocation.Passage_Up)
-        passage_down = level.get_passage_coord(LevelLocation.Passage_Down)
+        passage_up = level.get_location_coord(LevelLocation.Passage_Up)
+        passage_down = level.get_location_coord(LevelLocation.Passage_Down)
         io.draw_path(level.path(passage_up, passage_down))
         game_actions.redraw()
 

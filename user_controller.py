@@ -145,12 +145,13 @@ class UserController(object):
     def enter(self, passage):
         coord = self.creature.coord
         level = self.creature.level
-        if level.has_exit(coord) and level.get_exit(coord) == passage:
+
+        if level.has_exit(coord) and level.has_location(passage) and coord == level.get_location_coord(passage):
             return self.game_actions.enter_passage()
         else:
             # debug use
             try:
-                new_coord = level.get_passage_coord(passage)
+                new_coord = level.get_location_coord(passage)
             except KeyError:
                 self.io.msg("This level doesn't seem to have a passage that way.")
             else:

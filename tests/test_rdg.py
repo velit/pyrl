@@ -4,8 +4,8 @@ import pytest
 
 import rdg
 from level_template import LevelTemplate
-from game_data.levels.shared_assets import finalize_tiles
-from generic_structures import List2D
+from game_data.levels.shared_assets import construct_data
+from generic_structures import Array2D
 
 
 def pp_tm(tm, cols):
@@ -38,7 +38,7 @@ TEST_DIMENSIONS = (10, 10)
 @pytest.fixture
 def generator():
 
-    level_template = LevelTemplate(dimensions=TEST_DIMENSIONS)
+    level_template = LevelTemplate(tiles=Array2D(TEST_DIMENSIONS))
     generator = rdg.RDG(level_template)
     generator.init_tiles()
     return generator
@@ -48,37 +48,35 @@ def test_dungeon_generation(rectangles, generator):
     rect = rectangles[0]
 
     generator.attempt_room(rect, (0, 1))
-    room = finalize_tiles(
-        List2D(
-            "w.wwwrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "wwwwwrrrrr",
-            TEST_DIMENSIONS[1]
-        )
+    room, *_ = construct_data(
+        TEST_DIMENSIONS,
+        "w.wwwrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "wwwwwrrrrr",
+        {}, {}, {},
     )
     assert generator.level_template.tiles == room
 
     generator.attempt_corridor((4, 4), (0, 1), 6)
-    room = finalize_tiles(
-        List2D(
-            "w.wwwrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wwwwww"
-            "w........w"
-            "w...wwwwww"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "w...wrrrrr"
-            "wwwwwrrrrr",
-            TEST_DIMENSIONS[1]
-        )
+    room, *_ = construct_data(
+        TEST_DIMENSIONS,
+        "w.wwwrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wwwwww"
+        "w........w"
+        "w...wwwwww"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "w...wrrrrr"
+        "wwwwwrrrrr",
+        {}, {}, {},
     )
     assert generator.level_template.tiles == room

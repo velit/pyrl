@@ -45,10 +45,9 @@ class GameActions(object):
         if not level.has_exit(creature.coord):
             return ActionError.NoEntrance
 
-        passage = level.get_exit(creature.coord)
-        dest_world_loc, dest_passage = level.get_destination_info(passage)
+        world_location, level_location = level.get_exit_info(creature.coord)
 
-        if not game.move_creature_to_level(creature, dest_world_loc, dest_passage):
+        if not game.move_creature_to_level(creature, world_location, level_location):
             return ActionError.PassageLeadsNoWhere
 
         self.do_action(creature.action_cost(Action.Move))

@@ -1,18 +1,23 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from enums.colors import Pair
-from level_template import LevelTemplate
-from creature.template import CreatureTemplate
-from generic_structures import List2D
-from game_data.levels.shared_assets import finalize_creatures, finalize_tiles
-from creature.creature import Creature
-from tile import Tile
+from enum import Enum
+
 from config.game import GameConf
-from enums.level_locations import LevelLocation
+from enums.colors import Pair
+from game_data.levels.shared_assets import construct_data
+from level_template import LevelTemplate
+from tile import Tile
+from rdg import LevelGen
 
 
-def get_template(world):
-    chars = List2D(
+class OverWorldLocation(Enum):
+    Dungeon = 1
+
+
+# TODO: fix
+def get_template():
+    dimensions = GameConf.LEVEL_DIMENSIONS
+    charstr = (
         '^^^^^^^^¨=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^^¨¨=¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^¨¨t=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -38,37 +43,33 @@ def get_template(world):
         '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
-        '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',
-
-    len('------------------------------------------------------------------------------------------------')
+        '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
     )
 
     # Overworld movement multiplier
     MULT = min(GameConf.LEVEL_DIMENSIONS)
-    tile_dict = {
-        '"': Tile("grassland", ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=MULT),
-        '^': Tile("mountains", ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=MULT),
-        '=': Tile("river",     ('=', Pair.Blue),  ('=', Pair.Blue),  False, False, move_mult=MULT),
-        'T': Tile("forest",    ('T', Pair.Green), ('T', Pair.Green), True,  True,  move_mult=MULT),
-        't': Tile("town",      ('*', Pair.Green), ('*', Pair.Green), True,  True,  move_mult=MULT,
-                  exit_point=LevelLocation.Passage_Down),
-        '*': Tile("dungeon",   ('*', Pair.Brown), ('*', Pair.Brown), True,  True,  move_mult=MULT,
-                  exit_point=LevelLocation.Passage_Down),
+    custom_tiles = {
+        '"': Tile("grassland",      ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=MULT),
+        '¨': Tile("mountains",      ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=MULT),
+        '=': Tile("river",          ('=', Pair.Blue),  ('=', Pair.Blue),  False, False, move_mult=MULT),
+        'T': Tile("forest",         ('T', Pair.Green), ('T', Pair.Green), True,  True,  move_mult=MULT),
+        't': Tile("town",           ('*', Pair.Green), ('*', Pair.Green), True,  True,  move_mult=MULT),
+        '*': Tile("dungeon",        ('*', Pair.Brown), ('*', Pair.Brown), True,  True,  move_mult=MULT),
         '^': Tile("high mountains", ('^', Pair.Brown), ('^', Pair.Brown), False, False, move_mult=MULT),
     }
-
-    creature_dict = {
+    custom_locations = {
+        '*': OverWorldLocation.Dungeon
     }
-
-    tiles = finalize_tiles(chars, tile_dict)
-
-    creatures = finalize_creatures(creature_dict, chars)
+    custom_creatures = {
+    }
+    template_data = custom_tiles, custom_locations, custom_creatures
+    tiles, location_coords, creatures = construct_data(dimensions, charstr, *template_data)
 
     return LevelTemplate(
-        danger_level=0,
-        dimensions=tiles.get_dimensions(),
+        danger_level=1,
+        generation_type=LevelGen.NoGeneration,
         tiles=tiles,
-        static_creatures=creatures,
+        location_coords=location_coords,
+        custom_creatures=creatures,
         creature_spawning=False,
     )
-get_template()

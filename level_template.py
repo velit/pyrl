@@ -1,35 +1,37 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from enums.directions import Dir
-from enums.level_locations import LevelLocation
-from game_data.creatures import creature_templates
-from game_data.tiles import PyrlTile
-from generic_algorithms import add_vector
-from rdg import GenLevelType, generate_tiles
-from generic_structures import List2D
+from rdg import generate_tiles_to, LevelGen
 from config.game import GameConf
+from game_data.creatures import creature_templates
+from generic_structures import Array2D
+from level import LevelLocation
 
 
 class LevelTemplate(object):
 
-    default_level_type = GenLevelType.Dungeon
-
-    def __init__(self, danger_level=0, dimensions=GameConf.LEVEL_DIMENSIONS, tiles=None,
-                 static_creatures=(), creature_spawning=True):
+    def __init__(self, danger_level=0, generation_type=LevelGen.Dungeon, tiles=None,
+                 location_coords=None, custom_creatures=(), creature_spawning=True):
         self.danger_level = danger_level
-        self.tiles = tiles
-        self.rows, self.cols = dimensions
-        self.passage_locations = {}
-        self.passage_destination_infos = {}
-        self.static_creatures = list(static_creatures)
+        if tiles is None:
+            self.tiles = Array2D(GameConf.LEVEL_DIMENSIONS)
+        else:
+            self.tiles = tiles
+        self.location_coords = {}
+        self.exit_infos = {}
+        self.custom_creatures = list(custom_creatures)
         self.creature_spawning = creature_spawning
         self.creature_spawn_count = 99
 
-    def finalize(self):
-        if self.tiles is None:
-            generate_tiles(self, self.default_level_type)
+        self.exit_point_info = []
+
+        self.generation_type = generation_type
+        if self.generation_type.value > LevelGen.ExtendExisting.value:
+            self.rows, self.cols = self.tiles.dimensions
         else:
-            self._finalize_manual_tiles()
+            self.rows, self.cols = GameConf.LEVEL_DIMENSIONS
+
+        if location_coords is not None:
+            self.location_coords.update(location_coords)
 
     def get_creature_spawn_list(self):
         creature_list = []
@@ -40,22 +42,37 @@ class LevelTemplate(object):
                 creature_list.extend((creature, ) * weight_coeff)
         return creature_list
 
-    def _finalize_manual_tiles(self):
-        self.tiles = List2D((self._finalize_tile(tile, self.tiles, index) for
-                             index, tile in enumerate(self.tiles)), self.tiles._bound)
+    def will_have_location(self, location):
+        if location == LevelLocation.Random_Location:
+            return True
 
-    def _finalize_tile(self, tile, tiles, index):
-        coord = self.tiles.get_coord(index)
-        if tile.exit_point is not None:
-            self.passage_locations[tile.exit_point] = coord
+        if location in self.location_coords:
+            return True
 
-        if tile != PyrlTile.Dynamic_Wall:
-            return tile
+        if self.generation_type != LevelGen.NoGeneration:
+            return location in LevelLocation
 
-        neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
-        neighbor_tiles = (tiles[coord] for coord in neighbor_coords if tiles.is_legal(coord))
-        rocks = (PyrlTile.Dynamic_Wall, PyrlTile.Wall, PyrlTile.Rock)
-        if any(handle not in rocks for handle in neighbor_tiles):
-            return PyrlTile.Wall
-        else:
-            return PyrlTile.Rock
+        return False
+
+    def add_exit_info(self, source_location, target_info):
+        self.exit_point_info.append((source_location, target_info))
+
+    def finalize(self):
+        if self.generation_type.is_used():
+            generate_tiles_to(self)
+
+        self._finalize_exit_infos()
+
+        return self
+
+    def _finalize_exit_infos(self):
+        """
+        Set exit point data based on previously given exit point info.
+
+        This delayed definition is required because non-custom levels are generated on the
+        fly and coord info for the level location_coords doesn't exist yet at the time of
+        defining the connections between levels.
+        """
+        for source_location, target_info in self.exit_point_info:
+            source_coord = self.location_coords[source_location]
+            self.exit_infos[source_coord] = target_info

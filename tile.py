@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.game import GameConf
-
 
 class Tile(object):
 
@@ -13,7 +11,6 @@ class Tile(object):
                  mem_char,
                  passable=True,
                  see_through=True,
-                 exit_point=None,
                  move_mult=1):
         self.name = name
         self.visible_char = visible_char
@@ -21,7 +18,6 @@ class Tile(object):
         self.is_passable = passable
         self.is_see_through = see_through
         self.movement_multiplier = move_mult
-        self.exit_point = exit_point
 
     @property
     def defense_rating(self):

@@ -2,15 +2,22 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
+from enum import Enum
+
 import path
 from config.debug import Debug
-from enums.level_locations import LevelLocation
+from creature.actions import Action
 from creature.creature import Creature
 from enums.directions import Dir
 from generic_algorithms import bresenham, cross_product, get_vector, add_vector
-from turn_scheduler import TurnScheduler
 from generic_structures import Event
-from creature.actions import Action
+from turn_scheduler import TurnScheduler
+
+
+class LevelLocation(Enum):
+    Passage_Up      = 1
+    Passage_Down    = 2
+    Random_Location = 3
 
 
 class Level(object):
@@ -18,15 +25,16 @@ class Level(object):
     def __init__(self, world_loc, level_template):
         self.world_loc = world_loc
         self.tiles = level_template.tiles
-        self.rows, self.cols = self.tiles.get_dimensions()
+        self.rows, self.cols = self.tiles.dimensions
         self.danger_level = level_template.danger_level
-        self.passage_locations = level_template.passage_locations
-        self.passage_destination_infos = level_template.passage_destination_infos
+        self.location_coords = level_template.location_coords
+        self.exit_infos = level_template.exit_infos
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
+        self.generation_type = level_template.generation_type
 
-        for creature in level_template.static_creatures:
+        for creature in level_template.custom_creatures:
             self.spawn_creature(creature)
 
         if level_template.creature_spawning:
@@ -46,8 +54,8 @@ class Level(object):
     def get_coord_iter(self):
         return ((y, x) for y in range(self.rows) for x in range(self.cols))
 
-    def get_exit(self, coord):
-        return self.tiles[coord].exit_point
+    def get_exit_info(self, coord):
+        return self.exit_infos[coord]
 
     def get_creature(self, coord):
         return self.creatures[coord]
@@ -71,14 +79,11 @@ class Level(object):
                 else:
                     yield coord, self.get_memory_char(coord)
 
-    def get_passage_coord(self, passage):
-        if passage == LevelLocation.Passage_Random:
+    def get_location_coord(self, level_location):
+        if level_location == LevelLocation.Random_Location:
             return self.get_free_coord()
         else:
-            return self.passage_locations[passage]
-
-    def get_destination_info(self, passage):
-        return self.passage_destination_infos[passage]
+            return self.location_coords[level_location]
 
     def get_last_pathable_coord(self, coord_start, coord_end):
         last = None
@@ -87,7 +92,7 @@ class Level(object):
                 return last
             last = coord
 
-    def get_neighbor_locations_and_costs(self, coord):
+    def get_neighbor_location_coords_and_costs(self, coord):
         for direction in self.get_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             multiplier = self.movement_multiplier(coord, direction)
@@ -102,8 +107,11 @@ class Level(object):
     def has_creature(self, coord):
         return coord in self.creatures
 
+    def has_location(self, location):
+        return location in self.location_coords
+
     def has_exit(self, coord):
-        return self.tiles[coord].exit_point is not None
+        return coord in self.exit_infos
 
     def is_legal(self, *args, **keys):
         return self.tiles.is_legal(*args, **keys)
@@ -143,10 +151,10 @@ class Level(object):
         return cost
 
     def path(self, start_coord, goal_coord):
-        return path.path(start_coord, goal_coord, self.get_neighbor_locations_and_costs, self._a_star_heuristic)
+        return path.path(start_coord, goal_coord, self.get_neighbor_location_coords_and_costs, self._a_star_heuristic)
 
     def look_information(self, coord):
-        #if coord in creature.visited_locations:
+        #if coord in creature.visited_location_coords:
         information = "{}x{} ".format(*coord)
         if self.has_creature(coord):
             c = self.get_creature(coord)
@@ -174,8 +182,8 @@ class Level(object):
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
 
-    def add_creature_to_passage(self, creature, passage):
-        coord = self.get_passage_coord(passage)
+    def add_creature_to_location(self, creature, level_location):
+        coord = self.get_location_coord(level_location)
         self.add_creature(creature, coord)
 
     def add_creature(self, creature, coord=None):
@@ -222,30 +230,23 @@ class Level(object):
         self.visible_change.trigger(creatureB.coord)
 
     def creature_can_reach(self, creature, target_coord):
-        if creature.coord == target_coord:
-            return True
-        else:
-            vector = get_vector(creature.coord, target_coord)
-            if vector in Dir.All:
-                return True
-            else:
-                return False
+        return (creature.coord == target_coord or
+            get_vector(creature.coord, target_coord) in Dir.All)
 
     def creature_can_move(self, creature, direction):
         if direction not in Dir.AllPlusStay:
             raise ValueError("Illegal movement direction: {}".format(direction))
         elif direction == Dir.Stay:
             return True
-        elif self.is_legal(creature.coord, direction):
-            coord = add_vector(creature.coord, direction)
-            return self.is_passable(coord)
         else:
-            return False
+            coord = add_vector(creature.coord, direction)
+            return self.is_legal(coord) and self.is_passable(coord)
 
-    def creature_has_sight(self, creature, target_coord):
+    def creature_target_theoretically_in_sight(self, creature, target_coord):
         cy, cx = creature.coord
         ty, tx = target_coord
-        if (cy - ty) ** 2 + (cx - tx) ** 2 <= creature.sight ** 2:
-            return self.check_los(creature.coord, target_coord)
-        else:
-            return False
+        return (cy - ty) ** 2 + (cx - tx) ** 2 <= creature.sight ** 2
+
+    def creature_has_sight(self, creature, target_coord):
+        return (self.creature_target_theoretically_in_sight(creature, target_coord) and
+                self.check_los(creature.coord, target_coord))
