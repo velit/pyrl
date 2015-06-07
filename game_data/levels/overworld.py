@@ -12,6 +12,7 @@ from rdg import LevelGen
 
 class OverWorldLocation(Enum):
     Dungeon = 1
+    Village = 2
 
 
 # TODO: fix
@@ -58,7 +59,8 @@ def get_template():
         '^': Tile("high mountains", ('^', Pair.Brown), ('^', Pair.Brown), False, False, move_mult=MULT),
     }
     custom_locations = {
-        '*': OverWorldLocation.Dungeon
+        '*': OverWorldLocation.Dungeon,
+        't': OverWorldLocation.Village,
     }
     custom_creatures = {
     }

@@ -80,13 +80,6 @@ class _Rectangle(tuple):
 
 class RDG(object):
 
-    level_cycles          = 300
-    room_y_range          = 5, 11
-    room_x_range          = 7, 14
-    corridor_y_range      = 5, 14
-    corridor_x_range      = 7, 20
-    corridor_chance_range = 0, 0.3
-    room_chance_range     = 0.3, 1
     F = PyrlTile.Floor
     W = PyrlTile.Wall
     R = PyrlTile.Rock
@@ -95,6 +88,14 @@ class RDG(object):
         self.level_template = level_template
         self.rows, self.cols = level_template.tiles.dimensions
         self.generation_type = level_template.generation_type
+
+        self.level_cycles          = 300
+        self.room_y_range          = 5, 11
+        self.room_x_range          = 7, 14
+        self.corridor_y_range      = 5, 14
+        self.corridor_x_range      = 7, 20
+        self.corridor_chance_range = 0, 0.3
+        self.room_chance_range     = 0.3, 1
 
         self.wall_coords = set()
         self.wall_coords_cache = tuple()
@@ -162,17 +163,15 @@ class RDG(object):
                 assert False
 
     def add_location(self, tile, location):
-        i = 0
-        while True:
+        for _ in range(1000000):
             coord = self.get_free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
             tile = self.level_template.tiles[coord]
 
             if neighbors == (self.F, self.F, self.F, self.F) and tile == self.F:
                 break
-
-            i += 1
-            assert i < 1000000, "Passageway add failed due to free coord get failed."
+        else:
+            assert False, "Passageway add failed due to free coord get failed."
 
         self.level_template.tiles[coord] = tile
         self.level_template.location_coords[location] = coord
@@ -226,7 +225,7 @@ class RDG(object):
     def get_free_coord(self):
         while True:
             coord = self.get_random_coord()
-            if self.level_template.tiles[coord].is_passable:
+            if self.level_template.tiles[coord] == self.F:
                 return coord
 
     def get_random_coord(self):

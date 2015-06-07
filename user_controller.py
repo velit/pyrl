@@ -12,7 +12,7 @@ from interface.debug_action import debug_action
 from interface.help_screen import help_screen
 from interface.inventory import equipment
 from interface.walk_mode import WalkMode
-from level_template import LevelLocation
+from level import LevelLocation
 
 
 class UserController(object):
@@ -47,8 +47,8 @@ class UserController(object):
             Bind.Help.key:       self.help_screen,
             Bind.Inventory.key:  self.equipment,
             Bind.Walk_Mode.key:  self.init_walk_mode,
-            Bind.Ascend.key:     partial(self.enter, LevelLocation.Passage_Up),
-            Bind.Descend.key:    partial(self.enter, LevelLocation.Passage_Down),
+            Bind.Ascend.key:     partial(self.ascend),
+            Bind.Descend.key:    partial(self.descend),
         }
         for key, direction in Bind.action_direction.items():
             self.action_mapping[key] = partial(self.act_to_dir, direction)
@@ -142,23 +142,62 @@ class UserController(object):
     def redraw(self):
         self.game_actions.redraw()
 
-    def enter(self, passage):
+    def descend(self):
+        coord = self.creature.coord
+        level = self.creature.level
+        if not level.has_location(coord):
+            try:
+                new_coord = level.get_location_coord(LevelLocation.Passage_Down)
+            except KeyError:
+                return "You don't find any downwards passage."
+            if not level.is_passable(new_coord):
+                level.remove_creature(level.get_creature(new_coord))
+            return self.game_actions.teleport(new_coord)
+
+        if level.get_location(coord) == LevelLocation.Passage_Up:
+            try:
+                new_coord = level.get_location_coord(LevelLocation.Passage_Down)
+            except KeyError:
+                return "Cannot descend an upwards passage."
+            if not level.is_passable(new_coord):
+                level.remove_creature(level.get_creature(new_coord))
+            return self.game_actions.teleport(new_coord)
+
+        return self.game_actions.enter_passage()
+
+    def ascend(self):
+        coord = self.creature.coord
+        level = self.creature.level
+        if not level.has_location(coord):
+            try:
+                new_coord = level.get_location_coord(LevelLocation.Passage_Up)
+            except KeyError:
+                return "You don't find any upwards passage."
+            if not level.is_passable(new_coord):
+                level.remove_creature(level.get_creature(new_coord))
+            return self.game_actions.teleport(new_coord)
+
+        if level.get_location(coord) != LevelLocation.Passage_Up:
+            try:
+                new_coord = level.get_location_coord(LevelLocation.Passage_Up)
+            except KeyError:
+                return "This location has no upwards passage."
+            if not level.is_passable(new_coord):
+                level.remove_creature(level.get_creature(new_coord))
+            return self.game_actions.teleport(new_coord)
+
+        return self.game_actions.enter_passage()
+
+    def enter(self):
+        return self.game_actions.enter_passage()
         coord = self.creature.coord
         level = self.creature.level
 
-        if level.has_exit(coord) and level.has_location(passage) and coord == level.get_location_coord(passage):
+        if level.has_exit(coord):
             return self.game_actions.enter_passage()
         else:
+            self.io.msg("This level doesn't seem to have a passage that way.")
             # debug use
-            try:
-                new_coord = level.get_location_coord(passage)
-            except KeyError:
-                self.io.msg("This level doesn't seem to have a passage that way.")
-            else:
-                if not level.is_passable(new_coord):
-                    level.remove_creature(level.get_creature(new_coord))
-                error = self.game_actions.teleport(new_coord)
-                return error
 
     def sight_change(self, amount):
         self.creature.base_perception += amount

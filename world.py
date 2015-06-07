@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from collections import defaultdict
+from collections import Counter
 
 from level import Level, LevelLocation
 from level_template import LevelTemplate
@@ -9,61 +9,66 @@ from level_template import LevelTemplate
 class LevelNotFound(Exception): pass
 
 
-def _zero_factory():
-    return 0
-
-
 class World(object):
 
     def __init__(self, player):
         self.levels = {}
         self.level_templates = {}
-        self.dungeon_lengths = defaultdict(_zero_factory)
+        self.level_connections = {}
+        self.dungeon_lengths = Counter()
         self.player = player
         self.start_level = None
 
     def add_level_template(self, dungeon_key, level_template=None):
         self.dungeon_lengths[dungeon_key] += 1
         level_i = self.dungeon_lengths[dungeon_key]
-        wloc = dungeon_key, level_i
-        prev_wloc = dungeon_key, level_i - 1
+        curr_level_key = dungeon_key, level_i
+        prev_level_key = dungeon_key, level_i - 1
 
         if level_template is None:
             level_template = LevelTemplate(level_i)
 
         if level_i != 1:
-            previous_template = self.level_templates[prev_wloc]
+            previous_template = self.level_templates[prev_level_key]
 
             passage_down = LevelLocation.Passage_Down
             passage_up = LevelLocation.Passage_Up
             if (previous_template.will_have_location(passage_down) and level_template.will_have_location(passage_up)):
-                previous_template.add_exit_info(passage_down, (wloc, passage_up))
-                level_template.add_exit_info(passage_up, (prev_wloc, passage_down))
+                self.set_connection((prev_level_key, passage_down), (curr_level_key, passage_up))
+                self.set_connection((curr_level_key, passage_up), (prev_level_key, passage_down))
 
-        self.level_templates[wloc] = level_template
+        self.level_templates[curr_level_key] = level_template
 
-    def get_level(self, world_loc, visible_change_callback):
-        if world_loc not in self.levels:
-            if world_loc not in self.level_templates:
-                raise LevelNotFound("Nonexistant level key: {}".format(world_loc))
-            level = Level(world_loc, self.level_templates[world_loc].finalize())
+    def get_level(self, level_key, visible_change_callback):
+        if level_key not in self.levels:
+            if level_key not in self.level_templates:
+                raise LevelNotFound("Nonexistant level key: {}".format(level_key))
+            level = Level(level_key, self.level_templates[level_key].finalize())
             level.visible_change.subscribe(visible_change_callback)
-            self.levels[world_loc] = level
+            self.levels[level_key] = level
 
-        return self.levels[world_loc]
+        return self.levels[level_key]
 
-    def add_two_way_connection(self, wlocA, locA, wlocB, locB, do_assert=True):
-        A = self.level_templates[wlocA]
-        B = self.level_templates[wlocB]
+    def has_destination(self, world_point):
+        return world_point in self.level_connections
+
+    def get_destination(self, world_point):
+        return self.level_connections[world_point]
+
+    def add_two_way_connection(self, world_point_a, world_point_b, do_assert=True):
 
         if do_assert:
-            assert A.will_have_location(locA), \
-                "{} doesn't have location {}.".format(A, locA)
-            assert B.will_have_location(locB), \
-                "{} doesn't have location {}.".format(B, locB)
+            level_key_a, level_loc_a = world_point_a
+            level_key_b, level_loc_b = world_point_b
+            level_a = self.level_templates[level_key_a]
+            level_b = self.level_templates[level_key_b]
+            assert level_a.will_have_location(level_loc_a), \
+                "{} doesn't have location {}.".format(level_a, level_loc_a)
+            assert level_b.will_have_location(level_loc_b), \
+                "{} doesn't have location {}.".format(level_b, level_loc_b)
 
-        self.add_one_way_connection(A, locA, (wlocB, locB))
-        self.add_one_way_connection(B, locB, (wlocA, locA))
+        self.set_connection(world_point_a, world_point_b)
+        self.set_connection(world_point_b, world_point_a)
 
-    def add_one_way_connection(self, level_template, source_location, exit_info):
-        level_template.add_exit_info(source_location, exit_info)
+    def set_connection(self, world_point_a, world_point_b):
+        self.level_connections[world_point_a] = world_point_b

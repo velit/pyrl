@@ -234,6 +234,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1433373678" done="1433551315">
+        Fix entering/exiting arbitrary exit_points. / Move exit data completely out of levels.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -354,6 +360,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1430678659" done="1433551389">
+        Update help_screen
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -456,35 +468,26 @@
     <note priority="veryhigh" time="1430944118">
         Add regex/search to lines_view
     </note>
+    <note priority="veryhigh" time="1432475550">
+        Consider making coord type/namedtuple. Consider using namedtuples more in general.
+    </note>
     <note priority="veryhigh" time="1432492857">
         Add item dropping, picking up.
     </note>
-    <note priority="veryhigh" time="1433373678">
-        Fix entering/exiting arbitrary exit_points.
-    </note>
-    <note priority="high" time="1427329682">
-        Make message queue stop time when the message window gets full. Make pressing enter advance time.
-    </note>
-    <note priority="high" time="1429217226">
-        Add explicit key support for non-special keys as well.
+    <note priority="veryhigh" time="1433712709">
+        Change get_free_coord code to generi_stru.Array2D
     </note>
     <note priority="high" time="1429224251">
         Add regeneration
     </note>
-    <note priority="high" time="1430586353">
-        Add numpad 5 support to ncurses_wrapper
-    </note>
-    <note priority="high" time="1430678659">
-        Update help_screen
-    </note>
     <note priority="high" time="1430680379">
         Consider moving key_groups / direction dicts out of config.finalize.py to game code modules.
     </note>
-    <note priority="high" time="1432475550">
-        Consider making coord type/namedtuple.
-    </note>
     <note priority="high" time="1432483779">
         Make it possible to spawn multiple different static monsters.
+    </note>
+    <note priority="high" time="1433450911">
+        Change user_controller to use exceptions to give feedback on failed actions. (?)
     </note>
     <note priority="medium" time="1329647500">
         Make a curses getstring method
@@ -497,5 +500,14 @@
     </note>
     <note priority="low" time="1388282755">
         add a way to calm monsters by talking
+    </note>
+    <note priority="low" time="1427329682">
+        Make message queue stop time when the message window gets full. Make pressing enter advance time.
+    </note>
+    <note priority="low" time="1429217226">
+        Add explicit key support for non-special keys as well.
+    </note>
+    <note priority="low" time="1430586353">
+        Add numpad 5 support to ncurses_wrapper
     </note>
 </todo>

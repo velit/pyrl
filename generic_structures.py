@@ -77,6 +77,31 @@ class Array2D(list):
             yield self.get_coord(i), item
 
 
+class OneToOneMapping(dict):
+
+    def __setitem__(self, key, value):
+        if value in self.values():
+            raise ValueError("Value {} already exists in mapping.".format(value))
+        super().__setitem__(key, value)
+
+    def getkey(self, arg_value):
+        for key, value in self.items():
+            if value == arg_value:
+                return key
+        raise ValueError("Value {} not found.".format(arg_value))
+
+    def update(self, E=None, **kwords):
+        if E is not None:
+            if hasattr(E, "keys"):
+                for key in E:
+                    self[key] = E[key]
+            else:
+                for key, value in E:
+                    self[key] = value
+        for key in kwords:
+            self[key] = kwords[key]
+
+
 class PriorityQueue(object):
 
     def __init__(self):

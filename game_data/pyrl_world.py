@@ -18,7 +18,7 @@ def get_world():
 
     world.add_level_template("overworld", overworld.get_template())
 
-    world.add_two_way_connection(("overworld", 1), overworld.OverWorldLocation.Dungeon,
-                                 (("dungeon"), 1), LevelLocation.Passage_Up)
+    world.add_two_way_connection((("overworld", 1), overworld.OverWorldLocation.Dungeon),
+                                 ((("dungeon"), 1), LevelLocation.Passage_Up))
 
     return world

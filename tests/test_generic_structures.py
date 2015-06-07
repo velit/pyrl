@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from generic_structures import PriorityQueue, Array2D, Event
+from generic_structures import PriorityQueue, Array2D, Event, OneToOneMapping
+import pytest
 
 
 def test_Array2D():
@@ -11,7 +12,7 @@ def test_Array2D():
     l[l.get_coord(0)] == 0
     l[l.get_coord(1)] == 1
     l[l.get_coord(2)] == 2
-    l[l.get_coord(3)] == None
+    l[l.get_coord(3)] is None
 
     assert l.is_legal((0, 0))
     assert l.is_legal((1, 1))
@@ -19,6 +20,37 @@ def test_Array2D():
     assert not l.is_legal((-1, -1))
     assert not l.is_legal((3, 2))
 
+
+def test_one_to_one_mapping():
+    mapping = OneToOneMapping()
+    mapping[0] = 0
+    mapping[1] = 1
+    mapping[2] = 2
+    mapping[3] = 3
+    mapping[4] = 4
+
+    assert mapping[0] == 0
+    assert mapping[1] == 1
+    assert mapping[2] == 2
+    assert mapping[3] == 3
+    assert mapping[4] == 4
+
+    mapping[0] = 5
+    assert mapping[0] == 5
+    assert mapping.getkey(5) == 0
+
+    with pytest.raises(ValueError):
+        mapping[1] = 5
+
+    del mapping[4]
+    with pytest.raises(ValueError):
+        mapping.getkey(4)
+
+    with pytest.raises(ValueError):
+        mapping.update(**{"a": 10, "b": 10})
+
+    with pytest.raises(ValueError):
+        mapping.update({"a": 10, "b": 10})
 
 def test_turn_scheduler():
     pq = PriorityQueue()

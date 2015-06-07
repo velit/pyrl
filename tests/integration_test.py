@@ -41,13 +41,13 @@ def test_save_and_load_game(mockwrapper, game):
     input_seq = [Bind.Descend.key] * 4 + [Bind.Save.key]
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 4
-    assert game.player.level.world_loc[1] == 3
+    assert game.player.level.key[1] == 3
 
     game = load_game(mockwrapper)
     input_seq = [Bind.Descend.key] * 4
     game = prepare_input_and_exe(mockwrapper, game, input_seq)
     assert game.turn_counter == 8
-    assert game.player.level.world_loc[1] == 5
+    assert game.player.level.key[1] == 5
 
 
 def test_subsystems(mockwrapper, game):

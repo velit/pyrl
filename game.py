@@ -65,9 +65,10 @@ class Game(object):
 
             creature.level.turn_scheduler.add(creature, action_cost)
 
-    def move_creature_to_level(self, creature, world_location, level_location):
+    def move_creature_to_level(self, creature, world_point):
+        level_key, level_location = world_point
         try:
-            target_level = self.world.get_level(world_location, self.add_modified_location)
+            target_level = self.world.get_level(level_key, self.add_modified_location)
         except LevelNotFound:
             return False
 

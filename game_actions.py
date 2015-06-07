@@ -42,12 +42,17 @@ class GameActions(object):
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not level.has_exit(creature.coord):
+        if not level.has_location(creature.coord):
             return ActionError.NoEntrance
 
-        world_location, level_location = level.get_exit_info(creature.coord)
+        source_point = (level.key, level.get_location(creature.coord))
 
-        if not game.move_creature_to_level(creature, world_location, level_location):
+        if not game.world.has_destination(source_point):
+            return ActionError.PassageLeadsNoWhere
+
+        destination_point = game.world.get_destination(source_point)
+
+        if not game.move_creature_to_level(creature, destination_point):
             return ActionError.PassageLeadsNoWhere
 
         self.do_action(creature.action_cost(Action.Move))

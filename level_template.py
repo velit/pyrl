@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from rdg import generate_tiles_to, LevelGen
 from config.game import GameConf
 from game_data.creatures import creature_templates
-from generic_structures import Array2D
+from generic_structures import Array2D, OneToOneMapping
 from level import LevelLocation
 
 
@@ -16,8 +16,7 @@ class LevelTemplate(object):
             self.tiles = Array2D(GameConf.LEVEL_DIMENSIONS)
         else:
             self.tiles = tiles
-        self.location_coords = {}
-        self.exit_infos = {}
+        self.location_coords = OneToOneMapping()
         self.custom_creatures = list(custom_creatures)
         self.creature_spawning = creature_spawning
         self.creature_spawn_count = 99
@@ -54,25 +53,8 @@ class LevelTemplate(object):
 
         return False
 
-    def add_exit_info(self, source_location, target_info):
-        self.exit_point_info.append((source_location, target_info))
-
     def finalize(self):
         if self.generation_type.is_used():
             generate_tiles_to(self)
 
-        self._finalize_exit_infos()
-
         return self
-
-    def _finalize_exit_infos(self):
-        """
-        Set exit point data based on previously given exit point info.
-
-        This delayed definition is required because non-custom levels are generated on the
-        fly and coord info for the level location_coords doesn't exist yet at the time of
-        defining the connections between levels.
-        """
-        for source_location, target_info in self.exit_point_info:
-            source_coord = self.location_coords[source_location]
-            self.exit_infos[source_coord] = target_info

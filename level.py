@@ -22,13 +22,12 @@ class LevelLocation(Enum):
 
 class Level(object):
 
-    def __init__(self, world_loc, level_template):
-        self.world_loc = world_loc
+    def __init__(self, level_key, level_template):
+        self.key = level_key
         self.tiles = level_template.tiles
         self.rows, self.cols = self.tiles.dimensions
         self.danger_level = level_template.danger_level
         self.location_coords = level_template.location_coords
-        self.exit_infos = level_template.exit_infos
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
@@ -79,6 +78,9 @@ class Level(object):
                 else:
                     yield coord, self.get_memory_char(coord)
 
+    def get_location(self, coord):
+        return self.location_coords.getkey(coord)
+
     def get_location_coord(self, level_location):
         if level_location == LevelLocation.Random_Location:
             return self.get_free_coord()
@@ -107,11 +109,11 @@ class Level(object):
     def has_creature(self, coord):
         return coord in self.creatures
 
-    def has_location(self, location):
-        return location in self.location_coords
+    def has_location(self, coord):
+        return coord in self.location_coords.values()
 
-    def has_exit(self, coord):
-        return coord in self.exit_infos
+    def has_location_coord(self, location):
+        return location in self.location_coords
 
     def is_legal(self, *args, **keys):
         return self.tiles.is_legal(*args, **keys)

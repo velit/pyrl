@@ -16,7 +16,7 @@ def register_status_texts(game, creature):
     add_element(Stat.intelligence.value,    lambda: creature.intelligence)
     add_element(Stat.endurance.value,       lambda: creature.endurance)
     add_element(Stat.perception.value,      lambda: creature.perception)
-    add_element("Wloc",                     lambda: "{}/{}".format(*creature.level.world_loc))
+    add_element("Wloc",                     lambda: "{}/{}".format(*creature.level.key))
     add_element("Loc",                      lambda: "{0:02},{1:02}".format(*creature.coord))
     add_element("Turns",                    lambda: game.turn_counter)
     add_element("Game Time",                lambda: game.time)
