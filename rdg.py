@@ -9,6 +9,7 @@ from enums.directions import Dir
 from generic_algorithms import add_vector
 from game_data.tiles import PyrlTile
 from level import LevelLocation
+from config.debug import Debug
 
 
 class LevelGen(Enum):
@@ -163,15 +164,15 @@ class RDG(object):
                 assert False
 
     def add_location(self, tile, location):
-        for _ in range(1000000):
-            coord = self.get_free_coord()
+        for _ in range(Debug.max_loop_cycles):
+            coord = self.free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
             old_tile = self.level_template.tiles[coord]
 
             if neighbors == (self.F, self.F, self.F, self.F) and old_tile == self.F:
                 break
         else:
-            assert False, "Passageway add failed due to free coord get failed."
+            assert False, "Location add failed due to free coord get failed."
 
         self.level_template.tiles[coord] = tile
         self.level_template.location_coords[location] = coord
@@ -222,14 +223,11 @@ class RDG(object):
         else:
             return False
 
-    def get_free_coord(self):
+    def free_coord(self):
         while True:
-            coord = self.get_random_coord()
+            coord = self.level_template.tiles.random_coord()
             if self.level_template.tiles[coord] == self.F:
                 return coord
-
-    def get_random_coord(self):
-        return randrange(self.rows), randrange(self.cols)
 
     def get_random_wall_coord(self):
         if self.is_wall_coords_dirty:

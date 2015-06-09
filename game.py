@@ -158,7 +158,7 @@ class Game(object):
         level = self.player.level
 
         if Debug.show_map:
-            draw_coords = level.get_coord_iter()
+            draw_coords = level.tiles.coord_iter()
             vision_info = level.get_vision_information(draw_coords, self.player.vision,
                                                      always_show_creatures=True)
         else:

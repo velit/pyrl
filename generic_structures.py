@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 
+from random import randrange
 from heapq import heappush, heappop
 from itertools import zip_longest
 
@@ -44,8 +45,8 @@ class Array2D(list):
         return index // second_dim_bound, index % second_dim_bound
 
     def __init__(self, dimensions, init_values=(), fillvalue=None):
-        self.dimensions = dimensions
-        size = self.dimensions[0] * self.dimensions[1]
+        self.rows, self.cols = dimensions
+        size = self.rows * self.cols
         assert len(init_values) <= size, \
             "Given init_values ({}) exceed size by dimensions ({}).".format(len(init_values, size))
         init_seq = (value for _, value in zip_longest(range(size), init_values, fillvalue=fillvalue))
@@ -58,10 +59,10 @@ class Array2D(list):
         return super().__setitem__(self.get_index(coord), value)
 
     def get_coord(self, index):
-        return self.get_coord_from_index(index, self.dimensions[1])
+        return self.get_coord_from_index(index, self.cols)
 
     def get_index(self, coord):
-        return self.get_index_from_coord(coord, self.dimensions[1])
+        return self.get_index_from_coord(coord, self.cols)
 
     def is_legal(self, coord):
         y, x = coord
@@ -69,12 +70,23 @@ class Array2D(list):
         return (0 <= y < rows) and (0 <= x < cols)
 
     def clear(self):
-        for i in range(self.dimensions[0] * self.dimensions[1]):
+        for i in range(self.rows * self.cols):
             super().__setitem__(self, i, None)
 
     def enumerate(self):
         for i, item in enumerate(self):
             yield self.get_coord(i), item
+
+    def coord_iter(self):
+        for i, item in enumerate(self):
+            yield self.get_coord(i)
+
+    def random_coord(self):
+        return randrange(self.rows), randrange(self.cols)
+
+    @property
+    def dimensions(self):
+        return self.rows, self.cols
 
 
 class OneToOneMapping(dict):

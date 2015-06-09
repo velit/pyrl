@@ -43,18 +43,13 @@ class Level(object):
                 creature = Creature(random.choice(self.creature_spawn_list))
                 self.spawn_creature(creature)
 
-    def get_free_coord(self):
-        # TODO: improve this at some point
-        while True:
-            coord = random.randrange(self.rows), random.randrange(self.cols)
+    def free_coord(self):
+        for _ in range(Debug.max_loop_cycles):
+            coord = self.tiles.random_coord()
             if self.is_passable(coord):
                 return coord
-
-    def get_coord_iter(self):
-        return ((y, x) for y in range(self.rows) for x in range(self.cols))
-
-    def get_exit_info(self, coord):
-        return self.exit_infos[coord]
+        else:
+            assert False, "Free coord search failed."
 
     def get_creature(self, coord):
         return self.creatures[coord]
@@ -83,7 +78,7 @@ class Level(object):
 
     def get_location_coord(self, level_location):
         if level_location == LevelLocation.Random_Location:
-            return self.get_free_coord()
+            return self.free_coord()
         else:
             return self.location_coords[level_location]
 
@@ -190,11 +185,11 @@ class Level(object):
 
     def add_creature(self, creature, coord=None):
         if coord is None:
-            coord = self.get_free_coord()
+            coord = self.free_coord()
 
         elif self.has_creature(coord):
             blocking_creature = self.creatures[coord]
-            self.move_creature(blocking_creature, self.get_free_coord())
+            self.move_creature(blocking_creature, self.free_coord())
         self.creatures[coord] = creature
         creature.coord = coord
         creature.level = self
