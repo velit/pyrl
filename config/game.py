@@ -15,6 +15,7 @@ class GameConf(object):
     status_bar_height      = 2
     animation_period       = 0.02
     default_game_name      = "pyrl"
+    clearly_show_vision    = False
 
     ##################################
     ### Data section, don't modify ###

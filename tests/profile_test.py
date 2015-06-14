@@ -7,7 +7,7 @@ from rdg import generate_tiles_to, LevelGen
 from tools import profile_util
 
 
-def test_rdg_generation():
+def test_profile_rdg_generation():
     profiler = Profile()
     profiler.enable()
 

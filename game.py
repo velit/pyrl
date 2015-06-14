@@ -34,7 +34,7 @@ class Game(object):
 
     def init_nonserial_objects(self, cursor_lib_callback, player):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_input = UserController(GameActions(self, player), self.io)
+        self.user_controller = UserController(GameActions(self, player), self.io)
         register_status_texts(self, player)
 
     def main_loop(self):
@@ -50,14 +50,14 @@ class Game(object):
 
             if creature is self.player:
                 self.update_view(creature)
-                self.user_input.game_actions.clear_action()
-                self.user_input.get_user_input_and_act()
-                action_cost = self.user_input.game_actions.action_cost
+                self.user_controller.game_actions._clear_action()
+                self.user_controller.get_user_input_and_act()
+                action_cost = self.user_controller.game_actions.action_cost
 
                 if action_cost > 0:
                     self.turn_counter += 1
             else:
-                ai_game_actions.clear_action(and_associate_creature=creature)
+                ai_game_actions._clear_action(and_associate_creature=creature)
                 self.ai.act_alert(ai_game_actions, self.player.coord)
                 action_cost = ai_game_actions.action_cost
 
@@ -130,46 +130,49 @@ class Game(object):
         level = creature.level
         new_vision = ShadowCast.get_light_set(level.is_see_through, creature.coord,
                                               creature.sight, level.rows, level.cols)
-
-        modified = self.pop_modified_locations()
         creature.vision, old_vision = new_vision, creature.vision
 
-        if not Debug.show_map:
-            # new ^ old is the set of new squares in view and squares that were left # behind.
-            # new & old & modified is the set of squares still in view which had changes
-            # since last turn.
-            update_set = (new_vision ^ old_vision) | (new_vision & old_vision & modified)
-            updated_vision_data = level.get_vision_information(update_set, new_vision)
+        creature_changed_vision = (new_vision ^ old_vision)
+        creature_unchanged_vision = (new_vision & old_vision)
+        level_changed_vision = self.pop_modified_locations()
+
+        if Debug.show_map:
+            update_coords = creature_changed_vision | level_changed_vision
+            vision_info = level.get_vision_information(update_coords, new_vision,
+                                                       always_show_creatures=True)
         else:
-            update_set = (new_vision ^ old_vision) | modified
-            updated_vision_data = level.get_vision_information(update_set, new_vision, always_show_creatures=True)
+            # new ^ old is the set of new squares in view and squares that were left # behind.
+            # new & old & modified is the set of old squares still in view which had changes
+            # since last turn.
+            update_coords = creature_changed_vision | (creature_unchanged_vision & level_changed_vision)
+            vision_info = level.get_vision_information(update_coords, new_vision)
 
-        self.io.draw(updated_vision_data)
+        self.io.draw(vision_info)
 
-        if Debug.reverse:
+        if GameConf.clearly_show_vision:
             reverse_data = level.get_vision_information(new_vision, new_vision)
-            self.io.draw(reverse_data, Debug.reverse)
+            self.io.draw(reverse_data, True)
 
     def redraw(self):
         self.io.level_window.clear()
         level = self.player.level
 
-        if not Debug.show_map:
-            draw_set = self.player.get_visited_locations() | self.player.vision
-            draw_data = level.get_vision_information(draw_set, self.player.vision)
-        else:
-            draw_set = level.get_coord_iter()
-            draw_data = level.get_vision_information(draw_set, self.player.vision,
+        if Debug.show_map:
+            draw_coords = level.get_coord_iter()
+            vision_info = level.get_vision_information(draw_coords, self.player.vision,
                                                      always_show_creatures=True)
-        self.io.draw(draw_data)
+        else:
+            draw_coords = self.player.get_visited_locations() | self.player.vision
+            vision_info = level.get_vision_information(draw_coords, self.player.vision)
+        self.io.draw(vision_info)
 
-        if Debug.reverse:
+        if GameConf.clearly_show_vision:
             reverse_data = level.get_vision_information(self.player.vision,
                                                         self.player.vision)
-            self.io.draw(reverse_data, Debug.reverse)
+            self.io.draw(reverse_data, True)
 
     def __getstate__(self):
-        exclude_state = ('user_input', 'io')
+        exclude_state = ('user_controller', 'io')
         state = vars(self).copy()
         for item in exclude_state:
             del state[item]

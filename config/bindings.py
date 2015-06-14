@@ -49,15 +49,15 @@ class Bind(object):
     Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Directions used in moving/attacking/targetting
-    SouthWest = '1',  'm',  Key.NUMPAD_1,  Key.END
-    South     = '2',  ',',  Key.NUMPAD_2,  Key.DOWN
-    SouthEast = '3',  '.',  Key.NUMPAD_3,  Key.PAGE_DOWN
-    West      = '4',  'j',  Key.NUMPAD_4,  Key.LEFT
-    Stay      = '5',  'k',  Key.NUMPAD_5,  Key.NONE
-    East      = '6',  'l',  Key.NUMPAD_6,  Key.RIGHT
-    NorthWest = '7',  'u',  Key.NUMPAD_7,  Key.HOME
-    North     = '8',  'i',  Key.NUMPAD_8,  Key.UP
-    NorthEast = '9',  'o',  Key.NUMPAD_9,  Key.PAGE_UP
+    SouthWest = '1', 'm', Key.NUMPAD_1, Key.END
+    South     = '2', ',', Key.NUMPAD_2, Key.DOWN
+    SouthEast = '3', '.', Key.NUMPAD_3, Key.PAGE_DOWN
+    West      = '4', 'j', Key.NUMPAD_4, Key.LEFT
+    Stay      = '5', 'k', Key.NUMPAD_5, Key.NONE
+    East      = '6', 'l', Key.NUMPAD_6, Key.RIGHT
+    NorthWest = '7', 'u', Key.NUMPAD_7, Key.HOME
+    North     = '8', 'i', Key.NUMPAD_8, Key.UP
+    NorthEast = '9', 'o', Key.NUMPAD_9, Key.PAGE_UP
 
     # Initiates walk mode into direction
     Instant_SouthWest = Key.NONE  # Key.END
@@ -70,31 +70,19 @@ class Bind(object):
     Instant_North     = Key.NONE  # Key.UP
     Instant_NorthEast = Key.NONE  # Key.PAGE_UP
 
-    # queries
-    Yes = 'y'
-    No = 'n'
-    Default_Yes = 'Y'
-    Default_No = 'N'
-    Default_Query = Key.ENTER
-    # The way these work is for example:
-    #   "Quit the game? [Yes/Default_No]
-    #       or
-    #   "Save the game? [Default_Yes/No]
-    # Default_Query executes the default action.
-    # Pressing Yes/Default_Yes will execute yes and vice versa with No/Default_No
-
     # main view
-    Help      = Key.F1, Key.F2
-    Look_Mode = 'q'
-    Inventory = 'I'
-    Descend   = 'X'
-    Ascend    = 'x'
-    Quit      = 'Q'
-    Save      = 'S'
-    Attack    = 'a'
-    Redraw    = '^r'
-    History   = 'p'
-    Walk_Mode = 'w'
+    Help        = Key.F1, Key.F2
+    Look_Mode   = 'q'
+    Inventory   = 'I'
+    Descend     = 'X'
+    Ascend      = 'x'
+    Quit        = 'Q'
+    Save        = 'S'
+    Attack      = 'a'
+    Redraw      = '^r'
+    History     = 'p'
+    Walk_Mode   = 'w'
+    Show_Vision = 'H'
 
     # inventory
     View_Inventory            = 'v'
@@ -103,3 +91,10 @@ class Bind(object):
     Equipment_Slot_Right_Hand = 'r'
     Equipment_Slot_Left_Hand  = 'l'
     Equipment_Slot_Feet       = 'f'
+
+    # queries
+    Yes = 'y'
+    No = 'n'
+    Default_Yes = 'Y'
+    Default_No = 'N'
+    Default_Query = Key.ENTER

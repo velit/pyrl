@@ -25,16 +25,16 @@ class GameActions(object):
         if creature:
             self.creature = creature
 
-    def clear_action(self, and_associate_creature=None):
+    def _clear_action(self, and_associate_creature=None):
         self.action_cost = -1
         if and_associate_creature:
             self.creature = and_associate_creature
 
+    def _do_action(self, cost):
+        self.action_cost = cost
+
     def already_acted(self):
         return self.action_cost >= 0
-
-    def do_action(self, cost):
-        self.action_cost = cost
 
     def enter_passage(self):
         game, level, creature = self.game, self.creature.level, self.creature
@@ -55,7 +55,7 @@ class GameActions(object):
         if not game.move_creature_to_level(creature, destination_point):
             return ActionError.PassageLeadsNoWhere
 
-        self.do_action(creature.action_cost(Action.Move))
+        self._do_action(creature.action_cost(Action.Move))
 
     def move(self, direction):
         level, creature = self.creature.level, self.creature
@@ -68,7 +68,7 @@ class GameActions(object):
 
         level.move_creature_to_dir(creature, direction)
         move_multiplier = level.movement_multiplier(creature.coord, direction)
-        self.do_action(creature.action_cost(Action.Move, move_multiplier))
+        self._do_action(creature.action_cost(Action.Move, move_multiplier))
 
     def teleport(self, target_coord):
         level, creature = self.creature.level, self.creature
@@ -79,7 +79,7 @@ class GameActions(object):
             return ActionError.IllegalTeleport
 
         level.move_creature(creature, target_coord)
-        self.do_action(creature.action_cost(Action.Move))
+        self._do_action(creature.action_cost(Action.Move))
 
     def swap(self, direction):
         game, level, creature = self.game, self.creature.level, self.creature
@@ -96,7 +96,7 @@ class GameActions(object):
 
         level.swap_creature(creature, target_creature)
         move_multiplier = level.movement_multiplier(creature.coord, direction)
-        self.do_action(creature.action_cost(Action.Move, move_multiplier))
+        self._do_action(creature.action_cost(Action.Move, move_multiplier))
 
     def attack(self, direction):
         game, level, creature = self.game, self.creature.level, self.creature
@@ -118,7 +118,7 @@ class GameActions(object):
             died = target.is_dead()
         if died:
             game.creature_death(target)
-        self.do_action(creature.action_cost(Action.Attack))
+        self._do_action(creature.action_cost(Action.Attack))
         personity = (creature is game.player, target is game.player)
         msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
         game.io.msg(msg)
@@ -128,7 +128,7 @@ class GameActions(object):
             return ActionError.PlayerAction
 
         self.game.save_mark = True
-        self.do_action(0)
+        self._do_action(0)
 
     def quit(self):
         if self.creature is not self.game.player:

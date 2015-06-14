@@ -8,11 +8,12 @@ from enums.directions import Dir
 from enums.keys import Key
 from game_actions import ActionError
 from generic_algorithms import add_vector
-from interface.debug_action import debug_action
+from interface.debug_action import DebugAction
 from interface.help_screen import help_screen
 from interface.inventory import equipment
 from interface.walk_mode import WalkMode
 from level import LevelLocation
+from config.game import GameConf
 
 
 class UserController(object):
@@ -29,31 +30,38 @@ class UserController(object):
 
     def __init__(self, game_actions, io_system):
         self.game_actions = game_actions
-        self.creature = game_actions.creature
         self.io = io_system
         self.walk_mode = WalkMode(self)
-        self.action_mapping = {
-            'd':  self.debug_action,
-            '+':  partial(self.sight_change, 1),
-            '-':  partial(self.sight_change, -1),
+        self.debug_action = DebugAction(self)
+        self.set_actions()
 
-            Key.CLOSE_WINDOW:    self.quit,
-            Bind.Quit.key:       self.quit,
-            Bind.Save.key:       self.save,
-            Bind.Attack.key:     self.attack,
-            Bind.Redraw.key:     self.redraw,
-            Bind.History.key:    self.print_history,
-            Bind.Look_Mode.key:  self.look,
-            Bind.Help.key:       self.help_screen,
-            Bind.Inventory.key:  self.equipment,
-            Bind.Walk_Mode.key:  self.init_walk_mode,
-            Bind.Ascend.key:     partial(self.ascend),
-            Bind.Descend.key:    partial(self.descend),
+    @property
+    def creature(self):
+        return self.game_actions.creature
+
+    def set_actions(self):
+        self.actions = {
+            'd':                  self.debug_action.ask_action,
+            '+':                  partial(self.debug_action.sight_change, 1),
+            '-':                  partial(self.debug_action.sight_change, -1),
+            Key.CLOSE_WINDOW:     self.quit,
+            Bind.Quit.key:        self.quit,
+            Bind.Save.key:        self.save,
+            Bind.Attack.key:      self.attack,
+            Bind.Redraw.key:      self.redraw,
+            Bind.History.key:     self.print_history,
+            Bind.Look_Mode.key:   self.look,
+            Bind.Help.key:        self.help_screen,
+            Bind.Inventory.key:   self.equipment,
+            Bind.Walk_Mode.key:   self.init_walk_mode,
+            Bind.Show_Vision.key: self.show_vision,
+            Bind.Ascend.key:      partial(self.ascend),
+            Bind.Descend.key:     partial(self.descend),
         }
         for key, direction in Bind.action_direction.items():
-            self.action_mapping[key] = partial(self.act_to_dir, direction)
+            self.actions[key] = partial(self.act_to_dir, direction)
         for key, direction in Bind.walk_mode_direction.items():
-            self.action_mapping[key] = partial(self.init_walk_mode, direction)
+            self.actions[key] = partial(self.init_walk_mode, direction)
 
     def get_user_input_and_act(self):
         while True:
@@ -61,11 +69,11 @@ class UserController(object):
                 error = self.walk_mode.continue_walk()
             else:
                 key = self.io.get_key()
-                if key not in self.action_mapping:
+                if key not in self.actions:
                     self.io.msg("Undefined key: {}".format(key))
                     continue
 
-                error = self.action_mapping[key]()
+                error = self.actions[key]()
 
             if error is not None:
                 assert error != ActionError.AlreadyActed, "Player attempted to act twice."
@@ -145,68 +153,37 @@ class UserController(object):
     def descend(self):
         coord = self.creature.coord
         level = self.creature.level
-        if not level.has_location(coord):
-            try:
-                new_coord = level.get_location_coord(LevelLocation.Passage_Down)
-            except KeyError:
-                return "You don't find any downwards passage."
-            if not level.is_passable(new_coord):
-                level.remove_creature(level.get_creature(new_coord))
-            return self.game_actions.teleport(new_coord)
-
-        if level.get_location(coord) == LevelLocation.Passage_Up:
-            try:
-                new_coord = level.get_location_coord(LevelLocation.Passage_Down)
-            except KeyError:
-                return "Cannot descend an upwards passage."
-            if not level.is_passable(new_coord):
-                level.remove_creature(level.get_creature(new_coord))
-            return self.game_actions.teleport(new_coord)
+        if level.has_location(coord):
+            location = level.get_location(coord)
+            if location == LevelLocation.Passage_Up:
+                #return "Cannot descend an upwards passage."
+                return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
+        else:
+            #return "You don't find any downwards passage."
+            return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
 
         return self.game_actions.enter_passage()
 
     def ascend(self):
         coord = self.creature.coord
         level = self.creature.level
-        if not level.has_location(coord):
-            try:
-                new_coord = level.get_location_coord(LevelLocation.Passage_Up)
-            except KeyError:
-                return "You don't find any upwards passage."
-            if not level.is_passable(new_coord):
-                level.remove_creature(level.get_creature(new_coord))
-            return self.game_actions.teleport(new_coord)
-
-        if level.get_location(coord) != LevelLocation.Passage_Up:
-            try:
-                new_coord = level.get_location_coord(LevelLocation.Passage_Up)
-            except KeyError:
-                return "This location has no upwards passage."
-            if not level.is_passable(new_coord):
-                level.remove_creature(level.get_creature(new_coord))
-            return self.game_actions.teleport(new_coord)
-
-        return self.game_actions.enter_passage()
-
-    def enter(self):
-        return self.game_actions.enter_passage()
-        coord = self.creature.coord
-        level = self.creature.level
-
-        if level.has_exit(coord):
-            return self.game_actions.enter_passage()
+        if level.has_location(coord):
+            location = level.get_location(coord)
+            if location != LevelLocation.Passage_Up:
+                #return "Cannot ascend a downwards passage."
+                return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
         else:
-            self.io.msg("This level doesn't seem to have a passage that way.")
-            # debug use
+            #return "You don't find any upwards passage."
+            return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
 
-    def sight_change(self, amount):
-        self.creature.base_perception += amount
+        return self.game_actions.enter_passage()
+
+    def show_vision(self):
+        GameConf.clearly_show_vision = not GameConf.clearly_show_vision
+        self.game_actions.redraw()
 
     def print_history(self):
         self.io.message_bar.print_history()
-
-    def debug_action(self):
-        debug_action(self.io, self.game_actions)
 
     def equipment(self):
         return equipment(self.io, self.creature.equipment)

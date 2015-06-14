@@ -492,6 +492,9 @@
     <note priority="medium" time="1329647500">
         Make a curses getstring method
     </note>
+    <note priority="medium" time="1434306827">
+        Streamline queries in Bindings (Yes/No/Default etc.)
+    </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels
     </note>

@@ -166,9 +166,9 @@ class RDG(object):
         for _ in range(1000000):
             coord = self.get_free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
-            tile = self.level_template.tiles[coord]
+            old_tile = self.level_template.tiles[coord]
 
-            if neighbors == (self.F, self.F, self.F, self.F) and tile == self.F:
+            if neighbors == (self.F, self.F, self.F, self.F) and old_tile == self.F:
                 break
         else:
             assert False, "Passageway add failed due to free coord get failed."

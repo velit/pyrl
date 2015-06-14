@@ -3,15 +3,33 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pytest
 
 import rdg
+import level
 from level_template import LevelTemplate
 from game_data.levels.shared_assets import construct_data
 from generic_structures import Array2D
+from game_data.tiles import PyrlTile
 
 
 def pp_tm(tm, cols):
     """Pretty print tiles."""
     for i, c in enumerate(tm):
         print(c, end=('' if i % cols != cols - 1 else '\n'))
+
+
+@pytest.mark.slow
+def test_many_rdg_generation():
+    for _ in range(1000):
+        lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
+        rdg.generate_tiles_to(lt)
+        lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
+        lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
+
+
+def test_rdg_generation():
+    lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
+    rdg.generate_tiles_to(lt)
+    lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
+    lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
 
 
 @pytest.fixture
@@ -48,7 +66,7 @@ def test_dungeon_generation(rectangles, generator):
     rect = rectangles[0]
 
     generator.attempt_room(rect, (0, 1))
-    room, *_ = construct_data(
+    room, _, _ = construct_data(
         TEST_DIMENSIONS,
         "w.wwwrrrrr"
         "w...wrrrrr"
@@ -65,7 +83,7 @@ def test_dungeon_generation(rectangles, generator):
     assert generator.level_template.tiles == room
 
     generator.attempt_corridor((4, 4), (0, 1), 6)
-    room, *_ = construct_data(
+    room, _, _ = construct_data(
         TEST_DIMENSIONS,
         "w.wwwrrrrr"
         "w...wrrrrr"

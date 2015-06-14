@@ -5,37 +5,55 @@ from config.bindings import Bind
 
 def help_screen(io):
     header = "Help Screen, ^ means ctrl, ! means alt"
-    first_column = (
-        "{:32}".format("Main View:"),
-        "",
-        "Help            {0!s:16.16}".format(Bind.Help),
-        "Look Mode       {0!s:16.16}".format(Bind.Look_Mode),
-        "Inventory       {0!s:16.16}".format(Bind.Inventory),
-        "Descend         {0!s:16.16}".format(Bind.Descend),
-        "Ascend          {0!s:16.16}".format(Bind.Ascend),
-        "Quit            {0!s:16.16}".format(Bind.Quit),
-        "Save            {0!s:16.16}".format(Bind.Save),
-        "Manual Attack   {0!s:16.16}".format(Bind.Attack),
-        "Redraw Screen   {0!s:16.16}".format(Bind.Redraw),
-        "Print History   {0!s:16.16}".format(Bind.History),
-        "Walk Mode       {0!s:16.16}".format(Bind.Walk_Mode),
+    columns = \
+    (
+        (
+            "{:32}".format("Main View:"),
+            "",
+            "Help            {0!s:16.16}".format(Bind.Help),
+            "Look Mode       {0!s:16.16}".format(Bind.Look_Mode),
+            "Inventory       {0!s:16.16}".format(Bind.Inventory),
+            "Descend         {0!s:16.16}".format(Bind.Descend),
+            "Ascend          {0!s:16.16}".format(Bind.Ascend),
+            "Quit            {0!s:16.16}".format(Bind.Quit),
+            "Save            {0!s:16.16}".format(Bind.Save),
+            "Manual Attack   {0!s:16.16}".format(Bind.Attack),
+            "Redraw Screen   {0!s:16.16}".format(Bind.Redraw),
+            "Print History   {0!s:16.16}".format(Bind.History),
+            "Walk Mode       {0!s:16.16}".format(Bind.Walk_Mode),
+        ),
+        (
+            "",
+            "",
+            "Show vision     {0!s:16.16}".format(Bind.Show_Vision),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+        ),
+        (
+            "General:",
+            "",
+            "Cancel          {0!s:16.16}".format(Bind.Cancel),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+            "                {0!s:16.16}".format(""),
+        ),
     )
-    second_column = (
-        "General:",
-        "",
-        "Cancel          {0!s:16.16}".format(Bind.Cancel),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-        "                {0!s:16.16}".format(""),
-    )
-    columns = tuple(cells[0] + cells[1] for cells in zip(first_column, second_column))
+    top = tuple("".join(row) for row in zip(*columns))
     bottom = (
         "",
         "Direction keys used for movement, implicit attacking, walk mode, etc:",
@@ -51,6 +69,6 @@ def help_screen(io):
         "",
         "Colors available     dc (only on ncurses ie. pyrl.py)",
     )
-    help_lines = columns + bottom
+    help_lines = top + bottom
     footer = "{0} to close".format(Bind.Cancel.key)
     io.menu(header, help_lines, footer, Bind.Cancel)

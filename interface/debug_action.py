@@ -7,97 +7,128 @@ from rdg import LevelGen
 from level import LevelLocation
 
 
-def debug_action(io, game_actions):
-    creature = game_actions.creature
-    level = creature.level
+class DebugAction(object):
 
-    def show_map():
+    def __init__(self, user_controller):
+        self.user_controller = user_controller
+        self.actions = {
+            'v': self.show_map,
+            'r': self.toggle_path_heuristic_cross,
+            'l': self.cycle_level_type,
+            'd': self.show_path_debug,
+            'k': self.kill_creatures_in_level,
+            'o': self.draw_path_to_passage_down,
+            'p': self.draw_path_from_up_to_down,
+            'i': self.interactive_console,
+            'y': self.toggle_log_keycodes,
+            'c': self.display_curses_color_info,
+            'm': self.print_message_debug_string,
+        }
+
+    @property
+    def creature(self):
+        return self.user_controller.creature
+
+    @property
+    def level(self):
+        return self.user_controller.game_actions.creature.level
+
+    @property
+    def game(self):
+        return self.user_controller.game_actions.game
+
+    @property
+    def io(self):
+        return self.user_controller.io
+
+    @property
+    def game_actions(self):
+        return self.user_controller.game_actions
+
+    def ask_action(self):
+        c = self.io.get_key("Avail cmds: " + "".join(sorted(self.actions.keys())))
+
+        if c in self.actions:
+            self.actions[c]()
+        else:
+            self.io.msg("Undefined debug key: {}".format(c))
+
+    def show_map(self):
         Debug.show_map = not Debug.show_map
-        game_actions.redraw()
-        io.msg("Show map set to {}".format(Debug.show_map))
+        self.game_actions.redraw()
+        self.io.msg("Show map set to {}".format(Debug.show_map))
 
-    def toggle_path_heuristic_cross():
+    def toggle_path_heuristic_cross(self):
         Debug.cross = not Debug.cross
-        io.msg("Path heuristic cross set to {}".format(Debug.cross))
+        self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
 
-    def cycle_level_type():
+    def cycle_level_type(self):
         if LevelTemplate.default_level_type == LevelGen.Dungeon:
             LevelTemplate.default_level_type = LevelGen.Arena
         else:
             LevelTemplate.default_level_type = LevelGen.Dungeon
-        io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
+        self.io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
 
-    def show_path_debug():
+    def show_path_debug(self):
         if not Debug.path:
             Debug.path = True
-            io.msg("Path debug set")
+            self.io.msg("Path debug set")
         elif not Debug.path_step:
             Debug.path_step = True
-            io.msg("Path debug and stepping set")
+            self.io.msg("Path debug and stepping set")
         else:
             Debug.path = False
             Debug.path_step = False
-            io.msg("Path debug unset")
+            self.io.msg("Path debug unset")
 
-    def show_fov_debug():
-        Debug.reverse = not Debug.reverse
-        game_actions.redraw()
-        io.msg("Reverse set to {}".format(Debug.reverse))
-
-    def kill_creatures_in_level():
-        creature_list = list(level.creatures.values())
-        creature_list.remove(creature)
+    def kill_creatures_in_level(self):
+        creature_list = list(self.level.creatures.values())
+        creature_list.remove(self.creature)
         for i in creature_list:
-            level.remove_creature(i)
-        io.msg("Abrakadabra.")
+            self.level.remove_creature(i)
+        self.io.msg("Abrakadabra.")
 
-    def draw_path_to_passage_down():
-        passage_down = level.get_location_coord(LevelLocation.Passage_Down)
-        io.draw_path(level.path(creature.coord, passage_down))
-        game_actions.redraw()
+    def draw_path_to_passage_down(self):
+        passage_down = self.level.get_location_coord(LevelLocation.Passage_Down)
+        self.io.draw_path(self.level.path(self.creature.coord, passage_down))
+        self.game_actions.redraw()
 
-    def draw_path_from_up_to_down():
-        passage_up = level.get_location_coord(LevelLocation.Passage_Up)
-        passage_down = level.get_location_coord(LevelLocation.Passage_Down)
-        io.draw_path(level.path(passage_up, passage_down))
-        game_actions.redraw()
+    def draw_path_from_up_to_down(self):
+        passage_up = self.level.get_location_coord(LevelLocation.Passage_Up)
+        passage_down = self.level.get_location_coord(LevelLocation.Passage_Down)
+        self.io.draw_path(self.level.path(passage_up, passage_down))
+        self.game_actions.redraw()
 
-    def interactive_console():
-        game = game_actions.game
-        io.suspend()
+    def interactive_console(self):
+        game = self.game
+        self.io.suspend()
         code.interact(local=locals())
-        io.resume()
+        self.io.resume()
 
-    def toggle_log_keycodes():
+    def toggle_log_keycodes(self):
         Debug.show_keycodes = not Debug.show_keycodes
-        io.msg("Input code debug set to {}".format(Debug.show_keycodes))
+        self.io.msg("Input code debug set to {}".format(Debug.show_keycodes))
 
-    def display_curses_color_info():
+    def display_curses_color_info(self):
         import curses
-        io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
-        io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
+        self.io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
+        self.io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
             curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
 
-    def print_message_debug_string():
-        io.msg(Debug.debug_string)
+    def print_message_debug_string(self):
+        self.io.msg(Debug.debug_string)
 
-    debug_actions = {
-        'v': show_map,
-        'r': toggle_path_heuristic_cross,
-        'l': cycle_level_type,
-        'd': show_path_debug,
-        'h': show_fov_debug,
-        'k': kill_creatures_in_level,
-        'o': draw_path_to_passage_down,
-        'p': draw_path_from_up_to_down,
-        'i': interactive_console,
-        'y': toggle_log_keycodes,
-        'c': display_curses_color_info,
-        'm': print_message_debug_string,
-    }
-    c = io.get_key("Avail cmds: " + "".join(sorted(debug_actions.keys())))
+    def sight_change(self, amount):
+        self.creature.base_perception += amount
+        self.game.update_view(self.creature)
+        self.game_actions.redraw()
 
-    if c in debug_actions:
-        debug_actions[c]()
-    else:
-        io.msg("Undefined debug key: {}".format(c))
+    def teleport_to_location(self, location):
+        try:
+            new_coord = self.level.get_location_coord(location)
+        except KeyError:
+            self.io.msg("This level doesn't seem to have a {} location".format(location))
+            return
+        if not self.level.is_passable(new_coord):
+            self.level.remove_creature(self.level.get_creature(new_coord))
+        return self.game_actions.teleport(new_coord)

@@ -26,3 +26,6 @@ class Tile(object):
     @property
     def armor(self):
         return 100 if self.is_passable else 40
+
+    def __repr__(self):
+        return "Tile({0.name}: {0.visible_char[0]})".format(self)
