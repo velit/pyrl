@@ -27,15 +27,22 @@ class Game(object):
         self.save_mark = False
 
         self.world = get_world()
-        self.player = self.world.player
         self.world.get_level(self.world.start_level, self.add_modified_location)
 
-        self.init_nonserial_objects(cursor_lib, self.player)
+        self.init_nonserial_objects(cursor_lib)
 
-    def init_nonserial_objects(self, cursor_lib_callback, player):
+    @property
+    def player(self):
+        return self.world.player
+
+    @property
+    def level(self):
+        return self.world.player.level
+
+    def init_nonserial_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_controller = UserController(GameActions(self, player), self.io)
-        register_status_texts(self, player)
+        self.user_controller = UserController(GameActions(self, self.player), self.io)
+        register_status_texts(self, self.player)
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
@@ -88,11 +95,10 @@ class Game(object):
 
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
-        level = creature.level
         if creature is self.player:
             self.io.notify("You die...")
             self.endgame(ask=False)
-        level.remove_creature(creature, turnscheduler_remove=True)
+        self.level.remove_creature(creature, turnscheduler_remove=True)
 
     def endgame(self, ask=True):
         if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
@@ -155,7 +161,7 @@ class Game(object):
 
     def redraw(self):
         self.io.level_window.clear()
-        level = self.player.level
+        level = self.level
 
         if Debug.show_map:
             draw_coords = level.tiles.coord_iter()
@@ -167,8 +173,7 @@ class Game(object):
         self.io.draw(vision_info)
 
         if GameConf.clearly_show_vision:
-            reverse_data = level.get_vision_information(self.player.vision,
-                                                        self.player.vision)
+            reverse_data = level.get_vision_information(self.player.vision, self.player.vision)
             self.io.draw(reverse_data, True)
 
     def __getstate__(self):

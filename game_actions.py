@@ -25,6 +25,18 @@ class GameActions(object):
         if creature:
             self.creature = creature
 
+    @property
+    def world(self):
+        return self.game.world
+
+    @property
+    def level(self):
+        return self.creature.level
+
+    @property
+    def player(self):
+        return self.game.world.player
+
     def _clear_action(self, and_associate_creature=None):
         self.action_cost = -1
         if and_associate_creature:
@@ -37,91 +49,83 @@ class GameActions(object):
         return self.action_cost >= 0
 
     def enter_passage(self):
-        game, level, creature = self.game, self.creature.level, self.creature
-
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not level.has_location(creature.coord):
+        if not self.level.has_location(self.creature.coord):
             return ActionError.NoEntrance
 
-        source_point = (level.key, level.get_location(creature.coord))
+        source_point = (self.level.key, self.level.get_location(self.creature.coord))
 
-        if not game.world.has_destination(source_point):
+        if not self.world.has_destination(source_point):
             return ActionError.PassageLeadsNoWhere
 
-        destination_point = game.world.get_destination(source_point)
+        destination_point = self.world.get_destination(source_point)
 
-        if not game.move_creature_to_level(creature, destination_point):
+        if not self.game.move_creature_to_level(self.creature, destination_point):
             return ActionError.PassageLeadsNoWhere
 
-        self._do_action(creature.action_cost(Action.Move))
+        self._do_action(self.creature.action_cost(Action.Move))
 
     def move(self, direction):
-        level, creature = self.creature.level, self.creature
-
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not level.creature_can_move(creature, direction):
+        if not self.level.creature_can_move(self.creature, direction):
             return ActionError.IllegalMove
 
-        level.move_creature_to_dir(creature, direction)
-        move_multiplier = level.movement_multiplier(creature.coord, direction)
-        self._do_action(creature.action_cost(Action.Move, move_multiplier))
+        self.level.move_creature_to_dir(self.creature, direction)
+        move_multiplier = self.level.movement_multiplier(self.creature.coord, direction)
+        self._do_action(self.creature.action_cost(Action.Move, move_multiplier))
 
     def teleport(self, target_coord):
-        level, creature = self.creature.level, self.creature
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not level.is_passable(target_coord):
+        if not self.level.is_passable(target_coord):
             return ActionError.IllegalTeleport
 
-        level.move_creature(creature, target_coord)
-        self._do_action(creature.action_cost(Action.Move))
+        self.level.move_creature(self.creature, target_coord)
+        self._do_action(self.creature.action_cost(Action.Move))
 
     def swap(self, direction):
-        game, level, creature = self.game, self.creature.level, self.creature
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        target_coord = add_vector(creature.coord, direction)
-        if not level.has_creature(target_coord):
+        target_coord = add_vector(self.creature.coord, direction)
+        if not self.level.has_creature(target_coord):
             return ActionError.NoSwapTarget
 
-        target_creature = level.get_creature(target_coord)
-        if not game.ai.willing_to_swap(target_creature, creature, game.player):
+        target_creature = self.level.get_creature(target_coord)
+        if not self.game.ai.willing_to_swap(target_creature, self.creature, self.game.player):
             return ActionError.SwapTargetResists
 
-        level.swap_creature(creature, target_creature)
-        move_multiplier = level.movement_multiplier(creature.coord, direction)
-        self._do_action(creature.action_cost(Action.Move, move_multiplier))
+        self.level.swap_creature(self.creature, target_creature)
+        move_multiplier = self.level.movement_multiplier(self.creature.coord, direction)
+        self._do_action(self.creature.action_cost(Action.Move, move_multiplier))
 
     def attack(self, direction):
-        game, level, creature = self.game, self.creature.level, self.creature
-
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        target_coord = add_vector(creature.coord, direction)
+        target_coord = add_vector(self.creature.coord, direction)
 
-        if level.has_creature(target_coord):
-            target = level.get_creature(target_coord)
+        if self.level.has_creature(target_coord):
+            target = self.level.get_creature(target_coord)
         else:
-            target = level.tiles[target_coord]
+            target = self.level.tiles[target_coord]
 
-        succeeds, damage = get_melee_attack_cr(creature, target)
+        succeeds, damage = get_melee_attack_cr(self.creature, target)
         died = False
         if damage:
             target.receive_damage(damage)
             died = target.is_dead()
         if died:
-            game.creature_death(target)
-        self._do_action(creature.action_cost(Action.Attack))
-        personity = (creature is game.player, target is game.player)
-        msg = get_combat_message(succeeds, damage, died, personity, creature.name, target.name)
-        game.io.msg(msg)
+            self.game.creature_death(target)
+        self._do_action(self.creature.action_cost(Action.Attack))
+        personity = (self.creature is self.player, target is self.player)
+        msg = get_combat_message(succeeds, damage, died, personity, self.creature.name, target.name)
+        self.game.io.msg(msg)
 
     def save(self):
         if self.creature is not self.game.player:

@@ -8,10 +8,8 @@ from enums.directions import Dir
 from enums.keys import Key
 from game_actions import ActionError
 from generic_algorithms import add_vector
-from interface.debug_action import DebugAction
 from interface.help_screen import help_screen
 from interface.inventory import equipment
-from interface.walk_mode import WalkMode
 from level import LevelLocation
 from config.game import GameConf
 
@@ -29,6 +27,9 @@ class UserController(object):
     }
 
     def __init__(self, game_actions, io_system):
+        from interface.debug_action import DebugAction
+        from interface.walk_mode import WalkMode
+
         self.game_actions = game_actions
         self.io = io_system
         self.walk_mode = WalkMode(self)
@@ -38,6 +39,10 @@ class UserController(object):
     @property
     def creature(self):
         return self.game_actions.creature
+
+    @property
+    def level(self):
+        return self.game_actions.creature.level
 
     def set_actions(self):
         self.actions = {
@@ -89,11 +94,10 @@ class UserController(object):
 
     def act_to_dir(self, direction):
         target_coord = add_vector(self.creature.coord, direction)
-        level = self.creature.level
         error = None
-        if level.creature_can_move(self.creature, direction):
+        if self.level.creature_can_move(self.creature, direction):
             error = self.game_actions.move(direction)
-        elif level.has_creature(target_coord):
+        elif self.level.has_creature(target_coord):
             error = self.game_actions.attack(direction)
         else:
             error = ActionError.IllegalMove
@@ -101,23 +105,22 @@ class UserController(object):
 
     def look(self):
         coord = self.creature.coord
-        level = self.creature.level
         drawline_flag = False
         direction = Dir.Stay
         while True:
             new_coord = add_vector(coord, direction)
-            if level.is_legal(new_coord):
+            if self.level.is_legal(new_coord):
                 coord = new_coord
-            self.io.msg(level.look_information(coord))
+            self.io.msg(self.level.look_information(coord))
             if drawline_flag:
                 self.io.draw_line(self.creature.coord, coord, ("*", Pair.Yellow))
                 self.io.draw_line(coord, self.creature.coord, ("*", Pair.Yellow))
-                self.io.msg("LoS: {}".format(level.check_los(self.creature.coord, coord)))
+                self.io.msg("LoS: {}".format(self.level.check_los(self.creature.coord, coord)))
             if coord != self.creature.coord:
-                char = level.get_visible_char(coord)
+                char = self.level.get_visible_char(coord)
                 char = char[0], (Color.Black, Color.Green)
                 self.io.draw_char(coord, char)
-                self.io.draw_char(self.creature.coord, level.get_visible_char(self.creature.coord), reverse=True)
+                self.io.draw_char(self.creature.coord, self.level.get_visible_char(self.creature.coord), reverse=True)
             c = self.io.get_key()
             self.game_actions.redraw()
             direction = Dir.Stay
@@ -127,11 +130,11 @@ class UserController(object):
                 drawline_flag = not drawline_flag
             elif c == 'b':
                 from generic_algorithms import bresenham
-                for coord in bresenham(level.get_coord(self.creature.coord), coord):
+                for coord in bresenham(self.level.get_coord(self.creature.coord), coord):
                     self.io.msg(coord)
             elif c == 's':
-                if level.has_creature(coord):
-                    self.game_actions.game.register_status_texts(level.get_creature(coord))
+                if self.level.has_creature(coord):
+                    self.game_actions.game.register_status_texts(self.level.get_creature(coord))
             elif c in Bind.Cancel or c in Bind.Look_Mode:
                 break
 
@@ -151,10 +154,8 @@ class UserController(object):
         self.game_actions.redraw()
 
     def descend(self):
-        coord = self.creature.coord
-        level = self.creature.level
-        if level.has_location(coord):
-            location = level.get_location(coord)
+        if self.level.has_location(self.creature.coord):
+            location = self.level.get_location(self.creature.coord)
             if location == LevelLocation.Passage_Up:
                 #return "Cannot descend an upwards passage."
                 return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
@@ -165,10 +166,8 @@ class UserController(object):
         return self.game_actions.enter_passage()
 
     def ascend(self):
-        coord = self.creature.coord
-        level = self.creature.level
-        if level.has_location(coord):
-            location = level.get_location(coord)
+        if self.level.has_location(self.creature.coord):
+            location = self.level.get_location(self.creature.coord)
             if location != LevelLocation.Passage_Up:
                 #return "Cannot ascend a downwards passage."
                 return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
@@ -194,3 +193,25 @@ class UserController(object):
     def help_screen(self):
         help_screen(self.io)
         self.game_actions.redraw()
+
+
+class UserControllerProxy(object):
+
+    def __init__(self, user_controller):
+        self.user_controller = user_controller
+
+    @property
+    def creature(self):
+        return self.user_controller.creature
+
+    @property
+    def level(self):
+        return self.user_controller.game_actions.creature.level
+
+    @property
+    def io(self):
+        return self.user_controller.io
+
+    @property
+    def game_actions(self):
+        return self.user_controller.game_actions

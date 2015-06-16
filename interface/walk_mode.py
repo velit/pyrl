@@ -5,6 +5,7 @@ from enums.directions import Dir
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
 from config.bindings import Bind
 from enums.keys import Key
+from user_controller import UserControllerProxy
 
 
 WALK_IN_PLACE = (None, None)
@@ -16,10 +17,10 @@ OPEN          = (True, True)
 INTERRUPT_MSG_TIME = 1
 
 
-class WalkMode(object):
+class WalkMode(UserControllerProxy):
 
     def __init__(self, user_controller):
-        self.user_controller = user_controller
+        super().__init__(user_controller)
         self.state = None
 
     def is_walk_mode_active(self):
@@ -27,13 +28,13 @@ class WalkMode(object):
 
     def init_walk_mode(self, direction=None):
         if self._any_creatures_visible():
-            self.user_controller.io.msg("Not while there are creatures in the vicinity.")
+            self.io.msg("Not while there are creatures in the vicinity.")
             return None
 
         if direction is None:
             user_query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
             key_seq = tuple(Bind.action_direction.keys()) + Bind.Cancel
-            key = self.user_controller.io.ask(user_query, key_seq)
+            key = self.io.ask(user_query, key_seq)
             if key in Bind.action_direction:
                 direction = Bind.action_direction[key]
             else:
@@ -56,23 +57,23 @@ class WalkMode(object):
 
             if result is not None:
                 new_direction, new_walk_type = result
-                if msg_time < self.user_controller.io.get_current_time():
+                if msg_time < self.io.get_current_time():
                     message = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
                 else:
                     message = ""
                 key_seq = Bind.Walk_Mode + Bind.Cancel
-                key = self.user_controller.io.selective_ask_until_timestamp(message, timestamp, key_seq)
+                key = self.io.selective_ask_until_timestamp(message, timestamp, key_seq)
                 if key == Key.NO_INPUT:
-                    error = self.user_controller.game_actions.move(new_direction)
+                    error = self.game_actions.move(new_direction)
                     if not error:
-                        walk_delay = self.user_controller.io.get_future_time(GameConf.animation_period)
+                        walk_delay = self.io.get_future_time(GameConf.animation_period)
                         self.state = new_direction, new_walk_type, walk_delay, msg_time
                     return error
 
         self.state = None
 
     def _init_walk_mode(self, direction):
-        error = self.user_controller.game_actions.move(direction)
+        error = self.game_actions.move(direction)
         if error:
             return error, None
         else:
@@ -90,8 +91,8 @@ class WalkMode(object):
                     walk_type = CORRIDOR
 
             return (error, (direction, walk_type,
-                    self.user_controller.io.get_future_time(GameConf.animation_period),
-                    self.user_controller.io.get_future_time(INTERRUPT_MSG_TIME)))
+                    self.io.get_future_time(GameConf.animation_period),
+                    self.io.get_future_time(INTERRUPT_MSG_TIME)))
 
     def _corridor_walk_type(self, origin_direction):
         forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(origin_direction)
@@ -106,7 +107,7 @@ class WalkMode(object):
     def _get_corridor_candidate_dirs(self, direction):
         reverse = reverse_vector(direction)
         back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
-        candidate_dirs = set(self.user_controller.creature.level.get_passable_neighbors(self.user_controller.creature.coord)) - {reverse}
+        candidate_dirs = set(self.level.get_passable_neighbors(self.creature.coord)) - {reverse}
         candidate_forward_dirs = candidate_dirs - back_sides
         candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides
@@ -119,7 +120,7 @@ class WalkMode(object):
             return direction, new_walk_type
 
     def _passable(self, direction):
-        return self.user_controller.creature.level.is_passable(add_vector(self.user_controller.creature.coord, direction))
+        return self.level.is_passable(add_vector(self.creature.coord, direction))
 
     def _get_neighbor_passables(self, direction):
             upper_left_dir = anticlockwise_45(direction)
@@ -148,7 +149,6 @@ class WalkMode(object):
         return left, right
 
     def _any_creatures_visible(self):
-        has_creature = self.user_controller.creature.level.has_creature
-        vision = self.user_controller.creature.vision
-        not_self = lambda coord: coord != self.user_controller.creature.coord
-        return any(has_creature(coord) for coord in vision if not_self(coord))
+        has_creature = self.level.has_creature
+        not_self = lambda coord: coord != self.creature.coord
+        return any(has_creature(coord) for coord in self.creature.vision if not_self(coord))

@@ -5,12 +5,14 @@ from config.debug import Debug
 from level_template import LevelTemplate
 from rdg import LevelGen
 from level import LevelLocation
+from user_controller import UserControllerProxy
 
 
-class DebugAction(object):
+class DebugAction(UserControllerProxy):
 
     def __init__(self, user_controller):
-        self.user_controller = user_controller
+        super().__init__(user_controller)
+
         self.actions = {
             'v': self.show_map,
             'r': self.toggle_path_heuristic_cross,
@@ -24,26 +26,6 @@ class DebugAction(object):
             'c': self.display_curses_color_info,
             'm': self.print_message_debug_string,
         }
-
-    @property
-    def creature(self):
-        return self.user_controller.creature
-
-    @property
-    def level(self):
-        return self.user_controller.game_actions.creature.level
-
-    @property
-    def game(self):
-        return self.user_controller.game_actions.game
-
-    @property
-    def io(self):
-        return self.user_controller.io
-
-    @property
-    def game_actions(self):
-        return self.user_controller.game_actions
 
     def ask_action(self):
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.actions.keys())))
@@ -100,7 +82,7 @@ class DebugAction(object):
         self.game_actions.redraw()
 
     def interactive_console(self):
-        game = self.game
+        game = self.game_actions.game
         self.io.suspend()
         code.interact(local=locals())
         self.io.resume()
@@ -120,7 +102,7 @@ class DebugAction(object):
 
     def sight_change(self, amount):
         self.creature.base_perception += amount
-        self.game.update_view(self.creature)
+        self.game_actions.game.update_view(self.creature)
         self.game_actions.redraw()
 
     def teleport_to_location(self, location):
