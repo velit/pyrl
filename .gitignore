@@ -8,3 +8,4 @@ Session.vim
 errors.err
 profiling_results
 .ropeproject/
+__pycache__

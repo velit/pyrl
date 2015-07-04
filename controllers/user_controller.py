@@ -27,8 +27,8 @@ class UserController(object):
     }
 
     def __init__(self, game_actions, io_system):
-        from interface.debug_action import DebugAction
-        from interface.walk_mode import WalkMode
+        from controllers.debug_action import DebugAction
+        from controllers.walk_mode import WalkMode
 
         self.game_actions = game_actions
         self.io = io_system

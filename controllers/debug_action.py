@@ -5,7 +5,7 @@ from config.debug import Debug
 from level_template import LevelTemplate
 from rdg import LevelGen
 from level import LevelLocation
-from user_controller import UserControllerProxy
+from controllers.user_controller import UserControllerProxy
 
 
 class DebugAction(UserControllerProxy):

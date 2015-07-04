@@ -10,7 +10,7 @@ from config.bindings import Bind
 from fov import ShadowCast
 from game_actions import GameActions
 from interface.status_texts import register_status_texts
-from user_controller import UserController
+from controllers.user_controller import UserController
 from window.window_system import WindowSystem
 from world import LevelNotFound
 
