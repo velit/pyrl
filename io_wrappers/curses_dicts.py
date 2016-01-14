@@ -5,7 +5,7 @@ from enums.colors import Color
 from enums.keys import Key
 
 
-ncurses_key_map = {
+curses_key_map = {
     chr(curses.ascii.CR):   Key.ENTER,
     chr(curses.ascii.ESC):  Key.ESC,
     chr(curses.ascii.SP):   Key.SPACE,
@@ -45,7 +45,7 @@ ncurses_key_map = {
 }
 
 
-class NCurses256ColorDict(dict):
+class Curses256ColorDict(dict):
 
     color_map = {
         Color.Red:           124,
@@ -91,7 +91,7 @@ class NCurses256ColorDict(dict):
             return color_pair
 
 
-class NCursesColorDict(dict):
+class CursesColorDict(dict):
 
     color_map = {
         Color.Red:           curses.COLOR_RED,

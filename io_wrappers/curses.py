@@ -13,73 +13,84 @@ import logging
 from config.game import GameConf
 from enums.keys import Key
 from config.debug import Debug
-from io_wrappers.ncurses_dicts import NCurses256ColorDict, NCursesColorDict, ncurses_key_map
+from io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
 
 
-_root_win = None
+def clean_curses():
+    """Resume normal shell state. Does nothing if curses wasn't initialized."""
+    try:
+        curses.reset_shell_mode()
+    except curses.error:
+        pass
+    try:
+        curses.endwin()
+    except curses.error:
+        pass
 
 
-class NCursesWrapper(object):
-
-    implementation = "ncurses"
+class CursesWrapper(object):
 
     def __init__(self, curses_root_window=None):
-        """Initialize curses and NCursesWindow."""
-        NCursesWindowWrapper.init(curses_root_window)
+        """Initialize curses and prepare for creation of new windows."""
+        if curses_root_window is None:
+            curses_root_window = curses.initscr()
+        self.curses_root_window = curses_root_window
 
-    def new_window(cls, dimensions):
-        """Create and return an ncurses window wrapper of dimensions = (rows, colums)."""
+        curses.noecho()
+        curses.cbreak()                   # no line buffering
+        curses.nonl()                     # allow return key detection in input
+        curses.curs_set(0)                # Remove cursor visibility
+        curses_root_window.keypad(True)
+
+        # see curses.wrapper implementation for reason for try-except
+        try:
+            curses.start_color()
+        except:
+            pass
+
+        self.root_win = CursesWindow(self.curses_root_window)
+
+    def new_window(self, dimensions):
+        """Create and return an curses window wrapper of dimensions = (rows, colums)."""
         rows, columns = dimensions
 
         # Writing to the last cell of a window raises an exception because the
-        # automatic cursor move to the next cell is illegal which is an ncurses
+        # automatic cursor move to the next cell is illegal which is a curses
         # limitation. The +1 to rows fixes that without impacting most anything
         # else. The one thing it affects is there's a line after the last
         # application line where writes don't explicitely error out.
         window = curses.newpad(rows + 1, columns)
-        return NCursesWindowWrapper(window)
+        return CursesWindow(window, self.root_win)
 
     def flush(self):
         curses.doupdate()
 
-    @classmethod
-    def suspend(cls):
+    def suspend(self):
         curses.def_prog_mode()
         curses.reset_shell_mode()
         curses.endwin()
 
-    @classmethod
-    def resume(cls):
+    def resume(self):
         curses.reset_prog_mode()
 
-    @classmethod
-    def is_ncurses_init(cls):
-        return _root_win is not None
 
+class CursesWindow(object):
 
-class NCursesWindowWrapper(object):
+    color_map = None
+    key_map = curses_key_map
 
-    implementation = NCursesWrapper.implementation
-    _color_map = None
-    _key_map = ncurses_key_map
-
-    @classmethod
-    def init(cls, curses_root_window=None):
-        """
-        Initialize curses if not already and prepare class attributes.
-
-        This function has to be called separately if this class is used directly
-        instead from NCursesWrapper().new_window(dimensions).
-        """
-        global _root_win
-        _root_win = cls(_init_curses(curses_root_window))
-
-        if curses.COLORS == 256:
-            cls._color_map = NCurses256ColorDict()
+    def __init__(self, curses_window, root_window=None):
+        if root_window is None:
+            self.root_win = self
         else:
-            cls._color_map = NCursesColorDict()
+            self.root_win = root_window
 
-    def __init__(self, curses_window):
+        if self.color_map is None:
+            if curses.COLORS == 256:
+                CursesWindow.color_map = Curses256ColorDict()
+            else:
+                CursesWindow.color_map = CursesColorDict()
+
         self.win = curses_window
         self.win.keypad(True)
         self.win.immedok(False)
@@ -87,23 +98,23 @@ class NCursesWindowWrapper(object):
 
     def addch(self, y, x, char):
         symbol, color = char
-        self.win.addch(y, x, symbol, self._color_map[color])
+        self.win.addch(y, x, symbol, self.color_map[color])
 
     def addstr(self, y, x, string, color=None):
         if color is None:
             self.win.addstr(y, x, string)
         else:
-            self.win.addstr(y, x, string, self._color_map[color])
+            self.win.addstr(y, x, string, self.color_map[color])
 
     def draw(self, char_payload_sequence):
         local_addch = self.win.addch
-        local_color = self._color_map
+        local_color = self.color_map
         for (y, x), (symbol, color) in char_payload_sequence:
             local_addch(y, x, symbol, local_color[color])
 
     def draw_reverse(self, char_payload_sequence):
         local_addch = self.win.addch
-        local_color = self._color_map
+        local_color = self.color_map
         for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
             local_addch(y, x, symbol, local_color[bg, fg])
 
@@ -111,7 +122,7 @@ class NCursesWindowWrapper(object):
         self.win.erase()
 
     def blit(self, size, screen_position):
-        self._check_root_window_size()
+        self._ensure_terminal_is_big_enough()
         rows, cols = size
         y, x = screen_position
         self.win.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
@@ -144,9 +155,10 @@ class NCursesWindowWrapper(object):
             raw = key
 
         if key == curses.KEY_RESIZE:
-            self._check_root_window_size()
-        elif key in self._key_map:
-            key = self._key_map[key]
+            self._ensure_terminal_is_big_enough()
+
+        if key in self.key_map:
+            key = self.key_map[key]
         else:
             nr = ord(key)
             if nr < 128:
@@ -170,45 +182,24 @@ class NCursesWindowWrapper(object):
                 alt = True
         return key, alt
 
-    @classmethod
-    def _check_root_window_size(cls):
-        rows, cols = _root_win.get_dimensions()
+    def _ensure_terminal_is_big_enough(self):
+        rows, cols = self.root_win.get_dimensions()
         min_rows, min_cols = GameConf.game_dimensions
         while rows < min_rows or cols < min_cols:
             message = ("Game needs at least a screen size of {}x{} while the "
-                       "current size is {}x{}. Please resize the screen or "
-                       "press Q to quit.")
+                    "current size is {}x{}. Please resize the screen or "
+                    "press Q to quit.")
             message = message.format(min_cols, min_rows, cols, rows)
-            _root_win.addstr(0, 0, message)
-            _root_win.win.refresh()
+            self.root_win.addstr(0, 0, message)
+            self.root_win.win.refresh()
 
-            if _root_win.get_key() == "Q":
-                _root_win.clear()
+            if self.root_win.get_key() == "Q":
+                self.root_win.clear()
                 message = "Confirm quit by pressing Y."
-                _root_win.addstr(0, 0, message)
-                _root_win.win.refresh()
-                if _root_win.get_key() == "Y":
+                self.root_win.addstr(0, 0, message)
+                self.root_win.win.refresh()
+                if self.root_win.get_key() == "Y":
                     exit()
-            _root_win.clear()
-            _root_win.win.refresh()
-            rows, cols = _root_win.get_dimensions()
-
-
-def _init_curses(curses_root_window=None):
-
-    if curses_root_window is None:
-        curses_root_window = curses.initscr()
-
-    curses.noecho()
-    curses.cbreak()                   # no line buffering
-    curses.nonl()                     # allow return key detection in input
-    curses.curs_set(0)                # Remove cursor visibility
-    curses_root_window.keypad(True)
-
-    # see curses.wrapper implementation for reason for try-except
-    try:
-        curses.start_color()
-    except:
-        pass
-
-    return curses_root_window
+            self.root_win.clear()
+            self.root_win.win.refresh()
+            rows, cols = self.root_win.get_dimensions()

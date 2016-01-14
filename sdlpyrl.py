@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import main
-from io_wrappers.libtcod import LibTCODWrapper
+from io_wrappers.libtcod import TCODWrapper
 
 
-main.start(LibTCODWrapper)
+main.start(TCODWrapper)
