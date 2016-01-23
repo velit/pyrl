@@ -3,7 +3,7 @@ from generic_structures import Array2D
 from game_data.tiles import PyrlTile
 from enums.directions import Dir
 from generic_algorithms import add_vector
-from level import LevelLocation
+from world.level import LevelLocation
 
 
 base_tiles = {

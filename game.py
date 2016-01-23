@@ -12,7 +12,7 @@ from game_actions import GameActions
 from interface.status_texts import register_status_texts
 from controllers.user_controller import UserController
 from window.window_system import WindowSystem
-from world import LevelNotFound
+from world.world import LevelNotFound
 
 
 class Game(object):

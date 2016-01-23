@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .lines_view import lines_view
+from interface.lines_view import lines_view, multi_select_lines_view
 from config.bindings import Bind
 from creature.equipment import Slot
 from collections import namedtuple
@@ -29,11 +29,11 @@ def equipment(io, char_equipment):
         if retval is None:
             return
         elif retval in Bind.View_Inventory:
-            inventory(io, char_equipment)
+            backpack(io, char_equipment)
         elif retval in range(len(equipment_rows)):
             slot = equipment_rows[retval].slot
             if char_equipment.get_item(slot) is None:
-                equip_item = inventory(io, char_equipment, slot)
+                equip_item = backpack_equip_item(io, char_equipment, slot)
                 if equip_item is not None:
                     char_equipment.equip(equip_item, slot)
             else:
@@ -42,17 +42,31 @@ def equipment(io, char_equipment):
             assert False, "Got unhandled return value as input {}".format(retval)
 
 
-def inventory(io, char_equipment, slot=None):
+def backpack_equip_item(io, char_equipment, slot):
 
     items = char_equipment.get_inventory_items(slot)
     lines = (str(item) for item in items)
 
-    if slot is None:
-        header = "Inventory"
-        lines_view(io.whole_window, lines, header=header)
+    header = "Select item to equip"
+    index = lines_view(io.whole_window, lines, select_keys=Bind.Item_Select_Keys,
+                        header=header)
+    if index is not None:
+        return items[index]
     else:
-        header = "Select item to equip"
-        index = lines_view(io.whole_window, lines, select_keys=Bind.Item_Select_Keys,
-                           header=header)
-        if index is not None:
-            return items[index]
+        return None
+
+
+def backpack(io, char_equipment):
+
+    items = char_equipment.get_inventory_items()
+    lines = tuple(str(item) for item in items)
+
+    header = "Backpack"
+    key, selected_item_indexes = multi_select_lines_view(io.whole_window, lines,
+                                                   select_keys=Bind.Item_Select_Keys, header=header)
+    if selected_item_indexes:
+        selected_lines = (lines[i] for i in selected_item_indexes)
+        for description in selected_lines:
+            io.msg(description)
+    if key is None:
+        return None

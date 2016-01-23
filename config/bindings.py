@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from .finalize import finalize_bindings
+from config.finalize import finalize_bindings
 from enums.keys import Key
 
 
@@ -31,13 +31,13 @@ class Bind(object):
         -Modifiers do not work with special keys.
     """
 
-    # general
+    # General
     Cancel = 'z', Key.SPACE, Key.ESC
 
-    # full message bar
+    # Full message bar
     Last_Message = Key.ENTER
 
-    # scrollable views
+    # Scrollable views
     Next_Line     = '+', '^n'
     Previous_Line = '-', '^p'
     Next_Page     = Key.PAGE_DOWN, '^d'
@@ -45,7 +45,7 @@ class Bind(object):
 
     # This is the same as doing Item_Select_Keys = 'a', 'b', 'c' ...
     # But it wont work if you want modifiers like ^ or !.
-    # You have to write the whole thing out then
+    # You have to write the whole thing out then.
     Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Directions used in moving/attacking/targetting
@@ -70,10 +70,11 @@ class Bind(object):
     Instant_North     = Key.NONE  # Key.UP
     Instant_NorthEast = Key.NONE  # Key.PAGE_UP
 
-    # main view
+    # Main view
     Help        = Key.F1, Key.F2
     Look_Mode   = 'q'
-    Inventory   = 'I'
+    Equipment   = 'e'
+    Backpack    = 'b'
     Descend     = 'X'
     Ascend      = 'x'
     Quit        = 'Q'
@@ -84,15 +85,16 @@ class Bind(object):
     Walk_Mode   = 'w'
     Show_Vision = 'H'
 
-    # inventory
-    View_Inventory            = 'v'
+    # Inventory
+    View_Inventory            = '^b'
+    View_Equipment            = '^e'
     Equipment_Slot_Head       = 'h'
     Equipment_Slot_Body       = 'b'
     Equipment_Slot_Right_Hand = 'r'
     Equipment_Slot_Left_Hand  = 'l'
     Equipment_Slot_Feet       = 'f'
 
-    # queries
+    # Queries
     Yes = 'y'
     No = 'n'
     Default_Yes = 'Y'

@@ -4,7 +4,7 @@ from rdg import generate_tiles_to, LevelGen
 from config.game import GameConf
 from game_data.creatures import creature_templates
 from generic_structures import Array2D, OneToOneMapping
-from level import LevelLocation
+from world.level import LevelLocation
 
 
 class LevelTemplate(object):

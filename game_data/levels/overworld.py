@@ -5,8 +5,8 @@ from enum import Enum
 from config.game import GameConf
 from enums.colors import Pair
 from game_data.levels.shared_assets import construct_data
-from level_template import LevelTemplate
-from tile import Tile
+from world.level_template import LevelTemplate
+from world.tile import Tile
 from rdg import LevelGen
 
 

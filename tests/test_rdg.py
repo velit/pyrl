@@ -3,8 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pytest
 
 import rdg
-import level
-from level_template import LevelTemplate
+from world.level import LevelLocation
+from world.level_template import LevelTemplate
 from game_data.levels.shared_assets import construct_data
 from generic_structures import Array2D
 from game_data.tiles import PyrlTile
@@ -21,15 +21,15 @@ def test_many_rdg_generation():
     for _ in range(1000):
         lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
         rdg.generate_tiles_to(lt)
-        lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
-        lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
+        lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
+        lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
 
 
 def test_rdg_generation():
     lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
     rdg.generate_tiles_to(lt)
-    lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
-    lt.tiles[lt.location_coords[level.LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
+    lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
+    lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
 
 
 @pytest.fixture

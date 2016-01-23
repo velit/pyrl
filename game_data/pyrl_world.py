@@ -1,9 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from world import World
+from world.world import World
 from game_data.levels import test_level, overworld
 from game_data.player import Player
-from level import LevelLocation
+from world.level import LevelLocation
 
 
 def get_world():

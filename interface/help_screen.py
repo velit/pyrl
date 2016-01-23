@@ -12,7 +12,7 @@ def help_screen(io):
             "",
             "Help            {0!s:16.16}".format(Bind.Help),
             "Look Mode       {0!s:16.16}".format(Bind.Look_Mode),
-            "Inventory       {0!s:16.16}".format(Bind.Inventory),
+            "Inventory       {0!s:16.16}".format(Bind.Equipment),
             "Descend         {0!s:16.16}".format(Bind.Descend),
             "Ascend          {0!s:16.16}".format(Bind.Ascend),
             "Quit            {0!s:16.16}".format(Bind.Quit),

@@ -9,8 +9,8 @@ from enums.keys import Key
 from game_actions import ActionError
 from generic_algorithms import add_vector
 from interface.help_screen import help_screen
-from interface.inventory import equipment
-from level import LevelLocation
+from interface.inventory import equipment, backpack
+from world.level import LevelLocation
 from config.game import GameConf
 
 
@@ -57,7 +57,8 @@ class UserController(object):
             Bind.History.key:     self.print_history,
             Bind.Look_Mode.key:   self.look,
             Bind.Help.key:        self.help_screen,
-            Bind.Inventory.key:   self.equipment,
+            Bind.Equipment.key:   self.equipment,
+            Bind.Backpack.key:    self.backpack,
             Bind.Walk_Mode.key:   self.init_walk_mode,
             Bind.Show_Vision.key: self.show_vision,
             Bind.Ascend.key:      partial(self.ascend),
@@ -95,7 +96,7 @@ class UserController(object):
     def act_to_dir(self, direction):
         target_coord = add_vector(self.creature.coord, direction)
         error = None
-        if self.level.creature_can_move(self.creature, direction):
+        if self.game_actions.can_move(direction):
             error = self.game_actions.move(direction)
         elif self.level.has_creature(target_coord):
             error = self.game_actions.attack(direction)
@@ -186,6 +187,9 @@ class UserController(object):
 
     def equipment(self):
         return equipment(self.io, self.creature.equipment)
+
+    def backpack(self):
+        return backpack(self.io, self.creature.equipment)
 
     def init_walk_mode(self, instant_direction=None):
         return self.walk_mode.init_walk_mode(instant_direction)

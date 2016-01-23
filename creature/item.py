@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from dice import Dice
-from .equipment import Slot
+from creature.equipment import Slot
 
 
 def get_stats_str(stats):

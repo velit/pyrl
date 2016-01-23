@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 from os.path import join
 
-from .game import GameConf
+from config.game import GameConf
 
 
 class Debug(object):

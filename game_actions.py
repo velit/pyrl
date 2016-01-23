@@ -3,7 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from enum import Enum
 from combat import get_melee_attack_cr, get_combat_message
 from creature.actions import Action
-from generic_algorithms import add_vector
+from generic_algorithms import add_vector, get_vector
+from enums.directions import Dir
 
 
 class ActionError(Enum):
@@ -71,7 +72,7 @@ class GameActions(object):
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not self.level.creature_can_move(self.creature, direction):
+        if not self.can_move(direction):
             return ActionError.IllegalMove
 
         self.level.move_creature_to_dir(self.creature, direction)
@@ -128,6 +129,7 @@ class GameActions(object):
         self.game.io.msg(msg)
 
     def save(self):
+        """Zero cost action."""
         if self.creature is not self.game.player:
             return ActionError.PlayerAction
 
@@ -135,13 +137,41 @@ class GameActions(object):
         self._do_action(0)
 
     def quit(self):
+        """Free action."""
         if self.creature is not self.game.player:
             return ActionError.PlayerAction
 
         self.game.endgame(ask=False)
 
     def redraw(self):
+        """Free action."""
         if self.creature is not self.game.player:
             return ActionError.PlayerAction
 
         self.game.redraw()
+
+    def can_reach(self, target_coord):
+        """Free action."""
+        return (self.creature.coord == target_coord or
+            get_vector(self.creature.coord, target_coord) in Dir.All)
+
+    def can_move(self, direction):
+        """Free action."""
+        if direction not in Dir.AllPlusStay:
+            raise ValueError("Illegal movement direction: {}".format(direction))
+        elif direction == Dir.Stay:
+            return True
+        else:
+            coord = add_vector(self.creature.coord, direction)
+            return self.level.is_legal(coord) and self.level.is_passable(coord)
+
+    def target_within_sight_distance(self, target_coord):
+        """Free action."""
+        cy, cx = self.creature.coord
+        ty, tx = target_coord
+        return (cy - ty) ** 2 + (cx - tx) ** 2 <= self.creature.sight ** 2
+
+    def target_in_sight(self, target_coord):
+        """Free action."""
+        return (self.target_within_sight_distance(target_coord) and
+                self.level.check_los(self.creature.coord, target_coord))

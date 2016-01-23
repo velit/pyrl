@@ -2,8 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import Counter
 
-from level import Level, LevelLocation
-from level_template import LevelTemplate
+from world.level import Level, LevelLocation
+from world.level_template import LevelTemplate
 
 
 class LevelNotFound(Exception): pass

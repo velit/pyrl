@@ -2,14 +2,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-from enum import Enum
-
 import path
+from enum import Enum
 from config.debug import Debug
 from creature.actions import Action
 from creature.creature import Creature
 from enums.directions import Dir
-from generic_algorithms import bresenham, cross_product, get_vector, add_vector
+from generic_algorithms import bresenham, cross_product, add_vector
 from generic_structures import Event
 from turn_scheduler import TurnScheduler
 
@@ -31,6 +30,7 @@ class Level(object):
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
+        self.items = {}
         self.generation_type = level_template.generation_type
 
         for creature in level_template.custom_creatures:
@@ -225,25 +225,3 @@ class Level(object):
         self.creatures[creatureB.coord] = creatureB
         self.visible_change.trigger(creatureA.coord)
         self.visible_change.trigger(creatureB.coord)
-
-    def creature_can_reach(self, creature, target_coord):
-        return (creature.coord == target_coord or
-            get_vector(creature.coord, target_coord) in Dir.All)
-
-    def creature_can_move(self, creature, direction):
-        if direction not in Dir.AllPlusStay:
-            raise ValueError("Illegal movement direction: {}".format(direction))
-        elif direction == Dir.Stay:
-            return True
-        else:
-            coord = add_vector(creature.coord, direction)
-            return self.is_legal(coord) and self.is_passable(coord)
-
-    def creature_target_theoretically_in_sight(self, creature, target_coord):
-        cy, cx = creature.coord
-        ty, tx = target_coord
-        return (cy - ty) ** 2 + (cx - tx) ** 2 <= creature.sight ** 2
-
-    def creature_has_sight(self, creature, target_coord):
-        return (self.creature_target_theoretically_in_sight(creature, target_coord) and
-                self.check_los(creature.coord, target_coord))

@@ -6,8 +6,9 @@ from creature.template import CreatureTemplate
 from enums.colors import Pair
 from game_data.levels.shared_assets import construct_data
 from game_data.tiles import PyrlTile
-from level_template import LevelTemplate, LevelGen
-from level import LevelLocation
+from world.level_template import LevelTemplate
+from world.level import LevelLocation
+from rdg import LevelGen
 
 
 def get_template(player):

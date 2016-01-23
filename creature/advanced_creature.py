@@ -2,9 +2,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from collections import defaultdict
 
-from .stats import Stat
-from .creature import Creature
-from .equipment import Equipment
+from creature.stats import Stat
+from creature.creature import Creature
+from creature.equipment import Equipment
 
 
 def _add_equipment_properties(cls):

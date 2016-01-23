@@ -10,7 +10,17 @@ def lines_view(*keys, **args):
     If select_keys is defined and user presses key, return index of the appropriate line.
     """
     view = LinesView(*keys, **args)
-    return view.render()
+    return view.single_select_render()
+
+
+def multi_select_lines_view(*keys, **args):
+    """
+    Render a view using lines as sequence of strings.
+
+    If select_keys is defined and user presses key, return index of the appropriate line.
+    """
+    view = LinesView(*keys, **args)
+    return view.multi_select_render()
 
 
 class LinesView(object):
@@ -31,33 +41,33 @@ class LinesView(object):
         if footer is not None:
             self.footer = footer
 
-        self.index = 0
+        self.view_offset = 0
         self.view_lines = self.window.rows - self.view_overhead
         self.select_keys = select_keys
+        self.selected_items = set()
         self.return_keys = return_keys
 
         if self.select_keys:
             self.select_keys = select_keys[:self.view_lines]
             self.visible_amount = min(len(self.select_keys), len(self.lines))
-            upper_one_char = lambda key: key.upper() if len(key) == 1 else key
-            self.select_keys_str = tuple(upper_one_char(key) for key in self.select_keys)
+            self.select_keys_str = tuple(self._capitalize_single_chars(self.select_keys))
         else:
             self.visible_amount = min(self.view_lines, len(self.lines))
 
-        self.key_seq = Bind.Cancel + Bind.scroll_keys + self.select_keys + self.return_keys
+        self.all_keys = Bind.Cancel + Bind.scroll_keys + self.select_keys + self.return_keys
 
-    def render(self):
+    def single_select_render(self):
         while True:
             if self.select_keys:
-                lines = self._iter_slice(self.lines, self.index, self.index + self.visible_amount)
+                lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
                 keys_lines = zip(self.select_keys_str, lines)
                 print_lines = ("{0} - {1}".format(key, line) for key, line in keys_lines)
             else:
-                print_lines = self._iter_slice(self.lines, self.index, self.index + self.visible_amount)
+                print_lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
 
             self._print_view(print_lines)
 
-            key = self.window.selective_get_key(self.key_seq, refresh=True)
+            key = self.window.selective_get_key(self.all_keys, refresh=True)
 
             if key in self.return_keys:
                 return key
@@ -66,9 +76,53 @@ class LinesView(object):
             elif key in Bind.scroll_keys:
                 self._update_index(key)
             elif key in self.select_keys:
-                return self.select_keys.index(key) + self.index
+                return self.select_keys.index(key) + self.view_offset
             else:
                 assert False, "Got unhandled key as input {}".format(key)
+
+    def multi_select_render(self):
+
+        if not self.select_keys:
+            raise ValueError("LinesView initialization has to have non-empty select"
+                             "_keys when using multi select mode")
+
+        while True:
+
+            lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
+            keys_lines = zip(self.select_keys_str, lines)
+            print_lines = ("{} {} {}".format(key, self._selection_symbol(self.view_offset + i), line)
+                           for i, (key, line) in enumerate(keys_lines))
+
+            self._print_view(print_lines)
+
+            key = self.window.selective_get_key(self.all_keys, refresh=True)
+
+            if key in self.return_keys:
+                return key, tuple(sorted(self.selected_items))
+            elif key in Bind.Cancel:
+                return None, tuple(sorted(self.selected_items))
+            elif key in Bind.scroll_keys:
+                self._update_index(key)
+            elif key in self.select_keys:
+                self._toggle_selection(self.select_keys.index(key) + self.view_offset)
+            else:
+                assert False, "Got unhandled key as input {}".format(key)
+
+    def _selection_symbol(self, index):
+        if index in self.selected_items:
+            return "+"
+        else:
+            return "-"
+
+    def _toggle_selection(self, index):
+        self.selected_items ^= {index}
+
+    def _capitalize_single_chars(self, seq):
+        for key in seq:
+            if len(key) == 1:
+                yield key.upper()
+            else:
+                yield key
 
     def _print_view(self, print_lines):
         self.window.clear()
@@ -85,7 +139,7 @@ class LinesView(object):
                 yield seq[i]
 
     def _update_index(self, key):
-        i = self.index
+        i = self.view_offset
         if key in Bind.Next_Line:
             i += 1
         elif key in Bind.Next_Page:
@@ -96,4 +150,4 @@ class LinesView(object):
             i -= self.visible_amount - 1
         min_i, max_i = 0, max(0, len(self.lines) - self.visible_amount)
         i = min(max(i, min_i), max_i)
-        self.index = i
+        self.view_offset = i

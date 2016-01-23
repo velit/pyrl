@@ -8,7 +8,7 @@ from random import randrange, random, choice
 from enums.directions import Dir
 from generic_algorithms import add_vector
 from game_data.tiles import PyrlTile
-from level import LevelLocation
+from world.level import LevelLocation
 from config.debug import Debug
 
 

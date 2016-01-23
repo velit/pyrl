@@ -22,14 +22,14 @@ class AI(object):
         else:
             chase_coord, chase_vector = None, None
 
-        if level.creature_has_sight(creature, alert_coord):
+        if game_actions.target_in_sight(alert_coord):
             # passive actions
             if chase_coord is not None and chase_coord != alert_coord:
                 chase_vector = get_vector(chase_coord, alert_coord)
             chase_coord = alert_coord
 
             # actions
-            if level.creature_can_reach(creature, alert_coord):
+            if game_actions.can_reach(alert_coord):
                 error = game_actions.attack(get_vector(creature.coord, alert_coord))
             else:
                 error = self.move_towards(game_actions, alert_coord)
@@ -93,8 +93,7 @@ class AI(object):
             assert False, "AI state bug. Best action was: {}".format(best_action)
 
     def move_random(self, game_actions):
-        creature = game_actions.creature
-        valid_dirs = [direction for direction in Dir.All if creature.level.creature_can_move(creature, direction)]
+        valid_dirs = [direction for direction in Dir.All if game_actions.can_move(direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
             return game_actions.move(random.choice(valid_dirs))
         else:

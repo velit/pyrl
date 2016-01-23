@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from enums.colors import Pair
-from tile import Tile
+from world.tile import Tile
 
 
 class PyrlTile(object):
