@@ -5,13 +5,7 @@ class Tile(object):
 
     """Permanent portion of a square. Eg. walls or floor."""
 
-    def __init__(self,
-                 name,
-                 visible_char,
-                 mem_char,
-                 passable=True,
-                 see_through=True,
-                 move_mult=1):
+    def __init__(self, name, visible_char, mem_char, passable=True, see_through=True, move_mult=1):
         self.name = name
         self.visible_char = visible_char
         self.memory_char = mem_char

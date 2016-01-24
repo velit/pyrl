@@ -43,7 +43,7 @@ def test_one_to_one_mapping():
         mapping[1] = 5
 
     del mapping[4]
-    with pytest.raises(ValueError):
+    with pytest.raises(KeyError):
         mapping.getkey(4)
 
     with pytest.raises(ValueError):

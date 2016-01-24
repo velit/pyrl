@@ -74,7 +74,7 @@ class AI(object):
             coord = add_vector(creature.coord, direction)
             if level.is_passable(coord):
                 action = Action.Move
-            elif level.has_creature(coord) and self.willing_to_swap(level.get_creature(coord), creature):
+            elif coord in level.creatures and self.willing_to_swap(level.creatures[coord], creature):
                 action = Action.Swap
             else:
                 continue

@@ -113,9 +113,9 @@ class RDG(object):
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
         if self.generation_type.value >= LevelGen.Dungeon.value:
-            if LevelLocation.Passage_Up not in self.level_template.location_coords:
+            if LevelLocation.Passage_Up not in self.level_template.locations.values():
                 self.add_location(PyrlTile.Stairs_Up, LevelLocation.Passage_Up)
-            if LevelLocation.Passage_Down not in self.level_template.location_coords:
+            if LevelLocation.Passage_Down not in self.level_template.locations.values():
                 self.add_location(PyrlTile.Stairs_Down, LevelLocation.Passage_Down)
 
     def init_tiles(self):
@@ -175,7 +175,7 @@ class RDG(object):
             assert False, "Location add failed due to free coord get failed."
 
         self.level_template.tiles[coord] = tile
-        self.level_template.location_coords[location] = coord
+        self.level_template.locations[coord] = location
 
     def make_initial_room(self):
         while True:

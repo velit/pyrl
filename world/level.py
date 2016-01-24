@@ -26,7 +26,7 @@ class Level(object):
         self.tiles = level_template.tiles
         self.rows, self.cols = self.tiles.dimensions
         self.danger_level = level_template.danger_level
-        self.location_coords = level_template.location_coords
+        self.locations = level_template.locations
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
@@ -42,45 +42,45 @@ class Level(object):
             for _ in range(level_template.creature_spawn_count):
                 creature = Creature(random.choice(self.creature_spawn_list))
                 self.spawn_creature(creature)
+        else:
+            self.creature_spawn_list = []
+
+    def get_location_coord(self, level_location):
+        if level_location == LevelLocation.Random_Location:
+            return self.free_coord()
+        else:
+            return self.locations.getkey(level_location)
 
     def free_coord(self):
         for _ in range(Debug.max_loop_cycles):
             coord = self.tiles.random_coord()
             if self.is_passable(coord):
                 return coord
+
+        free_coords = [coord for coord in self.tiles.coord_iter() if self.is_passable(coord)]
+        if free_coords:
+            return random.choice(free_coords)
         else:
             assert False, "Free coord search failed."
 
-    def get_creature(self, coord):
-        return self.creatures[coord]
-
-    def get_visible_char(self, coord):
-        if self.has_creature(coord):
-            return self.get_creature(coord).char
+    def visible_char(self, coord):
+        if coord in self.creatures:
+            return self.creatures[coord].char
         else:
             return self.tiles[coord].visible_char
 
-    def get_memory_char(self, coord):
+    def memory_char(self, coord):
         return self.tiles[coord].memory_char
 
     def get_vision_information(self, coords, visible_coords, always_show_creatures=False):
         for coord in coords:
             if coord in visible_coords:
-                yield coord, self.get_visible_char(coord)
+                yield coord, self.visible_char(coord)
             else:
-                if always_show_creatures and self.has_creature(coord):
-                    yield coord, self.get_creature(coord).char
+                if always_show_creatures and coord in self.creatures:
+                    yield coord, self.creatures[coord].char
                 else:
-                    yield coord, self.get_memory_char(coord)
-
-    def get_location(self, coord):
-        return self.location_coords.getkey(coord)
-
-    def get_location_coord(self, level_location):
-        if level_location == LevelLocation.Random_Location:
-            return self.free_coord()
-        else:
-            return self.location_coords[level_location]
+                    yield coord, self.memory_char(coord)
 
     def get_last_pathable_coord(self, coord_start, coord_end):
         last = None
@@ -101,20 +101,11 @@ class Level(object):
             if self.is_legal(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
 
-    def has_creature(self, coord):
-        return coord in self.creatures
-
-    def has_location(self, coord):
-        return coord in self.location_coords.values()
-
-    def has_location_coord(self, location):
-        return location in self.location_coords
-
     def is_legal(self, *args, **keys):
         return self.tiles.is_legal(*args, **keys)
 
     def is_passable(self, coord):
-        if self.has_creature(coord):
+        if coord in self.creatures:
             return False
         else:
             return self.tiles[coord].is_passable
@@ -153,8 +144,8 @@ class Level(object):
     def look_information(self, coord):
         #if coord in creature.visited_location_coords:
         information = "{}x{} ".format(*coord)
-        if self.has_creature(coord):
-            c = self.get_creature(coord)
+        if coord in self.creatures:
+            c = self.creatures[coord]
             msg = "{} hp:{}/{} sight:{} armor:{} dr:{} ar:{} attack:{}D{}+{}"
             information += msg.format(c.name, c.hp, c.max_hp, c.sight, c.armor,
                                       c.defense_rating, c.attack_rating, *c.get_damage_info())
@@ -187,7 +178,7 @@ class Level(object):
         if coord is None:
             coord = self.free_coord()
 
-        elif self.has_creature(coord):
+        elif coord in self.creatures:
             blocking_creature = self.creatures[coord]
             self.move_creature(blocking_creature, self.free_coord())
         self.creatures[coord] = creature

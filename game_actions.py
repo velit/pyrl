@@ -53,10 +53,10 @@ class GameActions(object):
         if self.already_acted():
             return ActionError.AlreadyActed
 
-        if not self.level.has_location(self.creature.coord):
+        if self.creature.coord not in self.level.locations:
             return ActionError.NoEntrance
 
-        source_point = (self.level.key, self.level.get_location(self.creature.coord))
+        source_point = (self.level.key, self.level.locations[self.creature.coord])
 
         if not self.world.has_destination(source_point):
             return ActionError.PassageLeadsNoWhere
@@ -94,10 +94,10 @@ class GameActions(object):
             return ActionError.AlreadyActed
 
         target_coord = add_vector(self.creature.coord, direction)
-        if not self.level.has_creature(target_coord):
+        if target_coord not in self.level.creatures:
             return ActionError.NoSwapTarget
 
-        target_creature = self.level.get_creature(target_coord)
+        target_creature = self.level.creatures[target_coord]
         if not self.game.ai.willing_to_swap(target_creature, self.creature, self.game.player):
             return ActionError.SwapTargetResists
 
@@ -111,8 +111,8 @@ class GameActions(object):
 
         target_coord = add_vector(self.creature.coord, direction)
 
-        if self.level.has_creature(target_coord):
-            target = self.level.get_creature(target_coord)
+        if target_coord in self.level.creatures:
+            target = self.level.creatures[target_coord]
         else:
             target = self.level.tiles[target_coord]
 

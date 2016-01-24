@@ -98,7 +98,7 @@ class UserController(object):
         error = None
         if self.game_actions.can_move(direction):
             error = self.game_actions.move(direction)
-        elif self.level.has_creature(target_coord):
+        elif target_coord in self.level.creatures:
             error = self.game_actions.attack(direction)
         else:
             error = ActionError.IllegalMove
@@ -118,10 +118,10 @@ class UserController(object):
                 self.io.draw_line(coord, self.creature.coord, ("*", Pair.Yellow))
                 self.io.msg("LoS: {}".format(self.level.check_los(self.creature.coord, coord)))
             if coord != self.creature.coord:
-                char = self.level.get_visible_char(coord)
+                char = self.level.visible_char(coord)
                 char = char[0], (Color.Black, Color.Green)
                 self.io.draw_char(coord, char)
-                self.io.draw_char(self.creature.coord, self.level.get_visible_char(self.creature.coord), reverse=True)
+                self.io.draw_char(self.creature.coord, self.level.visible_char(self.creature.coord), reverse=True)
             c = self.io.get_key()
             self.game_actions.redraw()
             direction = Dir.Stay
@@ -134,8 +134,8 @@ class UserController(object):
                 for coord in bresenham(self.level.get_coord(self.creature.coord), coord):
                     self.io.msg(coord)
             elif c == 's':
-                if self.level.has_creature(coord):
-                    self.game_actions.game.register_status_texts(self.level.get_creature(coord))
+                if coord in self.level.creatures:
+                    self.game_actions.game.register_status_texts(self.level.creatures[coord])
             elif c in Bind.Cancel or c in Bind.Look_Mode:
                 break
 
@@ -155,25 +155,27 @@ class UserController(object):
         self.game_actions.redraw()
 
     def descend(self):
-        if self.level.has_location(self.creature.coord):
-            location = self.level.get_location(self.creature.coord)
-            if location == LevelLocation.Passage_Up:
-                #return "Cannot descend an upwards passage."
-                return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
-        else:
+        try:
+            location = self.level.locations[self.creature.coord]
+        except KeyError:
             #return "You don't find any downwards passage."
+            return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
+
+        if location == LevelLocation.Passage_Up:
+            #return "Cannot descend an upwards passage."
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
 
         return self.game_actions.enter_passage()
 
     def ascend(self):
-        if self.level.has_location(self.creature.coord):
-            location = self.level.get_location(self.creature.coord)
-            if location != LevelLocation.Passage_Up:
-                #return "Cannot ascend a downwards passage."
-                return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
-        else:
+        try:
+            location = self.level.locations[self.creature.coord]
+        except KeyError:
             #return "You don't find any upwards passage."
+            return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
+
+        if location != LevelLocation.Passage_Up:
+            #return "Cannot ascend a downwards passage."
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
 
         return self.game_actions.enter_passage()

@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import time
+from collections import deque
 
 from enums.colors import Pair
 from config.bindings import Bind
@@ -33,12 +34,17 @@ class WindowSystem(object):
         status_position   = (self.level_window.screen_position[0] + self.level_window.rows, 0)
         self.status_bar   = StatusBar(cursor_lib, sts_bar_dims, status_position)
 
+        self.prepared_input = deque()
+
     def get_key(self, message=None, refresh=True):
         if message is not None:
             self.msg(message)
         if refresh:
             self.refresh()
-        return self.level_window.get_key()
+        if self.prepared_input:
+            return self.prepared_input.popleft()
+
+        return self.whole_window.get_key()
 
     def msg(self, *a):
         self.message_bar.queue_msg(*a)

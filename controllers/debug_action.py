@@ -1,11 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import code
+import random
 from rdg import LevelGen
 from config.debug import Debug
+from config.bindings import Bind
 from world.level_template import LevelTemplate
 from world.level import LevelLocation
 from controllers.user_controller import UserControllerProxy
+from creature.creature import Creature
 
 
 class DebugAction(UserControllerProxy):
@@ -14,18 +17,25 @@ class DebugAction(UserControllerProxy):
         super().__init__(user_controller)
 
         self.actions = {
-            'v': self.show_map,
-            'r': self.toggle_path_heuristic_cross,
-            'l': self.cycle_level_type,
+            'a': self.add_monster,
+            'c': self.display_curses_color_info,
             'd': self.show_path_debug,
+            'i': self.interactive_console,
             'k': self.kill_creatures_in_level,
+            'l': self.cycle_level_type,
+            'm': self.print_message_debug_string,
             'o': self.draw_path_to_passage_down,
             'p': self.draw_path_from_up_to_down,
-            'i': self.interactive_console,
+            'r': self.toggle_path_heuristic_cross,
+            'v': self.show_map,
+            'x': self.ascend_to_surface,
             'y': self.toggle_log_keycodes,
-            'c': self.display_curses_color_info,
-            'm': self.print_message_debug_string,
+            'X': self.descend_to_end,
         }
+
+    def update_without_acting(self):
+        self.game_actions.game.update_view(self.creature)
+        self.game_actions.redraw()
 
     def ask_action(self):
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.actions.keys())))
@@ -34,6 +44,13 @@ class DebugAction(UserControllerProxy):
             self.actions[c]()
         else:
             self.io.msg("Undefined debug key: {}".format(c))
+
+    def add_monster(self):
+        if self.level.creature_spawn_list:
+            self.level.spawn_creature(Creature(random.choice(self.level.creature_spawn_list)))
+            self.update_without_acting()
+        else:
+            self.io.msg("No random spawning on this level. Can't add monster.")
 
     def show_map(self):
         Debug.show_map = not Debug.show_map
@@ -71,14 +88,14 @@ class DebugAction(UserControllerProxy):
         self.io.msg("Abrakadabra.")
 
     def draw_path_to_passage_down(self):
-        passage_down = self.level.get_location_coord(LevelLocation.Passage_Down)
-        self.io.draw_path(self.level.path(self.creature.coord, passage_down))
+        passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
+        self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
         self.game_actions.redraw()
 
     def draw_path_from_up_to_down(self):
-        passage_up = self.level.get_location_coord(LevelLocation.Passage_Up)
-        passage_down = self.level.get_location_coord(LevelLocation.Passage_Down)
-        self.io.draw_path(self.level.path(passage_up, passage_down))
+        passage_up_coord = self.level.get_location_coord(LevelLocation.Passage_Up)
+        passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
+        self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
         self.game_actions.redraw()
 
     def interactive_console(self):
@@ -102,8 +119,7 @@ class DebugAction(UserControllerProxy):
 
     def sight_change(self, amount):
         self.creature.base_perception += amount
-        self.game_actions.game.update_view(self.creature)
-        self.game_actions.redraw()
+        self.update_without_acting()
 
     def teleport_to_location(self, location):
         try:
@@ -112,5 +128,11 @@ class DebugAction(UserControllerProxy):
             self.io.msg("This level doesn't seem to have a {} location".format(location))
             return
         if not self.level.is_passable(new_coord):
-            self.level.remove_creature(self.level.get_creature(new_coord))
+            self.level.remove_creature(self.level.creatures[new_coord])
         return self.game_actions.teleport(new_coord)
+
+    def descend_to_end(self):
+        self.io.prepared_input.extend([Bind.Descend.key]*200)
+
+    def ascend_to_surface(self):
+        self.io.prepared_input.extend([Bind.Ascend.key]*200)

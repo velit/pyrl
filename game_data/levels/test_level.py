@@ -54,13 +54,13 @@ def get_template(player):
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures
-    tiles, location_coords, creatures = construct_data(dimensions, charstr, *level_data)
+    tiles, locations, creatures = construct_data(dimensions, charstr, *level_data)
 
     return LevelTemplate(
         danger_level=1,
         generation_type=LevelGen.NoGeneration,
         tiles=tiles,
-        location_coords=location_coords,
+        locations=locations,
         custom_creatures=creatures,
         creature_spawning=False,
     )

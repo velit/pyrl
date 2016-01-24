@@ -91,6 +91,8 @@ class Array2D(list):
 
 class OneToOneMapping(dict):
 
+    """A dict-like object which guarantees uniqueness for values in addition to keys."""
+
     def __setitem__(self, key, value):
         if value in self.values():
             raise ValueError("Value {} already exists in mapping.".format(value))
@@ -100,7 +102,7 @@ class OneToOneMapping(dict):
         for key, value in self.items():
             if value == arg_value:
                 return key
-        raise ValueError("Value {} not found.".format(arg_value))
+        raise KeyError("Value {} not found in mapping.".format(arg_value))
 
     def update(self, E=None, **kwords):
         if E is not None:

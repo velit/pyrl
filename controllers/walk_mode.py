@@ -149,6 +149,5 @@ class WalkMode(UserControllerProxy):
         return left, right
 
     def _any_creatures_visible(self):
-        has_creature = self.level.has_creature
         not_self = lambda coord: coord != self.creature.coord
-        return any(has_creature(coord) for coord in self.creature.vision if not_self(coord))
+        return any(coord in self.level.creatures for coord in self.creature.vision if not_self(coord))

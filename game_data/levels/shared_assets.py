@@ -49,14 +49,14 @@ def _assert_size(charstr, dimensions):
 
 def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures_lookup):
     tiles = unfinalized_tiles
-    location_coords = {}
+    locations = {}
     creatures = []
     for coord, char in tiles.enumerate():
 
         tiles[coord] = tiles_lookup[char]
 
         if char in locations_lookup:
-            location_coords[locations_lookup[char]] = coord
+            locations[coord] = locations_lookup[char]
 
         if char in creatures_lookup:
             creature = creatures_lookup[char]
@@ -64,7 +64,7 @@ def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures
             creatures.append(creature)
 
     _finalize_tiles(tiles)
-    return tiles, location_coords, creatures
+    return tiles, locations, creatures
 
 
 def _finalize_tiles(tiles):

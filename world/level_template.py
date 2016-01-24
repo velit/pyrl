@@ -10,13 +10,13 @@ from world.level import LevelLocation
 class LevelTemplate(object):
 
     def __init__(self, danger_level=0, generation_type=LevelGen.Dungeon, tiles=None,
-                 location_coords=None, custom_creatures=(), creature_spawning=True):
+                 locations=None, custom_creatures=(), creature_spawning=True):
         self.danger_level = danger_level
         if tiles is None:
             self.tiles = Array2D(GameConf.LEVEL_DIMENSIONS)
         else:
             self.tiles = tiles
-        self.location_coords = OneToOneMapping()
+        self.locations = OneToOneMapping()
         self.custom_creatures = list(custom_creatures)
         self.creature_spawning = creature_spawning
         self.creature_spawn_count = 99
@@ -29,8 +29,8 @@ class LevelTemplate(object):
         else:
             self.rows, self.cols = GameConf.LEVEL_DIMENSIONS
 
-        if location_coords is not None:
-            self.location_coords.update(location_coords)
+        if locations is not None:
+            self.locations.update(locations)
 
     def get_creature_spawn_list(self):
         creature_list = []
@@ -45,7 +45,7 @@ class LevelTemplate(object):
         if location == LevelLocation.Random_Location:
             return True
 
-        if location in self.location_coords:
+        if location in self.locations.values():
             return True
 
         if self.generation_type != LevelGen.NoGeneration:

@@ -18,18 +18,18 @@ def pp_tm(tm, cols):
 
 @pytest.mark.slow
 def test_many_rdg_generation():
-    for _ in range(1000):
+    for _ in range(100):
         lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
         rdg.generate_tiles_to(lt)
-        lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
-        lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
+        lt.tiles[lt.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
+        lt.tiles[lt.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Up
 
 
 def test_rdg_generation():
     lt = LevelTemplate(generation_type=rdg.LevelGen.Dungeon)
     rdg.generate_tiles_to(lt)
-    lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Down
-    lt.tiles[lt.location_coords[LevelLocation.Passage_Down]] == PyrlTile.Stairs_Up
+    lt.tiles[lt.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
+    lt.tiles[lt.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Up
 
 
 @pytest.fixture
