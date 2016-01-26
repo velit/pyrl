@@ -1,16 +1,17 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import itertools
 from enum import Enum
 from creature.stats import Stat
 
 
 class Slot(Enum):
 
-    head       = "Head"
-    body       = "Body"
-    right_hand = "Right Hand"
-    left_hand  = "Left Hand"
-    feet       = "Feet"
+    Head       = "Head"
+    Body       = "Body"
+    Right_Hand = "Right Hand"
+    Left_Hand  = "Left Hand"
+    Feet       = "Feet"
 
 
 class Equipment(object):
@@ -19,64 +20,68 @@ class Equipment(object):
 
         self.applied_stats = {stat: 0 for stat in Stat}
 
-        self.bag_of_holding = set()
-        self.worn_items = {
-            Slot.head:        None,
-            Slot.body:        None,
-            Slot.right_hand:  None,
-            Slot.left_hand:   None,
-            Slot.feet:        None,
+        self._bag = ()
+        self._worn_items = {
+            Slot.Head:        None,
+            Slot.Body:        None,
+            Slot.Right_Hand:  None,
+            Slot.Left_Hand:   None,
+            Slot.Feet:        None,
         }
 
     def get_item(self, slot):
-        return self.worn_items[slot]
+        return self._worn_items[slot]
+
+    def equip_from_bag(self, index, slot):
+        item = self.unbag_item(index)
+        self.equip(item, slot)
 
     def equip(self, item, slot):
         assert slot in item.compatible_slots, "Item {} does not fit into slot {}".format(item, slot)
 
-        self.unbag_item(item)
-        if self.worn_items[slot] is not None:
+        if self._worn_items[slot] is not None:
             self.unequip(slot)
-        self._equip_item(item, slot)
+        self._worn_items[slot] = item
+        self._add_stats(item)
 
     def unequip(self, slot):
-        item = self.worn_items[slot]
-        assert item is not None, "Slot is already empty"
-        self._unequip_item(item, slot)
+        assert self._worn_items[slot] is not None, "Slot is already empty"
+
+        item = self._worn_items[slot]
+        self._worn_items[slot] = None
+        self._remove_stats(item)
         self.bag_item(item)
 
     def bag_item(self, item):
-        self.bag_of_holding.add(item)
+        self.bag_items((item, ))
 
-    def unbag_item(self, item):
-        self.bag_of_holding.remove(item)
+    def bag_items(self, items):
+        self._bag = tuple(itertools.chain(self._bag, items))
+
+    def unbag_item(self, item_index):
+        return self.unbag_items((item_index, ))[0]
+
+    def unbag_items(self, item_indexes):
+        index_set = set(item_indexes)
+        unbagged_items = tuple(self._bag[index] for index in item_indexes)
+        self._bag = tuple(item for index, item in enumerate(self._bag) if index not in index_set)
+        return unbagged_items
 
     def get_damage_info(self):
-        if self.worn_items[Slot.right_hand] is not None:
-            return self.worn_items[Slot.right_hand].get_damage()
-        elif self.worn_items[Slot.left_hand] is not None:
-            return self.worn_items[Slot.left_hand].get_damage()
+        if self._worn_items[Slot.Right_Hand] is not None:
+            return self._worn_items[Slot.Right_Hand].get_damage()
+        elif self._worn_items[Slot.Left_Hand] is not None:
+            return self._worn_items[Slot.Left_Hand].get_damage()
         else:
             return None
 
-    def get_inventory_lines(self):
-        f = "{1}. {0.name} {0.stats}"
-        for i, item in enumerate(self.bag_of_holding):
-            yield f.format(item, (i + 1) % 10)
+    def enumerate_bag(self):
+        return enumerate(self._bag)
 
-    def get_inventory_items(self, slot=None):
-        """Return a sorted tuple of inventory items in given slot, if None return all items."""
-        if slot is not None:
-            return tuple(sorted(item for item in self.bag_of_holding if item.fits_to_slot(slot)))
-        else:
-            return tuple(sorted(self.bag_of_holding))
-
-    def _equip_item(self, item, slot):
-        self.worn_items[slot] = item
+    def _add_stats(self, item):
         for stat, value in item.stats:
             self.applied_stats[stat] += value
 
-    def _unequip_item(self, item, slot):
-        self.worn_items[slot] = None
+    def _remove_stats(self, item):
         for stat, value in item.stats:
             self.applied_stats[stat] -= value

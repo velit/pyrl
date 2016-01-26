@@ -7,8 +7,8 @@ from config.debug import Debug
 from config.bindings import Bind
 from world.level_template import LevelTemplate
 from world.level import LevelLocation
-from controllers.user_controller import UserControllerProxy
 from creature.creature import Creature
+from controllers.user_controller_proxy import UserControllerProxy
 
 
 class DebugAction(UserControllerProxy):
@@ -34,8 +34,7 @@ class DebugAction(UserControllerProxy):
         }
 
     def update_without_acting(self):
-        self.game_actions.game.update_view(self.creature)
-        self.game_actions.redraw()
+        self.game_actions._do_action(0)
 
     def ask_action(self):
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.actions.keys())))
@@ -85,6 +84,7 @@ class DebugAction(UserControllerProxy):
         creature_list.remove(self.creature)
         for i in creature_list:
             self.level.remove_creature(i)
+        self.update_without_acting()
         self.io.msg("Abrakadabra.")
 
     def draw_path_to_passage_down(self):
@@ -99,8 +99,11 @@ class DebugAction(UserControllerProxy):
         self.game_actions.redraw()
 
     def interactive_console(self):
-        game = self.game_actions.game
         self.io.suspend()
+        game = self.game_actions.game
+        io = self.io
+        player = self.creature
+        level = self.level
         code.interact(local=locals())
         self.io.resume()
 

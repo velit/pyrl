@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from generic_structures import PriorityQueue, Array2D, Event, OneToOneMapping
+from generic_structures import Array2D, Event, OneToOneMapping
 import pytest
 
 
@@ -51,18 +51,6 @@ def test_one_to_one_mapping():
 
     with pytest.raises(ValueError):
         mapping.update({"a": 10, "b": 10})
-
-def test_turn_scheduler():
-    pq = PriorityQueue()
-    pq.add(3, 3)
-    pq.add(1, 1)
-    pq.add(2, 2)
-    pq.add(0, 0)
-    pq.remove(2)
-
-    assert pq.pop() == (0, 0, 4)
-    assert pq.pop() == (1, 1, 2)
-    assert pq.pop() == (3, 3, 1)
 
 
 def test_observable_event():

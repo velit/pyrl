@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 from random import randrange
-from heapq import heappush, heappop
 from itertools import zip_longest
 
 
@@ -114,30 +113,6 @@ class OneToOneMapping(dict):
                     self[key] = value
         for key in kwords:
             self[key] = kwords[key]
-
-
-class PriorityQueue(object):
-
-    def __init__(self):
-        self.pq = []
-        self.count = 0
-        self.remove_set = set()
-
-    def add(self, task, priority):
-        self.count += 1
-        entry = (priority, self.count, task)
-        heappush(self.pq, entry)
-
-    def remove(self, task):
-        self.remove_set.add(task)
-
-    def pop(self):
-        while True:
-            priority, count, task = heappop(self.pq)
-            if task not in self.remove_set:
-                return task, priority, count
-            else:
-                self.remove_set.remove(task)
 
 
 class Event(object):

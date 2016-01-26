@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import random
 
 import path
+import itertools
 from enum import Enum
 from config.debug import Debug
 from creature.actions import Action
@@ -216,3 +217,32 @@ class Level(object):
         self.creatures[creatureB.coord] = creatureB
         self.visible_change.trigger(creatureA.coord)
         self.visible_change.trigger(creatureB.coord)
+
+    def view_items(self, coord):
+        return self.items[coord]
+
+    def take_items(self, coord, item_indexes):
+        if not item_indexes:
+            return ()
+
+        assert coord in self.items, "Trying to take items from a coord {} that doesn't have any.".format(coord)
+
+        current_items = self.items[coord]
+        taken_items = tuple(current_items[index] for index in item_indexes)
+
+        index_set = set(item_indexes)
+        left_items = tuple(item for index, item in enumerate(current_items) if index not in index_set)
+
+        if left_items:
+            self.items[coord] = left_items
+        else:
+            del self.items[coord]
+
+        return taken_items
+
+    def deposit_items(self, coord, items):
+        if coord in self.items:
+            current_items = self.items[coord]
+        else:
+            current_items = ()
+        self.items[coord] = tuple(itertools.chain(current_items, items))

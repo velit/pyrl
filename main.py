@@ -68,7 +68,7 @@ def load_game(game_name, cursor_lib_callback):
     except FileNotFoundError:
         print("Game '{}' not found.".format(game_name), file=sys.stderr)
         sys.exit(1)
-    game.init_nonserial_objects(cursor_lib_callback)
+    game.init_nonserializable_objects(cursor_lib_callback)
     game.redraw()
     return game
 

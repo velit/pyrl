@@ -35,7 +35,7 @@ class Item(object):
 
 class Weapon(Item):
     def __init__(self, name, dice, sides, addition, stats=(),
-                 compatible_slots=(Slot.right_hand, Slot.left_hand)):
+                 compatible_slots=(Slot.Right_Hand, Slot.Left_Hand)):
         super().__init__(name, stats, compatible_slots)
         self.damage = Dice(dice, sides, addition)
 

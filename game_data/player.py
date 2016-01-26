@@ -19,14 +19,12 @@ def Player():
         (Stat.speed, 100),
         (Stat.sight, 0),
     )
-    armor_slots = (Slot.body, )
+    armor_slots = (Slot.Body, )
     armor = Item("Armor of Kings", armor_stats, armor_slots)
-    player.equipment.bag_item(armor)
-    player.equipment.equip(armor, Slot.body)
+    player.equipment.equip(armor, Slot.Body)
 
     weapon = Weapon("Sting", 1, 8, 20)
-    player.equipment.bag_item(weapon)
-    player.equipment.equip(weapon, Slot.right_hand)
+    player.equipment.equip(weapon, Slot.Right_Hand)
 
     items = (
         Weapon("short sword +1",     1,  6,  1),

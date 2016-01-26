@@ -43,11 +43,6 @@ class Bind(object):
     Next_Page     = Key.PAGE_DOWN, '^d'
     Previous_Page = Key.PAGE_UP, '^u'
 
-    # This is the same as doing Item_Select_Keys = 'a', 'b', 'c' ...
-    # But it wont work if you want modifiers like ^ or !.
-    # You have to write the whole thing out then.
-    Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
-
     # Directions used in moving/attacking/targetting
     SouthWest = '1', 'm', Key.NUMPAD_1, Key.END
     South     = '2', ',', Key.NUMPAD_2, Key.DOWN
@@ -85,14 +80,14 @@ class Bind(object):
     Walk_Mode   = 'w'
     Show_Vision = 'H'
 
-    # Inventory
-    View_Inventory            = '^b'
-    View_Equipment            = '^e'
-    Equipment_Slot_Head       = 'h'
-    Equipment_Slot_Body       = 'b'
-    Equipment_Slot_Right_Hand = 'r'
-    Equipment_Slot_Left_Hand  = 'l'
-    Equipment_Slot_Feet       = 'f'
+    # Equipment                Head  Body  RightHand  LeftHand  Feet
+    Equipment_Select_Keys   = 'h',  'b',  'r',       'l',      'f'
+    Equipment_View_Backpack = 'v'
+
+    # This is the same as doing Item_Select_Keys = 'a', 'b', 'c' ...
+    # But it wont work if you want modifiers like ^ or !.
+    # You have to write the whole thing out then.
+    Item_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
 
     # Queries
     Yes = 'y'

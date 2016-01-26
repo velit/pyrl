@@ -480,6 +480,12 @@
     <note priority="veryhigh" time="1432492857">
         Add item dropping, picking up.
     </note>
+    <note priority="veryhigh" time="1453792942">
+        Remove level reference from creature.
+    </note>
+    <note priority="veryhigh" time="1453793846">
+        Swap UserControllerProxy usage with game_actions, delete proxy afterwards.
+    </note>
     <note priority="high" time="1429224251">
         Add regeneration
     </note>

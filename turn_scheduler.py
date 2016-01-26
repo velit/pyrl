@@ -29,6 +29,8 @@ class PollingTurnScheduler(object):
 
 class TurnScheduler(object):
 
+    """Priority queue based turn scheduler. Behaves in LIFO fashion with equal time values."""
+
     def __init__(self):
         self.priority_queue = []
         self.time = 0
@@ -37,7 +39,7 @@ class TurnScheduler(object):
         self.count = 0
 
     def add(self, event, time_delta):
-        self.count += 1
+        self.count -= 1
         entry = (self.time + time_delta, self.count, event)
         heappush(self.priority_queue, entry)
 

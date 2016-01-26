@@ -5,7 +5,7 @@ from enums.directions import Dir
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
 from config.bindings import Bind
 from enums.keys import Key
-from controllers.user_controller import UserControllerProxy
+from controllers.user_controller_proxy import UserControllerProxy
 
 
 WALK_IN_PLACE = (None, None)

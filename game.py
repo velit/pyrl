@@ -29,7 +29,7 @@ class Game(object):
         self.world = get_world()
         self.world.get_level(self.world.start_level, self.add_modified_location)
 
-        self.init_nonserial_objects(cursor_lib)
+        self.init_nonserializable_objects(cursor_lib)
 
     @property
     def player(self):
@@ -39,7 +39,7 @@ class Game(object):
     def level(self):
         return self.world.player.level
 
-    def init_nonserial_objects(self, cursor_lib_callback):
+    def init_nonserializable_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
         self.user_controller = UserController(GameActions(self, self.player), self.io)
         register_status_texts(self, self.player)
@@ -68,7 +68,7 @@ class Game(object):
                 self.ai.act_alert(ai_game_actions, self.player.coord)
                 action_cost = ai_game_actions.action_cost
 
-            assert action_cost >= 0, "Negative cost actions are not allowed.  {}".format(action_cost)
+            assert action_cost >= 0, "Negative cost actions are not allowed (yet at least). {}".format(action_cost)
 
             creature.level.turn_scheduler.add(creature, action_cost)
 

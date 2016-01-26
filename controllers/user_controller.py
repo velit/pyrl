@@ -188,10 +188,10 @@ class UserController(object):
         self.io.message_bar.print_history()
 
     def equipment(self):
-        return equipment(self.io, self.creature.equipment)
+        return equipment(self.game_actions)
 
     def backpack(self):
-        return backpack(self.io, self.creature.equipment)
+        return backpack(self.game_actions)
 
     def init_walk_mode(self, instant_direction=None):
         return self.walk_mode.init_walk_mode(instant_direction)
@@ -199,25 +199,3 @@ class UserController(object):
     def help_screen(self):
         help_screen(self.io)
         self.game_actions.redraw()
-
-
-class UserControllerProxy(object):
-
-    def __init__(self, user_controller):
-        self.user_controller = user_controller
-
-    @property
-    def creature(self):
-        return self.user_controller.creature
-
-    @property
-    def level(self):
-        return self.user_controller.game_actions.creature.level
-
-    @property
-    def io(self):
-        return self.user_controller.io
-
-    @property
-    def game_actions(self):
-        return self.user_controller.game_actions

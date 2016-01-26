@@ -75,20 +75,18 @@ def test_subsystems(mockwrapper, game):
 
     inventory = (
         Bind.Equipment,
-        Bind.View_Inventory,
+        Bind.Equipment_View_Backpack,
         Bind.Cancel,
-        Bind.Equipment_Slot_Body,
-        Bind.Equipment_Slot_Right_Hand,
-        Bind.Equipment_Slot_Left_Hand,
+        Bind.Equipment_Select_Keys[1],
+        Bind.Equipment_Select_Keys[2],
+        Bind.Equipment_Select_Keys[3],
         Bind.Item_Select_Keys[0],
         Bind.Cancel,
     )
 
     walk_mode = (Bind.Walk_Mode, Bind.East, Bind.Instant_West)
 
-    # disabled:
-    # + inventory
-    input_seq = help_system + movement_and_look_system + message_system + whole_map + path_to_staircase + walk_mode
+    input_seq = help_system + movement_and_look_system + message_system + whole_map + path_to_staircase + inventory + walk_mode
     input_seq = (action if isinstance(action, str) else action.key for action in input_seq)
     game = prepare_input_and_run(mockwrapper, game, input_seq)
     assert game.turn_counter == 4
