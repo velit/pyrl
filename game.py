@@ -24,7 +24,6 @@ class Game(object):
         self.time = 0
         self.modified_locations = set()
         self.vision_cache = None
-        self.save_mark = False
 
         self.world = get_world()
         self.world.get_level(self.world.start_level, self.add_modified_location)
@@ -48,10 +47,6 @@ class Game(object):
         ai_game_actions = GameActions(self)
         self.io.msg("{0} for help menu".format(Bind.Help.key))
         while True:
-            if self.save_mark:
-                self.savegame(ask=False)
-                self.save_mark = False
-
             creature, time_delta = self.player.level.turn_scheduler.advance_time()
             self.time += time_delta
 
@@ -70,7 +65,9 @@ class Game(object):
 
             assert action_cost >= 0, "Negative cost actions are not allowed (yet at least). {}".format(action_cost)
 
-            creature.level.turn_scheduler.add(creature, action_cost)
+            creature_check, time_delta = self.player.level.turn_scheduler.addpop(creature, action_cost)
+            assert creature is creature_check
+            assert time_delta == 0
 
     def move_creature_to_level(self, creature, world_point):
         level_key, level_location = world_point
@@ -79,7 +76,7 @@ class Game(object):
         except LevelNotFound:
             return False
 
-        creature.level.remove_creature(creature, turnscheduler_remove=False)
+        creature.level.remove_creature(creature)
         target_level.add_creature_to_location(creature, level_location)
 
         try:
@@ -98,7 +95,7 @@ class Game(object):
         if creature is self.player:
             self.io.notify("You die...")
             self.endgame(ask=False)
-        self.level.remove_creature(creature, turnscheduler_remove=True)
+        self.level.remove_creature(creature)
 
     def endgame(self, ask=True):
         if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:

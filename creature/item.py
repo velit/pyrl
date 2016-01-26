@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from dice import Dice
 from creature.equipment import Slot
+from enums.colors import Pair
 
 
 def get_stats_str(stats):
@@ -10,10 +11,11 @@ def get_stats_str(stats):
 
 
 class Item(object):
-    def __init__(self, name, stats=(), compatible_slots=()):
+    def __init__(self, name, compatible_slots=(), char=(']', Pair.Normal), stats=()):
         self.name = name
-        self.stats = tuple(stats)
+        self.char = char
         self.compatible_slots = tuple(compatible_slots)
+        self.stats = tuple(stats)
 
     def __str__(self):
         if self.stats:
@@ -26,6 +28,10 @@ class Item(object):
         self.stats += ((stat, value), )
         return self
 
+    def add_stats(self, stats):
+        self.stats += stats
+        return self
+
     def fits_to_slot(self, slot):
         return slot in self.compatible_slots
 
@@ -34,9 +40,10 @@ class Item(object):
 
 
 class Weapon(Item):
-    def __init__(self, name, dice, sides, addition, stats=(),
-                 compatible_slots=(Slot.Right_Hand, Slot.Left_Hand)):
-        super().__init__(name, stats, compatible_slots)
+    def __init__(self, name, dice_stats, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
+                 char=('(', Pair.Normal), stats=()):
+        super().__init__(name, compatible_slots, char, stats)
+        dice, sides, addition = dice_stats
         self.damage = Dice(dice, sides, addition)
 
     def roll(self):

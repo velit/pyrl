@@ -9,6 +9,7 @@ class Action(Enum):
     Attack = 3
     Swap = 4
     Exchange_Items = 4
+    Spawn = 5
 
     @property
     def cost(self):
@@ -21,4 +22,5 @@ action_cost = {
     Action.Attack: 1000,
     Action.Swap: 1000,
     Action.Exchange_Items: 1000,
+    Action.Spawn: 1000,
 }

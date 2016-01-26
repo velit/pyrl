@@ -67,6 +67,8 @@ class Level(object):
     def visible_char(self, coord):
         if coord in self.creatures:
             return self.creatures[coord].char
+        elif coord in self.items:
+            return self.items[coord][0].char
         else:
             return self.tiles[coord].visible_char
 
@@ -169,11 +171,12 @@ class Level(object):
             coord = creature.coord
 
         self.add_creature(creature, coord)
-        self.turn_scheduler.add(creature, creature.action_cost(Action.Move))
+        self.turn_scheduler.add(creature, creature.action_cost(Action.Spawn))
 
     def add_creature_to_location(self, creature, level_location):
         coord = self.get_location_coord(level_location)
         self.add_creature(creature, coord)
+        self.turn_scheduler.add(creature, 0)
 
     def add_creature(self, creature, coord=None):
         if coord is None:
@@ -187,15 +190,12 @@ class Level(object):
         creature.level = self
         self.visible_change.trigger(coord)
 
-    def remove_creature(self, creature, turnscheduler_remove=True):
+    def remove_creature(self, creature):
         coord = creature.coord
         del self.creatures[coord]
         creature.coord = None
         creature.level = None
-
-        if turnscheduler_remove:
-            self.turn_scheduler.remove(creature)
-
+        self.turn_scheduler.remove(creature)
         self.visible_change.trigger(coord)
 
     def move_creature(self, creature, new_coord):
@@ -218,8 +218,11 @@ class Level(object):
         self.visible_change.trigger(creatureA.coord)
         self.visible_change.trigger(creatureB.coord)
 
-    def view_items(self, coord):
-        return self.items[coord]
+    def enumerate_items(self, coord):
+        if coord in self.items:
+            return enumerate(self.items[coord])
+        else:
+            return enumerate(())
 
     def take_items(self, coord, item_indexes):
         if not item_indexes:

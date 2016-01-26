@@ -75,7 +75,7 @@ class Equipment(object):
         else:
             return None
 
-    def enumerate_bag(self):
+    def enumerate_items(self):
         return enumerate(self._bag)
 
     def _add_stats(self, item):

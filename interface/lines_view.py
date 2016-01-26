@@ -7,7 +7,12 @@ from config.bindings import Bind
 Line = collections.namedtuple("Line", ("return_value", "string"))
 
 
-def lines_view(*keys, **args):
+_single = "{}/{} to scroll  {}/{} for next/previous line  {} to close"
+_single = _single.format(Bind.Next_Page.key, Bind.Previous_Page.key, Bind.Next_Line.key,
+                         Bind.Previous_Line.key, Bind.Cancel.key)
+
+
+def lines_view(window, lines, select_keys=(), return_keys=(), header="", footer=_single):
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
 
@@ -15,18 +20,24 @@ def lines_view(*keys, **args):
     If user presses one of return_keys, return that.
     If user presses one of Bind.Cancel keys return that
     """
-    view = LinesView(*keys, **args)
-    return view.single_select_render()
+    view = LinesView(window, lines, select_keys, return_keys)
+    return view.single_select_render(header, footer)
 
 
-def multi_select_lines_view(*keys, **args):
+_multi = "{}/{} to scroll  {}/{} for next/previous line  {}/{} to (de)select all  {} to close"
+_multi = _multi.format(Bind.Next_Page.key, Bind.Previous_Page.key,
+                       Bind.Next_Line.key, Bind.Previous_Line.key,
+                       Bind.Deselect_All.key, Bind.Select_All.key, Bind.Cancel.key)
+
+
+def multi_select_lines_view(window, lines, select_keys=(), return_keys=(), header="", footer=_multi):
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
 
     Can select multiple lines. Returns a (return_key, retvals_of_selected_lines) tuple.
     """
-    view = LinesView(*keys, **args)
-    return view.multi_select_render()
+    view = LinesView(window, lines, select_keys, return_keys)
+    return view.multi_select_render(header, footer)
 
 
 class LinesView(object):
@@ -36,15 +47,11 @@ class LinesView(object):
     footer_pos = -1
     view_overhead = 4
 
-    footer_fmt = "{}/{} to scroll  {}/{} for next/previous line  {} to close"
-    footer = footer_fmt.format(Bind.Next_Page.key, Bind.Previous_Page.key,
-                            Bind.Next_Line.key, Bind.Previous_Line.key, Bind.Cancel.key)
-
-    def __init__(self, window, lines, select_keys=(), return_keys=(), header="", footer=footer):
+    def __init__(self, window, lines, select_keys=(), return_keys=()):
         self.window = window
         self.lines = tuple(lines)
-        self.header = header
-        self.footer = footer
+        self.header = None
+        self.footer = None
 
         self.view_offset = 0
         self.view_height = self.window.rows - self.view_overhead
@@ -53,7 +60,7 @@ class LinesView(object):
         self.return_keys = return_keys + Bind.Cancel
 
         if self.select_keys:
-            self.select_keys = select_keys[:self.view_height]
+            self.select_keys = select_keys[:min(self.view_height, len(self.lines))]
             self.visible_amount = min(len(self.select_keys), len(self.lines))
             self.select_keys_str = tuple(self._capitalize_single_chars(self.select_keys))
         else:
@@ -61,7 +68,9 @@ class LinesView(object):
 
         self.all_keys = Bind.scroll_keys + self.select_keys + self.return_keys
 
-    def single_select_render(self):
+    def single_select_render(self, header="", footer=""):
+        self.header = header
+        self.footer = footer
         while True:
             if self.select_keys:
                 lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
@@ -83,11 +92,14 @@ class LinesView(object):
             else:
                 assert False, "Got unhandled key as input {}".format(key)
 
-    def multi_select_render(self):
+    def multi_select_render(self, header="", footer=""):
 
         if not self.select_keys:
             raise ValueError("LinesView initialization has to have non-empty select"
                              "_keys when using multi select mode")
+
+        self.header = header
+        self.footer = footer
 
         while True:
 

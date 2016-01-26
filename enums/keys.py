@@ -43,8 +43,5 @@ class Key(object):
     WINDOW_RESIZE = "Window resize"
     CLOSE_WINDOW  = "Close window"
 
-    # Use this one to unbind keys
-    NONE          = "Unbound"
-
-    # Bindings user don't use this one
+    # Do not use
     NO_INPUT = "No Input"

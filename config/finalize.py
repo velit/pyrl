@@ -8,7 +8,10 @@ class BindingTuple(tuple):
 
     @property
     def key(self):
-        return self[0]
+        if self:
+            return self[0]
+        else:
+            return "Unbound"
 
     def __str__(self):
         return ", ".join("{}".format(key) for key in self)

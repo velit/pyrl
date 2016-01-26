@@ -1,7 +1,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import textwrap
+import logging
 
+import io_wrappers.mock
 from config.bindings import Bind
 from enums.colors import Pair
 from window.base_window import BaseWindow
@@ -31,8 +33,12 @@ class MessageBar(BaseWindow):
         self.blit()
 
     def queue_msg(self, *args):
-        for obj in args:
-            self.msgqueue.append(str(obj))
+        if self.cursor_win.implementation == io_wrappers.mock.IMPLEMENTATION:
+            for obj in args:
+                logging.debug("io.msg: {}".format(obj))
+        else:
+            for obj in args:
+                self.msgqueue.append(str(obj))
 
     def print_event(self, event):
         skip = False

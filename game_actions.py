@@ -16,6 +16,7 @@ class ActionError(Enum):
     PassageLeadsNoWhere = "This passage doesn't seem to lead anywhere."
     NoPassage           = "This location doesn't have a passage."
     PlayerAction        = "Only the player can do this action."
+    NoItemsOnGround     = "There aren't any items on the ground to pick up."
 
 
 class GameActions(object):
@@ -145,13 +146,25 @@ class GameActions(object):
         self.level.deposit_items(self.coord, items)
         self._do_action(self.creature.action_cost(Action.Exchange_Items))
 
+    def pickup_items(self, item_indexes):
+        items = self.level.take_items(self.coord, item_indexes)
+        self.creature.equipment.bag_items(items)
+        self._do_action(self.creature.action_cost(Action.Exchange_Items))
+
     def save(self):
-        """Zero cost player action. Will exit out to the event loop for the saving to happen."""
+        """Free player action."""
         if self.creature is not self.game.player:
             return ActionError.PlayerAction
 
-        self.game.save_mark = True
-        self._do_action(0)
+        return self.game.savegame(ask=False)
+
+    def enumerate_floor_items(self):
+        """Free action."""
+        return self.level.enumerate_items(self.coord)
+
+    def enumerate_character_items(self):
+        """Free action."""
+        return self.equipment.enumerate_items()
 
     def quit(self):
         """Free player action."""
@@ -169,8 +182,7 @@ class GameActions(object):
 
     def can_reach(self, target_coord):
         """Free action."""
-        return (self.coord == target_coord or
-            get_vector(self.coord, target_coord) in Dir.All)
+        return (self.coord == target_coord or get_vector(self.coord, target_coord) in Dir.All)
 
     def can_move(self, direction):
         """Free action."""

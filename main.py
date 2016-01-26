@@ -48,6 +48,7 @@ def prepare_game(cursor_lib_callback, cmdline_args=None):
 
 def init_logger_system():
     logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
+    logging.debug("Starting new session")
 
 
 def get_commandline_options(args=None):

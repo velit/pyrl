@@ -14,11 +14,11 @@ def equipment():
 @pytest.fixture
 def items():
     return {
-        Slot.Right_Hand: Weapon("short sword +1", 1, 6, 1),
-        Slot.Left_Hand:  Weapon("short sword", 1, 6, 0),
-        Slot.Head:       Item("helmet", [(Stat.armor, 1)], [Slot.Head]),
-        Slot.Body:       Item("armor", [(Stat.strength, 2), (Stat.armor, 4)], [Slot.Body]),
-        Slot.Feet:       Item("boots", [(Stat.armor, 1)], [Slot.Feet]),
+        Slot.Right_Hand: Weapon("short sword +1", (1, 6, 1)),
+        Slot.Left_Hand:  Weapon("short sword", (1, 6, 0)),
+        Slot.Head:       Item("helmet", [Slot.Head]).add_stat(Stat.armor, 1),
+        Slot.Body:       Item("armor", [Slot.Body], stats=[(Stat.strength, 2), (Stat.armor, 4)]),
+        Slot.Feet:       Item("boots", [Slot.Feet]).add_stat(Stat.armor, 1),
     }
 
 

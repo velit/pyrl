@@ -14,9 +14,14 @@ from io_wrappers.libtcod_dicts import libtcod_color_map
 from io_wrappers.libtcod_dicts import libtcod_key_map
 
 
+IMPLEMENTATION = "tcod"
+
+
 class TCODWrapper(object):
 
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""
+
+    implementation = IMPLEMENTATION
 
     def __init__(self, root_window=None):
         """Init the SDL surface and prepare for draw calls."""
@@ -50,6 +55,7 @@ class TCODWrapper(object):
 
 class TCODWindow(object):
 
+    implementation = IMPLEMENTATION
     key_map = libtcod_key_map
     color_map = libtcod_color_map
 

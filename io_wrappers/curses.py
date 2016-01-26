@@ -16,6 +16,9 @@ from config.debug import Debug
 from io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
 
 
+IMPLEMENTATION = "curses"
+
+
 def clean_curses():
     """Resume normal shell state. Does nothing if curses wasn't initialized."""
     try:
@@ -29,6 +32,8 @@ def clean_curses():
 
 
 class CursesWrapper(object):
+
+    implementation = IMPLEMENTATION
 
     def __init__(self, curses_root_window=None):
         """Initialize curses and prepare for creation of new windows."""
@@ -76,6 +81,7 @@ class CursesWrapper(object):
 
 class CursesWindow(object):
 
+    implementation = IMPLEMENTATION
     color_map = None
     key_map = curses_key_map
 

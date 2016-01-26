@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from functools import partial
 
+import interface.inventory
 from config.bindings import Bind
 from enums.colors import Color, Pair
 from enums.directions import Dir
@@ -9,21 +10,19 @@ from enums.keys import Key
 from game_actions import ActionError
 from generic_algorithms import add_vector
 from interface.help_screen import help_screen
-from interface.inventory import equipment, backpack
 from world.level import LevelLocation
 from config.game import GameConf
 
 
 class UserController(object):
     error_messages = {
-        ActionError.AlreadyActed:         "You already acted.",
         ActionError.IllegalMove:          "You can't move there.",
         ActionError.IllegalTeleport:      "You can't teleport there.",
         ActionError.SwapTargetResists:    "The creature resists your swap attempt.",
         ActionError.NoSwapTarget:         "There isn't a creature there to swap with.",
         ActionError.PassageLeadsNoWhere:  "This passage doesn't seem to lead anywhere.",
         ActionError.NoPassage:            "This location doesn't have a passage.",
-        ActionError.PlayerAction:         "Only the player can do this action.",
+        ActionError.NoItemsOnGround:      "There aren't any items on the ground to pick up.",
     }
 
     def __init__(self, game_actions, io_system):
@@ -46,28 +45,53 @@ class UserController(object):
 
     def set_actions(self):
         self.actions = {
-            'd':                  self.debug_action.ask_action,
-            '+':                  partial(self.debug_action.sight_change, 1),
-            '-':                  partial(self.debug_action.sight_change, -1),
-            Key.CLOSE_WINDOW:     self.quit,
-            Bind.Quit.key:        self.quit,
-            Bind.Save.key:        self.save,
-            Bind.Attack.key:      self.attack,
-            Bind.Redraw.key:      self.redraw,
-            Bind.History.key:     self.print_history,
-            Bind.Look_Mode.key:   self.look,
-            Bind.Help.key:        self.help_screen,
-            Bind.Equipment.key:   self.equipment,
-            Bind.Backpack.key:    self.backpack,
-            Bind.Walk_Mode.key:   self.init_walk_mode,
-            Bind.Show_Vision.key: self.show_vision,
-            Bind.Ascend.key:      partial(self.ascend),
-            Bind.Descend.key:     partial(self.descend),
+            '+':                     partial(self.debug_action.sight_change, 1),
+            '-':                     partial(self.debug_action.sight_change, -1),
+            Key.CLOSE_WINDOW:        self.quit,
         }
-        for key, direction in Bind.action_direction.items():
-            self.actions[key] = partial(self.act_to_dir, direction)
-        for key, direction in Bind.walk_mode_direction.items():
-            self.actions[key] = partial(self.init_walk_mode, direction)
+
+        unfinalized_actions = {
+            Bind.Debug_Commands:     self.debug_action.ask_action,
+            Bind.Quit:               self.quit,
+            Bind.Save:               self.save,
+            Bind.Attack:             self.attack,
+            Bind.Redraw:             self.redraw,
+            Bind.History:            self.print_history,
+            Bind.Look_Mode:          self.look,
+            Bind.Help:               self.help_screen,
+            Bind.Equipment:          self.equipment,
+            Bind.Backpack:           self.backpack,
+            Bind.Pick_Up_Items:      self.pickup_items,
+            Bind.Drop_Items:         self.drop_items,
+            Bind.Walk_Mode:          self.init_walk_mode,
+            Bind.Show_Vision:        self.show_vision,
+            Bind.Ascend:             self.ascend,
+            Bind.Descend:            self.descend,
+
+            Bind.SouthWest:          partial(self.act_to_dir, Dir.SouthWest),
+            Bind.South:              partial(self.act_to_dir, Dir.South),
+            Bind.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
+            Bind.West:               partial(self.act_to_dir, Dir.West),
+            Bind.Stay:               partial(self.act_to_dir, Dir.Stay),
+            Bind.East:               partial(self.act_to_dir, Dir.East),
+            Bind.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
+            Bind.North:              partial(self.act_to_dir, Dir.North),
+            Bind.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
+
+            Bind.Instant_SouthWest:  partial(self.init_walk_mode, Dir.SouthWest),
+            Bind.Instant_South:      partial(self.init_walk_mode, Dir.South),
+            Bind.Instant_SouthEast:  partial(self.init_walk_mode, Dir.SouthEast),
+            Bind.Instant_West:       partial(self.init_walk_mode, Dir.West),
+            Bind.Instant_Stay:       partial(self.init_walk_mode, Dir.Stay),
+            Bind.Instant_East:       partial(self.init_walk_mode, Dir.East),
+            Bind.Instant_NorthWest:  partial(self.init_walk_mode, Dir.NorthWest),
+            Bind.Instant_North:      partial(self.init_walk_mode, Dir.North),
+            Bind.Instant_NorthEast:  partial(self.init_walk_mode, Dir.NorthEast),
+        }
+
+        for keys, action in unfinalized_actions.items():
+            for key in keys:
+                self.actions[key] = action
 
     def get_user_input_and_act(self):
         while True:
@@ -188,10 +212,16 @@ class UserController(object):
         self.io.message_bar.print_history()
 
     def equipment(self):
-        return equipment(self.game_actions)
+        return interface.inventory.equipment(self.game_actions)
 
     def backpack(self):
-        return backpack(self.game_actions)
+        return interface.inventory.backpack(self.game_actions)
+
+    def pickup_items(self):
+        return interface.inventory.pickup_items(self.game_actions)
+
+    def drop_items(self):
+        return interface.inventory.drop_items(self.game_actions)
 
     def init_walk_mode(self, instant_direction=None):
         return self.walk_mode.init_walk_mode(instant_direction)

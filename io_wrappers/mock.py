@@ -1,44 +1,53 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import deque
+import logging
 
 from enums.keys import Key
+
+
+IMPLEMENTATION = "mock"
 
 
 class MockInputEnd(Exception):
     pass
 
 
-class MockWrapper():
+class MockWrapper(object):
 
-    _prepared_input = deque()
+    implementation = IMPLEMENTATION
 
     def __init__(self):
+        self._prepared_input = deque()
+
+    def _prepare_input(self, input_seq):
+        self._prepared_input.extend(input_seq)
+
+    def flush(self):
         pass
 
-    @classmethod
-    def _prepare_input(cls, input_seq):
-        cls._prepared_input.extend(input_seq)
-
-    @staticmethod
-    def flush():
+    def suspend(self):
         pass
 
-    @staticmethod
-    def suspend():
+    def resume(self):
         pass
 
-    @staticmethod
-    def resume():
-        pass
+    def new_window(self, dimensions):
+        return MockWrapperWindow(self)
 
-    @classmethod
-    def new_window(cls, size):
-        return cls()
+
+class MockWrapperWindow(object):
+
+    implementation = IMPLEMENTATION
+
+    def __init__(self, wrapper):
+        self.wrapper = wrapper
 
     def get_key(self):
         try:
-            return self._prepared_input.popleft()
+            key = self.wrapper._prepared_input.popleft()
+            logging.debug("Returning key {}".format(key))
+            return key
         except IndexError:
             raise MockInputEnd()
 
