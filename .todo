@@ -492,6 +492,9 @@
     <note priority="veryhigh" time="1453809687">
         Add messages when dropping/picking up items
     </note>
+    <note priority="veryhigh" time="1453824766">
+        Add select/deselect all keys to items view.
+    </note>
     <note priority="high" time="1429224251">
         Add regeneration
     </note>

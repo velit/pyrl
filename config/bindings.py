@@ -98,7 +98,7 @@ class Bind(object):
     # But it wont work if you want modifiers like ^ or !.
     # You have to write the whole thing out then.
     Backpack_Select_Keys = tuple('abcdefghijklmnopqrstuvwxy')
-    Backpack_Drop_Items = '^d'
+    Backpack_Drop_Items = Key.TAB
 
     # Queries
     Yes = 'y'

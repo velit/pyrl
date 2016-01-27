@@ -20,8 +20,34 @@ def lines_view(window, lines, select_keys=(), return_keys=(), header="", footer=
     If user presses one of return_keys, return that.
     If user presses one of Bind.Cancel keys return that
     """
-    view = LinesView(window, lines, select_keys, return_keys)
-    return view.single_select_render(header, footer)
+    lines_amount = len(lines)
+    header_and_footer_size = 4
+    visible_amount = min(window.rows - header_and_footer_size, lines_amount)
+    return_keys = return_keys + Bind.Cancel
+    all_keys = Bind.scroll_keys + select_keys + return_keys
+
+    if select_keys:
+        visible_amount = min(len(select_keys), lines_amount)
+        select_keys = select_keys[:visible_amount]
+        keys_str = tuple(_capitalize_single_chars(select_keys))
+
+    view_offset = 0
+    while True:
+        print_lines = _slice_lines(lines, view_offset, view_offset + visible_amount)
+        if select_keys:
+            print_lines = ("{0} - {1}".format(key, line.string) for key, line in zip(keys_str, print_lines))
+
+        _print_view(window, print_lines, header, footer)
+        key = window.selective_get_key(all_keys, refresh=True)
+
+        if key in return_keys:
+            return key
+        elif key in select_keys:
+            return lines[select_keys.index(key) + view_offset].return_value
+        elif key in Bind.scroll_keys:
+            view_offset = _new_offset(view_offset, key, visible_amount, lines_amount)
+        else:
+            assert False, "Got unhandled key as input {}".format(key)
 
 
 _multi = "{}/{} to scroll  {}/{} for next/previous line  {}/{} to (de)select all  {} to close"
@@ -30,139 +56,88 @@ _multi = _multi.format(Bind.Next_Page.key, Bind.Previous_Page.key,
                        Bind.Deselect_All.key, Bind.Select_All.key, Bind.Cancel.key)
 
 
-def multi_select_lines_view(window, lines, select_keys=(), return_keys=(), header="", footer=_multi):
+def multi_select_lines_view(window, lines, select_keys, return_keys=(), header="", footer=_multi):
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
 
     Can select multiple lines. Returns a (return_key, retvals_of_selected_lines) tuple.
     """
-    view = LinesView(window, lines, select_keys, return_keys)
-    return view.multi_select_render(header, footer)
+    if not select_keys:
+        raise ValueError("LinesView initialization has to have non-empty select"
+                            "_keys when using multi select mode")
 
+    lines_amount = len(lines)
+    header_and_footer_size = 4
+    visible_amount = min(window.rows - header_and_footer_size, lines_amount, len(select_keys))
+    select_keys = select_keys[:visible_amount]
+    return_keys = return_keys + Bind.Cancel
+    all_keys = Bind.scroll_keys + select_keys + return_keys + Bind.Select_All + Bind.Deselect_All
+    keys_str = tuple(_capitalize_single_chars(select_keys))
 
-class LinesView(object):
+    view_offset = 0
+    selected_indexes = set()
+    while True:
+        print_lines = _slice_lines(lines, view_offset, view_offset + visible_amount)
+        print_lines = tuple("{} {} {}".format(key, _selection_symbol(selected_indexes, view_offset + i), line.string)
+                        for i, (key, line) in enumerate(zip(keys_str, print_lines)))
 
-    header_pos = 0
-    main_view_pos = 2
-    footer_pos = -1
-    view_overhead = 4
+        _print_view(window, print_lines, header, footer)
 
-    def __init__(self, window, lines, select_keys=(), return_keys=()):
-        self.window = window
-        self.lines = tuple(lines)
-        self.header = None
-        self.footer = None
+        key = window.selective_get_key(all_keys, refresh=True)
 
-        self.view_offset = 0
-        self.view_height = self.window.rows - self.view_overhead
-        self.select_keys = select_keys
-        self.selected_line_indexes = set()
-        self.return_keys = return_keys + Bind.Cancel
-
-        if self.select_keys:
-            self.select_keys = select_keys[:min(self.view_height, len(self.lines))]
-            self.visible_amount = min(len(self.select_keys), len(self.lines))
-            self.select_keys_str = tuple(self._capitalize_single_chars(self.select_keys))
+        if key in return_keys:
+            return key, tuple(lines[i].return_value for i in sorted(selected_indexes))
+        elif key in select_keys:
+            selected_indexes ^= {select_keys.index(key) + view_offset}
+        elif key in Bind.scroll_keys:
+            view_offset = _new_offset(view_offset, key, visible_amount, lines_amount)
+        elif key in Bind.Select_All:
+            selected_indexes = set(range(lines_amount))
+        elif key in Bind.Deselect_All:
+            selected_indexes.clear()
         else:
-            self.visible_amount = min(self.view_height, len(self.lines))
+            assert False, "Got unhandled key as input {}".format(key)
 
-        self.all_keys = Bind.scroll_keys + self.select_keys + self.return_keys
 
-    def single_select_render(self, header="", footer=""):
-        self.header = header
-        self.footer = footer
-        while True:
-            if self.select_keys:
-                lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
-                keys_lines = zip(self.select_keys_str, lines)
-                print_lines = ("{0} - {1}".format(key, line.string) for key, line in keys_lines)
-            else:
-                print_lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
+def _selection_symbol(selected, index):
+    return "+" if index in selected else "-"
 
-            self._print_view(print_lines)
 
-            key = self.window.selective_get_key(self.all_keys, refresh=True)
-
-            if key in self.return_keys:
-                return key
-            elif key in self.select_keys:
-                return self.lines[self.select_keys.index(key) + self.view_offset].return_value
-            elif key in Bind.scroll_keys:
-                self._update_index(key)
-            else:
-                assert False, "Got unhandled key as input {}".format(key)
-
-    def multi_select_render(self, header="", footer=""):
-
-        if not self.select_keys:
-            raise ValueError("LinesView initialization has to have non-empty select"
-                             "_keys when using multi select mode")
-
-        self.header = header
-        self.footer = footer
-
-        while True:
-
-            lines = self._iter_slice(self.lines, self.view_offset, self.view_offset + self.visible_amount)
-            keys_lines = zip(self.select_keys_str, lines)
-            print_lines = ("{} {} {}".format(key, self._selection_symbol(self.view_offset + i), line.string)
-                           for i, (key, line) in enumerate(keys_lines))
-
-            self._print_view(print_lines)
-
-            key = self.window.selective_get_key(self.all_keys, refresh=True)
-
-            if key in self.return_keys:
-                return key, tuple(self.lines[i].return_value for i in sorted(self.selected_line_indexes))
-            elif key in self.select_keys:
-                self._toggle_selection(self.select_keys.index(key) + self.view_offset)
-            elif key in Bind.scroll_keys:
-                self._update_index(key)
-            else:
-                assert False, "Got unhandled key as input {}".format(key)
-
-    def _selection_symbol(self, index):
-        if index in self.selected_line_indexes:
-            return "+"
+def _capitalize_single_chars(seq):
+    for key in seq:
+        if len(key) == 1:
+            yield key.upper()
         else:
-            return "-"
+            yield key
 
-    def _toggle_selection(self, index):
-        self.selected_line_indexes ^= {index}
 
-    def _capitalize_single_chars(self, seq):
-        for key in seq:
-            if len(key) == 1:
-                yield key.upper()
-            else:
-                yield key
+def _print_view(window, print_lines, header="", footer="", main_view_pos=2, header_pos=0, footer_pos=-1):
+    window.clear()
+    if header is not None:
+        window.draw_banner(header, y_offset=header_pos)
+    window.draw_lines(print_lines, y_offset=main_view_pos)
+    if footer is not None:
+        window.draw_banner(footer, y_offset=footer_pos)
 
-    def _print_view(self, print_lines):
-        self.window.clear()
-        if self.header is not None:
-            self.window.draw_banner(self.header, y_offset=self.header_pos)
-        self.window.draw_lines(print_lines, y_offset=self.main_view_pos)
-        if self.footer is not None:
-            self.window.draw_banner(self.footer, y_offset=self.footer_pos)
 
-    def _iter_slice(self, seq, start_index=0, stop_index=None):
-        if stop_index is not None:
-            for i in range(start_index, stop_index):
-                yield seq[i]
-        else:
-            for i in range(start_index, len(seq)):
-                yield seq[i]
+def _slice_lines(seq, start_index=0, stop_index=None):
+    if stop_index is not None:
+        for i in range(start_index, stop_index):
+            yield seq[i]
+    else:
+        for i in range(start_index, len(seq)):
+            yield seq[i]
 
-    def _update_index(self, key):
-        i = self.view_offset
-        if key in Bind.Next_Line:
-            i += 1
-        elif key in Bind.Next_Page:
-            i += self.visible_amount - 1
-        elif key in Bind.Previous_Line:
-            i -= 1
-        elif key in Bind.Previous_Page:
-            i -= self.visible_amount - 1
-        min_i, max_i = 0, max(0, len(self.lines) - self.visible_amount)
-        i = min(max(i, min_i), max_i)
-        self.view_offset = i
+
+def _new_offset(offset, key, visible_amount, lines_amount):
+    if key in Bind.Next_Line:
+        offset += 1
+    elif key in Bind.Next_Page:
+        offset += visible_amount - 1
+    elif key in Bind.Previous_Line:
+        offset -= 1
+    elif key in Bind.Previous_Page:
+        offset -= visible_amount - 1
+    max_offset = max(0, lines_amount - visible_amount)
+    offset = min(max(0, offset), max_offset)
+    return offset

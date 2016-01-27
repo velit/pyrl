@@ -23,7 +23,7 @@ profile-in-place:
 	./pyrl.py -p && less save_data/profiling_results
 
 log:
-	tail -n 50 save_data/pyrl.log
+	tail -n 50 -f save_data/pyrl.log
 
 profile-log:
 	less save_data/profiling_results
