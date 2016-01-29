@@ -241,6 +241,7 @@ class Level(object):
         else:
             del self.items[coord]
 
+        self.visible_change.trigger(coord)
         return taken_items
 
     def deposit_items(self, coord, items):
@@ -249,3 +250,4 @@ class Level(object):
         else:
             current_items = ()
         self.items[coord] = tuple(itertools.chain(current_items, items))
+        self.visible_change.trigger(coord)

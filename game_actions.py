@@ -28,10 +28,6 @@ class GameActions(object):
             self.creature = creature
 
     @property
-    def world(self):
-        return self.game.world
-
-    @property
     def level(self):
         return self.creature.level
 
@@ -42,10 +38,6 @@ class GameActions(object):
     @property
     def coord(self):
         return self.creature.coord
-
-    @property
-    def equipment(self):
-        return self.creature.equipment
 
     @property
     def io(self):
@@ -62,6 +54,15 @@ class GameActions(object):
     def already_acted(self):
         return self.action_cost is not None
 
+    def act_to_dir(self, direction):
+        target_coord = add_vector(self.coord, direction)
+        if target_coord in self.level.creatures:
+            return self.game_actions.attack(direction)
+        elif self.can_move(direction):
+            return self.move(direction)
+        else:
+            return ActionError.IllegalMove
+
     def enter_passage(self):
         if self.already_acted():
             return ActionError.AlreadyActed
@@ -71,10 +72,10 @@ class GameActions(object):
 
         source_point = (self.level.key, self.level.locations[self.coord])
 
-        if not self.world.has_destination(source_point):
+        if not self.game.world.has_destination(source_point):
             return ActionError.PassageLeadsNoWhere
 
-        destination_point = self.world.get_destination(source_point)
+        destination_point = self.game.world.get_destination(source_point)
 
         if not self.game.move_creature_to_level(self.creature, destination_point):
             return ActionError.PassageLeadsNoWhere
@@ -151,6 +152,20 @@ class GameActions(object):
         self.creature.equipment.bag_items(items)
         self._do_action(self.creature.action_cost(Action.Exchange_Items))
 
+    def get_passage(self):
+        """Free action."""
+        try:
+            return self.level.locations[self.coord]
+        except KeyError:
+            return ActionError.NoPassage
+
+    def get_coords_of_creatures_in_vision(self, include_player=False):
+        """Free action."""
+        if include_player:
+            return self.creature.vision & self.level.creatures.keys()
+        else:
+            return self.creature.vision & self.level.creatures.keys() - {self.coord}
+
     def save(self):
         """Free player action."""
         if self.creature is not self.game.player:
@@ -164,7 +179,7 @@ class GameActions(object):
 
     def enumerate_character_items(self):
         """Free action."""
-        return self.equipment.enumerate_items()
+        return self.creature.equipment.enumerate_items()
 
     def quit(self):
         """Free player action."""

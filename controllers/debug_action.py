@@ -8,13 +8,24 @@ from config.bindings import Bind
 from world.level_template import LevelTemplate
 from world.level import LevelLocation
 from creature.creature import Creature
-from controllers.user_controller_proxy import UserControllerProxy
 
 
-class DebugAction(UserControllerProxy):
+class DebugAction(object):
 
-    def __init__(self, user_controller):
-        super().__init__(user_controller)
+    @property
+    def io(self):
+        return self.game_actions.io
+
+    @property
+    def level(self):
+        return self.game_actions.level
+
+    @property
+    def creature(self):
+        return self.game_actions.creature
+
+    def __init__(self, game_actions):
+        self.game_actions = game_actions
 
         self.actions = {
             'a': self.add_monster,

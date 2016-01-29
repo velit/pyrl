@@ -12,9 +12,10 @@ def equipment(game_actions):
     header = "Equipment"
     footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
     footer = footer_fmt.format(Bind.Equipment_View_Backpack.key, Bind.Cancel.key)
+    equipment = game_actions.creature.equipment
 
     while True:
-        lines = tuple(Line(slot, "{0:11}: {1}".format(slot.value, ga.equipment.get_item(slot))) for slot in Slot)
+        lines = tuple(Line(slot, "{0:11}: {1}".format(slot.value, equipment.get_item(slot))) for slot in Slot)
         retval = lines_view(ga.io.whole_window, lines, select_keys, return_keys, header, footer)
 
         if retval in Bind.Cancel:
@@ -23,10 +24,10 @@ def equipment(game_actions):
             backpack(ga)
         elif retval in Slot:
             slot = retval
-            if ga.equipment.get_item(slot) is None:
+            if equipment.get_item(slot) is None:
                 backpack_equip_item(ga, slot)
             else:
-                ga.equipment.unequip(slot)
+                equipment.unequip(slot)
         else:
             assert False, "Got unhandled return value as input {}".format(retval)
 
@@ -39,7 +40,7 @@ def backpack_equip_item(game_actions, slot):
     if retval in Bind.Cancel:
         return
     else:
-        ga.equipment.equip_from_bag(retval, slot)
+        ga.creature.equipment.equip_from_bag(retval, slot)
 
 
 def backpack(game_actions):

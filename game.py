@@ -1,4 +1,4 @@
-"""pyrl; Python roguelike by Tapani Kiiskinen."""
+"""pyrl; Python roguelike by Veli Tapani Kiiskinen."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import state_store
@@ -19,35 +19,34 @@ class Game(object):
 
     def __init__(self, game_name, cursor_lib):
         self.game_name = game_name
-        self.turn_counter = 0
         self.ai = AI()
+        self.turn_counter = 0
         self.time = 0
-        self.modified_locations = set()
-        self.vision_cache = None
+        self.outdated_vision_coordinates = set()
 
         self.world = get_world()
         self.world.get_level(self.world.start_level, self.add_modified_location)
-
-        self.init_nonserializable_objects(cursor_lib)
+        self.io, self.user_controller = self.init_nonserializable_objects(cursor_lib)
 
     @property
     def player(self):
         return self.world.player
 
     @property
-    def level(self):
+    def active_level(self):
         return self.world.player.level
 
     def init_nonserializable_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
-        self.user_controller = UserController(GameActions(self, self.player), self.io)
-        register_status_texts(self, self.player)
+        self.user_controller = UserController(GameActions(self, self.player))
+        register_status_texts(self.io, self, self.player)
+        return self.io, self.user_controller
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
         self.io.msg("{0} for help menu".format(Bind.Help.key))
         while True:
-            creature, time_delta = self.player.level.turn_scheduler.advance_time()
+            creature, time_delta = self.active_level.turn_scheduler.advance_time()
             self.time += time_delta
 
             if creature is self.player:
@@ -65,7 +64,7 @@ class Game(object):
 
             assert action_cost >= 0, "Negative cost actions are not allowed (yet at least). {}".format(action_cost)
 
-            creature_check, time_delta = self.player.level.turn_scheduler.addpop(creature, action_cost)
+            creature_check, time_delta = self.active_level.turn_scheduler.addpop(creature, action_cost)
             assert creature is creature_check
             assert time_delta == 0
 
@@ -95,7 +94,7 @@ class Game(object):
         if creature is self.player:
             self.io.notify("You die...")
             self.endgame(ask=False)
-        self.level.remove_creature(creature)
+        creature.level.remove_creature(creature)
 
     def endgame(self, ask=True):
         if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
@@ -116,11 +115,11 @@ class Game(object):
             self.io.msg(msg_str)
 
     def add_modified_location(self, coord):
-        self.modified_locations.add(coord)
+        self.outdated_vision_coordinates.add(coord)
 
     def pop_modified_locations(self):
-        locations = self.modified_locations
-        self.modified_locations = set()
+        locations = self.outdated_vision_coordinates
+        self.outdated_vision_coordinates = set()
         return locations
 
     def update_view(self, creature):
@@ -130,9 +129,9 @@ class Game(object):
         This operation should only be done on creatures that have the .vision
         attribute ie. AdvancedCreatures for instance.
         """
-        level = creature.level
-        new_vision = ShadowCast.get_light_set(level.is_see_through, creature.coord,
-                                              creature.sight, level.rows, level.cols)
+        lvl = creature.level
+        new_vision = ShadowCast.get_light_set(lvl.is_see_through, creature.coord,
+                                              creature.sight, lvl.rows, lvl.cols)
         creature.vision, old_vision = new_vision, creature.vision
 
         creature_changed_vision = (new_vision ^ old_vision)
@@ -141,36 +140,36 @@ class Game(object):
 
         if Debug.show_map:
             update_coords = creature_changed_vision | level_changed_vision
-            vision_info = level.get_vision_information(update_coords, new_vision,
+            vision_info = lvl.get_vision_information(update_coords, new_vision,
                                                        always_show_creatures=True)
         else:
             # new ^ old is the set of new squares in view and squares that were left # behind.
             # new & old & modified is the set of old squares still in view which had changes
             # since last turn.
             update_coords = creature_changed_vision | (creature_unchanged_vision & level_changed_vision)
-            vision_info = level.get_vision_information(update_coords, new_vision)
+            vision_info = lvl.get_vision_information(update_coords, new_vision)
 
         self.io.draw(vision_info)
 
         if GameConf.clearly_show_vision:
-            reverse_data = level.get_vision_information(new_vision, new_vision)
+            reverse_data = lvl.get_vision_information(new_vision, new_vision)
             self.io.draw(reverse_data, True)
 
     def redraw(self):
         self.io.level_window.clear()
-        level = self.level
+        lvl = self.active_level
 
         if Debug.show_map:
-            draw_coords = level.tiles.coord_iter()
-            vision_info = level.get_vision_information(draw_coords, self.player.vision,
+            draw_coords = lvl.tiles.coord_iter()
+            vision_info = lvl.get_vision_information(draw_coords, self.player.vision,
                                                      always_show_creatures=True)
         else:
             draw_coords = self.player.get_visited_locations() | self.player.vision
-            vision_info = level.get_vision_information(draw_coords, self.player.vision)
+            vision_info = lvl.get_vision_information(draw_coords, self.player.vision)
         self.io.draw(vision_info)
 
         if GameConf.clearly_show_vision:
-            reverse_data = level.get_vision_information(self.player.vision, self.player.vision)
+            reverse_data = lvl.get_vision_information(self.player.vision, self.player.vision)
             self.io.draw(reverse_data, True)
 
     def __getstate__(self):

@@ -5,7 +5,6 @@ from enums.directions import Dir
 from generic_algorithms import add_vector, get_vector, clockwise, anticlockwise, reverse_vector, clockwise_45, anticlockwise_45
 from config.bindings import Bind
 from enums.keys import Key
-from controllers.user_controller_proxy import UserControllerProxy
 
 
 WALK_IN_PLACE = (None, None)
@@ -17,11 +16,23 @@ OPEN          = (True, True)
 INTERRUPT_MSG_TIME = 1
 
 
-class WalkMode(UserControllerProxy):
+class WalkMode(object):
 
-    def __init__(self, user_controller):
-        super().__init__(user_controller)
+    def __init__(self, game_actions):
+        self.game_actions = game_actions
         self.state = None
+
+    @property
+    def io(self):
+        return self.game_actions.io
+
+    @property
+    def level(self):
+        return self.game_actions.level
+
+    @property
+    def creature(self):
+        return self.game_actions.creature
 
     def is_walk_mode_active(self):
         return self.state is not None
@@ -120,7 +131,7 @@ class WalkMode(UserControllerProxy):
             return direction, new_walk_type
 
     def _passable(self, direction):
-        return self.level.is_passable(add_vector(self.creature.coord, direction))
+        return self.game_actions.can_move(direction)
 
     def _get_neighbor_passables(self, direction):
             upper_left_dir = anticlockwise_45(direction)
@@ -149,5 +160,4 @@ class WalkMode(UserControllerProxy):
         return left, right
 
     def _any_creatures_visible(self):
-        not_self = lambda coord: coord != self.creature.coord
-        return any(coord in self.level.creatures for coord in self.creature.vision if not_self(coord))
+        return len(self.game_actions.get_coords_of_creatures_in_vision())
