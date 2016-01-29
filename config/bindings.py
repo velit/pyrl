@@ -76,7 +76,7 @@ class Bind(object):
     Look_Mode     = 'q'
     Equipment     = 'e'
     Backpack      = 'b'
-    Drop_Items    = '^d'
+    Drop_Items    = 'D'
     Pick_Up_Items = 'p'
     Descend       = 'X'
     Ascend        = 'x'

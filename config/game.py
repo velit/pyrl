@@ -8,7 +8,7 @@ class GameConf(object):
     # minimum (30, 96)
     game_dimensions        = (30, 96)
 
-    # valid in range(1, 10), higher less space
+    # valid between 1 and 9, higher slower but less space
     save_compression_level = 6
 
     message_bar_height     = 2

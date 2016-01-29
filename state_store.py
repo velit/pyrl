@@ -22,7 +22,7 @@ def save(obj, save_name):
         os.mkdir(GameConf.DATA_FOLDER)
 
     save_path = os.path.join(GameConf.DATA_FOLDER, save_name + _SAVE_FILETYPE)
-    state_string = pickle.dumps(obj)
+    state_string = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
     compressed_state = zlib.compress(state_string, GameConf.save_compression_level)
     with open(save_path, "wb") as f:
         f.write(compressed_state)
@@ -31,4 +31,3 @@ def save(obj, save_name):
     uncompressed = len(state_string)
 
     return uncompressed, save_size
-    return msg_str.format(uncompressed, save_size, uncompressed / save_size)

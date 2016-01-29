@@ -7,7 +7,7 @@ from config.bindings import Bind
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
-from game_actions import ActionError
+from game_actions import ActionFeedback
 from generic_algorithms import add_vector
 from interface.help_screen import help_screen
 from world.level import LevelLocation
@@ -16,13 +16,13 @@ from config.game import GameConf
 
 class UserController(object):
     error_messages = {
-        ActionError.IllegalMove:          "You can't move there.",
-        ActionError.IllegalTeleport:      "You can't teleport there.",
-        ActionError.SwapTargetResists:    "The creature resists your swap attempt.",
-        ActionError.NoSwapTarget:         "There isn't a creature there to swap with.",
-        ActionError.PassageLeadsNoWhere:  "This passage doesn't seem to lead anywhere.",
-        ActionError.NoPassage:            "This location doesn't have a passage.",
-        ActionError.NoItemsOnGround:      "There aren't any items on the ground to pick up.",
+        ActionFeedback.IllegalMove:          "You can't move there.",
+        ActionFeedback.IllegalTeleport:      "You can't teleport there.",
+        ActionFeedback.SwapTargetResists:    "The creature resists your swap attempt.",
+        ActionFeedback.NoSwapTarget:         "There isn't a creature there to swap with.",
+        ActionFeedback.PassageLeadsNoWhere:  "This passage doesn't seem to lead anywhere.",
+        ActionFeedback.NoPassage:            "This location doesn't have a passage.",
+        ActionFeedback.NoItemsOnGround:      "There aren't any items on the ground to pick up.",
     }
 
     def __init__(self, game_actions):
@@ -75,7 +75,7 @@ class UserController(object):
             Bind.South:              partial(self.act_to_dir, Dir.South),
             Bind.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
             Bind.West:               partial(self.act_to_dir, Dir.West),
-            Bind.Stay:               partial(self.act_to_dir, Dir.Stay),
+            Bind.Stay:               self.wait,
             Bind.East:               partial(self.act_to_dir, Dir.East),
             Bind.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
             Bind.North:              partial(self.act_to_dir, Dir.North),
@@ -109,8 +109,8 @@ class UserController(object):
                 error = self.actions[key]()
 
             if error is not None:
-                assert error != ActionError.AlreadyActed, "Player attempted to act twice."
-                assert error != ActionError.PlayerAction, "Player was denied a player only action."
+                assert error != ActionFeedback.AlreadyActed, "Player attempted to act twice."
+                assert error != ActionFeedback.PlayerAction, "Player was denied a player only action."
 
                 if error in self.error_messages:
                     self.io.msg(self.error_messages[error])
@@ -122,6 +122,9 @@ class UserController(object):
 
     def act_to_dir(self, direction):
         return self.game_actions.act_to_dir(direction)
+
+    def wait(self):
+        return self.game_actions.wait()
 
     def look(self):
         coord = self.coord

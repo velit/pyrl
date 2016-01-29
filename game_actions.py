@@ -7,7 +7,7 @@ from generic_algorithms import add_vector, get_vector
 from enums.directions import Dir
 
 
-class ActionError(Enum):
+class ActionFeedback(Enum):
     AlreadyActed        = "Creature already acted."
     IllegalMove         = "Creature can't move there."
     IllegalTeleport     = "Creature can't teleport there."
@@ -17,6 +17,9 @@ class ActionError(Enum):
     NoPassage           = "This location doesn't have a passage."
     PlayerAction        = "Only the player can do this action."
     NoItemsOnGround     = "There aren't any items on the ground to pick up."
+
+    def __str__(self):
+        return self.value
 
 
 class GameActions(object):
@@ -57,37 +60,37 @@ class GameActions(object):
     def act_to_dir(self, direction):
         target_coord = add_vector(self.coord, direction)
         if target_coord in self.level.creatures:
-            return self.game_actions.attack(direction)
+            return self.attack(direction)
         elif self.can_move(direction):
             return self.move(direction)
         else:
-            return ActionError.IllegalMove
+            return ActionFeedback.IllegalMove
 
     def enter_passage(self):
         if self.already_acted():
-            return ActionError.AlreadyActed
+            return ActionFeedback.AlreadyActed
 
         if self.coord not in self.level.locations:
-            return ActionError.NoEntrance
+            return ActionFeedback.NoEntrance
 
         source_point = (self.level.key, self.level.locations[self.coord])
 
         if not self.game.world.has_destination(source_point):
-            return ActionError.PassageLeadsNoWhere
+            return ActionFeedback.PassageLeadsNoWhere
 
         destination_point = self.game.world.get_destination(source_point)
 
         if not self.game.move_creature_to_level(self.creature, destination_point):
-            return ActionError.PassageLeadsNoWhere
+            return ActionFeedback.PassageLeadsNoWhere
 
         self._do_action(self.creature.action_cost(Action.Move))
 
     def move(self, direction):
         if self.already_acted():
-            return ActionError.AlreadyActed
+            return ActionFeedback.AlreadyActed
 
         if not self.can_move(direction):
-            return ActionError.IllegalMove
+            return ActionFeedback.IllegalMove
 
         self.level.move_creature_to_dir(self.creature, direction)
         move_multiplier = self.level.movement_multiplier(self.coord, direction)
@@ -95,25 +98,25 @@ class GameActions(object):
 
     def teleport(self, target_coord):
         if self.already_acted():
-            return ActionError.AlreadyActed
+            return ActionFeedback.AlreadyActed
 
         if not self.level.is_passable(target_coord):
-            return ActionError.IllegalTeleport
+            return ActionFeedback.IllegalTeleport
 
         self.level.move_creature(self.creature, target_coord)
         self._do_action(self.creature.action_cost(Action.Move))
 
     def swap(self, direction):
         if self.already_acted():
-            return ActionError.AlreadyActed
+            return ActionFeedback.AlreadyActed
 
         target_coord = add_vector(self.coord, direction)
         if target_coord not in self.level.creatures:
-            return ActionError.NoSwapTarget
+            return ActionFeedback.NoSwapTarget
 
         target_creature = self.level.creatures[target_coord]
         if not self.game.ai.willing_to_swap(target_creature, self.creature, self.player):
-            return ActionError.SwapTargetResists
+            return ActionFeedback.SwapTargetResists
 
         self.level.swap_creature(self.creature, target_creature)
         move_multiplier = self.level.movement_multiplier(self.coord, direction)
@@ -121,7 +124,7 @@ class GameActions(object):
 
     def attack(self, direction):
         if self.already_acted():
-            return ActionError.AlreadyActed
+            return ActionFeedback.AlreadyActed
 
         target_coord = add_vector(self.coord, direction)
 
@@ -152,12 +155,15 @@ class GameActions(object):
         self.creature.equipment.bag_items(items)
         self._do_action(self.creature.action_cost(Action.Exchange_Items))
 
+    def wait(self):
+        self._do_action(self.creature.action_cost(Action.Generic))
+
     def get_passage(self):
         """Free action."""
         try:
             return self.level.locations[self.coord]
         except KeyError:
-            return ActionError.NoPassage
+            return ActionFeedback.NoPassage
 
     def get_coords_of_creatures_in_vision(self, include_player=False):
         """Free action."""
@@ -169,7 +175,7 @@ class GameActions(object):
     def save(self):
         """Free player action."""
         if self.creature is not self.game.player:
-            return ActionError.PlayerAction
+            return ActionFeedback.PlayerAction
 
         return self.game.savegame(ask=False)
 
@@ -184,14 +190,14 @@ class GameActions(object):
     def quit(self):
         """Free player action."""
         if self.creature is not self.game.player:
-            return ActionError.PlayerAction
+            return ActionFeedback.PlayerAction
 
         self.game.endgame(ask=False)
 
     def redraw(self):
         """Free player action."""
         if self.creature is not self.game.player:
-            return ActionError.PlayerAction
+            return ActionFeedback.PlayerAction
 
         self.game.redraw()
 
