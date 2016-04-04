@@ -16,17 +16,15 @@ class LevelWindow(BaseWindow):
         self.blit()
 
     def draw_char(self, coord, char, reverse=False):
-        y, x = coord
         if reverse:
-            symbol, (fg, bg) = char
-            char = symbol, (bg, fg)
-        self.addch(y, x, char)
+            char = char[0], char[1][1], char[1][0]
+        super().draw_char(coord, char)
 
     def draw_line(self, coordA, coordB, char=('*', Pair.Yellow), includeFirst=False):
         if includeFirst:
-            for y, x in bresenham(coordA, coordB):
-                self.addch(y, x, char)
+            for coord in bresenham(coordA, coordB):
+                self.draw_char(coord, char)
         else:
-            for y, x in bresenham(coordA, coordB):
-                if (y, x) != coordA:
-                    self.addch(y, x, char)
+            for coord in bresenham(coordA, coordB):
+                if coord != coordA:
+                    self.draw_char(coord, char)

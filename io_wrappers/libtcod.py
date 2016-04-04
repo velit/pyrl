@@ -107,12 +107,13 @@ class TCODWindow(object):
     def get_dimensions(self):
         return libtcod.console_get_height(self.win), libtcod.console_get_width(self.win)
 
-    def addch(self, y, x, char):
+    def draw_char(self, char, coord=(0, 0)):
+        y, x = coord
         symbol, (fg, bg) = char
-        libtcod.console_put_char_ex(self.win, x, y, symbol,
-                                    self.color_map[fg], self.color_map[bg])
+        libtcod.console_put_char_ex(self.win, x, y, symbol, self.color_map[fg], self.color_map[bg])
 
-    def addstr(self, y, x, string, color=None):
+    def draw_str(self, string, coord=(0, 0), color=None):
+        y, x = coord
         if color is None:
             libtcod.console_print(self.win, x, y, string)
         else:

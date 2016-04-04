@@ -6,6 +6,7 @@ from window.base_window import BaseWindow
 
 
 class StatusBar(BaseWindow):
+
     """Handles the status bar system."""
 
     def __init__(self, *a, **k):
@@ -26,4 +27,4 @@ class StatusBar(BaseWindow):
         status_string = "  ".join("{}:{}".format(string, getter()) for string, getter in self.elements)
         lines = self.wrapper.wrap(status_string)
         for i, line in enumerate(lines):
-            self.addstr(i, 0, line)
+            self.draw_str(line, (i, 0))

@@ -118,5 +118,5 @@ class WindowSystem(object):
         y, x = coord
         if ask_line is not None:
             self.message_bar.clear()
-            self.message_bar.addstr(y, x, ask_line)
+            self.message_bar.draw_str(ask_line, (y, x))
         return self.message_bar.get_str((y, x + len(ask_line)))

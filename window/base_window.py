@@ -15,11 +15,11 @@ class BaseWindow(object):
         self.screen_position = screen_position
         self.cursor_win = cursor_lib.new_window(dimensions)
 
-    def addch(self, y, x, char):
-        self.cursor_win.addch(y, x, char)
+    def draw_char(self, char, coord):
+        self.cursor_win.draw_char(char, coord)
 
-    def addstr(self, y, x, string, color=None):
-        self.cursor_win.addstr(y, x, string, color)
+    def draw_str(self, string, coord, color=None):
+        self.cursor_win.draw_str(string, coord, color)
 
     def draw(self, char_payload_sequence):
         self.cursor_win.draw(char_payload_sequence)
@@ -84,15 +84,15 @@ class BaseWindow(object):
 
     def draw_lines(self, lines, y_offset=0, x_offset=0):
         for i, line in enumerate(lines):
-            self.addstr(i + y_offset, x_offset, line)
+            self.draw_str(line, (i + y_offset, x_offset))
 
     def draw_banner(self, banner_text, y_offset=0, color=Pair.Brown):
         format_str = "{0:+^" + str(self.cols) + "}"
         banner_text = format_str.format("  " + banner_text + "  ")
         if y_offset < 0:
-            self.addstr(self.rows + y_offset, 0, banner_text, color)
+            self.draw_str(banner_text, (self.rows + y_offset, 0), color)
         else:
-            self.addstr(y_offset, 0, banner_text, color)
+            self.draw_str(banner_text, (y_offset, 0), color)
 
     def get_str(self, coord=(0, 0)):
         y, x = coord
@@ -103,11 +103,11 @@ class BaseWindow(object):
             user_input = user_input[:max_size]
             cursor_pos = min(max(cursor_pos, -len(user_input)), 0)
             positive_pos = len(user_input) + cursor_pos
-            self.addstr(y, x, user_input)
+            self.draw_str(user_input, (y, x))
             cursor_char = (" " + user_input)[cursor_pos]
-            self.addch(y, x + len(user_input) + cursor_pos, (cursor_char, Pair.Cursor))
+            self.draw_char((cursor_char, Pair.Cursor), (y, x + len(user_input) + cursor_pos))
             key = self.get_key(refresh=True)
-            self.addstr(y, x, " " * (len(user_input) + 1))
+            self.draw_str(" " * (len(user_input) + 1), (y, x))
 
             if key == Key.SPACE:
                 key = " "

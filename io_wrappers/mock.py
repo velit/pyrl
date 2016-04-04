@@ -63,10 +63,10 @@ class MockWrapperWindow(object):
     def get_dimensions(self):
         pass
 
-    def addch(self, y, x, char):
+    def draw_char(self, coord, char):
         pass
 
-    def addstr(self, y, x, string, color=None):
+    def draw_str(self, coord, string, color=None):
         pass
 
     def draw(self, char_payload_sequence):

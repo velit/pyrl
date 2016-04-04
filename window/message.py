@@ -44,9 +44,9 @@ class MessageBar(BaseWindow):
         skip = False
         lines = self.wrap(" ".join(event))
         for i, line in enumerate(lines):
-            self.addstr(i % self.rows, 0, line)
+            self.draw_str(line, (i % self.rows, 0))
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-                self.addstr(self.rows - 1, self.cols - MORE_STR_LEN, MORE_STR, Pair.Green)
+                self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), Pair.Green)
                 if self.selective_get_key(Bind.Last_Message + Bind.Cancel, refresh=True) in Bind.Last_Message:
                     skip = True
                     break
@@ -54,7 +54,7 @@ class MessageBar(BaseWindow):
         if skip:
             self.clear()
             for i in range(self.rows):
-                self.addstr(i, 0, lines[i - self.rows])
+                self.draw_str(lines[i - self.rows], (i, 0))
 
     def print_history(self):
         keep_asking = True

@@ -102,11 +102,13 @@ class CursesWindow(object):
         self.win.immedok(False)
         self.win.scrollok(False)
 
-    def addch(self, y, x, char):
+    def draw_char(self, char, coord=(0, 0)):
+        y, x = coord
         symbol, color = char
         self.win.addch(y, x, symbol, self.color_map[color])
 
-    def addstr(self, y, x, string, color=None):
+    def draw_str(self, string, coord=(0, 0), color=None):
+        y, x = coord
         if color is None:
             self.win.addstr(y, x, string)
         else:
@@ -198,13 +200,13 @@ class CursesWindow(object):
                     "current size is {}x{}. Please resize the screen or "
                     "press Q to quit.")
             message = message.format(min_cols, min_rows, cols, rows)
-            self.root_win.addstr(0, 0, message)
+            self.root_win.draw_str(message)
             self.root_win.win.refresh()
 
             if self.root_win.get_key() == "Q":
                 self.root_win.clear()
                 message = "Confirm quit by pressing Y."
-                self.root_win.addstr(0, 0, message)
+                self.root_win.draw_str(message)
                 self.root_win.win.refresh()
                 if self.root_win.get_key() == "Y":
                     exit()
