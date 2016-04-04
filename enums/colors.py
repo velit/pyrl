@@ -59,3 +59,4 @@ class Pair(object):
     Darkest      = (Color.Darkest,       Color.Black)
     Dark         = (Color.Dark,          Color.Black)
     Black        = (Color.Black,         Color.Black)
+    Cursor       = (Color.Black,         Color.Green)

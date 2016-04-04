@@ -15,6 +15,7 @@ curses_key_map = {
     curses.KEY_A3:          Key.NUMPAD_9,
     curses.KEY_B2:          Key.NUMPAD_5,
     curses.KEY_BACKSPACE:   Key.BACKSPACE,
+    curses.KEY_BTAB:        Key.SHIFT_TAB,
     curses.KEY_C1:          Key.NUMPAD_1,
     curses.KEY_C3:          Key.NUMPAD_3,
     curses.KEY_DC:          Key.DELETE,

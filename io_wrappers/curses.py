@@ -165,6 +165,8 @@ class CursesWindow(object):
 
         if key in self.key_map:
             key = self.key_map[key]
+        elif isinstance(key, int):
+            key = str(key)
         else:
             nr = ord(key)
             if nr < 128:

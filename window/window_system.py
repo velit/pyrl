@@ -113,3 +113,10 @@ class WindowSystem(object):
 
     def get_current_time(self):
         return time.time()
+
+    def get_str(self, ask_line=None, coord=(0, 0)):
+        y, x = coord
+        if ask_line is not None:
+            self.message_bar.clear()
+            self.message_bar.addstr(y, x, ask_line)
+        return self.message_bar.get_str((y, x + len(ask_line)))

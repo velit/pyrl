@@ -178,11 +178,11 @@ class UserController(object):
 
     def descend(self):
         location = self.game_actions.get_passage()
-        if location != LevelLocation.Passage_Down:
+        if location not in (ActionFeedback.NoPassage, LevelLocation.Passage_Up):
+            return self.game_actions.enter_passage()
+        else:
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
             #return "You don't find any downwards passage."
-        else:
-            return self.game_actions.enter_passage()
 
     def ascend(self):
         location = self.game_actions.get_passage()

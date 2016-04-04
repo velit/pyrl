@@ -35,6 +35,7 @@ class DebugAction(object):
             'k': self.kill_creatures_in_level,
             'l': self.cycle_level_type,
             'm': self.print_message_debug_string,
+            'g': self.print_user_input,
             'o': self.draw_path_to_passage_down,
             'p': self.draw_path_from_up_to_down,
             'r': self.toggle_path_heuristic_cross,
@@ -43,6 +44,9 @@ class DebugAction(object):
             'y': self.toggle_log_keycodes,
             'X': self.descend_to_end,
         }
+
+    def print_user_input(self):
+        self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
     def update_without_acting(self):
         self.game_actions._do_action(0)

@@ -93,3 +93,36 @@ class BaseWindow(object):
             self.addstr(self.rows + y_offset, 0, banner_text, color)
         else:
             self.addstr(y_offset, 0, banner_text, color)
+
+    def get_str(self, coord=(0, 0)):
+        y, x = coord
+        cursor_pos = 0
+        user_input = ""
+        max_size = self.cols - x - 1
+        while True:
+            user_input = user_input[:max_size]
+            cursor_pos = min(max(cursor_pos, -len(user_input)), 0)
+            positive_pos = len(user_input) + cursor_pos
+            self.addstr(y, x, user_input)
+            cursor_char = (" " + user_input)[cursor_pos]
+            self.addch(y, x + len(user_input) + cursor_pos, (cursor_char, Pair.Cursor))
+            key = self.get_key(refresh=True)
+            self.addstr(y, x, " " * (len(user_input) + 1))
+
+            if key == Key.SPACE:
+                key = " "
+
+            if key in (Key.ENTER, "^m", "^j", "^d"):
+                return user_input
+            elif key in ("^w", "^u"):
+                user_input = user_input[positive_pos:]
+            elif key in (Key.BACKSPACE, "^h"):
+                user_input = user_input[:positive_pos - 1] + user_input[positive_pos:]
+            elif key == Key.DELETE:
+                user_input = user_input[:positive_pos] + user_input[positive_pos - 1:]
+            elif key == Key.LEFT:
+                cursor_pos = max(cursor_pos - 1, -len(user_input))
+            elif key == Key.RIGHT:
+                cursor_pos = min(cursor_pos + 1, 0)
+            else:
+                user_input = user_input[:positive_pos] + key + user_input[positive_pos:]

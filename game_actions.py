@@ -46,14 +46,6 @@ class GameActions(object):
     def io(self):
         return self.game.io
 
-    def _clear_action(self, and_associate_creature=None):
-        self.action_cost = None
-        if and_associate_creature:
-            self.creature = and_associate_creature
-
-    def _do_action(self, cost):
-        self.action_cost = cost
-
     def already_acted(self):
         return self.action_cost is not None
 
@@ -141,6 +133,8 @@ class GameActions(object):
         if died:
             self.game.creature_death(target)
         self._do_action(self.creature.action_cost(Action.Attack))
+
+
         personity = (self.creature is self.player, target is self.player)
         msg = get_combat_message(succeeds, damage, died, personity, self.creature.name, target.name)
         self.game.io.msg(msg)
@@ -225,3 +219,14 @@ class GameActions(object):
         """Free action."""
         return (self.target_within_sight_distance(target_coord) and
                 self.level.check_los(self.coord, target_coord))
+
+    # def _attack_msg
+    #TODO: add better support for attack messages
+
+    def _clear_action(self, and_associate_creature=None):
+        self.action_cost = None
+        if and_associate_creature:
+            self.creature = and_associate_creature
+
+    def _do_action(self, cost):
+        self.action_cost = cost
