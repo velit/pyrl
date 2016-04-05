@@ -82,6 +82,13 @@ class BaseWindow(object):
         self.blit()
         self.cursor_lib.flush()
 
+    def menu(self, header, lines, footer, key_set):
+        self.clear()
+        self.draw_banner(header)
+        self.draw_lines(lines, y_offset=2)
+        self.draw_banner(footer, y_offset=-1)
+        return self.selective_get_key(key_set, refresh=True)
+
     def draw_lines(self, lines, y_offset=0, x_offset=0):
         for i, line in enumerate(lines):
             self.draw_str(line, (i + y_offset, x_offset))
@@ -94,8 +101,9 @@ class BaseWindow(object):
         else:
             self.draw_str(banner_text, (y_offset, 0), color)
 
-    def get_str(self, coord=(0, 0)):
-        y, x = coord
+    def get_str(self, ask_line="", coord=(0, 0)):
+        self.draw_str(ask_line, coord)
+        y, x = coord[0], coord[1] + len(ask_line)
         cursor_pos = 0
         user_input = ""
         max_size = self.cols - x - 1
@@ -116,10 +124,15 @@ class BaseWindow(object):
                 return user_input
             elif key in ("^w", "^u"):
                 user_input = user_input[positive_pos:]
+            elif key in (Key.END, "^e"):
+                cursor_pos = 0
+            elif key in (Key.HOME, "^a"):
+                cursor_pos = -len(user_input)
             elif key in (Key.BACKSPACE, "^h"):
                 user_input = user_input[:positive_pos - 1] + user_input[positive_pos:]
             elif key == Key.DELETE:
-                user_input = user_input[:positive_pos] + user_input[positive_pos - 1:]
+                user_input = user_input[:positive_pos] + user_input[positive_pos + 1:]
+                cursor_pos += 1
             elif key == Key.LEFT:
                 cursor_pos = max(cursor_pos - 1, -len(user_input))
             elif key == Key.RIGHT:

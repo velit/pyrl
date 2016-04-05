@@ -204,6 +204,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1430944118" done="1459852612">
+        Add regex/search to lines_view
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1431034577" done="1432492785">
         Change raise AssertionErrors to assert thing, error
         <comment>
@@ -254,6 +260,12 @@
     </note>
     <note priority="veryhigh" time="1453793846" done="1454157411">
         Swap UserControllerProxy usage with game_actions, delete proxy afterwards.
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1459741212" done="1459754487">
+        Change window_system/base_window functions to use coord tuples as parameters over y, x
         <comment>
             done
         </comment>
@@ -486,9 +498,6 @@
     <note priority="veryhigh" time="1429823187">
         Overhaul walk mode
     </note>
-    <note priority="veryhigh" time="1430944118">
-        Add regex/search to lines_view
-    </note>
     <note priority="veryhigh" time="1432475550">
         Consider making coord type/namedtuple. Consider using namedtuples more in general.
     </note>
@@ -501,20 +510,17 @@
     <note priority="veryhigh" time="1453809687">
         Add messages when dropping/picking up items
     </note>
-    <note priority="veryhigh" time="1453824766">
+    <note priority="veryhigh" time="1453824766" done="1459852671">
         Add select/deselect all keys to items view.
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1454012477">
         Update game_actions to provide tools for user_controller.look
     </note>
     <note priority="veryhigh" time="1459740027">
         Overhaul input key representation. Currently done as strings but need a richer format.
-    </note>
-    <note priority="veryhigh" time="1459741212" done="1459754487">
-        Change window_system/base_window functions to use coord tuples as parameters over y, x
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="high" time="1429224251">
         Add regeneration

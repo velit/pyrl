@@ -5,56 +5,21 @@ from config.bindings import Bind
 
 def help_screen(io):
     header = "Help Screen, ^ means ctrl, ! means alt"
-    columns = \
-    (
-        (
-            "{:32}".format("Main View:"),
-            "",
-            "Help            {0!s:16.16}".format(Bind.Help),
-            "Look Mode       {0!s:16.16}".format(Bind.Look_Mode),
-            "Inventory       {0!s:16.16}".format(Bind.Equipment),
-            "Descend         {0!s:16.16}".format(Bind.Descend),
-            "Ascend          {0!s:16.16}".format(Bind.Ascend),
-            "Quit            {0!s:16.16}".format(Bind.Quit),
-            "Save            {0!s:16.16}".format(Bind.Save),
-            "Manual Attack   {0!s:16.16}".format(Bind.Attack),
-            "Redraw Screen   {0!s:16.16}".format(Bind.Redraw),
-            "Print History   {0!s:16.16}".format(Bind.History),
-            "Walk Mode       {0!s:16.16}".format(Bind.Walk_Mode),
-        ),
-        (
-            "",
-            "",
-            "Show vision     {0!s:16.16}".format(Bind.Show_Vision),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-        ),
-        (
-            "General:",
-            "",
-            "Cancel          {0!s:16.16}".format(Bind.Cancel),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-            "                {0!s:16.16}".format(""),
-        ),
-    )
-    top = tuple("".join(row) for row in zip(*columns))
-    bottom = (
+    section = "{!s:16.16}"*2
+    help_lines = (
+        ("{:32}"*2).format("Main View:", "General"),
+        "",
+        (section * 3).format("Help",           Bind.Help,        "Show vision",  Bind.Show_Vision,  "Cancel",  Bind.Cancel),
+        (section * 1).format("Look Mode",      Bind.Look_Mode),
+        (section * 1).format("Inventory",      Bind.Equipment),
+        (section * 1).format("Descend",        Bind.Descend),
+        (section * 1).format("Ascend",         Bind.Ascend),
+        (section * 1).format("Quit",           Bind.Quit),
+        (section * 1).format("Save",           Bind.Save),
+        (section * 1).format("Manual Attack",  Bind.Attack),
+        (section * 1).format("Redraw Screen",  Bind.Redraw),
+        (section * 1).format("Print History",  Bind.History),
+        (section * 1).format("Walk Mode",      Bind.Walk_Mode),
         "",
         "Direction keys used for movement, implicit attacking, walk mode, etc:",
         "  Numpad keys",
@@ -69,6 +34,40 @@ def help_screen(io):
         "",
         "Colors available     dc (only on ncurses ie. pyrl.py)",
     )
-    help_lines = top + bottom
+    footer = "{0} to close".format(Bind.Cancel.key)
+    io.menu(header, help_lines, footer, Bind.Cancel)
+
+
+def scroll_views_help_screen(io):
+    header = "Help Screen, ^ means ctrl, ! means alt"
+    section = "{!s:16.16}"*2
+    help_lines = (
+        ("{:32}"*2).format("Main View:", "General"),
+        "",
+        (section * 3).format("Help",           Bind.Help,        "Show vision",  Bind.Show_Vision,  "Cancel",  Bind.Cancel),
+        (section * 1).format("Look Mode",      Bind.Look_Mode),
+        (section * 1).format("Inventory",      Bind.Equipment),
+        (section * 1).format("Descend",        Bind.Descend),
+        (section * 1).format("Ascend",         Bind.Ascend),
+        (section * 1).format("Quit",           Bind.Quit),
+        (section * 1).format("Save",           Bind.Save),
+        (section * 1).format("Manual Attack",  Bind.Attack),
+        (section * 1).format("Redraw Screen",  Bind.Redraw),
+        (section * 1).format("Print History",  Bind.History),
+        (section * 1).format("Walk Mode",      Bind.Walk_Mode),
+        "",
+        "Direction keys used for movement, implicit attacking, walk mode, etc:",
+        "  Numpad keys",
+        "  So called vi-keys (hjklyubn.)",
+        "",
+        "Debug keys that start with d",
+        "Map hax             dv        Other path                   dp",
+        "Kill monsters       dk        Reverse fov                  dh",
+        "Path to stairs      do        Interactive console          di",
+        "Toggle path debugs  dd        Change level types           dl",
+        "Print debug string  dm        Set cross heuristic in path  dr",
+        "",
+        "Colors available     dc (only on ncurses ie. pyrl.py)",
+    )
     footer = "{0} to close".format(Bind.Cancel.key)
     io.menu(header, help_lines, footer, Bind.Cancel)

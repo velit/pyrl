@@ -44,6 +44,7 @@ class Bind(object):
     Previous_Line = '-', '^p'
     Next_Page     = Key.PAGE_DOWN, '^d'
     Previous_Page = Key.PAGE_UP, '^u'
+    Filter        = "^f"
 
     # Multi-select views
     Select_All   = '^a'

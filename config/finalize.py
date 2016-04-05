@@ -22,6 +22,8 @@ def finalize_bindings(cls):
     _BindingTuplefy_attributes(cls)
 
     cls.scroll_keys = cls.Next_Line + cls.Previous_Line + cls.Next_Page + cls.Previous_Page
+    cls.multi_select_keys = cls.Select_All + cls.Deselect_All
+
     cls.query_keys = cls.Yes + cls.No + cls.Default_Yes + cls.Default_No + cls.Default_Query
 
     action_tuple = (

@@ -70,13 +70,7 @@ class WindowSystem(object):
             self.level_window.draw_reverse(character_data_sequence)
 
     def menu(self, header, lines, footer, key_set, target_window=None):
-        if target_window is None:
-            target_window = self.whole_window
-        target_window.clear()
-        target_window.draw_banner(header)
-        target_window.draw_lines(lines, y_offset=2)
-        target_window.draw_banner(footer, y_offset=-1)
-        return target_window.selective_get_key(key_set, refresh=True)
+        return self.whole_window.menu(header=header, lines=lines, footer=footer, key_set=key_set)
 
     def draw_char(self, coord, char, reverse=False):
         self.level_window.draw_char(coord, char, reverse)
@@ -114,9 +108,6 @@ class WindowSystem(object):
     def get_current_time(self):
         return time.time()
 
-    def get_str(self, ask_line=None, coord=(0, 0)):
-        y, x = coord
-        if ask_line is not None:
-            self.message_bar.clear()
-            self.message_bar.draw_str(ask_line, (y, x))
-        return self.message_bar.get_str((y, x + len(ask_line)))
+    def get_str(self, ask_line="", coord=(0, 0)):
+        self.message_bar.clear()
+        return self.message_bar.get_str(ask_line=ask_line, coord=coord)
