@@ -7,7 +7,10 @@ The dots are floor tiles, the # dungeon walls and < and > entrances to other
 levels. The @ is the player character and the brown walls and bold dots are in
 line of sight of the player.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-nc/3.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">pyrl</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit/pyrl" property="cc:attributionName" rel="cc:attributionURL">Veli Tapani Kiiskinen</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/">Creative Commons Attribution-NonCommercial 3.0 Unported License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
+<br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Python Roguelike</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit" property="cc:attributionName" rel="cc:attributionURL">Veli Tapani Kiiskinen</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+<br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/velit/pyrl" rel="dct:source">https://github.com/velit/pyrl</a>.
+<br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit/pyrl" rel="cc:morePermissions">https://github.com/velit/pyrl</a>.
 
 Running pyrl
 ============
@@ -27,7 +30,6 @@ SDL version of the game. Windows supports only the SDL version.
 ### \*nix and Mac pyrl.py requirements
 
 * Python 3.4
-* libncurses (Base package should come pre-installed in most \*nixes)
 * Terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
 
 
