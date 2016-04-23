@@ -4,11 +4,11 @@ import random
 
 import path
 import itertools
-from enum import Enum
 from config.debug import Debug
-from creature.actions import Action
 from creature.creature import Creature
+from enum import Enum
 from enums.directions import Dir
+from game_actions import Action
 from generic_algorithms import bresenham, cross_product, add_vector
 from generic_structures import Event
 from turn_scheduler import TurnScheduler
@@ -96,7 +96,7 @@ class Level(object):
         for direction in self.get_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             multiplier = self.movement_multiplier(coord, direction)
-            yield neighbor_coord, round(multiplier * Action.Move.cost)
+            yield neighbor_coord, round(multiplier * Action.Move.base_cost)
 
     def get_passable_neighbors(self, coord):
         for direction in Dir.All:
@@ -124,7 +124,7 @@ class Level(object):
                     any(not self.is_see_through(coord) for coord in bresenham(coordB, coordA)))
 
     def distance_heuristic(self, coordA, coordB):
-        return round(path.heuristic(coordA, coordB, Action.Move.cost, Dir.DiagonalMoveMult))
+        return round(path.heuristic(coordA, coordB, Action.Move.base_cost, Dir.DiagonalMoveMult))
 
     def movement_multiplier(self, coord, direction):
         origin_multiplier = self.tiles[coord].movement_multiplier
@@ -218,13 +218,13 @@ class Level(object):
         self.visible_change.trigger(creatureA.coord)
         self.visible_change.trigger(creatureB.coord)
 
-    def enumerate_items(self, coord):
+    def view_items(self, coord):
         if coord in self.items:
-            return enumerate(self.items[coord])
+            return tuple(self.items[coord])
         else:
-            return enumerate(())
+            return ()
 
-    def take_items(self, coord, item_indexes):
+    def pop_items(self, coord, item_indexes):
         if not item_indexes:
             return ()
 
@@ -244,7 +244,7 @@ class Level(object):
         self.visible_change.trigger(coord)
         return taken_items
 
-    def deposit_items(self, coord, items):
+    def add_items(self, coord, items):
         if coord in self.items:
             current_items = self.items[coord]
         else:

@@ -1,6 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import itertools
 from enum import Enum
 from creature.stats import Stat
 
@@ -20,7 +19,7 @@ class Equipment(object):
 
         self.applied_stats = {stat: 0 for stat in Stat}
 
-        self._bag = ()
+        self._bag = []
         self._worn_items = {
             Slot.Head:        None,
             Slot.Body:        None,
@@ -53,18 +52,18 @@ class Equipment(object):
         self.bag_item(item)
 
     def bag_item(self, item):
-        self.bag_items((item, ))
+        self._bag.append(item)
 
     def bag_items(self, items):
-        self._bag = tuple(itertools.chain(self._bag, items))
+        self._bag.extend(items)
 
     def unbag_item(self, item_index):
-        return self.unbag_items((item_index, ))[0]
+        return self._bag.pop(item_index)
 
     def unbag_items(self, item_indexes):
-        index_set = set(item_indexes)
+        index_set = tuple(item_indexes)
         unbagged_items = tuple(self._bag[index] for index in item_indexes)
-        self._bag = tuple(item for index, item in enumerate(self._bag) if index not in index_set)
+        self._bag = [item for index, item in enumerate(self._bag) if index not in index_set]
         return unbagged_items
 
     def get_damage_info(self):
@@ -75,8 +74,8 @@ class Equipment(object):
         else:
             return None
 
-    def enumerate_items(self):
-        return enumerate(self._bag)
+    def view_items(self):
+        return tuple(self._bag)
 
     def _add_stats(self, item):
         for stat, value in item.stats:

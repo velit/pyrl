@@ -2,106 +2,100 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import random
 
-from creature.actions import Action
+from game_actions import Action, ActionError, GameActionsProperties
 from enums.directions import Dir
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 
-class AI(object):
+class AI(GameActionsProperties, object):
 
     def __init__(self):
         self.ai_state = {}
 
-    def act_alert(self, game_actions, alert_coord):
-        creature = game_actions.creature
-        level = creature.level
+    def act(self, game_actions, alert_coord):
+        self.actions = game_actions
 
-        error = None
-        if creature in self.ai_state:
-            chase_coord, chase_vector = self.ai_state[creature]
+        if self.creature in self.ai_state:
+            chase_coord, chase_vector = self.ai_state[self.creature]
         else:
             chase_coord, chase_vector = None, None
 
-        if game_actions.target_in_sight(alert_coord):
+        if self.actions.target_in_sight(alert_coord):
             # passive actions
             if chase_coord is not None and chase_coord != alert_coord:
                 chase_vector = get_vector(chase_coord, alert_coord)
             chase_coord = alert_coord
 
             # actions
-            if game_actions.can_reach(alert_coord):
-                error = game_actions.attack(get_vector(creature.coord, alert_coord))
+            if self.actions.can_reach(alert_coord):
+                feedback = self.actions.attack(get_vector(self.coord, alert_coord))
             else:
-                error = self.move_towards(game_actions, alert_coord)
+                feedback = self.move_towards(alert_coord)
 
         else:
             # chasing and already at the target square and has a chase vector to pursue
-            if chase_coord == creature.coord:
+            if chase_coord == self.coord:
                 if chase_vector is not None:
-                    # resize the chase vector to the creatures sight so the creature can just go there
-                    chase_vector = resize_vector_to_len(chase_vector, creature.sight)
+                    # resize the chase vector to the creatures sight so the self.creature can just go there
+                    chase_vector = resize_vector_to_len(chase_vector, self.creature.sight)
 
                     # calculate a new target square
-                    overarching_target = add_vector(creature.coord, chase_vector)
-                    chase_coord = level.get_last_pathable_coord(creature.coord, overarching_target)
+                    overarching_target = add_vector(self.coord, chase_vector)
+                    chase_coord = self.level.get_last_pathable_coord(self.coord, overarching_target)
 
                     # if an obstacle is hit end chase
-                    if creature.coord == chase_coord:
+                    if self.coord == chase_coord:
                         chase_coord, chase_vector = None, None
                 else:
                     chase_coord = None
 
             # actions
             if chase_coord is not None:
-                error = self.move_towards(game_actions, chase_coord)
+                feedback = self.move_towards(chase_coord)
             else:
-                error = self.move_random(game_actions)
+                feedback = self.move_random()
 
         if chase_coord is not None or chase_vector is not None:
-            self.ai_state[creature] = chase_coord, chase_vector
+            self.ai_state[self.creature] = chase_coord, chase_vector
         else:
-            self.remove_creature_state(creature)
+            self.remove_creature_state()
 
-        assert error is None, "AI state bug. Got error from game: {}".format(error)
+        assert feedback.type not in ActionError, \
+            "AI state bug. Got error from game: {} {}".format(feedback.type, feedback.params)
 
-    def move_towards(self, game_actions, target_coord):
-        creature = game_actions.creature
-        level = creature.level
+    def move_towards(self, target_coord):
         best_action = Action.Move
         best_direction = Dir.Stay
         best_cost = None
         for direction in Dir.AllPlusStay:
-            coord = add_vector(creature.coord, direction)
-            if level.is_passable(coord):
+            coord = add_vector(self.coord, direction)
+            if self.level.is_passable(coord):
                 action = Action.Move
-            elif coord in level.creatures and self.willing_to_swap(level.creatures[coord], creature):
+            elif coord in self.level.creatures and self.actions.willing_to_swap(self.level.creatures[coord]):
                 action = Action.Swap
             else:
                 continue
 
-            cost = level.distance_heuristic(coord, target_coord)
+            cost = self.level.distance_heuristic(coord, target_coord)
             if best_cost is None or cost < best_cost:
                 best_action = action
                 best_direction = direction
                 best_cost = cost
 
         if best_action == Action.Move:
-            return game_actions.move(best_direction)
+            return self.actions.move(best_direction)
         elif best_action == Action.Swap:
-            return game_actions.swap(best_direction)
+            return self.actions.swap(best_direction)
         else:
             assert False, "AI state bug. Best action was: {}".format(best_action)
 
-    def move_random(self, game_actions):
-        valid_dirs = [direction for direction in Dir.All if game_actions.can_move(direction)]
+    def move_random(self):
+        valid_dirs = [direction for direction in Dir.All if self.actions.can_move(direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
-            return game_actions.move(random.choice(valid_dirs))
+            return self.actions.move(random.choice(valid_dirs))
         else:
-            return game_actions.move(Dir.Stay)
+            return self.actions.move(Dir.Stay)
 
-    def willing_to_swap(self, creature, target_creature, player=None):
-        return target_creature is not player and creature not in self.ai_state
-
-    def remove_creature_state(self, creature):
-        if creature in self.ai_state:
-            del self.ai_state[creature]
+    def remove_creature_state(self):
+        if self.creature in self.ai_state:
+            del self.ai_state[self.creature]

@@ -51,15 +51,15 @@ class Game(object):
 
             if creature is self.player:
                 self.update_view(creature)
-                self.user_controller.game_actions._clear_action()
-                self.user_controller.get_user_input_and_act()
-                action_cost = self.user_controller.game_actions.action_cost
+                self.user_controller.actions._clear_action()
+                self.user_controller.act()
+                action_cost = self.user_controller.actions.action_cost
 
                 if action_cost > 0:
                     self.turn_counter += 1
             else:
                 ai_game_actions._clear_action(and_associate_creature=creature)
-                self.ai.act_alert(ai_game_actions, self.player.coord)
+                self.ai.act(ai_game_actions, self.player.coord)
                 action_cost = ai_game_actions.action_cost
 
             assert action_cost >= 0, "Negative cost actions are not allowed (yet at least). {}".format(action_cost)

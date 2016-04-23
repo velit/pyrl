@@ -8,26 +8,15 @@ from config.bindings import Bind
 from world.level_template import LevelTemplate
 from world.level import LevelLocation
 from creature.creature import Creature
+from game_actions import GameActionsProperties
 
 
-class DebugAction(object):
-
-    @property
-    def io(self):
-        return self.game_actions.io
-
-    @property
-    def level(self):
-        return self.game_actions.level
-
-    @property
-    def creature(self):
-        return self.game_actions.creature
+class DebugAction(GameActionsProperties, object):
 
     def __init__(self, game_actions):
-        self.game_actions = game_actions
+        self.actions = game_actions
 
-        self.actions = {
+        self.action_funcs = {
             'a': self.add_monster,
             'c': self.display_curses_color_info,
             'd': self.show_path_debug,
@@ -49,13 +38,13 @@ class DebugAction(object):
         self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
     def update_without_acting(self):
-        self.game_actions._do_action(0)
+        self.actions._do_action(0)
 
     def ask_action(self):
-        c = self.io.get_key("Avail cmds: " + "".join(sorted(self.actions.keys())))
+        c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
 
-        if c in self.actions:
-            self.actions[c]()
+        if c in self.action_funcs:
+            self.action_funcs[c]()
         else:
             self.io.msg("Undefined debug key: {}".format(c))
 
@@ -68,7 +57,7 @@ class DebugAction(object):
 
     def show_map(self):
         Debug.show_map = not Debug.show_map
-        self.game_actions.redraw()
+        self.actions.redraw()
         self.io.msg("Show map set to {}".format(Debug.show_map))
 
     def toggle_path_heuristic_cross(self):
@@ -105,17 +94,17 @@ class DebugAction(object):
     def draw_path_to_passage_down(self):
         passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
         self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
-        self.game_actions.redraw()
+        self.actions.redraw()
 
     def draw_path_from_up_to_down(self):
         passage_up_coord = self.level.get_location_coord(LevelLocation.Passage_Up)
         passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
         self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
-        self.game_actions.redraw()
+        self.actions.redraw()
 
     def interactive_console(self):
         self.io.suspend()
-        game = self.game_actions.game
+        game = self.actions.game
         io = self.io
         player = self.creature
         level = self.level
@@ -147,7 +136,7 @@ class DebugAction(object):
             return
         if not self.level.is_passable(new_coord):
             self.level.remove_creature(self.level.creatures[new_coord])
-        return self.game_actions.teleport(new_coord)
+        return self.actions.teleport(new_coord)
 
     def descend_to_end(self):
         self.io.prepared_input.extend([Bind.Descend.key]*200)

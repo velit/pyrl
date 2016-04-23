@@ -35,7 +35,10 @@ class Creature(object):
         return self.hp <= 0
 
     def action_cost(self, action, multiplier=1):
-        return round(action.cost * multiplier * self.speed_multiplier)
+        return round(action.base_cost * multiplier * self.speed_multiplier)
+
+    def __repr__(self):
+        return "Creature(name={})".format(self.name, self.level)
 
     @property
     def strength(self):

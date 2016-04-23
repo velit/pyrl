@@ -38,6 +38,9 @@ class Item(object):
     def __lt__(self, other):
         return str(self) < str(other)
 
+    def __repr__(self):
+        return "Item(name={name}, char={char}, compatible_slots={compatible_slots}, stats={stats})".format(**self.__dict__)
+
 
 class Weapon(Item):
     def __init__(self, name, dice_stats, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),

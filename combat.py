@@ -18,20 +18,20 @@ def get_melee_attack(attack_rating, damage_info, defense_rating, armor):
         return (False, 0)
 
 
-def get_combat_message(attack_succeeds, damage, dies, personity, attacker_name, defender_name):
-    attacker_is_player, target_is_player = personity
+def get_combat_message(attack_succeeds, damage, dies, player_attacker,
+                       player_target, attacker_name, defender_name):
 
-    if attacker_is_player:
+    if player_attacker:
         attacker = "You"
         third_person_singular = False
     else:
         attacker = "The {}".format(attacker_name)
         third_person_singular = True
 
-    if attacker_is_player and target_is_player:
+    if player_attacker and player_target:
         target = "yourself"
         indirect_target = "yourself"
-    elif target_is_player:
+    elif player_target:
         target = "you"
         indirect_target = "you"
     else:
