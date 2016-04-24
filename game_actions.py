@@ -5,6 +5,7 @@ from collections import namedtuple
 from combat import get_melee_attack_cr, get_combat_message
 from generic_algorithms import add_vector, get_vector
 from enums.directions import Dir
+from functools import wraps
 
 
 GameFeedback = namedtuple("GameFeedback", "type, params")
@@ -70,6 +71,17 @@ def feedback(feedback, *params):
         return GameFeedback(feedback, ())
 
 
+def player_action(func):
+
+    @wraps(func)
+    def player_check_wrapper(self, *args, **kwargs):
+        if self.creature is not self.game.player:
+            return feedback(ActionError.PlayerAction)
+        else:
+            return func(self, *args, **kwargs)
+    return player_check_wrapper
+
+
 class GameActions(object):
 
     """
@@ -81,27 +93,17 @@ class GameActions(object):
     info about the action.
     """
 
+    coord  = property(lambda self: self.creature.coord)
+    level  = property(lambda self: self.creature.level)
+    io     = property(lambda self: self.game.io)
+    world  = property(lambda self: self.game.world)
+    player = property(lambda self: self.game.world.player)
+
     def __init__(self, game, creature=None):
         self.game = game
         self.action_cost = None
         if creature:
             self.creature = creature
-
-    @property
-    def level(self):
-        return self.creature.level
-
-    @property
-    def player(self):
-        return self.game.world.player
-
-    @property
-    def coord(self):
-        return self.creature.coord
-
-    @property
-    def io(self):
-        return self.game.io
 
     def already_acted(self):
         return self.action_cost is not None
@@ -225,6 +227,8 @@ class GameActions(object):
     def willing_to_swap(self, target_creature):
         return self.creature is not self.player and target_creature not in self.game.ai.ai_state
 
+    # Free Actions:
+
     def get_tile(self):
         """Free action."""
         return self.level.tiles[self.creature.coord]
@@ -243,13 +247,6 @@ class GameActions(object):
         else:
             return self.creature.vision & self.level.creatures.keys() - {self.coord}
 
-    def save(self):
-        """Free player action."""
-        if self.creature is not self.game.player:
-            return feedback(ActionError.PlayerAction)
-
-        return self.game.savegame(ask=False)
-
     def view_floor_items(self):
         """Free action."""
         return self.level.view_items(self.coord)
@@ -257,20 +254,6 @@ class GameActions(object):
     def view_character_items(self):
         """Free action."""
         return self.creature.equipment.view_items()
-
-    def quit(self):
-        """Free player action."""
-        if self.creature is not self.game.player:
-            return feedback(ActionError.PlayerAction)
-
-        self.game.endgame(ask=False)
-
-    def redraw(self):
-        """Free player action."""
-        if self.creature is not self.game.player:
-            return feedback(ActionError.PlayerAction)
-
-        self.game.redraw()
 
     def can_reach(self, target_coord):
         """Free action."""
@@ -297,6 +280,21 @@ class GameActions(object):
         return (self.target_within_sight_distance(target_coord) and
                 self.level.check_los(self.coord, target_coord))
 
+    @player_action
+    def save(self):
+        """Free player action."""
+        return self.game.savegame(ask=False)
+
+    @player_action
+    def quit(self):
+        """Free player action."""
+        self.game.endgame(ask=False)
+
+    @player_action
+    def redraw(self):
+        """Free player action."""
+        self.game.redraw()
+
     def _clear_action(self, and_associate_creature=None):
         self.action_cost = None
         if and_associate_creature:
@@ -314,18 +312,9 @@ class GameActionsProperties(object):
     Remember to set the self.actions variable correctly in classes that use this.
     """
 
-    @property
-    def creature(self):
-        return self.actions.creature
-
-    @property
-    def coord(self):
-        return self.actions.creature.coord
-
-    @property
-    def level(self):
-        return self.actions.creature.level
-
-    @property
-    def io(self):
-        return self.actions.io
+    creature = property(lambda self: self.actions.creature)
+    coord    = property(lambda self: self.actions.creature.coord)
+    level    = property(lambda self: self.actions.creature.level)
+    io       = property(lambda self: self.actions.game.io)
+    world    = property(lambda self: self.actions.game.world)
+    player   = property(lambda self: self.actions.game.world.player)

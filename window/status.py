@@ -3,14 +3,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import textwrap
 
 from window.base_window import BaseWindow
+from functools import wraps
 
 
 class StatusBar(BaseWindow):
 
     """Handles the status bar system."""
 
-    def __init__(self, *a, **k):
-        BaseWindow.__init__(self, *a, **k)
+    @wraps(BaseWindow.__init__, assigned=())
+    def __init__(self, *args, **kwargs):
+        BaseWindow.__init__(self, *args, **kwargs)
 
         self.elements = []
         self.wrapper = textwrap.TextWrapper(width=self.cols)

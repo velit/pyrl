@@ -11,6 +11,7 @@ from window.base_window import BaseWindow
 from window.level import LevelWindow
 from window.message import MessageBar
 from window.status import StatusBar
+from functools import wraps
 
 
 class WindowSystem(object):
@@ -46,8 +47,8 @@ class WindowSystem(object):
 
         return self.whole_window.get_key()
 
-    def msg(self, *a):
-        self.message_bar.queue_msg(*a)
+    def msg(self, *messages):
+        self.message_bar.queue_msg(*messages)
 
     def ask(self, message, keys=Bind.query_keys):
         self.msg(message)
@@ -69,18 +70,21 @@ class WindowSystem(object):
         else:
             self.level_window.draw_reverse(character_data_sequence)
 
-    def menu(self, header, lines, footer, key_set, target_window=None):
-        return self.whole_window.menu(header=header, lines=lines, footer=footer, key_set=key_set)
+    @wraps(BaseWindow.menu, assigned=())
+    def menu(self, *args, **kwargs):
+        return self.whole_window.menu(*args, **kwargs)
 
-    def draw_char(self, coord, char, reverse=False):
-        self.level_window.draw_char(coord, char, reverse)
+    @wraps(LevelWindow.draw_char, assigned=())
+    def draw_char(self, *args, **kwargs):
+        self.level_window.draw_char(*args, **kwargs)
 
-    def draw_line(self, *a, **k):
-        self.level_window.draw_line(*a, **k)
+    @wraps(LevelWindow.draw_line, assigned=())
+    def draw_line(self, *args, **kwargs):
+        self.level_window.draw_line(*args, **kwargs)
 
     def draw_path(self, path):
         for coord in path:
-            self.draw_char(coord, (" ", Pair.Green), reverse=True)
+            self.draw_char((" ", Pair.Green), coord, reverse=True)
             if Debug.path_step:
                 self.level_window.get_key(refresh=True)
         if not Debug.path_step:

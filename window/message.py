@@ -7,6 +7,7 @@ import io_wrappers.mock
 from config.bindings import Bind
 from enums.colors import Pair
 from window.base_window import BaseWindow
+from functools import wraps
 
 
 MORE_STR = " More"
@@ -17,8 +18,9 @@ class MessageBar(BaseWindow):
 
     """Handles the messaging bar system."""
 
-    def __init__(self, *a, **k):
-        BaseWindow.__init__(self, *a, **k)
+    @wraps(BaseWindow.__init__, assigned=())
+    def __init__(self, *args, **kwargs):
+        BaseWindow.__init__(self, *args, **kwargs)
 
         self.history = []
         self.msgqueue = []

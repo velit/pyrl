@@ -154,10 +154,10 @@ class UserController(GameActionsProperties, object):
                 self.io.draw_line(coord, self.coord, ("*", Pair.Yellow))
                 self.io.msg("LoS: {}".format(self.actions.level.check_los(self.coord, coord)))
             if coord != self.coord:
-                char = self.actions.level.visible_char(coord)
-                char = char[0], (Color.Black, Color.Green)
-                self.io.draw_char(coord, char)
-                self.io.draw_char(self.coord, self.actions.level.visible_char(self.coord), reverse=True)
+                symbol, (foreground, background) = self.actions.level.visible_char(coord)
+                char = symbol, (foreground, Color.Green)
+                self.io.draw_char(char, coord)
+                self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
             c = self.io.get_key()
             self.actions.redraw()
             direction = Dir.Stay

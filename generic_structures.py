@@ -126,6 +126,6 @@ class Event(object):
     def unsubscribe(self, function):
         self.observers.remove(function)
 
-    def trigger(self, *args, **keys):
+    def trigger(self, *args, **kwargs):
         for observer in self.observers:
-            observer(*args, **keys)
+            observer(*args, **kwargs)

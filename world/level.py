@@ -10,8 +10,9 @@ from enum import Enum
 from enums.directions import Dir
 from game_actions import Action
 from generic_algorithms import bresenham, cross_product, add_vector
-from generic_structures import Event
+from generic_structures import Event, Array2D
 from turn_scheduler import TurnScheduler
+from functools import wraps
 
 
 class LevelLocation(Enum):
@@ -104,8 +105,9 @@ class Level(object):
             if self.is_legal(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
 
-    def is_legal(self, *args, **keys):
-        return self.tiles.is_legal(*args, **keys)
+    @wraps(Array2D.is_legal, assigned=())
+    def is_legal(self, *args, **kwargs):
+        return self.tiles.is_legal(*args, **kwargs)
 
     def is_passable(self, coord):
         if coord in self.creatures:

@@ -9,16 +9,14 @@ class LevelWindow(BaseWindow):
 
     """Handles the level display."""
 
-    def __init__(self, *a, **k):
-        BaseWindow.__init__(self, *a, **k)
-
     def update(self):
         self.blit()
 
-    def draw_char(self, coord, char, reverse=False):
+    def draw_char(self, char, coord, reverse=False):
         if reverse:
-            char = char[0], char[1][1], char[1][0]
-        super().draw_char(coord, char)
+            symbol, (fg, bg) = char
+            char = symbol, (bg, fg)
+        super().draw_char(char, coord)
 
     def draw_line(self, coordA, coordB, char=('*', Pair.Yellow), includeFirst=False):
         if includeFirst:

@@ -5,7 +5,6 @@ import random
 from rdg import LevelGen
 from config.debug import Debug
 from config.bindings import Bind
-from world.level_template import LevelTemplate
 from world.level import LevelLocation
 from creature.creature import Creature
 from game_actions import GameActionsProperties
@@ -65,11 +64,13 @@ class DebugAction(GameActionsProperties, object):
         self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
 
     def cycle_level_type(self):
-        if LevelTemplate.default_level_type == LevelGen.Dungeon:
-            LevelTemplate.default_level_type = LevelGen.Arena
-        else:
-            LevelTemplate.default_level_type = LevelGen.Dungeon
-        self.io.msg("Level type set to {}".format(LevelTemplate.default_level_type))
+        for level_template in self.world.level_templates.values():
+            if level_template.generation_type == LevelGen.Dungeon:
+                level_template.generation_type = LevelGen.Arena
+            elif level_template.generation_type == LevelGen.Arena:
+                level_template.generation_type = LevelGen.Dungeon
+            last_template_type = level_template.generation_type
+        self.io.msg("Level type set to {}".format(last_template_type))
 
     def show_path_debug(self):
         if not Debug.path:
