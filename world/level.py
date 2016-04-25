@@ -183,13 +183,14 @@ class Level(object):
     def add_creature(self, creature, coord=None):
         if coord is None:
             coord = self.free_coord()
-
-        elif coord in self.creatures:
+        if coord in self.creatures:
             blocking_creature = self.creatures[coord]
             self.move_creature(blocking_creature, self.free_coord())
         self.creatures[coord] = creature
         creature.coord = coord
         creature.level = self
+        if hasattr(creature, "outdated_vision_coordinates"):
+            self.visible_change.subscribe(creature.add_level_change)
         self.visible_change.trigger(coord)
 
     def remove_creature(self, creature):
@@ -198,6 +199,9 @@ class Level(object):
         creature.coord = None
         creature.level = None
         self.turn_scheduler.remove(creature)
+        if hasattr(creature, "outdated_vision_coordinates"):
+            self.visible_change.unsubscribe(creature.add_level_change)
+            creature.pop_modified_locations()
         self.visible_change.trigger(coord)
 
     def move_creature(self, creature, new_coord):

@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import namedtuple
 from config.bindings import Bind
 from config.game import GameConf
 from enums.directions import Dir
@@ -9,11 +10,15 @@ from generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_ve
                                 clockwise_45, anticlockwise_45)
 
 
-WALK_IN_PLACE = (None, None)
-CORRIDOR      = (False, False)
-LEFT          = (True, False)
-RIGHT         = (False, True)
-OPEN          = (True, True)
+WalkType = namedtuple("WalkType", "left_passable, right_passable")
+WalkModeState = namedtuple("WalkModeState", "direction, walk_type, next_walk_time, show_msg_time")
+
+
+WALK_IN_PLACE = WalkType(None,  None)
+CORRIDOR      = WalkType(False, False)
+LEFT          = WalkType(True,  False)
+RIGHT         = WalkType(False, True)
+OPEN          = WalkType(True,  True)
 
 INTERRUPT_MSG_TIME = 1
 
@@ -30,72 +35,64 @@ class WalkMode(GameActionsProperties, object):
     def init_walk_mode(self, direction=None):
         if self._any_creatures_visible():
             self.io.msg("Not while there are creatures in the vicinity.")
-            return None
+            return
 
         if direction is None:
             user_query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
-            key_seq = tuple(Bind.action_direction.keys()) + Bind.Cancel
+            key_seq = tuple(Bind.action_direction) + Bind.Cancel
             key = self.io.ask(user_query, key_seq)
-            if key in Bind.action_direction:
-                direction = Bind.action_direction[key]
-            else:
-                return None
+            if key in Bind.Cancel:
+                return
+            direction = Bind.action_direction[key]
 
-        feedback, walk_mode_data = self._init_walk_mode(direction)
-        if walk_mode_data is not None:
-            self.state = walk_mode_data
+        feedback = self.actions.move(direction)
+        if feedback.type in ActionError:
+            return feedback
+
+        walk_type = self._get_initial_walk_type(direction)
+        if not walk_type:
+            return feedback
+
+        self.state = WalkModeState(direction, walk_type,
+                                   self.io.get_future_time(GameConf.animation_period),
+                                   self.io.get_future_time(INTERRUPT_MSG_TIME))
         return feedback
 
     def continue_walk(self):
-        if not self._any_creatures_visible():
-            old_direction, old_walk_type, timestamp, msg_time = self.state
-            if old_walk_type == WALK_IN_PLACE:
-                result = old_direction, old_walk_type
-            elif old_walk_type == CORRIDOR:
-                result = self._corridor_walk_type(old_direction)
-            else:
-                result = self._normal_walk_type(old_direction, old_walk_type)
+        if self._any_creatures_visible():
+            self.state = None
+            return
 
-            if result is not None:
-                new_direction, new_walk_type = result
-                if msg_time < self.io.get_current_time():
-                    message = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
-                else:
-                    message = ""
-                key_seq = Bind.Walk_Mode + Bind.Cancel
-                key = self.io.selective_ask_until_timestamp(message, timestamp, key_seq)
-                if key == Key.NO_INPUT:
-                    feedback = self.actions.move(new_direction)
-                    assert feedback.type == Action.Move, \
-                        "Bug in walk_mode. Move failed: {} {}".format(feedback.type, feedback.params)
-
-                    walk_delay = self.io.get_future_time(GameConf.animation_period)
-                    self.state = new_direction, new_walk_type, walk_delay, msg_time
-                    return feedback
-
-        self.state = None
-
-    def _init_walk_mode(self, direction):
-        feedback = self.actions.move(direction)
-        if feedback.type in ActionError:
-            return feedback, None
+        if self.state.walk_type == WALK_IN_PLACE:
+            result = self.state.direction, self.state.walk_type
+        elif self.state.walk_type == CORRIDOR:
+            result = self._corridor_walk_type(self.state.direction)
         else:
-            walk_type = self._get_walk_type(direction)
-            if walk_type != WALK_IN_PLACE:
-                (forward, upper_left, upper_right, left, right, lower_left,
-                        lower_right) = self._get_neighbor_passables(direction)
-                if forward:
-                    if (left and not upper_left and not lower_left or
-                            right and not upper_right and not lower_right):
-                        return None, None
-                else:
-                    if left and lower_left or right and lower_right:
-                        return None, None
-                    walk_type = CORRIDOR
+            result = self._normal_walk_type(self.state.direction, self.state.walk_type)
 
-            return (feedback, (direction, walk_type,
-                    self.io.get_future_time(GameConf.animation_period),
-                    self.io.get_future_time(INTERRUPT_MSG_TIME)))
+        if result is None:
+            self.state = None
+            return
+
+        new_direction, new_walk_type = result
+
+        msg = ""
+        if self.state.show_msg_time < self.io.get_current_time():
+            msg = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
+        key_seq = Bind.Walk_Mode + Bind.Cancel
+        key = self.io.selective_ask_until_timestamp(msg, self.state.next_walk_time, key_seq)
+        if key != Key.NO_INPUT:
+            self.state = None
+            return
+
+        feedback = self.actions.move(new_direction)
+        assert feedback.type == Action.Move, \
+            "Bug in walk_mode. Move failed: {} {}".format(feedback.type, feedback.params)
+
+        next_walk_time = self.io.get_future_time(GameConf.animation_period)
+        self.state = WalkModeState(new_direction, new_walk_type, next_walk_time,
+                                    self.state.show_msg_time)
+        return feedback
 
     def _corridor_walk_type(self, origin_direction):
         forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(origin_direction)
@@ -121,6 +118,8 @@ class WalkMode(GameActionsProperties, object):
         new_walk_type = self._get_walk_type(direction)
         if forward and old_walk_type == new_walk_type:
             return direction, new_walk_type
+        else:
+            return None
 
     def _passable(self, direction):
         return self.actions.can_move(direction)
@@ -132,11 +131,28 @@ class WalkMode(GameActionsProperties, object):
             forward = self._passable(direction)
             left = self._passable(anticlockwise(direction))
             right = self._passable(clockwise(direction))
-            upper_left = self._passable(upper_left_dir)
-            lower_left = self._passable(anticlockwise(upper_left_dir))
-            upper_right = self._passable(upper_right_dir)
-            lower_right = self._passable(clockwise(upper_right_dir))
-            return forward, upper_left, upper_right, left, right, lower_left, lower_right
+            up_left = self._passable(upper_left_dir)
+            down_left = self._passable(anticlockwise(upper_left_dir))
+            up_right = self._passable(upper_right_dir)
+            down_right = self._passable(clockwise(upper_right_dir))
+            return forward, up_left, up_right, left, right, down_left, down_right
+
+    def _get_initial_walk_type(self, direction):
+        walk_type = self._get_walk_type(direction)
+        if walk_type != WALK_IN_PLACE:
+            forward, up_left, up_right, left, right, down_left, down_right = \
+                self._get_neighbor_passables(direction)
+            if forward and left and not up_left and not down_left:
+                return None
+            if forward and right and not up_right and not down_right:
+                return None
+            if not forward and left and down_left:
+                return None
+            if not forward and right and down_right:
+                return None
+            if not forward:
+                walk_type = CORRIDOR
+        return walk_type
 
     def _get_walk_type(self, direction):
         if direction in Dir.Orthogonals:
@@ -149,7 +165,7 @@ class WalkMode(GameActionsProperties, object):
             left, right = WALK_IN_PLACE
         else:
             raise Exception("Not a valid direction: {0}".format(direction))
-        return left, right
+        return WalkType(left, right)
 
     def _any_creatures_visible(self):
         return len(self.actions.get_coords_of_creatures_in_vision())

@@ -31,7 +31,7 @@ profile-log:
 future-test:
 	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py
 
-ctags:
+tags:
 	ctags -R .
 
 clean:

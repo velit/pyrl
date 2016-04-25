@@ -34,6 +34,9 @@ class AdvancedCreature(Creature):
         self.visited_locations = defaultdict(set)
         self.vision = set()
 
+        if creature_file.observe_level_change:
+            self.outdated_vision_coordinates = set()
+
     def get_damage_info(self):
         damage_info = self.equipment.get_damage_info()
         if damage_info is not None:
@@ -48,20 +51,25 @@ class AdvancedCreature(Creature):
     def is_idle(self):
         return False
 
-    def _update_visited_locations(self, coordinates):
-        self.visited_locations[self.level] |= coordinates
-
     def get_visited_locations(self):
         return self.visited_locations[self.level]
+
+    def add_level_change(self, coord):
+        self.outdated_vision_coordinates.add(coord)
+
+    def pop_modified_locations(self):
+        locations = self.outdated_vision_coordinates
+        self.outdated_vision_coordinates = set()
+        return locations
 
     @property
     def vision(self):
         return self._vision
 
     @vision.setter
-    def vision(self, value):
-        self._update_visited_locations(value)
-        self._vision = value
+    def vision(self, coordinates):
+        self.visited_locations[self.level] |= coordinates
+        self._vision = coordinates
 
     @vision.deleter
     def vision(self):

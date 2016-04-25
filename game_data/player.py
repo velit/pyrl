@@ -10,7 +10,7 @@ from enums.colors import Pair
 
 
 def Player():
-    template = CreatureTemplate("tappi", ('@', (Color.Green, Color.Black)), 0, 0)
+    template = CreatureTemplate("tappi", ('@', (Color.Green, Color.Black)), observe_level_change=True)
     player = AdvancedCreature(template)
 
     armor_stats = (

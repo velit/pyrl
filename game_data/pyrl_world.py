@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from world.world import World
+from world.world import World, LevelKey, WorldPoint
 from game_data.levels import test_level, overworld
 from game_data.player import Player
 from world.level import LevelLocation
@@ -9,16 +9,17 @@ from world.level import LevelLocation
 def get_world():
 
     world = World(Player())
-    start_dungeon = "dungeon"
-    world.start_level = (start_dungeon, 1)
-    world.add_level_template(start_dungeon, test_level.get_template(world.player))
+    start = LevelKey("dungeon", 1)
+    world.add_level_template(start.dungeon, test_level.get_template(world.player))
 
     for x in range(99 - 1):
-        world.add_level_template(start_dungeon)
+        world.add_level_template(start.dungeon)
 
-    world.add_level_template("overworld", overworld.get_template())
+    world.add_level_template(overworld.name, overworld.get_template())
 
-    world.add_two_way_connection((("overworld", 1), overworld.OverWorldLocation.Dungeon),
-                                 ((("dungeon"), 1), LevelLocation.Passage_Up))
+    world.set_two_way_connection(
+        WorldPoint(LevelKey(overworld.name, 1), overworld.OverWorldLocation.Dungeon),
+        WorldPoint(start, LevelLocation.Passage_Up))
 
+    world.get_level(start)
     return world

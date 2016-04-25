@@ -10,12 +10,14 @@ from world.tile import Tile
 from rdg import LevelGen
 
 
+name = "overworld"
+
+
 class OverWorldLocation(Enum):
     Dungeon = 1
     Village = 2
 
 
-# TODO: fix
 def get_template():
     dimensions = GameConf.LEVEL_DIMENSIONS
     charstr = (

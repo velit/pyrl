@@ -30,7 +30,7 @@ class AI(GameActionsProperties, object):
             if self.actions.can_reach(alert_coord):
                 feedback = self.actions.attack(get_vector(self.coord, alert_coord))
             else:
-                feedback = self.move_towards(alert_coord)
+                feedback = self._move_towards(alert_coord)
 
         else:
             # chasing and already at the target square and has a chase vector to pursue
@@ -51,19 +51,19 @@ class AI(GameActionsProperties, object):
 
             # actions
             if chase_coord is not None:
-                feedback = self.move_towards(chase_coord)
+                feedback = self._move_towards(chase_coord)
             else:
-                feedback = self.move_random()
+                feedback = self._move_random()
 
         if chase_coord is not None or chase_vector is not None:
             self.ai_state[self.creature] = chase_coord, chase_vector
         else:
-            self.remove_creature_state()
+            self.remove_creature_state(self.creature)
 
         assert feedback.type not in ActionError, \
             "AI state bug. Got error from game: {} {}".format(feedback.type, feedback.params)
 
-    def move_towards(self, target_coord):
+    def _move_towards(self, target_coord):
         best_action = Action.Move
         best_direction = Dir.Stay
         best_cost = None
@@ -89,13 +89,13 @@ class AI(GameActionsProperties, object):
         else:
             assert False, "AI state bug. Best action was: {}".format(best_action)
 
-    def move_random(self):
+    def _move_random(self):
         valid_dirs = [direction for direction in Dir.All if self.actions.can_move(direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
             return self.actions.move(random.choice(valid_dirs))
         else:
             return self.actions.move(Dir.Stay)
 
-    def remove_creature_state(self):
-        if self.creature in self.ai_state:
-            del self.ai_state[self.creature]
+    def remove_creature_state(self, creature):
+        if creature in self.ai_state:
+            del self.ai_state[creature]

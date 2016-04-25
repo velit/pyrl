@@ -22,25 +22,18 @@ class Game(object):
         self.ai = AI()
         self.turn_counter = 0
         self.time = 0
-        self.outdated_vision_coordinates = set()
 
         self.world = get_world()
-        self.world.get_level(self.world.start_level, self.add_modified_location)
         self.io, self.user_controller = self.init_nonserializable_objects(cursor_lib)
-
-    @property
-    def player(self):
-        return self.world.player
-
-    @property
-    def active_level(self):
-        return self.world.player.level
 
     def init_nonserializable_objects(self, cursor_lib_callback):
         self.io = WindowSystem(cursor_lib_callback())
         self.user_controller = UserController(GameActions(self, self.player))
         register_status_texts(self.io, self, self.player)
         return self.io, self.user_controller
+
+    player = property(lambda self: self.world.player)
+    active_level = property(lambda self: self.world.player.level)
 
     def main_loop(self):
         ai_game_actions = GameActions(self)
@@ -62,21 +55,21 @@ class Game(object):
                 self.ai.act(ai_game_actions, self.player.coord)
                 action_cost = ai_game_actions.action_cost
 
-            assert action_cost >= 0, "Negative cost actions are not allowed (yet at least). {}".format(action_cost)
+            assert action_cost >= 0, \
+                "Negative cost actions are not allowed (yet at least).{}".format(action_cost)
 
             creature_check, time_delta = self.active_level.turn_scheduler.addpop(creature, action_cost)
             assert creature is creature_check
             assert time_delta == 0
 
     def move_creature_to_level(self, creature, world_point):
-        level_key, level_location = world_point
         try:
-            target_level = self.world.get_level(level_key, self.add_modified_location)
+            target_level = self.world.get_level(world_point.level_key)
         except LevelNotFound:
             return False
 
         creature.level.remove_creature(creature)
-        target_level.add_creature_to_location(creature, level_location)
+        target_level.add_creature_to_location(creature, world_point.level_location)
 
         try:
             creature.vision.clear()
@@ -84,7 +77,6 @@ class Game(object):
             pass
 
         if creature is self.player:
-            self.pop_modified_locations()
             self.redraw()
 
         return True
@@ -114,14 +106,6 @@ class Game(object):
                 msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
             self.io.msg(msg_str)
 
-    def add_modified_location(self, coord):
-        self.outdated_vision_coordinates.add(coord)
-
-    def pop_modified_locations(self):
-        locations = self.outdated_vision_coordinates
-        self.outdated_vision_coordinates = set()
-        return locations
-
     def update_view(self, creature):
         """
         Update the vision set of the creature.
@@ -136,7 +120,7 @@ class Game(object):
 
         creature_changed_vision = (new_vision ^ old_vision)
         creature_unchanged_vision = (new_vision & old_vision)
-        level_changed_vision = self.pop_modified_locations()
+        level_changed_vision = creature.pop_modified_locations()
 
         if Debug.show_map:
             update_coords = creature_changed_vision | level_changed_vision

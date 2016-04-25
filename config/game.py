@@ -13,7 +13,7 @@ class GameConf(object):
 
     message_bar_height     = 2
     status_bar_height      = 2
-    animation_period       = 0.02
+    animation_period       = 0.01
     default_game_name      = "pyrl"
     clearly_show_vision    = False
 
