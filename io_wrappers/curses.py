@@ -151,7 +151,7 @@ class CursesWindow(object):
         """Non-blocking version of get_key."""
         self.win.nodelay(True)
         try:
-            return self.win.get_wch()
+            return self.get_key()
         except curses.error:
             return Key.NO_INPUT
         finally:

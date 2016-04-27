@@ -25,7 +25,7 @@ Key.NUMPAD_0 - Key.NUMPAD_9 #  mostly for sdl version of the game
 For other keys use a string representing that character. To use shift just write the
 character that comes out of the shift combination directly (eg. Q or #). For alt/meta
 prepend a ! character and for ctrl prepend a ^ character. Some rules:
-    -If you use ^ use lower case letters for it to work (eg. ^D or ^N).
+    -If you use ^ use lower case letters for it to work (eg. ^d or ^n).
     -If you use both ! and ^ in the same bind put ! before ^ for it to work.
     -Modifiers do not work with special keys.
 """
@@ -75,7 +75,7 @@ class MainView(metaclass=BindGroup):
     Save          = 'S'
     Attack        = 'a'
     Redraw        = '^r'
-    History       = 'p'
+    History       = '^h'
     Walk_Mode     = 'w'
     Show_Vision   = 'H'
 

@@ -107,10 +107,10 @@ class WindowSystem(object):
         return self.level_window.selective_get_key_until_timestamp(timestamp, key_seq)
 
     def get_future_time(self, delay):
-        return time.time() + delay
+        return time.monotonic() + delay
 
     def get_current_time(self):
-        return time.time()
+        return time.monotonic()
 
     def get_str(self, ask_line="", coord=(0, 0)):
         self.message_bar.clear()
