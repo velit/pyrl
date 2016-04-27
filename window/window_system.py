@@ -4,7 +4,7 @@ import time
 from collections import deque
 
 from enums.colors import Pair
-from config.bindings import Bind
+from bindings import Bind
 from config.game import GameConf
 from config.debug import Debug
 from window.base_window import BaseWindow
@@ -50,7 +50,7 @@ class WindowSystem(object):
     def msg(self, *messages):
         self.message_bar.queue_msg(*messages)
 
-    def ask(self, message, keys=Bind.query_keys):
+    def ask(self, message, keys=Bind.Queries):
         self.msg(message)
         self.refresh()
         return self.level_window.selective_get_key(keys)

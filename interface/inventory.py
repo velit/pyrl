@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from interface.lines_view import lines_view, Line
-from config.bindings import Bind
+from bindings import Bind
 from creature.equipment import Slot
 from game_actions import ActionError, feedback
 

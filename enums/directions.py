@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from bindings import Bind
 
 
 class Dir(object):
@@ -39,6 +40,19 @@ class Dir(object):
         NorthEast:  North,
         North:      NorthWest,
     }
+
+    from_key = {}
+    associate = lambda d, binds, direction: d.update((bind, direction) for bind in binds)
+    associate(from_key, Bind.SouthWest + Bind.Instant_SouthWest, SouthWest)
+    associate(from_key, Bind.South     + Bind.Instant_South,     South)
+    associate(from_key, Bind.SouthEast + Bind.Instant_SouthEast, SouthEast)
+    associate(from_key, Bind.West      + Bind.Instant_West,      West)
+    associate(from_key, Bind.Stay      + Bind.Instant_Stay,      Stay)
+    associate(from_key, Bind.East      + Bind.Instant_East,      East)
+    associate(from_key, Bind.NorthWest + Bind.Instant_NorthWest, NorthWest)
+    associate(from_key, Bind.North     + Bind.Instant_North,     North)
+    associate(from_key, Bind.NorthEast + Bind.Instant_NorthEast, NorthEast)
+    del associate
 
     OrthogonalMoveMult = 1
     DiagonalMoveMult = 2 ** 0.5

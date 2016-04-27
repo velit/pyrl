@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from functools import partial
 
 import interface.inventory
-from config.bindings import Bind
+from bindings import Bind
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
@@ -158,21 +158,21 @@ class UserController(GameActionsProperties, object):
                 char = symbol, (foreground, Color.Green)
                 self.io.draw_char(char, coord)
                 self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
-            c = self.io.get_key()
+            key = self.io.get_key()
             self.actions.redraw()
             direction = Dir.Stay
-            if c in Bind.action_direction:
-                direction = Bind.action_direction[c]
-            elif c == 'd':
+            if key in Bind.Directions:
+                direction = Dir.from_key[key]
+            elif key == 'd':
                 drawline_flag = not drawline_flag
-            elif c == 'b':
+            elif key == 'b':
                 from generic_algorithms import bresenham
                 for coord in bresenham(self.actions.level.get_coord(self.coord), coord):
                     self.io.msg(coord)
-            elif c == 's':
+            elif key == 's':
                 if coord in self.actions.level.creatures:
                     self.actions.game.register_status_texts(self.actions.level.creatures[coord])
-            elif c in Bind.Cancel or c in Bind.Look_Mode:
+            elif key in Bind.Cancel or key in Bind.Look_Mode:
                 break
 
     def quit(self):
@@ -183,9 +183,9 @@ class UserController(GameActionsProperties, object):
 
     def attack(self):
         msg = "Specify attack direction, {} to abort".format(Bind.Cancel.key)
-        key = self.io.ask(msg, Bind.action_direction.keys() | set(Bind.Cancel))
-        if key in Bind.action_direction:
-            return self.actions.attack(Bind.action_direction[key])
+        key = self.io.ask(msg, Bind.Directions + Bind.Cancel)
+        if key in Bind.Directions:
+            return self.actions.attack(Dir.from_key[key])
 
     def redraw(self):
         self.actions.redraw()

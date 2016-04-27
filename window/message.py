@@ -4,7 +4,7 @@ import textwrap
 import logging
 
 import io_wrappers.mock
-from config.bindings import Bind
+from bindings import Bind
 from enums.colors import Pair
 from window.base_window import BaseWindow
 from functools import wraps

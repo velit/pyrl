@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pytest
 from io_wrappers.mock import MockInputEnd
-from config.bindings import Bind
+from bindings import Bind
 
 
 TEST_GameConf_NAME = "test"

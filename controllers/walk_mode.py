@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import namedtuple
-from config.bindings import Bind
+from bindings import Bind
 from config.game import GameConf
 from enums.directions import Dir
 from enums.keys import Key
@@ -39,11 +39,11 @@ class WalkMode(GameActionsProperties, object):
 
         if direction is None:
             user_query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
-            key_seq = tuple(Bind.action_direction) + Bind.Cancel
+            key_seq = Bind.Directions + Bind.Cancel
             key = self.io.ask(user_query, key_seq)
             if key in Bind.Cancel:
                 return
-            direction = Bind.action_direction[key]
+            direction = Dir.from_key[key]
 
         feedback = self.actions.move(direction)
         if feedback.type in ActionError:

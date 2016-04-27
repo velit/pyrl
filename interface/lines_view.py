@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import re
 import collections
-from config.bindings import Bind
+from bindings import Bind
 
 
 Line = collections.namedtuple("Line", ("display", "return_value"))
@@ -42,9 +42,7 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
         _print_view(window, print_lines, header + filter, footer)
         key = window.selective_get_key(all_keys, refresh=True)
 
-        if key in Bind.scroll_keys:
-            scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))
-        elif key in Bind.Filter:
+        if key in Bind.Filter:
             query = "Filter regex (empty to clear): "
             filter = window.get_str(query, (1, 0))
             window.draw_str(" " * (len(query + filter) + 1), (1, 0))
@@ -54,6 +52,8 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
                 lines = tuple(line for line in orig_lines if re.search(filter, line.display))
                 filter = " (Filter/{})".format(filter)
             scroll_offset = 0
+        elif key in Bind.ScrollKeys:
+            scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))
 
         elif multi_select:
             if key in select_keys:
@@ -82,9 +82,9 @@ def _get_vars(window, lines, multi_select, select_keys, return_keys):
         content_size = min(window.rows - 4, len(lines))
 
     select_keys = select_keys[:content_size]
-    all_keys = Bind.scroll_keys + Bind.Filter + select_keys + return_keys
+    all_keys = Bind.ScrollKeys + select_keys + return_keys
     if multi_select:
-        all_keys += Bind.multi_select_keys
+        all_keys += Bind.MultiSelectKeys
 
     return content_size, select_keys, all_keys
 

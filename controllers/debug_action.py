@@ -4,7 +4,7 @@ import code
 import random
 from rdg import LevelGen
 from config.debug import Debug
-from config.bindings import Bind
+from bindings import Bind
 from world.level import LevelLocation
 from creature.creature import Creature
 from game_actions import GameActionsProperties

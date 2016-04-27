@@ -6,7 +6,7 @@ from game_data.pyrl_world import get_world
 from ai import AI
 from config.debug import Debug
 from config.game import GameConf
-from config.bindings import Bind
+from bindings import Bind
 from fov import ShadowCast
 from game_actions import GameActions
 from interface.status_texts import register_status_texts

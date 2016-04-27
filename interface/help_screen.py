@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from config.bindings import Bind
+from bindings import Bind
 
 
 def help_screen(io):

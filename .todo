@@ -246,6 +246,12 @@
             done, just used List2D
         </comment>
     </note>
+    <note priority="veryhigh" time="1432475550" done="1461718852">
+        Consider making coord type/namedtuple. Consider using namedtuples more in general.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1432492857" done="1453808733">
         Add item dropping, picking up.
         <comment>
@@ -290,6 +296,12 @@
     </note>
     <note priority="veryhigh" time="1459741212" done="1459754487">
         Change window_system/base_window functions to use coord tuples as parameters over y, x
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1461367262" done="1461553074">
+        Make world location a namedtuple.
         <comment>
             done
         </comment>
@@ -528,26 +540,20 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
-    <note priority="veryhigh" time="1432475550">
-        Consider making coord type/namedtuple. Consider using namedtuples more in general.
-    </note>
     <note priority="veryhigh" time="1453792942">
         Remove level reference from creature.
     </note>
-    <note priority="veryhigh" time="1453802534">
+    <note priority="veryhigh" time="1453802534" done="1461741943">
         Improve bindings, add hierarchies for the groupings of bindings.
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1454012477">
         Update game_actions to provide tools for user_controller.look
     </note>
     <note priority="veryhigh" time="1459740027">
         Overhaul input key representation. Currently done as strings but need a richer format.
-    </note>
-    <note priority="veryhigh" time="1461367262" done="1461553074">
-        Make world location a namedtuple.
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="veryhigh" time="1461374954">
         Add a pronoun system for items and game world objects
