@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from functools import partial
 
 import interface.inventory
+from interface.lines_view import lines_view, build_lines
 from bindings import Bind
 from enums.colors import Color, Pair
 from enums.directions import Dir
@@ -211,7 +212,8 @@ class UserController(GameActionsProperties, object):
         self.actions.redraw()
 
     def print_history(self):
-        self.io.message_bar.print_history()
+        header = "History"
+        lines_view(self.io.whole_window, build_lines(reversed(self.io.message_bar.history)), header=header)
 
     def equipment(self):
         return interface.inventory.equipment(self.actions)

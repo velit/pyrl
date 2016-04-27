@@ -8,13 +8,17 @@ from bindings import Bind
 Line = collections.namedtuple("Line", ("display", "return_value"))
 
 
-_single = "{}/{} to scroll  {}/{} for next/previous line  {} to close"
+def build_lines(iterable):
+    return tuple(Line(value, i) for i, value in enumerate(iterable))
+
+
+_single = "{}/{} scroll  {}/{} next/previous line  {} filter  {} close"
 _single = _single.format(Bind.Next_Page.key, Bind.Previous_Page.key, Bind.Next_Line.key,
-                         Bind.Previous_Line.key, Bind.Cancel.key)
-_multi = "{}/{} to scroll  {}/{} for next/previous line  {}/{} to (de)select all  {} to close"
+                         Bind.Previous_Line.key, Bind.Filter, Bind.Cancel.key)
+_multi = "{}/{} scroll  {}/{} next/previous line  {}/{} (de)select all  {} filter  {} close"
 _multi = _multi.format(Bind.Next_Page.key, Bind.Previous_Page.key,
                        Bind.Next_Line.key, Bind.Previous_Line.key,
-                       Bind.Deselect_All.key, Bind.Select_All.key, Bind.Cancel.key)
+                       Bind.Deselect_All.key, Bind.Select_All.key, Bind.Filter, Bind.Cancel.key)
 
 
 def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, select_keys=(),

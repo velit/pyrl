@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import pickle
-import zlib
+import bz2
 
 from config.game import GameConf
 
@@ -14,7 +14,7 @@ def load(save_name):
     save_path = os.path.join(GameConf.DATA_FOLDER, save_name + _SAVE_FILETYPE)
     with open(save_path, "rb") as f:
         state_string = f.read()
-    return pickle.loads(zlib.decompress(state_string))
+    return pickle.loads(bz2.decompress(state_string))
 
 
 def save(obj, save_name):
@@ -23,7 +23,7 @@ def save(obj, save_name):
 
     save_path = os.path.join(GameConf.DATA_FOLDER, save_name + _SAVE_FILETYPE)
     state_string = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
-    compressed_state = zlib.compress(state_string, GameConf.save_compression_level)
+    compressed_state = bz2.compress(state_string, GameConf.save_compression_level)
     with open(save_path, "wb") as f:
         f.write(compressed_state)
 

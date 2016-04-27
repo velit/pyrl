@@ -438,6 +438,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1430306212" done="1461764532">
+        Finalize history display/printing. Re-use item_view system.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1430678659" done="1433551389">
         Update help_screen
         <comment>
@@ -540,6 +546,12 @@
             fixed
         </comment>
     </note>
+    <note priority="medium" time="1434306827" done="1461744294">
+        Streamline queries in Bindings (Yes/No/Default etc.)
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="low" time="1315155844" done="1355047491">
         wizard/mana, warrior/stamina rogue/focus
         <comment>
@@ -550,6 +562,12 @@
         make a generic status bar print that splits correctly
         <comment>
             done
+        </comment>
+    </note>
+    <note priority="low" time="1429217226" done="1461764565">
+        Add explicit key support for non-special keys as well.
+        <comment>
+            Duplicate: 98
         </comment>
     </note>
     <note priority="verylow" time="1315155792" done="1328980726">
@@ -576,20 +594,11 @@
     <note priority="high" time="1429224251">
         Add regeneration
     </note>
-    <note priority="high" time="1430306212">
-        Finalize history display/printing. Re-use item_view system.
-    </note>
     <note priority="high" time="1452611306">
         https://www.reddit.com/r/roguelikedev/comments/406wx0/item_labels/
     </note>
     <note priority="high" time="1461374954">
         Add a pronoun system for items and game world objects
-    </note>
-    <note priority="medium" time="1434306827" done="1461744294">
-        Streamline queries in Bindings (Yes/No/Default etc.)
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels
@@ -603,10 +612,10 @@
     <note priority="low" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
     </note>
-    <note priority="low" time="1429217226">
-        Add explicit key support for non-special keys as well.
-    </note>
-    <note priority="low" time="1430586353">
+    <note priority="low" time="1430586353" done="1461764625">
         Add numpad 5 support to ncurses_wrapper
+        <comment>
+            Won't fix
+        </comment>
     </note>
 </todo>

@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import textwrap
 import logging
+import re
 
 import io_wrappers.mock
 from bindings import Bind
@@ -30,17 +31,33 @@ class MessageBar(BaseWindow):
         self.clear()
         if self.msgqueue:
             self.print_event(self.msgqueue)
-            self.history.append(self.msgqueue)
+            self.add_lines_to_history(self.msgqueue)
             self.msgqueue = []
         self.blit()
 
     def queue_msg(self, *args):
-        if self.cursor_win.implementation == io_wrappers.mock.IMPLEMENTATION:
-            for obj in args:
+        for obj in args:
+            if obj and self.cursor_win.implementation == io_wrappers.mock.IMPLEMENTATION:
                 logging.debug("io.msg: {}".format(obj))
-        else:
-            for obj in args:
+            elif obj:
                 self.msgqueue.append(str(obj))
+
+    def add_lines_to_history(self, lines):
+        for msg in lines:
+            lastitem = self.history[-1] if self.history else ""
+
+            if msg == lastitem:
+                self.history[-1] = "{} (x{})".format(msg, 2)
+                continue
+
+            if msg == lastitem[:len(msg)]:
+                result = re.match(r" \(x(\d+)\)", lastitem[len(msg):])
+                if result:
+                    repeat_number = int(result.group(1)) + 1
+                    self.history[-1] = "{} (x{})".format(msg, repeat_number)
+                    continue
+
+            self.history.append(msg)
 
     def print_event(self, event):
         skip = False
@@ -57,10 +74,3 @@ class MessageBar(BaseWindow):
             self.clear()
             for i in range(self.rows):
                 self.draw_str(lines[i - self.rows], (i, 0))
-
-    def print_history(self):
-        keep_asking = True
-        for i, event in enumerate(self.history):
-            self.print_event(["History line {}:".format(i)] + event)
-            if keep_asking and self.selective_get_key(Bind.Cancel + Bind.Last_Message, refresh=True) in Bind.Last_Message:
-                keep_asking = False

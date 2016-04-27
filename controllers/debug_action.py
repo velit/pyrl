@@ -7,7 +7,7 @@ from config.debug import Debug
 from bindings import Bind
 from world.level import LevelLocation
 from creature.creature import Creature
-from game_actions import GameActionsProperties
+from game_actions import GameActionsProperties, feedback, Action
 
 
 class DebugAction(GameActionsProperties, object):
@@ -38,6 +38,7 @@ class DebugAction(GameActionsProperties, object):
 
     def update_without_acting(self):
         self.actions._do_action(0)
+        return feedback(Action.Generic)
 
     def ask_action(self):
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
@@ -127,7 +128,7 @@ class DebugAction(GameActionsProperties, object):
 
     def sight_change(self, amount):
         self.creature.base_perception += amount
-        self.update_without_acting()
+        return self.update_without_acting()
 
     def teleport_to_location(self, location):
         try:
