@@ -1,8 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from generic_structures import Array2D
-from game_data.tiles import PyrlTile
 from enums.directions import Dir
+from game_data.tiles import PyrlTile
 from generic_algorithms import add_vector
+from generic_structures import Array2D
 from world.level import LevelLocation
 
 

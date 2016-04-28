@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from enums.colors import Pair
 from creature.template import CreatureTemplate
+from enums.colors import Pair
 
 
 creature_templates = (

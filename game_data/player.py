@@ -1,12 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from enums.colors import Color
-from creature.equipment import Slot
-from creature.stats import Stat
 from creature.advanced_creature import AdvancedCreature
+from creature.equipment import Slot
 from creature.item import Item, Weapon
+from creature.stats import Stat
 from creature.template import CreatureTemplate
-from enums.colors import Pair
+from enums.colors import Color, Pair
 
 
 def Player():

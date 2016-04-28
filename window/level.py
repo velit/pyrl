@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from enums.colors import Pair
 from generic_algorithms import bresenham
 from window.base_window import BaseWindow

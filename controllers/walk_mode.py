@@ -1,6 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import namedtuple
+
 from bindings import Bind
 from config.game import GameConf
 from enums.directions import Dir

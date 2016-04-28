@@ -1,13 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from enum import Enum
 
 from config.game import GameConf
 from enums.colors import Pair
 from game_data.levels.shared_assets import construct_data
+from rdg import LevelGen
 from world.level_template import LevelTemplate
 from world.tile import Tile
-from rdg import LevelGen
 
 
 name = "overworld"

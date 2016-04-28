@@ -1,15 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from enum import Enum
-
 from functools import partial
 from random import randrange, random, choice
 
-from enums.directions import Dir
-from generic_algorithms import add_vector
-from game_data.tiles import PyrlTile
-from world.level import LevelLocation
 from config.debug import Debug
+from enums.directions import Dir
+from game_data.tiles import PyrlTile
+from generic_algorithms import add_vector
+from world.level import LevelLocation
 
 
 class LevelGen(Enum):

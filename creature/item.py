@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from dice import Dice
 from creature.equipment import Slot
+from dice import Dice
 from enums.colors import Pair
 
 

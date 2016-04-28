@@ -1,11 +1,10 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from enum import Enum
 from collections import namedtuple
-from combat import get_melee_attack_cr, get_combat_message
-from generic_algorithms import add_vector, get_vector
-from enums.directions import Dir
+from enum import Enum
 from functools import wraps
+
+from combat import get_melee_attack_cr, get_combat_message
+from enums.directions import Dir
+from generic_algorithms import add_vector, get_vector
 
 
 GameFeedback = namedtuple("GameFeedback", "type, params")

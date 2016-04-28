@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 try:
     import curses
 except ImportError:
@@ -10,9 +8,9 @@ except ImportError:
 import curses.ascii
 import logging
 
+from config.debug import Debug
 from config.game import GameConf
 from enums.keys import Key
-from config.debug import Debug
 from io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
 
 

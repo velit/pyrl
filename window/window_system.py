@@ -1,17 +1,15 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import time
 from collections import deque
+from functools import wraps
 
-from enums.colors import Pair
 from bindings import Bind
-from config.game import GameConf
 from config.debug import Debug
+from config.game import GameConf
+from enums.colors import Pair
 from window.base_window import BaseWindow
 from window.level import LevelWindow
 from window.message import MessageBar
 from window.status import StatusBar
-from functools import wraps
 
 
 class WindowSystem(object):

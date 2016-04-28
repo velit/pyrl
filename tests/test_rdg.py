@@ -1,13 +1,11 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pytest
 
 import rdg
+from game_data.levels.shared_assets import construct_data
+from game_data.tiles import PyrlTile
+from generic_structures import Array2D
 from world.level import LevelLocation
 from world.level_template import LevelTemplate
-from game_data.levels.shared_assets import construct_data
-from generic_structures import Array2D
-from game_data.tiles import PyrlTile
 
 
 def pp_tm(tm, cols):

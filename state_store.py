@@ -1,8 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+import bz2
 import os
 import pickle
-import bz2
 
 from config.game import GameConf
 

@@ -1,13 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import code
 import random
-from rdg import LevelGen
-from config.debug import Debug
+
 from bindings import Bind
-from world.level import LevelLocation
+from config.debug import Debug
 from creature.creature import Creature
 from game_actions import GameActionsProperties, feedback, Action
+from rdg import LevelGen
+from world.level import LevelLocation
 
 
 class DebugAction(GameActionsProperties, object):

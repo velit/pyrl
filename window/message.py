@@ -1,14 +1,12 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import textwrap
 import logging
 import re
+import textwrap
+from functools import wraps
 
 import io_wrappers.mock
 from bindings import Bind
 from enums.colors import Pair
 from window.base_window import BaseWindow
-from functools import wraps
 
 
 MORE_STR = " More"

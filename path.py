@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from heapq import heappush, heappop
 
 from generic_algorithms import chebyshev

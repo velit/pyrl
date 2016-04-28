@@ -1,7 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from enums.keys import Key
 from bindings import BindGroup
+from enums.keys import Key
+
 
 """
 Modify these classes to define the mappings you want.

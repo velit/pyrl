@@ -1,7 +1,6 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import re
 import collections
+import re
+
 from bindings import Bind
 
 

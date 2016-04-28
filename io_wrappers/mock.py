@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-from collections import deque
 import logging
+from collections import deque
 
 from enums.keys import Key
 

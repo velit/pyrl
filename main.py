@@ -1,16 +1,14 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import argparse
 import atexit
 import locale
 import logging
-import sys
 import os
+import sys
 from cProfile import Profile
 
 import state_store
-from config.game import GameConf
 from config.debug import Debug
+from config.game import GameConf
 from tools import profile_util
 
 

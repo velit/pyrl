@@ -1,18 +1,16 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
+import itertools
 import random
+from enum import Enum
+from functools import wraps
 
 import path
-import itertools
 from config.debug import Debug
 from creature.creature import Creature
-from enum import Enum
 from enums.directions import Dir
 from game_actions import Action
 from generic_algorithms import bresenham, cross_product, add_vector
 from generic_structures import Event, Array2D
 from turn_scheduler import TurnScheduler
-from functools import wraps
 
 
 class LevelLocation(Enum):

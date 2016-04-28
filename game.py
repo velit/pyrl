@@ -1,16 +1,14 @@
 """pyrl; Python roguelike by Veli Tapani Kiiskinen."""
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import state_store
-from game_data.pyrl_world import get_world
 from ai import AI
+from bindings import Bind
 from config.debug import Debug
 from config.game import GameConf
-from bindings import Bind
+from controllers.user_controller import UserController
 from fov import ShadowCast
 from game_actions import GameActions
+from game_data.pyrl_world import get_world
 from interface.status_texts import register_status_texts
-from controllers.user_controller import UserController
 from window.window_system import WindowSystem
 from world.world import LevelNotFound
 

@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 try:
     import libtcod.libtcodpy as libtcod
 except Exception as e:
@@ -10,8 +8,7 @@ except Exception as e:
 
 from config.game import GameConf
 from enums.keys import Key
-from io_wrappers.libtcod_dicts import libtcod_color_map
-from io_wrappers.libtcod_dicts import libtcod_key_map
+from io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
 
 
 IMPLEMENTATION = "tcod"

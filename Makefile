@@ -28,9 +28,6 @@ log:
 profile-log:
 	less save_data/profiling_results
 
-future-test:
-	grep "from __future__ import absolute_import, division, print_function, unicode_literals" -L *.py */*.py
-
 tags:
 	ctags -R .
 

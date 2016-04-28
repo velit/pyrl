@@ -1,8 +1,5 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-
-from random import randrange
 from itertools import zip_longest
+from random import randrange
 
 
 def _disable_list_dynamicness(cls):

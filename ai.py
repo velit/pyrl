@@ -1,9 +1,7 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import random
 
-from game_actions import Action, ActionError, GameActionsProperties
 from enums.directions import Dir
+from game_actions import Action, ActionError, GameActionsProperties
 from generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 

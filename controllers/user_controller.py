@@ -1,18 +1,16 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from functools import partial
 
 import interface.inventory
-from interface.lines_view import lines_view, build_lines
 from bindings import Bind
+from config.game import GameConf
 from enums.colors import Color, Pair
 from enums.directions import Dir
 from enums.keys import Key
 from game_actions import ActionError, Action, GameActionsProperties
 from generic_algorithms import add_vector
 from interface.help_screen import help_screen
+from interface.lines_view import lines_view, build_lines
 from world.level import LevelLocation
-from config.game import GameConf
 
 
 class UserController(GameActionsProperties, object):

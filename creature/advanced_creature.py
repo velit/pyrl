@@ -1,10 +1,8 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from collections import defaultdict
 
-from creature.stats import Stat
 from creature.creature import Creature
 from creature.equipment import Equipment
+from creature.stats import Stat
 
 
 def _add_equipment_properties(cls):

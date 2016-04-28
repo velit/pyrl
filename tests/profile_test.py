@@ -1,10 +1,8 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from cProfile import Profile
 
-from world.level_template import LevelTemplate
 from rdg import generate_tiles_to, LevelGen
 from tools import profile_util
+from world.level_template import LevelTemplate
 
 
 def test_profile_rdg_generation():

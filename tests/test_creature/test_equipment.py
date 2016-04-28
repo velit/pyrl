@@ -1,9 +1,8 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import pytest
+
 from creature.equipment import Equipment, Slot
-from creature.stats import Stat
 from creature.item import Item, Weapon
+from creature.stats import Stat
 
 
 @pytest.fixture
