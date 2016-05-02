@@ -1,11 +1,13 @@
 import time
 
-from config.game import GameConf
 from enums.colors import Pair
 from enums.keys import Key
 
 
 class BaseWindow(object):
+
+    # Seconds to sleep until next user input check in half-block functions
+    half_block_input_responsiveness = 0.001
 
     def __init__(self, cursor_lib, dimensions, screen_position):
         self.cursor_lib = cursor_lib
@@ -28,49 +30,50 @@ class BaseWindow(object):
     def clear(self):
         self.cursor_win.clear()
 
-    # Blocking
-    def get_key(self, refresh=False):
-        if refresh:
-            self.refresh()
-        return self.cursor_win.get_key()
+    @classmethod
+    def get_time(cls):
+        """Get a time in fractional seconds that is compatible with self.check_key(until=timestamp)."""
+        return time.perf_counter()
 
-    # Non-blocking
-    def check_key(self):
-        return self.cursor_win.check_key()
+    def get_key(self, keys=None, refresh=False):
+        """
+        Return key from user.
 
-    # Half-blocking
-    def get_key_until_timestamp(self, timestamp, refresh=False):
-        if refresh:
-            self.refresh()
-
-        key = self.check_key()
-        while key == Key.NO_INPUT and time.monotonic() < timestamp:
-            time.sleep(GameConf.ANIMATION_INPUT_PERIOD)
-            key = self.check_key()
-        return key
-
-    # Blocking
-    def selective_get_key(self, key_seq, refresh=False):
+        If keys is given only those keys are considered valid return values. Continues blocking
+        until a valid key is returned by user in this case.
+        """
         if refresh:
             self.refresh()
 
-        key = self.get_key()
-        while key not in key_seq:
-            key = self.get_key()
-        return key
+        while True:
+            key = self.cursor_win.get_key()
+            if not keys or key in keys:
+                return key
 
-    # Half-blocking
-    def selective_get_key_until_timestamp(self, timestamp, key_seq, refresh=False):
+    def check_key(self, keys=None, until=None, refresh=False):
+        """
+        Return key if user has given one, otherwise return Key.NO_INPUT.
+
+        If keys is given only considers those keys valid return values returning Key.NO_INPUT
+        otherwise.
+        If until is given doesn't immediately return on no input. Instead waits for user input until
+        given time and returns Key.NO_INPUT in case no input is given in this time period.
+        """
         if refresh:
             self.refresh()
 
-        key = self.check_key()
-        while key not in key_seq:
-            if timestamp < time.monotonic():
-                return Key.NO_INPUT
-            time.sleep(GameConf.ANIMATION_INPUT_PERIOD)
-            key = self.check_key()
-        return key
+        while True:
+            key = self.cursor_win.check_key()
+            if until is None or self.get_time() >= until:
+                break
+            if key in keys:
+                break
+            time.sleep(self.half_block_input_responsiveness)
+
+        if not keys or key in keys:
+            return key
+        else:
+            return Key.NO_INPUT
 
     def blit(self):
         self.cursor_win.blit((self.rows, self.cols), self.screen_position)
@@ -84,7 +87,7 @@ class BaseWindow(object):
         self.draw_banner(header)
         self.draw_lines(lines, y_offset=2)
         self.draw_banner(footer, y_offset=-1)
-        return self.selective_get_key(key_set, refresh=True)
+        return self.get_key(keys=key_set, refresh=True)
 
     def draw_lines(self, lines, y_offset=0, x_offset=0):
         for i, line in enumerate(lines):

@@ -591,6 +591,9 @@
     <note priority="veryhigh" time="1454012477">
         Update game_actions to provide tools for user_controller.look
     </note>
+    <note priority="veryhigh" time="1462193098">
+        Remove DATA_FOLDER and LEVEL_DIMENSIONS from config.game
+    </note>
     <note priority="high" time="1429224251">
         Add regeneration
     </note>
@@ -602,6 +605,9 @@
     </note>
     <note priority="high" time="1461374954">
         Add a pronoun system for items and game world objects
+    </note>
+    <note priority="high" time="1462173383">
+        Add system for figuring out if savegame is external (wasn't produced by this machine) to warn about danger/mark external load.
     </note>
     <note priority="medium" time="1459740027">
         Overhaul input key representation. Currently done as strings but need a richer format.

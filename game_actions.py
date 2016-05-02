@@ -282,12 +282,12 @@ class GameActions(object):
     @player_action
     def save(self):
         """Free player action."""
-        return self.game.savegame(ask=False)
+        return self.game.savegame()
 
     @player_action
     def quit(self):
         """Free player action."""
-        self.game.endgame(ask=False)
+        self.game.endgame()
 
     @player_action
     def redraw(self):

@@ -15,7 +15,7 @@ class BindingTuple(tuple):
             return "Unbound"
 
     def __str__(self):
-        return ", ".join("{}".format(key) for key in self)
+        return "/".join("{}".format(key) for key in self)
 
 
 def _is_public_attr(attr):

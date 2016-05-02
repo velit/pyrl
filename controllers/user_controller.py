@@ -174,15 +174,21 @@ class UserController(GameActionsProperties, object):
             elif key in Bind.Cancel or key in Bind.Look_Mode:
                 break
 
-    def quit(self):
-        self.actions.quit()
+    def quit(self, dont_ask=True):
+        query = "Do you wish to end the game? [{}]".format(Bind.Strong_Yes)
+        if dont_ask or self.io.get_key(query) in Bind.Strong_Yes:
+            self.actions.quit()
 
-    def save(self):
-        self.actions.save()
+    def save(self, dont_ask=True):
+        query = "Do you wish to save the game? [{}]".format(Bind.Yes)
+        if dont_ask or self.io.get_key(query) in Bind.Yes:
+            self.io.msg("Saving...")
+            self.io.refresh()
+            self.io.msg(self.actions.save())
 
     def attack(self):
-        msg = "Specify attack direction, {} to abort".format(Bind.Cancel.key)
-        key = self.io.ask(msg, Bind.Directions + Bind.Cancel)
+        query = "Specify attack direction, {} to abort".format(Bind.Cancel.key)
+        key = self.io.get_key(query, keys=Bind.Directions + Bind.Cancel)
         if key in Bind.Directions:
             return self.actions.attack(Dir.from_key[key])
 

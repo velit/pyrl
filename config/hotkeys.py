@@ -32,17 +32,10 @@ prepend a ! character and for ctrl prepend a ^ character. Some rules:
 
 class General(metaclass=BindGroup):
 
+    Yes = 'y', 'Y'
+    Strong_Yes = 'Y'
     Cancel = 'z', Key.SPACE, Key.ESC
     Debug_Commands = 'd'
-
-
-class Queries(metaclass=BindGroup):
-
-    Yes = 'y'
-    No = 'n'
-    Default_Yes = 'Y'
-    Default_No = 'N'
-    Default_Query = Key.ENTER
 
 
 class ScrollKeys(metaclass=BindGroup):

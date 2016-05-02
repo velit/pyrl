@@ -36,9 +36,9 @@ class WalkMode(GameActionsProperties, object):
             return
 
         if direction is None:
-            user_query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
+            query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
             key_seq = Bind.Directions + Bind.Cancel
-            key = self.io.ask(user_query, key_seq)
+            key = self.io.get_key(query, keys=key_seq)
             if key in Bind.Cancel:
                 return
             direction = Dir.from_key[key]
@@ -82,10 +82,10 @@ class WalkMode(GameActionsProperties, object):
             return None
 
         msg = ""
-        if self.state.show_msg_time < self.io.get_current_time():
+        if self.state.show_msg_time < self.io.get_time():
             msg = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
         key_seq = Bind.Walk_Mode + Bind.Cancel
-        key = self.io.selective_ask_until_timestamp(msg, self.state.next_walk_time, key_seq)
+        key = self.io.check_key(msg, keys=key_seq, until=self.state.next_walk_time)
 
         if key in Bind.Walk_Mode + Bind.Cancel:
             return None

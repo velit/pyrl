@@ -43,7 +43,7 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
         print_lines = _get_print_lines(lines, scroll_offset, content_size,
                                        selected, select_keys)
         _print_view(window, print_lines, header + filter, footer)
-        key = window.selective_get_key(all_keys, refresh=True)
+        key = window.get_key(keys=all_keys)
 
         if key in Bind.Filter:
             query = "Filter regex (empty to clear): "

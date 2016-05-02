@@ -82,27 +82,22 @@ class Game(object):
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
         if creature is self.player:
-            self.io.notify("You die...")
-            self.endgame(ask=False)
+            self.io.get_key("You die...", keys=Bind.Cancel)
+            self.endgame()
         creature.level.remove_creature(creature)
 
-    def endgame(self, ask=True):
-        if not ask or self.io.ask("Do you wish to end the game? [y/N]") in GameConf.YES:
-            exit()
+    def endgame(self):
+        exit()
 
-    def savegame(self, ask=True):
-        if not ask or self.io.ask("Do you wish to save the game? [y/N]") in GameConf.YES:
-            self.io.msg("Saving...")
-            self.io.refresh()
-
-            try:
-                raw, compressed = state_store.save(self, self.game_name)
-            except IOError as e:
-                msg_str = str(e)
-            else:
-                msg_str = "Saved game '{}', file size: {:,} b, {:,} b compressed. Ratio: {:.2%}"
-                msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
-            self.io.msg(msg_str)
+    def savegame(self):
+        try:
+            raw, compressed = state_store.save(self, self.game_name)
+        except IOError as e:
+            msg_str = str(e)
+        else:
+            msg_str = "Saved game '{}', file size: {:,} b, {:,} b compressed. Ratio: {:.2%}"
+            msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
+        return msg_str
 
     def update_view(self, creature):
         """

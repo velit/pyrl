@@ -22,4 +22,3 @@ class GameConf(object):
 
     DATA_FOLDER = "save_data"
     LEVEL_DIMENSIONS = (game_dimensions[0] - message_bar_height - status_bar_height, game_dimensions[1])
-    ANIMATION_INPUT_PERIOD = min(animation_period / 10, 0.001)

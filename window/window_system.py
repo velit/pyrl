@@ -1,8 +1,6 @@
-import time
 from collections import deque
 from functools import wraps
 
-from bindings import Bind
 from config.debug import Debug
 from config.game import GameConf
 from enums.colors import Pair
@@ -35,26 +33,27 @@ class WindowSystem(object):
 
         self.prepared_input = deque()
 
-    def get_key(self, message=None, refresh=True):
-        if message is not None:
+    def get_key(self, message=None, keys=None):
+        if message:
             self.msg(message)
-        if refresh:
-            self.refresh()
+
+        self.refresh()
+
         if self.prepared_input:
             return self.prepared_input.popleft()
 
-        return self.whole_window.get_key()
+        return self.whole_window.get_key(keys=keys)
+
+    def check_key(self, message=None, keys=None, until=None):
+        if message:
+            self.msg(message)
+
+        self.refresh()
+
+        return self.whole_window.check_key(keys=keys, until=until)
 
     def msg(self, *messages):
         self.message_bar.queue_msg(*messages)
-
-    def ask(self, message, keys=Bind.Queries):
-        self.msg(message)
-        self.refresh()
-        return self.level_window.selective_get_key(keys)
-
-    def notify(self, print_str):
-        return self.ask(print_str, Bind.Cancel)
 
     def refresh(self):
         self.message_bar.update()
@@ -94,22 +93,12 @@ class WindowSystem(object):
     def resume(self):
         self.cursor_lib.resume()
 
-    def ask_until_timestamp(self, message, timestamp):
-        self.msg(message)
-        self.refresh()
-        return self.level_window.get_key_until_timestamp(timestamp)
-
-    def selective_ask_until_timestamp(self, message, timestamp, key_seq):
-        self.msg(message)
-        self.refresh()
-        return self.level_window.selective_get_key_until_timestamp(timestamp, key_seq)
-
-    def get_future_time(self, delay):
-        return time.monotonic() + delay
-
-    def get_current_time(self):
-        return time.monotonic()
-
     def get_str(self, ask_line="", coord=(0, 0)):
         self.message_bar.clear()
         return self.message_bar.get_str(ask_line=ask_line, coord=coord)
+
+    def get_future_time(self, delay):
+        return BaseWindow.get_time() + delay
+
+    def get_time(self):
+        return BaseWindow.get_time()
