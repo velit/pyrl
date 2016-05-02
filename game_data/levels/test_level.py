@@ -1,8 +1,7 @@
-from config.game import GameConf
 from creature.creature import Creature
 from creature.template import CreatureTemplate
 from enums.colors import Pair
-from game_data.levels.shared_assets import construct_data
+from game_data.levels.shared_assets import construct_data, level_dimensions
 from game_data.tiles import PyrlTile
 from rdg import LevelGen
 from world.level import LevelLocation
@@ -11,7 +10,7 @@ from world.level_template import LevelTemplate
 
 def get_template(player):
 
-    dimensions = GameConf.LEVEL_DIMENSIONS
+    dimensions = level_dimensions
     charstr = (
         '################################################################################################'
         '#######################..##################.#.#.#######.....#################################.##'

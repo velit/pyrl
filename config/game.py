@@ -4,9 +4,6 @@ class GameConf(object):
 
     """Configure variables above the data section to suit your needs."""
 
-    # minimum (30, 96)
-    game_dimensions        = (30, 96)
-
     # valid between 1 and 9, higher slower but less space
     save_compression_level = 9
 
@@ -20,5 +17,4 @@ class GameConf(object):
     ### Data section, don't modify ###
     ##################################
 
-    DATA_FOLDER = "save_data"
-    LEVEL_DIMENSIONS = (game_dimensions[0] - message_bar_height - status_bar_height, game_dimensions[1])
+    save_folder = "save_data"

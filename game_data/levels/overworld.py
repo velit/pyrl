@@ -1,8 +1,7 @@
 from enum import Enum
 
-from config.game import GameConf
 from enums.colors import Pair
-from game_data.levels.shared_assets import construct_data
+from game_data.levels.shared_assets import construct_data, level_dimensions
 from rdg import LevelGen
 from world.level_template import LevelTemplate
 from world.tile import Tile
@@ -17,7 +16,7 @@ class OverWorldLocation(Enum):
 
 
 def get_template():
-    dimensions = GameConf.LEVEL_DIMENSIONS
+    dimensions = level_dimensions
     charstr = (
         '^^^^^^^^¨=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^^¨¨=¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -48,7 +47,7 @@ def get_template():
     )
 
     # Overworld movement multiplier
-    MULT = min(GameConf.LEVEL_DIMENSIONS)
+    MULT = min(level_dimensions)
     custom_tiles = {
         '"': Tile("grassland",      ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=MULT),
         '¨': Tile("mountains",      ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=MULT),

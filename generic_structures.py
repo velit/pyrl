@@ -1,5 +1,10 @@
+from collections import namedtuple
 from itertools import zip_longest
 from random import randrange
+
+
+Coord = namedtuple("Coord", "y, x")
+TableDims = namedtuple("Size2D", "rows, cols")
 
 
 def _disable_list_dynamicness(cls):

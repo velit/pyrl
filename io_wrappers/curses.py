@@ -9,9 +9,9 @@ import curses.ascii
 import logging
 
 from config.debug import Debug
-from config.game import GameConf
 from enums.keys import Key
 from io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
+from window.window_system import WindowSystem
 
 
 IMPLEMENTATION = "curses"
@@ -192,7 +192,7 @@ class CursesWindow(object):
 
     def _ensure_terminal_is_big_enough(self):
         rows, cols = self.root_win.get_dimensions()
-        min_rows, min_cols = GameConf.game_dimensions
+        min_rows, min_cols = WindowSystem.game_dimensions
         while rows < min_rows or cols < min_cols:
             message = ("Game needs at least a screen size of {}x{} while the "
                     "current size is {}x{}. Please resize the screen or "

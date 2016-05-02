@@ -4,6 +4,8 @@ from functools import wraps
 from config.debug import Debug
 from config.game import GameConf
 from enums.colors import Pair
+from game_data.levels import level_dimensions
+from generic_structures import TableDims, Coord
 from window.base_window import BaseWindow
 from window.level import LevelWindow
 from window.message import MessageBar
@@ -12,24 +14,20 @@ from window.status import StatusBar
 
 class WindowSystem(object):
 
+    message_dimensions = TableDims(GameConf.message_bar_height, level_dimensions.cols)
+    status_dimensions = TableDims(GameConf.status_bar_height, level_dimensions.cols)
+    game_dimensions = TableDims(message_dimensions.rows + status_dimensions.rows +
+                                level_dimensions.rows, level_dimensions.cols)
+
     def __init__(self, cursor_lib):
         self.cursor_lib = cursor_lib
 
-        msg_rows = GameConf.message_bar_height
-        lvl_rows, lvl_cols = GameConf.LEVEL_DIMENSIONS
-        sts_rows = GameConf.status_bar_height
-
-        msg_bar_dims = (msg_rows, lvl_cols)
-        lvl_bar_dims = (lvl_rows, lvl_cols)
-        sts_bar_dims = (sts_rows, lvl_cols)
-
-        self.whole_window = BaseWindow(cursor_lib, GameConf.game_dimensions, (0, 0))
-
-        self.message_bar  = MessageBar(cursor_lib, msg_bar_dims, (0, 0))
-        level_position    = (self.message_bar.screen_position[0] + self.message_bar.rows, 0)
-        self.level_window = LevelWindow(cursor_lib, lvl_bar_dims, level_position)
-        status_position   = (self.level_window.screen_position[0] + self.level_window.rows, 0)
-        self.status_bar   = StatusBar(cursor_lib, sts_bar_dims, status_position)
+        self.whole_window = BaseWindow(cursor_lib, self.game_dimensions, Coord(0, 0))
+        self.message_bar  = MessageBar(cursor_lib, self.message_dimensions, Coord(0, 0))
+        level_position    = Coord(self.message_bar.screen_position.y + self.message_bar.rows, 0)
+        self.level_window = LevelWindow(cursor_lib, level_dimensions, level_position)
+        status_position   = Coord(self.level_window.screen_position.y + self.level_window.rows, 0)
+        self.status_bar   = StatusBar(cursor_lib, self.status_dimensions, status_position)
 
         self.prepared_input = deque()
 

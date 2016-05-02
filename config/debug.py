@@ -7,8 +7,8 @@ from config.game import GameConf
 class Debug(object):
 
     log_level = logging.DEBUG
-    log_file = join(GameConf.DATA_FOLDER, "pyrl.log")
-    profiling_output_file = join(GameConf.DATA_FOLDER, "profiling_results")
+    log_file = join(GameConf.save_folder, "pyrl.log")
+    profiling_output_file = join(GameConf.save_folder, "profiling_results")
     path = True
     path_step = False
     cross = True

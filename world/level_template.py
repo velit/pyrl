@@ -1,5 +1,5 @@
-from config.game import GameConf
 from game_data.creatures import creature_templates
+from game_data.levels import level_dimensions
 from generic_structures import Array2D, OneToOneMapping
 from rdg import generate_tiles_to, LevelGen
 from world.level import LevelLocation
@@ -11,7 +11,7 @@ class LevelTemplate(object):
                  locations=None, custom_creatures=(), creature_spawning=True):
         self.danger_level = danger_level
         if tiles is None:
-            self.tiles = Array2D(GameConf.LEVEL_DIMENSIONS)
+            self.tiles = Array2D(level_dimensions)
         else:
             self.tiles = tiles
         self.locations = OneToOneMapping()
@@ -25,7 +25,7 @@ class LevelTemplate(object):
         if self.generation_type.value > LevelGen.ExtendExisting.value:
             self.rows, self.cols = self.tiles.dimensions
         else:
-            self.rows, self.cols = GameConf.LEVEL_DIMENSIONS
+            self.rows, self.cols = level_dimensions
 
         if locations is not None:
             self.locations.update(locations)

@@ -1,3 +1,4 @@
+from config.game import GameConf
 try:
     import libtcod.libtcodpy as libtcod
 except Exception as e:
@@ -6,9 +7,9 @@ except Exception as e:
     print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
     sys.exit(1)
 
-from config.game import GameConf
 from enums.keys import Key
 from io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
+from window.window_system import WindowSystem
 
 
 IMPLEMENTATION = "tcod"
@@ -24,7 +25,7 @@ class TCODWrapper(object):
         """Init the SDL surface and prepare for draw calls."""
         flags = libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW
         libtcod.console_set_custom_font(b"resources/terminal10x18_gs_ro.png", flags)
-        rows, cols = GameConf.game_dimensions
+        rows, cols = WindowSystem.game_dimensions
         libtcod.console_init_root(cols, rows, GameConf.default_game_name.encode(), False, libtcod.RENDERER_SDL)
 
     def new_window(self, dimensions):

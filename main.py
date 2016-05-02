@@ -73,5 +73,5 @@ def load_game(game_name, cursor_lib_callback):
 
 
 def initialize_files_and_folders():
-    if not os.path.exists(GameConf.DATA_FOLDER):
-        os.makedirs(GameConf.DATA_FOLDER)
+    if not os.path.exists(GameConf.save_folder):
+        os.makedirs(GameConf.save_folder)

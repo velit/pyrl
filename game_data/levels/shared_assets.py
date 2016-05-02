@@ -1,8 +1,11 @@
 from enums.directions import Dir
 from game_data.tiles import PyrlTile
 from generic_algorithms import add_vector
-from generic_structures import Array2D
+from generic_structures import Array2D, TableDims
 from world.level import LevelLocation
+
+
+level_dimensions = TableDims(26, 96)
 
 
 base_tiles = {

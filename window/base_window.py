@@ -2,6 +2,7 @@ import time
 
 from enums.colors import Pair
 from enums.keys import Key
+from generic_structures import TableDims, Coord
 
 
 class BaseWindow(object):
@@ -11,8 +12,8 @@ class BaseWindow(object):
 
     def __init__(self, cursor_lib, dimensions, screen_position):
         self.cursor_lib = cursor_lib
-        self.rows, self.cols = dimensions
-        self.screen_position = screen_position
+        self.rows, self.cols = TableDims(*dimensions)
+        self.screen_position = Coord(*screen_position)
         self.cursor_win = cursor_lib.new_window(dimensions)
 
     def draw_char(self, char, coord):
