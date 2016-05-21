@@ -104,39 +104,60 @@ class BaseWindow(object):
 
     def get_str(self, ask_line="", coord=(0, 0)):
         self.draw_str(ask_line, coord)
-        y, x = coord[0], coord[1] + len(ask_line)
-        cursor_pos = 0
+        input_y = coord[0]
+        input_x = coord[1] + len(ask_line)
+        input_coord = input_y, input_x
         user_input = ""
-        max_size = self.cols - x - 1
+        cursor_index = len(user_input)
+        max_input_size = self.cols - input_x - 1
         while True:
-            user_input = user_input[:max_size]
-            cursor_pos = min(max(cursor_pos, -len(user_input)), 0)
-            positive_pos = len(user_input) + cursor_pos
-            self.draw_str(user_input, (y, x))
-            cursor_char = (" " + user_input)[cursor_pos]
-            self.draw_char((cursor_char, Pair.Cursor), (y, x + len(user_input) + cursor_pos))
+            # Normalize input
+            user_input = user_input[:max_input_size]
+            cursor_index = max(min(cursor_index, len(user_input)), 0)
+
+            # Update vars
+            cursor_coord = input_y, input_x + cursor_index
+            cursor_char = ((user_input + " ")[cursor_index], Pair.Cursor)
+
+            # Print
+            self.draw_str(user_input, input_coord)
+            self.draw_char(cursor_char, cursor_coord)
             key = self.get_key(refresh=True)
-            self.draw_str(" " * (len(user_input) + 1), (y, x))
+            self.draw_str(" " * (len(user_input)), input_coord)
+            self.draw_char((" ", Pair.Normal), cursor_coord)
 
             if key == Key.SPACE:
                 key = " "
 
             if key in (Key.ENTER, "^m", "^j", "^d"):
                 return user_input
-            elif key in ("^w", "^u"):
-                user_input = user_input[positive_pos:]
+            elif key == "^w":
+                state_whitespace = True
+                del_amount = 0
+                for char in reversed(user_input[:cursor_index]):
+                    if state_whitespace and not char.isspace():
+                        state_whitespace = False
+                    elif not state_whitespace and char.isspace():
+                        break
+                    del_amount += 1
+                user_input = user_input[:cursor_index - del_amount] + user_input[cursor_index:]
+                cursor_index -= del_amount
+            elif key == "^u":
+                user_input = user_input[cursor_index:]
+                cursor_index = 0
             elif key in (Key.END, "^e"):
-                cursor_pos = 0
+                cursor_index = len(user_input)
             elif key in (Key.HOME, "^a"):
-                cursor_pos = -len(user_input)
+                cursor_index = 0
             elif key in (Key.BACKSPACE, "^h"):
-                user_input = user_input[:positive_pos - 1] + user_input[positive_pos:]
+                user_input = user_input[:max(cursor_index - 1, 0)] + user_input[cursor_index:]
+                cursor_index -= 1
             elif key == Key.DELETE:
-                user_input = user_input[:positive_pos] + user_input[positive_pos + 1:]
-                cursor_pos += 1
+                user_input = user_input[:cursor_index] + user_input[cursor_index + 1:]
             elif key == Key.LEFT:
-                cursor_pos = max(cursor_pos - 1, -len(user_input))
+                cursor_index -= 1
             elif key == Key.RIGHT:
-                cursor_pos = min(cursor_pos + 1, 0)
+                cursor_index += 1
             else:
-                user_input = user_input[:positive_pos] + key + user_input[positive_pos:]
+                user_input = user_input[:cursor_index] + key + user_input[cursor_index:]
+                cursor_index += len(key)

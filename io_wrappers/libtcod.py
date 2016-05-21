@@ -1,15 +1,19 @@
-from config.game import GameConf
 try:
     import libtcod.libtcodpy as libtcod
 except Exception as e:
     import sys
-    print("Couldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
+    print(e, file=sys.stderr)
+    print("\nCouldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
     print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
     sys.exit(1)
+
+
+from config.game import GameConf
 
 from enums.keys import Key
 from io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
 from window.window_system import WindowSystem
+from enums.colors import Pair, Color
 
 
 IMPLEMENTATION = "tcod"
@@ -26,7 +30,8 @@ class TCODWrapper(object):
         flags = libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW
         libtcod.console_set_custom_font(b"resources/terminal10x18_gs_ro.png", flags)
         rows, cols = WindowSystem.game_dimensions
-        libtcod.console_init_root(cols, rows, GameConf.default_game_name.encode(), False, libtcod.RENDERER_SDL)
+        libtcod.console_init_root(cols, rows, GameConf.default_game_name.encode(), False,
+                                  libtcod.RENDERER_SDL)
 
     def new_window(self, dimensions):
         rows, columns = dimensions
@@ -58,8 +63,8 @@ class TCODWindow(object):
     color_map = libtcod_color_map
 
     def __init__(self, libtcod_window):
-        self.default_fg = libtcod.white
-        self.default_bg = libtcod.black
+        self.default_fg = self.color_map[Color.Normal]
+        self.default_bg = self.color_map[Color.Black]
         self.win = libtcod_window
         libtcod.console_set_default_foreground(self.win, self.default_fg)
         libtcod.console_set_default_background(self.win, self.default_bg)
@@ -113,25 +118,21 @@ class TCODWindow(object):
     def draw_str(self, string, coord=(0, 0), color=None):
         y, x = coord
         if color is None:
-            libtcod.console_print(self.win, x, y, string)
+            fg, bg = Pair.Normal
         else:
             fg, bg = color
-            libtcod.console_set_default_foreground(self.win, self.color_map[fg])
-            libtcod.console_set_default_background(self.win, self.color_map[bg])
-            libtcod.console_print(self.win, x, y, string)
-            libtcod.console_set_default_foreground(self.win, self.default_fg)
-            libtcod.console_set_default_background(self.win, self.default_bg)
+        libtcod.console_set_color_control(libtcod.COLCTRL_1, self.color_map[fg], self.color_map[bg])
+        string = chr(libtcod.COLCTRL_1) + string + chr(libtcod.COLCTRL_STOP)
+        libtcod.console_print(self.win, x, y, string)
 
     def draw(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
         local_color = self.color_map
         for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.win, x, y, symbol, local_color[fg],
-              local_color[bg])
+            d(self.win, x, y, symbol, local_color[fg], local_color[bg])
 
     def draw_reverse(self, char_payload_sequence):
         d = libtcod.console_put_char_ex
         local_color = self.color_map
         for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
-            d(self.win, x, y, symbol, local_color[bg],
-              local_color[fg])
+            d(self.win, x, y, symbol, local_color[bg], local_color[fg])

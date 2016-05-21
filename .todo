@@ -318,6 +318,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1462193098" done="1462229360">
+        Remove DATA_FOLDER and LEVEL_DIMENSIONS from config.game
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -594,11 +600,8 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
-    <note priority="veryhigh" time="1462193098" done="1462229360">
-        Remove DATA_FOLDER and LEVEL_DIMENSIONS from config.game
-        <comment>
-            done
-        </comment>
+    <note priority="veryhigh" time="1462289109">
+        Add color support for messages
     </note>
     <note priority="high" time="1453792942">
         Remove level reference from creature.
