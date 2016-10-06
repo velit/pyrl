@@ -1,6 +1,6 @@
 from enum import Enum
 
-from creature.stats import Stat
+from creature.stats import Stat, ComplexStat
 
 
 class Slot(Enum):
@@ -66,10 +66,12 @@ class Equipment(object):
         return unbagged_items
 
     def get_damage_info(self):
-        if self._worn_items[Slot.Right_Hand] is not None:
-            return self._worn_items[Slot.Right_Hand].get_damage()
-        elif self._worn_items[Slot.Left_Hand] is not None:
-            return self._worn_items[Slot.Left_Hand].get_damage()
+        right_hand = self._worn_items[Slot.Right_Hand]
+        left_hand = self._worn_items[Slot.Left_Hand]
+        if right_hand is not None and right_hand.get_stat(ComplexStat.weapon_dice) is not None:
+            return right_hand.get_stat(ComplexStat.weapon_dice)
+        elif left_hand is not None and left_hand.get_stat(ComplexStat.weapon_dice) is not None:
+            return left_hand.get_stat(ComplexStat.weapon_dice)
         else:
             return None
 
@@ -78,8 +80,10 @@ class Equipment(object):
 
     def _add_stats(self, item):
         for stat, value in item.stats:
-            self.applied_stats[stat] += value
+            if stat in Stat:
+                self.applied_stats[stat] += value
 
     def _remove_stats(self, item):
         for stat, value in item.stats:
-            self.applied_stats[stat] -= value
+            if stat in Stat:
+                self.applied_stats[stat] -= value

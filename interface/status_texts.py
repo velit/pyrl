@@ -1,13 +1,14 @@
 from creature.stats import Stat
+from dice import dice_str
 
 
 def register_status_texts(io, game, creature):
     add_element = io.status_bar.add_element
-    add_element("Dmg",                      lambda: "{}D{}+{}".format(*creature.get_damage_info()))
+    add_element("Dmg",                      lambda: dice_str(*creature.get_damage_info()))
     add_element("HP",                       lambda: "{}/{}".format(creature.hp, creature.max_hp))
     add_element(Stat.sight.value,           lambda: creature.sight)
-    add_element(Stat.attack_rating.value,   lambda: creature.attack_rating)
-    add_element(Stat.defense_rating.value,  lambda: creature.defense_rating)
+    add_element(Stat.accuracy.value,        lambda: creature.accuracy)
+    add_element(Stat.defense.value,         lambda: creature.defense)
     add_element(Stat.armor.value,           lambda: creature.armor)
     add_element(Stat.speed.value,           lambda: creature.speed)
     add_element(Stat.strength.value,        lambda: creature.strength)

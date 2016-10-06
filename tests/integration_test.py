@@ -80,6 +80,7 @@ def test_subsystems(game):
         Bind.Equipment_Select_Keys[1],
         Bind.Equipment_Select_Keys[2],
         Bind.Equipment_Select_Keys[3],
+        Bind.Equipment_Select_Keys[3],
         Bind.Backpack_Select_Keys[0],
         Bind.Cancel,
         Bind.Drop_Items,
@@ -130,7 +131,7 @@ def test_subsystems(game):
     game = prepare_input_and_run(game, inventory)
     assert game.turn_counter == 3
     assert coord == game.player.coord
-    assert previous_bag_count + 1 == len(game.player.equipment._bag)
+    assert len(game.player.equipment._bag) == previous_bag_count + 2
 
     game = prepare_input_and_run(game, walk_mode)
     assert game.turn_counter == 7

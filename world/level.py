@@ -151,7 +151,7 @@ class Level(object):
             c = self.creatures[coord]
             msg = "{} hp:{}/{} sight:{} armor:{} dr:{} ar:{} attack:{}D{}+{}"
             information += msg.format(c.name, c.hp, c.max_hp, c.sight, c.armor,
-                                      c.defense_rating, c.attack_rating, *c.get_damage_info())
+                                      c.defense, c.accuracy, *c.get_damage_info())
             if hasattr(c, "target_coord"):
                 information += " target:{}".format(c.target_coord)
             if hasattr(c, "chase_vector"):

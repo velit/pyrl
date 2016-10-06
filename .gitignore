@@ -1,11 +1,12 @@
-save_data
-*~
 *.swp
 *.pyc
+*.pyo
+save_data
+.ropeproject/
+.cache/
+__pycache__/
 tags
 dist
 Session.vim
 errors.err
 profiling_results
-.ropeproject/
-__pycache__

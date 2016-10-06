@@ -22,7 +22,7 @@ def prepare_game(cursor_lib_callback, cmdline_args=None):
     options = get_commandline_options(cmdline_args)
     initialize_files_and_folders()
 
-    locale.setlocale(locale.LC_ALL, "")
+    # locale.setlocale(locale.LC_ALL, "")
     init_logger_system()
 
     if options.load:

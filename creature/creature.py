@@ -1,4 +1,5 @@
 from creature.stats import ensure_stats
+from dice import Dice
 
 
 @ensure_stats
@@ -21,9 +22,9 @@ class Creature(object):
 
     def get_damage_info(self):
         dice = self.unarmed_dices
-        sides = self.unarmed_sides
+        highest_side = self.unarmed_sides
         addition = self.damage
-        return dice, sides, addition
+        return Dice(dice, highest_side, addition)
 
     def receive_damage(self, amount):
         if amount > 0:
@@ -71,11 +72,11 @@ class Creature(object):
         return self.endurance // 10
 
     @property
-    def attack_rating(self):
+    def accuracy(self):
         return self.dexterity + self.perception // 2
 
     @property
-    def defense_rating(self):
+    def defense(self):
         return self.dexterity + self.intelligence // 2
 
     @property

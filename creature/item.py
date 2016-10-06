@@ -1,61 +1,71 @@
 from creature.equipment import Slot
-from dice import Dice
 from enums.colors import Pair
+from creature.stats import Stat, ComplexStat
+from dice import dice_str
 
 
-def get_stats_str(stats):
-    stats_str = ", ".join("{0}:{1}".format(stat.value, value) for stat, value in stats)
-    return "{" + stats_str + "}"
+def Weapon(name, accuracy, weapon_dice, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
+           stats=(), char=('(', Pair.Normal)):
+    stats = ((ComplexStat.weapon_dice, weapon_dice), (Stat.accuracy, accuracy), *stats)
+    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char)
+
+
+def Armor(name, defense, armor, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
+    stats = ((Stat.defense, defense), (Stat.armor, armor), *stats)
+    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char)
 
 
 class Item(object):
-    def __init__(self, name, compatible_slots=(), char=(']', Pair.Normal), stats=()):
+    def __init__(self, name, compatible_slots, stats, char):
         self.name = name
         self.char = char
         self.compatible_slots = tuple(compatible_slots)
         self.stats = tuple(stats)
 
-    def __str__(self):
-        if self.stats:
-            stats_str = get_stats_str(self.stats)
-            return "{0.name} {1}".format(self, stats_str)
-        else:
-            return "{0.name}".format(self)
-
-    def add_stat(self, stat, value):
-        self.stats += ((stat, value), )
-        return self
-
-    def add_stats(self, stats):
-        self.stats += stats
-        return self
-
-    def fits_to_slot(self, slot):
+    def fits_slot(self, slot):
         return slot in self.compatible_slots
+
+    def get_stat(self, stat, default=None):
+        for stat0, value in self.stats:
+            if stat0 is stat:
+                return value
+        return default
+
+    def weapon_str(self):
+        weapon_dice = self.get_stat(ComplexStat.weapon_dice)
+        accuracy = self.get_stat(Stat.accuracy, default=0)
+        if weapon_dice is not None:
+            return " ({:+}, {})".format(accuracy, dice_str(*weapon_dice))
+        elif accuracy:
+            return " ({:+})".format(accuracy)
+        else:
+            return ""
+
+    def armor_str(self):
+        defense = self.get_stat(Stat.defense, default=0)
+        armor = self.get_stat(Stat.armor, default=0)
+        if defense or armor:
+            return " [{:+}, {:+}]".format(defense, armor)
+        else:
+            return ""
+
+    def stats_str(self):
+        skip_stats = (Stat.accuracy, ComplexStat.weapon_dice, Stat.defense, Stat.armor)
+        stats = ", ".join("{}:{:+}".format(stat.value, value) for stat, value in self.stats if stat not
+                          in skip_stats)
+        if stats:
+            return " {%s}" % stats
+        else:
+            return ""
+
+    def __str__(self):
+        return "{}{}{}{}".format(self.name, self.weapon_str(), self.armor_str(), self.stats_str())
 
     def __lt__(self, other):
         return str(self) < str(other)
 
     def __repr__(self):
-        return "Item(name={name}, char={char}, compatible_slots={compatible_slots}, stats={stats})".format(**self.__dict__)
-
-
-class Weapon(Item):
-    def __init__(self, name, dice_stats, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
-                 char=('(', Pair.Normal), stats=()):
-        super().__init__(name, compatible_slots, char, stats)
-        dice, sides, addition = dice_stats
-        self.damage = Dice(dice, sides, addition)
-
-    def roll(self):
-        return self.damage.roll()
-
-    def get_damage(self):
-        return self.damage.get_values()
-
-    def __str__(self):
-        if self.stats:
-            stats_str = get_stats_str(self.stats)
-            return "{0.name} ({0.damage}) {1}".format(self, stats_str)
-        else:
-            return "{0.name} ({0.damage})".format(self)
+        return ("Item(name={self.name}, "
+                "char={self.char}, "
+                "compatible_slots={self.compatible_slots}, "
+                "stats={self.stats})").format(self=self)

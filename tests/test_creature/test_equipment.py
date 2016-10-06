@@ -1,7 +1,7 @@
 import pytest
 
 from creature.equipment import Equipment, Slot
-from creature.item import Item, Weapon
+from creature.item import Weapon, Armor
 from creature.stats import Stat
 
 
@@ -13,11 +13,11 @@ def equipment():
 @pytest.fixture
 def items():
     return {
-        Slot.Right_Hand: Weapon("short sword +1", (1, 6, 1)),
-        Slot.Left_Hand:  Weapon("short sword", (1, 6, 0)),
-        Slot.Head:       Item("helmet", [Slot.Head]).add_stat(Stat.armor, 1),
-        Slot.Body:       Item("armor", [Slot.Body], stats=[(Stat.strength, 2), (Stat.armor, 4)]),
-        Slot.Feet:       Item("boots", [Slot.Feet]).add_stat(Stat.armor, 1),
+        Slot.Right_Hand: Weapon("short sword +1", 0, (1, 6, 1)),
+        Slot.Left_Hand:  Weapon("short sword",    0, (1, 6, 0)),
+        Slot.Head:       Armor("helmet", 0, 1, [Slot.Head]),
+        Slot.Body:       Armor("armor",  0, 4, [Slot.Body], stats=[(Stat.strength, 2)]),
+        Slot.Feet:       Armor("boots",  0, 1, [Slot.Feet]),
     }
 
 

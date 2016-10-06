@@ -10,12 +10,14 @@ class Stat(Enum):
     sight          = "Sight"
     max_hp         = "HP"
     armor          = "Armor"
-    attack_rating  = "AR"
-    defense_rating = "DR"
+    accuracy       = "Acc"
+    defense        = "Def"
     speed          = "Speed"
-    unarmed_dices  = "Unarmed dices"
-    unarmed_sides  = "Unarmed sides"
     damage         = "Dmg"
+
+
+class ComplexStat(Enum):
+    weapon_dice = "Damage"
 
 
 def ensure_stats(obj):

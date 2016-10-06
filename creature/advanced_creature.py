@@ -3,6 +3,7 @@ from collections import defaultdict
 from creature.creature import Creature
 from creature.equipment import Equipment
 from creature.stats import Stat
+from dice import Dice
 
 
 def _add_equipment_properties(cls):
@@ -38,13 +39,13 @@ class AdvancedCreature(Creature):
     def get_damage_info(self):
         damage_info = self.equipment.get_damage_info()
         if damage_info is not None:
-            dices, sides, addition = damage_info
+            dices, highest_side, addition = damage_info
             addition += self.damage
         else:
             dices = self.unarmed_dices
-            sides = self.unarmed_sides
+            highest_side = self.unarmed_sides
             addition = self.damage
-        return dices, sides, addition
+        return Dice(dices, highest_side, addition)
 
     def is_idle(self):
         return False

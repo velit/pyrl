@@ -34,7 +34,7 @@ def equipment(actions):
 
 def backpack_equip_item(actions, slot):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items())
-                  if item.fits_to_slot(slot))
+                  if item.fits_slot(slot))
     key, item = lines_view(actions.io.whole_window, lines, select_keys=Bind.Backpack_Select_Keys,
                         header="Select item to equip")
     if key in Bind.Cancel:

@@ -13,7 +13,7 @@ class Tile(object):
         self.movement_multiplier = move_mult
 
     @property
-    def defense_rating(self):
+    def defense(self):
         return 0
 
     @property

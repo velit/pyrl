@@ -4,12 +4,12 @@ from dice import dice_roll
 
 
 def get_melee_attack_cr(creature, target):
-    return get_melee_attack(creature.attack_rating, creature.get_damage_info(),
-                            target.defense_rating, target.armor)
+    return get_melee_attack(creature.accuracy, creature.get_damage_info(),
+                            target.defense, target.armor)
 
 
-def get_melee_attack(attack_rating, damage_info, defense_rating, armor):
-    roll = randint(1, 100) + attack_rating - defense_rating
+def get_melee_attack(accuracy, damage_info, defense, armor):
+    roll = randint(1, 100) + accuracy - defense
     if roll > 25:
         return (True, max(dice_roll(*damage_info) - armor, 0))
     else:

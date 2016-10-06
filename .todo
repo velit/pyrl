@@ -324,6 +324,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1475704071" done="1475759942">
+        Add namedtuple for weapon_dice
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -600,14 +606,20 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
-    <note priority="veryhigh" time="1462289109">
+    <note priority="veryhigh" time="1475592380">
+        Add item drops and progression through that
+    </note>
+    <note priority="veryhigh" time="1475764346">
+        Change unarmed_dices and unarmed_sides into a more flexible stat system for creatures.
+    </note>
+    <note priority="high" time="1462289109">
         Add color support for messages
     </note>
-    <note priority="high" time="1453792942">
-        Remove level reference from creature.
+    <note priority="high" time="1463834904">
+        Add a game character class.
     </note>
-    <note priority="high" time="1462173383">
-        Add system for figuring out if savegame is external (wasn't produced by this machine) to warn about danger/mark external load.
+    <note priority="high" time="1475677338">
+        Add item degradation and repairing through whetstones and armor repair kits.
     </note>
     <note priority="medium" time="1429224251">
         Add regeneration
@@ -624,6 +636,9 @@
     <note priority="medium" time="1461374954">
         Add a pronoun system for items and game world objects
     </note>
+    <note priority="medium" time="1462173383">
+        Add system for figuring out if savegame is external (wasn't produced by this machine) to warn about danger/mark external load.
+    </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels
     </note>
@@ -632,5 +647,8 @@
     </note>
     <note priority="low" time="1427329682">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
+    </note>
+    <note priority="verylow" time="1453792942">
+        Remove level reference from creature.
     </note>
 </todo>
