@@ -11,6 +11,7 @@ from game_data.pyrl_world import get_world
 from interface.status_texts import register_status_texts
 from window.window_system import WindowSystem
 from world.world import LevelNotFound
+from creature.remembers_vision import RemembersVision
 
 
 class Game(object):
@@ -106,25 +107,20 @@ class Game(object):
         This operation should only be done on creatures that have the .vision
         attribute ie. AdvancedCreatures for instance.
         """
+        if not isinstance(creature, RemembersVision):
+            raise ValueError("Creature {} doesn't have the capacity to remember its vision.")
+
         lvl = creature.level
         new_vision = ShadowCast.get_light_set(lvl.is_see_through, creature.coord,
                                               creature.sight, lvl.rows, lvl.cols)
         creature.vision, old_vision = new_vision, creature.vision
-
-        creature_changed_vision = (new_vision ^ old_vision)
-        creature_unchanged_vision = (new_vision & old_vision)
-        level_changed_vision = creature.pop_modified_locations()
+        potentially_modified_vision = new_vision | old_vision
 
         if Debug.show_map:
-            update_coords = creature_changed_vision | level_changed_vision
-            vision_info = lvl.get_vision_information(update_coords, new_vision,
+            vision_info = lvl.get_vision_information(lvl.tiles.coord_iter(), new_vision,
                                                        always_show_creatures=True)
         else:
-            # new ^ old is the set of new squares in view and squares that were left # behind.
-            # new & old & modified is the set of old squares still in view which had changes
-            # since last turn.
-            update_coords = creature_changed_vision | (creature_unchanged_vision & level_changed_vision)
-            vision_info = lvl.get_vision_information(update_coords, new_vision)
+            vision_info = lvl.get_vision_information(potentially_modified_vision, new_vision)
 
         self.io.draw(vision_info)
 

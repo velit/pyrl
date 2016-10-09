@@ -4,7 +4,6 @@ from functools import wraps
 
 import path
 from config.debug import Debug
-from creature import Creature
 from enums.directions import Dir
 from enums.level_gen import LevelGen
 from enums.level_location import LevelLocation
@@ -20,27 +19,30 @@ from turn_scheduler import TurnScheduler
 class Level(object):
 
     def __init__(self, danger_level=0, generation_type=LevelGen.Dungeon, tiles=None,
-                 locations=None, custom_creatures=(), creature_spawning=True):
+                 locations=(), custom_creatures=(), creature_spawning=True):
+        # Generation
         self.danger_level = danger_level
         self.generation_type = generation_type
-        if tiles is None:
-            self.tiles = Array2D(default_level_dimensions)
-        else:
-            self.tiles = tiles
-        self.locations = OneToOneMapping()
         self.custom_creatures = list(custom_creatures)
         self.creature_spawning = creature_spawning
         self.creature_spawn_count = 99
 
-        self.exit_point_info = []
+        # Normal usage
+        if tiles is None:
+            self.tiles = Array2D(default_level_dimensions)
+        else:
+            self.tiles = tiles
+
+        self.locations = OneToOneMapping(locations)
+        self.visible_change = Event()
+        self.turn_scheduler = TurnScheduler()
+        self.creatures = {}
+        self.items = {}
 
         if self.generation_type.value > LevelGen.ExtendExisting.value:
             self.rows, self.cols = self.tiles.dimensions
         else:
             self.rows, self.cols = default_level_dimensions
-
-        if locations is not None:
-            self.locations.update(locations)
 
         self.is_finalized = False
 
@@ -70,10 +72,6 @@ class Level(object):
             generate_tiles_to(self)
 
         self.key = level_key
-        self.visible_change = Event()
-        self.turn_scheduler = TurnScheduler()
-        self.creatures = {}
-        self.items = {}
 
         for creature in self.custom_creatures:
             self.spawn_creature(creature)
@@ -231,8 +229,6 @@ class Level(object):
         self.creatures[coord] = creature
         creature.coord = coord
         creature.level = self
-        if hasattr(creature, "outdated_vision_coordinates"):
-            self.visible_change.subscribe(creature.add_level_change)
         self.visible_change.trigger(coord)
 
     def remove_creature(self, creature):
@@ -241,9 +237,6 @@ class Level(object):
         creature.coord = None
         creature.level = None
         self.turn_scheduler.remove(creature)
-        if hasattr(creature, "outdated_vision_coordinates"):
-            self.visible_change.unsubscribe(creature.add_level_change)
-            creature.pop_modified_locations()
         self.visible_change.trigger(coord)
 
     def move_creature(self, creature, new_coord):
