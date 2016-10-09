@@ -10,7 +10,7 @@ from game_actions import ActionError, Action, GameActionsProperties
 from generic_algorithms import add_vector
 from interface.help_screen import help_screen
 from interface.lines_view import lines_view, build_lines
-from world.level import LevelLocation
+from enums.level_location import LevelLocation
 
 
 class UserController(GameActionsProperties, object):

@@ -1,49 +1,93 @@
 import itertools
 import random
-from enum import Enum
 from functools import wraps
 
 import path
 from config.debug import Debug
 from creature.creature import Creature
 from enums.directions import Dir
+from enums.level_gen import LevelGen
+from enums.level_location import LevelLocation
 from game_actions import Action
+from game_data.creatures import creature_templates
+from game_data.levels import default_level_dimensions
 from generic_algorithms import bresenham, cross_product, add_vector
-from generic_structures import Event, Array2D
+from generic_structures import Event, Array2D, OneToOneMapping
+from rdg import generate_tiles_to
 from turn_scheduler import TurnScheduler
-
-
-class LevelLocation(Enum):
-    Passage_Up      = 1
-    Passage_Down    = 2
-    Random_Location = 3
 
 
 class Level(object):
 
-    def __init__(self, level_key, level_template):
+    def __init__(self, danger_level=0, generation_type=LevelGen.Dungeon, tiles=None,
+                 locations=None, custom_creatures=(), creature_spawning=True):
+        self.danger_level = danger_level
+        self.generation_type = generation_type
+        if tiles is None:
+            self.tiles = Array2D(default_level_dimensions)
+        else:
+            self.tiles = tiles
+        self.locations = OneToOneMapping()
+        self.custom_creatures = list(custom_creatures)
+        self.creature_spawning = creature_spawning
+        self.creature_spawn_count = 99
+
+        self.exit_point_info = []
+
+        if self.generation_type.value > LevelGen.ExtendExisting.value:
+            self.rows, self.cols = self.tiles.dimensions
+        else:
+            self.rows, self.cols = default_level_dimensions
+
+        if locations is not None:
+            self.locations.update(locations)
+
+        self.is_finalized = False
+
+    def will_have_location(self, location):
+        if location == LevelLocation.Random_Location:
+            return True
+
+        if location in self.locations.values():
+            return True
+
+        if self.generation_type != LevelGen.NoGeneration:
+            return location in LevelLocation
+
+        return False
+
+    def get_creature_spawn_list(self):
+        creature_list = []
+        for creature in creature_templates:
+            start = creature.speciation_lvl
+            if start <= self.danger_level:
+                weight_coeff = self.danger_level - creature.speciation_lvl
+                creature_list.extend((creature, ) * weight_coeff)
+        return creature_list
+
+    def finalize(self, level_key):
+        if self.generation_type.is_used():
+            generate_tiles_to(self)
+
         self.key = level_key
-        self.tiles = level_template.tiles
-        self.rows, self.cols = self.tiles.dimensions
-        self.danger_level = level_template.danger_level
-        self.locations = level_template.locations
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
         self.creatures = {}
         self.items = {}
-        self.generation_type = level_template.generation_type
 
-        for creature in level_template.custom_creatures:
+        for creature in self.custom_creatures:
             self.spawn_creature(creature)
 
-        if level_template.creature_spawning:
-            self.creature_spawn_list = level_template.get_creature_spawn_list()
+        if self.creature_spawning:
+            self.creature_spawn_list = self.get_creature_spawn_list()
 
-            for _ in range(level_template.creature_spawn_count):
+            for _ in range(self.creature_spawn_count):
                 creature = Creature(random.choice(self.creature_spawn_list))
                 self.spawn_creature(creature)
         else:
             self.creature_spawn_list = []
+
+        self.is_finalized = True
 
     def get_location_coord(self, level_location):
         if level_location == LevelLocation.Random_Location:

@@ -1,16 +1,16 @@
 from creature.creature import Creature
 from creature.template import CreatureTemplate
 from enums.colors import Pair
-from game_data.levels.shared_assets import construct_data, level_dimensions
+from game_data.levels.shared_assets import construct_data, default_level_dimensions
 from game_data.tiles import PyrlTile
-from rdg import LevelGen
-from world.level import LevelLocation
-from world.level_template import LevelTemplate
+from enums.level_gen import LevelGen
+from world.level import Level
+from enums.level_location import LevelLocation
 
 
-def get_template(player):
+def get_level(player):
 
-    dimensions = level_dimensions
+    dimensions = default_level_dimensions
     charstr = (
         '################################################################################################'
         '#######################..##################.#.#.#######.....#################################.##'
@@ -53,7 +53,7 @@ def get_template(player):
     level_data = custom_tiles, custom_locations, custom_creatures
     tiles, locations, creatures = construct_data(dimensions, charstr, *level_data)
 
-    return LevelTemplate(
+    return Level(
         danger_level=1,
         generation_type=LevelGen.NoGeneration,
         tiles=tiles,

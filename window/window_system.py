@@ -4,7 +4,7 @@ from functools import wraps
 from config.debug import Debug
 from config.game import GameConf
 from enums.colors import Pair
-from game_data.levels import level_dimensions
+from game_data.levels import default_level_dimensions
 from generic_structures import TableDims, Coord
 from window.base_window import BaseWindow
 from window.level import LevelWindow
@@ -14,10 +14,10 @@ from window.status import StatusBar
 
 class WindowSystem(object):
 
-    message_dimensions = TableDims(GameConf.message_bar_height, level_dimensions.cols)
-    status_dimensions = TableDims(GameConf.status_bar_height, level_dimensions.cols)
+    message_dimensions = TableDims(GameConf.message_bar_height, default_level_dimensions.cols)
+    status_dimensions = TableDims(GameConf.status_bar_height, default_level_dimensions.cols)
     game_dimensions = TableDims(message_dimensions.rows + status_dimensions.rows +
-                                level_dimensions.rows, level_dimensions.cols)
+                                default_level_dimensions.rows, default_level_dimensions.cols)
 
     def __init__(self, cursor_lib):
         self.cursor_lib = cursor_lib
@@ -25,7 +25,7 @@ class WindowSystem(object):
         self.whole_window = BaseWindow(cursor_lib, self.game_dimensions, Coord(0, 0))
         self.message_bar  = MessageBar(cursor_lib, self.message_dimensions, Coord(0, 0))
         level_position    = Coord(self.message_bar.screen_position.y + self.message_bar.rows, 0)
-        self.level_window = LevelWindow(cursor_lib, level_dimensions, level_position)
+        self.level_window = LevelWindow(cursor_lib, default_level_dimensions, level_position)
         status_position   = Coord(self.level_window.screen_position.y + self.level_window.rows, 0)
         self.status_bar   = StatusBar(cursor_lib, self.status_dimensions, status_position)
 

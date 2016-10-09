@@ -5,8 +5,8 @@ from bindings import Bind
 from config.debug import Debug
 from creature.creature import Creature
 from game_actions import GameActionsProperties, feedback, Action
-from rdg import LevelGen
-from world.level import LevelLocation
+from enums.level_gen import LevelGen
+from enums.level_location import LevelLocation
 
 
 class DebugAction(GameActionsProperties, object):
@@ -64,12 +64,15 @@ class DebugAction(GameActionsProperties, object):
         self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
 
     def cycle_level_type(self):
-        for level_template in self.world.level_templates.values():
-            if level_template.generation_type == LevelGen.Dungeon:
-                level_template.generation_type = LevelGen.Arena
-            elif level_template.generation_type == LevelGen.Arena:
-                level_template.generation_type = LevelGen.Dungeon
-            last_template_type = level_template.generation_type
+        last_template_type = "All levels are already generated"
+        for level in self.world.level_templates.values():
+            if level.is_finalized:
+                continue
+            if level.generation_type == LevelGen.Dungeon:
+                level.generation_type = LevelGen.Arena
+            elif level.generation_type == LevelGen.Arena:
+                level.generation_type = LevelGen.Dungeon
+            last_template_type = level.generation_type
         self.io.msg("Level type set to {}".format(last_template_type))
 
     def show_path_debug(self):

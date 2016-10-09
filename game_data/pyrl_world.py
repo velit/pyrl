@@ -1,6 +1,6 @@
 from game_data.levels import test_level, overworld
 from game_data.player import Player
-from world.level import LevelLocation
+from enums.level_location import LevelLocation
 from world.world import World, LevelKey, WorldPoint
 
 
@@ -8,12 +8,12 @@ def get_world():
 
     world = World(Player())
     start = LevelKey("dungeon", 1)
-    world.add_level_template(start.dungeon, test_level.get_template(world.player))
+    world.add_level(start.dungeon, test_level.get_level(world.player))
 
     for x in range(99 - 1):
-        world.add_level_template(start.dungeon)
+        world.add_level(start.dungeon)
 
-    world.add_level_template(overworld.name, overworld.get_template())
+    world.add_level(overworld.name, overworld.get_level())
 
     world.set_two_way_connection(
         WorldPoint(LevelKey(overworld.name, 1), overworld.OverWorldLocation.Dungeon),

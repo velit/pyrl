@@ -1,6 +1,7 @@
+from enum import Enum
 
 
-class Color(object):
+class Color(Enum):
     Red          = "Red"
     Green        = "Green"
     Blue         = "Blue"
@@ -30,6 +31,9 @@ class Color(object):
     Darker       = "Darker"      # 48
     Darkest      = "Darkest"     # 18
     Black        = "Black"       # 0
+
+    def __str__(self):
+        return self.value
 
 
 class Pair(object):

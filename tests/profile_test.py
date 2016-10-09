@@ -1,8 +1,9 @@
 from cProfile import Profile
 
-from rdg import generate_tiles_to, LevelGen
+from enums.level_gen import LevelGen
+from rdg import generate_tiles_to
 from tools import profile_util
-from world.level_template import LevelTemplate
+from world.level import Level
 
 
 def test_profile_rdg_generation():
@@ -10,8 +11,8 @@ def test_profile_rdg_generation():
     profiler.enable()
 
     for _ in range(5):
-        lt = LevelTemplate(generation_type=LevelGen.Dungeon)
-        generate_tiles_to(lt)
+        level = Level(generation_type=LevelGen.Dungeon)
+        generate_tiles_to(level)
 
     profiler.disable()
     profile_util.write_results_log(profiler)

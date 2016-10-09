@@ -1,41 +1,16 @@
-from enum import Enum
 from functools import partial
 from random import randrange, random, choice
 
 from config.debug import Debug
 from enums.directions import Dir
+from enums.level_gen import LevelGen
 from game_data.tiles import PyrlTile
 from generic_algorithms import add_vector
-from world.level import LevelLocation
+from enums.level_location import LevelLocation
 
 
-class LevelGen(Enum):
-
-    """
-    Dictates what sort of level generation is applied when finalizing level template.
-
-    Generation types before and including ExtendExisting will utilize data in given tiles
-    parameter. Types after will not use tiles in any way.
-
-    All other types except NoGeneration will be handed to the dungeon generator.
-
-    NoGeneration: Use given tiles as is.
-    ExtendExisting: Extend the given tiles using standard dungeon generation.
-    Dungeon: Generate a standard dungeon.
-    Arena: Generate an empty arena spanning the whole level.
-    """
-
-    NoGeneration   = 1
-    ExtendExisting = 2  # TODO: Not implemented
-    Dungeon        = 3
-    Arena          = 4
-
-    def is_used(self):
-        return self != LevelGen.NoGeneration
-
-
-def generate_tiles_to(level_template):
-    RDG(level_template).generate_tiles()
+def generate_tiles_to(level):
+    RDG(level).generate_tiles()
 
 
 def Rectangle(y, x, height, width):
@@ -82,10 +57,10 @@ class RDG(object):
     W = PyrlTile.Wall
     R = PyrlTile.Rock
 
-    def __init__(self, level_template):
-        self.level_template = level_template
-        self.rows, self.cols = level_template.tiles.dimensions
-        self.generation_type = level_template.generation_type
+    def __init__(self, level):
+        self.level = level
+        self.rows, self.cols = level.tiles.dimensions
+        self.generation_type = level.generation_type
 
         self.level_cycles          = 300
         self.room_y_range          = 5, 11
@@ -110,14 +85,14 @@ class RDG(object):
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
         if self.generation_type.value >= LevelGen.Dungeon.value:
-            if LevelLocation.Passage_Up not in self.level_template.locations.values():
+            if LevelLocation.Passage_Up not in self.level.locations.values():
                 self.add_location(PyrlTile.Stairs_Up, LevelLocation.Passage_Up)
-            if LevelLocation.Passage_Down not in self.level_template.locations.values():
+            if LevelLocation.Passage_Down not in self.level.locations.values():
                 self.add_location(PyrlTile.Stairs_Down, LevelLocation.Passage_Down)
 
     def init_tiles(self):
-        for coord, item in self.level_template.tiles.enumerate():
-            self.level_template.tiles[coord] = self.R
+        for coord, item in self.level.tiles.enumerate():
+            self.level.tiles[coord] = self.R
 
     def generator_loop(self):
         rand_room_height = partial(randrange, *self.room_y_range)
@@ -164,15 +139,15 @@ class RDG(object):
         for _ in range(Debug.max_loop_cycles):
             coord = self.free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
-            old_tile = self.level_template.tiles[coord]
+            old_tile = self.level.tiles[coord]
 
             if neighbors == (self.F, self.F, self.F, self.F) and old_tile == self.F:
                 break
         else:
             assert False, "Location add failed due to free coord get failed."
 
-        self.level_template.tiles[coord] = tile
-        self.level_template.locations[coord] = location
+        self.level.tiles[coord] = tile
+        self.level.locations[coord] = location
 
     def make_initial_room(self):
         while True:
@@ -192,7 +167,7 @@ class RDG(object):
                 break
 
         self.make_room(Rectangle(y, x, height, width))
-        self.level_template.tiles[y + 2, x + 2] = PyrlTile.Black_Floor
+        self.level.tiles[y + 2, x + 2] = PyrlTile.Black_Floor
 
     def attempt_corridor(self, door_coord, direction, length):
         y, x = door_coord
@@ -215,15 +190,15 @@ class RDG(object):
     def attempt_room(self, rectangle, door_coord):
         if self.rectangle_consists_of_tiles(rectangle, (self.W, self.R)):
             self.make_room(rectangle)
-            self.level_template.tiles[door_coord] = self.F
+            self.level.tiles[door_coord] = self.F
             return True
         else:
             return False
 
     def free_coord(self):
         while True:
-            coord = self.level_template.tiles.random_coord()
-            if self.level_template.tiles[coord] == self.F:
+            coord = self.level.tiles.random_coord()
+            if self.level.tiles[coord] == self.F:
                 return coord
 
     def get_random_wall_coord(self):
@@ -267,7 +242,7 @@ class RDG(object):
             return False
 
     def get_up_down_left_right_neighbors(self, coord):
-        tiles = self.level_template.tiles
+        tiles = self.level.tiles
         neighbors = (
             tiles[add_vector(coord, Dir.North)],
             tiles[add_vector(coord, Dir.South)],
@@ -282,26 +257,26 @@ class RDG(object):
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):
                 if y in (y_start, y_limit - 1) or x in (x_start, x_limit - 1):
-                    self.level_template.tiles[y, x] = self.W
+                    self.level.tiles[y, x] = self.W
                     self.mark_wall((y, x))
                 else:
-                    self.level_template.tiles[y, x] = self.F
+                    self.level.tiles[y, x] = self.F
 
     def rectangle_consists_of_tiles(self, rectangle, tile_seq):
-        tiles = self.level_template.tiles
+        tiles = self.level.tiles
         return all(tiles.is_legal(coord) and tiles[coord] in tile_seq for coord in rectangle.iterate())
 
     def set_rectangle(self, rectangle, tile):
         """Set all the tiles in rectangle to given tile."""
         if tile == self.W:
             for coord in rectangle.iterate():
-                self.level_template.tiles[coord] = tile
+                self.level.tiles[coord] = tile
                 self.mark_wall(coord)
         else:
             for coord in rectangle.iterate():
-                self.level_template.tiles[coord] = tile
+                self.level.tiles[coord] = tile
 
     def turn_rock_to_wall(self):
-        for coord, tile in self.level_template.tiles.enumerate():
+        for coord, tile in self.level.tiles.enumerate():
             if tile == self.R:
-                self.level_template.tiles[coord] = self.W
+                self.level.tiles[coord] = self.W

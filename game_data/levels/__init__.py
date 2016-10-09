@@ -1,1 +1,1 @@
-from game_data.levels.shared_assets import level_dimensions
+from game_data.levels.shared_assets import default_level_dimensions
