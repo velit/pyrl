@@ -1,4 +1,5 @@
-from creature.equipment import Equipment, Slot
+from enums.slot import Slot
+from creature.equipment import Equipment
 from creature.item import Weapon, Armor
 from creature.stats import Stat
 

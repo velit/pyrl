@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from creature.stats import ensure_stats
 from dice import Dice
 
@@ -5,12 +7,14 @@ from dice import Dice
 @ensure_stats
 class Creature(object):
 
-    def __init__(self, creature_file):
-        self.name = creature_file.name
-        self.char = creature_file.char
+    def __init__(self, name, char, speciation_lvl=0, extinction_lvl=0, coord=None):
+        self.name = name
+        self.char = char
+        self.speciation_lvl = speciation_lvl
+        self.extinction_lvl = extinction_lvl
+        self.coord = coord
 
         self.level = None
-        self.coord = None
 
         self.base_strength     = 10
         self.base_dexterity    = 10
@@ -38,6 +42,9 @@ class Creature(object):
 
     def __repr__(self):
         return "Creature(name={})".format(self.name, self.level)
+
+    def copy(self):
+        return deepcopy(self)
 
     @property
     def strength(self):

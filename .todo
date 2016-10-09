@@ -609,8 +609,11 @@
     <note priority="veryhigh" time="1475592380">
         Add item drops and progression through that
     </note>
-    <note priority="veryhigh" time="1475975262">
+    <note priority="veryhigh" time="1475975262" done="1476038313">
         I think templates are kinda dumb, just merge them into the main creatures and incorporate functions that allow the creation of other objects from prototype objects.
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1476022134">
         Borked melee system, please fix

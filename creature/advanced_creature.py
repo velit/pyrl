@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from creature.creature import Creature
+from creature import Creature
 from creature.equipment import Equipment
 from creature.stats import Stat
 from dice import Dice
@@ -26,14 +26,15 @@ def _get_equipment_property(stat):
 @_add_equipment_properties
 class AdvancedCreature(Creature):
 
-    def __init__(self, creature_file):
+    def __init__(self, name, char, speciation_lvl=0, extinction_lvl=0, coord=None,
+                 observe_level_change=True):
         self.equipment = Equipment()
-        super().__init__(creature_file)
+        super().__init__(name, char, speciation_lvl, extinction_lvl, coord)
 
         self.visited_locations = defaultdict(set)
         self.vision = set()
 
-        if creature_file.observe_level_change:
+        if observe_level_change:
             self.outdated_vision_coordinates = set()
 
     def get_damage_info(self):

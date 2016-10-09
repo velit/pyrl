@@ -1,5 +1,5 @@
 from bindings import Bind
-from creature.equipment import Slot
+from enums.slot import Slot
 from game_actions import ActionError, feedback
 from interface.lines_view import lines_view, Line
 

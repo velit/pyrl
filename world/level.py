@@ -4,12 +4,12 @@ from functools import wraps
 
 import path
 from config.debug import Debug
-from creature.creature import Creature
+from creature import Creature
 from enums.directions import Dir
 from enums.level_gen import LevelGen
 from enums.level_location import LevelLocation
 from game_actions import Action
-from game_data.creatures import creature_templates
+from game_data.creatures import creatures
 from game_data.levels import default_level_dimensions
 from generic_algorithms import bresenham, cross_product, add_vector
 from generic_structures import Event, Array2D, OneToOneMapping
@@ -58,7 +58,7 @@ class Level(object):
 
     def get_creature_spawn_list(self):
         creature_list = []
-        for creature in creature_templates:
+        for creature in creatures:
             start = creature.speciation_lvl
             if start <= self.danger_level:
                 weight_coeff = self.danger_level - creature.speciation_lvl
@@ -82,7 +82,7 @@ class Level(object):
             self.creature_spawn_list = self.get_creature_spawn_list()
 
             for _ in range(self.creature_spawn_count):
-                creature = Creature(random.choice(self.creature_spawn_list))
+                creature = random.choice(self.creature_spawn_list).copy()
                 self.spawn_creature(creature)
         else:
             self.creature_spawn_list = []

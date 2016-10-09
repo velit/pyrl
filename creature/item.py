@@ -1,4 +1,4 @@
-from creature.equipment import Slot
+from enums.slot import Slot
 from enums.colors import Pair
 from creature.stats import Stat, ComplexStat
 from dice import dice_str

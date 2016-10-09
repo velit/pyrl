@@ -1,15 +1,13 @@
 from creature.advanced_creature import AdvancedCreature
-from creature.equipment import Slot
+from enums.slot import Slot
 from creature.item import Weapon, Armor
 from creature.stats import Stat
-from creature.template import CreatureTemplate
 from enums.colors import Color, Pair
 from dice import Dice
 
 
 def Player():
-    template = CreatureTemplate("tappi", ('@', (Color.Green, Color.Black)), observe_level_change=True)
-    player = AdvancedCreature(template)
+    player = AdvancedCreature("tappi", ('@', (Color.Green, Color.Black)), observe_level_change=True)
 
     armor_stats = (
         (Stat.accuracy, 10),

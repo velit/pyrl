@@ -63,8 +63,8 @@ def get_level():
     }
     custom_creatures = {
     }
-    template_data = custom_tiles, custom_locations, custom_creatures
-    tiles, locations, creatures = construct_data(dimensions, charstr, *template_data)
+    level_data = custom_tiles, custom_locations, custom_creatures
+    tiles, locations, creatures = construct_data(dimensions, charstr, *level_data)
 
     return Level(
         danger_level=1,
