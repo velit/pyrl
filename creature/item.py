@@ -4,23 +4,26 @@ from creature.stats import Stat, ComplexStat
 from dice import dice_str
 
 
-def Weapon(name, accuracy, weapon_dice, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
+def Weapon(name, accuracy, weapon_dice, two_handed=False, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
            stats=(), char=('(', Pair.Normal)):
     stats = ((ComplexStat.weapon_dice, weapon_dice), (Stat.accuracy, accuracy), *stats)
-    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char)
+    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
+                occupies_all_slots=two_handed)
 
 
 def Armor(name, defense, armor, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
     stats = ((Stat.defense, defense), (Stat.armor, armor), *stats)
-    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char)
+    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
+                occupies_all_slots=False)
 
 
 class Item(object):
-    def __init__(self, name, compatible_slots, stats, char):
+    def __init__(self, name, compatible_slots, stats, char, occupies_all_slots):
         self.name = name
-        self.char = char
         self.compatible_slots = tuple(compatible_slots)
         self.stats = tuple(stats)
+        self.char = char
+        self.occupies_all_slots = occupies_all_slots
 
     def fits_slot(self, slot):
         return slot in self.compatible_slots

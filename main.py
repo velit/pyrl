@@ -1,6 +1,6 @@
 import argparse
 import atexit
-import locale
+# import locale
 import logging
 import os
 import sys

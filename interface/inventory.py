@@ -4,13 +4,23 @@ from game_actions import ActionError, feedback
 from interface.lines_view import lines_view, Line
 
 
+def _get_equipment_item_str(equipment, slot):
+    item = equipment.get_item(slot)
+    if item is None:
+        return "-"
+    if not item.occupies_all_slots or slot == item.compatible_slots[0]:
+        return str(item)
+    else:
+        return "{}".format(item.name)
+
+
 def equipment(actions):
     footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
     footer = footer_fmt.format(Bind.Equipment_View_Backpack.key, Bind.Cancel.key)
     equipment = actions.creature.equipment
 
     while True:
-        lines = tuple(Line("{0:11}: {1}".format(slot.value, equipment.get_item(slot)), slot)
+        lines = tuple(Line("{:11}: {}".format(slot.value, _get_equipment_item_str(equipment, slot)), slot)
                       for slot in Slot)
         key, slot = lines_view(actions.io.whole_window, lines,
                                multi_select=False,

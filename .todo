@@ -609,17 +609,20 @@
     <note priority="veryhigh" time="1475592380">
         Add item drops and progression through that
     </note>
-    <note priority="veryhigh" time="1475764346">
-        Change unarmed_dices and unarmed_sides into a more flexible stat system for creatures.
-    </note>
-    <note priority="high" time="1462289109">
-        Add color support for messages
+    <note priority="veryhigh" time="1475975262">
+        I think templates are kinda dumb, just merge them into the main creatures and incorporate functions that allow the creation of other objects from prototype objects.
     </note>
     <note priority="high" time="1463834904">
         Add a game character class.
     </note>
     <note priority="high" time="1475677338">
         Add item degradation and repairing through whetstones and armor repair kits.
+    </note>
+    <note priority="high" time="1475764346">
+        Change unarmed_dices and unarmed_sides into a more flexible stat system for creatures.
+    </note>
+    <note priority="high" time="1475950694">
+        Modify integration test to have a separate initialization setup (player items etc.) for testing.
     </note>
     <note priority="medium" time="1429224251">
         Add regeneration
@@ -638,6 +641,9 @@
     </note>
     <note priority="medium" time="1462173383">
         Add system for figuring out if savegame is external (wasn't produced by this machine) to warn about danger/mark external load.
+    </note>
+    <note priority="medium" time="1462289109">
+        Add color support for messages
     </note>
     <note priority="low" time="1315155859">
         do edge leaving and entering in levels

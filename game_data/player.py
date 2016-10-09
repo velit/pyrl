@@ -18,6 +18,9 @@ def Player():
     armor = Armor("Armor of Kings", 10, 10, [Slot.Body], armor_stats, (']', Pair.Yellow))
     player.equipment.equip(armor, Slot.Body)
 
+    # weapon = Weapon("Black Spike", 15, Dice(8, 8, 10), two_handed=True, char=('(', Pair.Darkest))
+    # player.equipment.equip(weapon, Slot.Right_Hand)
+
     weapon = Weapon("Sting", 0, Dice(1, 8, 20), char=('(', Pair.Green))
     player.equipment.equip(weapon, Slot.Right_Hand)
 

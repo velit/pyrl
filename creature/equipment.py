@@ -12,6 +12,8 @@ class Slot(Enum):
     Feet       = "Feet"
 
 
+
+
 class Equipment(object):
 
     def __init__(self):
@@ -34,19 +36,37 @@ class Equipment(object):
         item = self.unbag_item(index)
         self.equip(item, slot)
 
-    def equip(self, item, slot):
-        assert slot in item.compatible_slots, "Item {} does not fit into slot {}".format(item, slot)
+    def _set_items(self, slots, value):
+        for slot in slots:
+            self._worn_items[slot] = value
 
-        if self._worn_items[slot] is not None:
-            self.unequip(slot)
-        self._worn_items[slot] = item
+    def equip(self, item, select_slot):
+        assert select_slot in item.compatible_slots, \
+            "Item {} does not fit into slot {}".format(item, select_slot)
+
+        if item.occupies_all_slots:
+            equip_slots = item.compatible_slots
+        else:
+            equip_slots = (select_slot, )
+
+        for slot in equip_slots:
+            if self._worn_items[slot] is not None:
+                self.unequip(slot)
+            self._worn_items[slot] = item
         self._add_stats(item)
 
-    def unequip(self, slot):
-        assert self._worn_items[slot] is not None, "Slot is already empty"
+    def unequip(self, select_slot):
+        assert self._worn_items[select_slot] is not None, "Slot is already empty"
 
-        item = self._worn_items[slot]
-        self._worn_items[slot] = None
+        item = self._worn_items[select_slot]
+        if item.occupies_all_slots:
+            unequip_slots = item.compatible_slots
+        else:
+            unequip_slots = (select_slot, )
+
+        for slot in unequip_slots:
+            self._worn_items[slot] = None
+
         self._remove_stats(item)
         self.bag_item(item)
 
