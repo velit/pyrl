@@ -95,3 +95,6 @@ class Equipment(object):
         for stat, value in item.stats:
             if stat in Stat:
                 self.applied_stats[stat] -= value
+
+    def __repr__(self):
+        return str(self._worn_items)

@@ -44,6 +44,7 @@ class DebugAction(GameActionsProperties, object):
 
         if c in self.action_funcs:
             self.action_funcs[c]()
+            return feedback(Action.Debug)
         else:
             self.io.msg("Undefined debug key: {}".format(c))
 

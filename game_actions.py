@@ -35,6 +35,7 @@ class Action(Enum):
     Enter_Passage  = "Creature entered a passage."
     Spawn          = "Creature spawned."
     Teleport       = "Creature teleported."
+    Debug          = "Creature did a debug action."
 
     @property
     def base_cost(self):

@@ -6,7 +6,7 @@ Dice = namedtuple("Dice", ["dices", "highest_side", "addition"])
 
 
 def dice_roll(dices, highest_side, addition):
-    return sum(randint(0, highest_side) for _ in range(dices))
+    return sum(randint(0, highest_side) for _ in range(dices)) + addition
 
 
 def dice_str(dices, highest_side, addition):
