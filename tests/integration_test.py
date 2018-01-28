@@ -1,7 +1,10 @@
 import pytest
 
-from bindings import Bind
-from io_wrappers.mock import MockInputEnd
+from unittest import mock
+
+from pyrl import main
+from pyrl.bindings import Bind
+from pyrl.io_wrappers.mock import MockInputEnd
 
 
 TEST_GameConf_NAME = "test"
@@ -9,28 +12,24 @@ TEST_GameConf_NAME = "test"
 
 @pytest.fixture
 def mockwrapper():
-    from io_wrappers.mock import MockWrapper
-    return MockWrapper
+    from pyrl.io_wrappers.mock import MockWrapper
+    return MockWrapper()
 
 
 @pytest.fixture
 def game(mockwrapper):
-
-    import main
-    return main.prepare_game(mockwrapper, cmdline_args=("-g", TEST_GameConf_NAME))
+    return main.game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mockwrapper)
 
 
 def load_game(mockwrapper):
-
-    import main
-    return main.prepare_game(mockwrapper, cmdline_args=("-l", TEST_GameConf_NAME))
+    return main.game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mockwrapper)
 
 
 def prepare_input_and_run(game, input_seq):
     input_seq = tuple(action if isinstance(action, str) else action.key for action in input_seq)
     game.io.cursor_lib._prepare_input(input_seq)
     try:
-        game.main_loop()
+        game.game_loop()
         assert False
     except MockInputEnd:
         return game
