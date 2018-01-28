@@ -1,5 +1,8 @@
 from copy import deepcopy
+from decimal import Decimal
+from fractions import Fraction
 
+from generic_algorithms import resize_range
 from creature.stats import ensure_stats
 from dice import Dice
 
@@ -7,11 +10,11 @@ from dice import Dice
 @ensure_stats
 class Creature(object):
 
-    def __init__(self, name, char, speciation_lvl=0, extinction_lvl=0, coord=None):
+    def __init__(self, name, char, danger_level=0, spawn_weight_class=1, coord=None):
         self.name = name
         self.char = char
-        self.speciation_lvl = speciation_lvl
-        self.extinction_lvl = extinction_lvl
+        self.danger_level = danger_level
+        self.spawn_weight_class = spawn_weight_class
         self.coord = coord
 
         self.level = None
@@ -41,10 +44,32 @@ class Creature(object):
         return round(action.base_cost * multiplier * self.speed_multiplier)
 
     def __repr__(self):
-        return "Creature(name={})".format(self.name, self.level)
+        return f"Creature(name={self.name})"
 
     def copy(self):
         return deepcopy(self)
+
+    def spawn_weight(self, external_danger_level):
+        return round(1000 * self.danger_level_spawn_mult(external_danger_level) *
+                     self.spawn_weight_class)
+
+    def danger_level_spawn_mult(self, external_danger_level):
+        diff = Decimal(external_danger_level - self.danger_level)
+
+        speciation_range = range(-5, 1)
+        extant_range = range(1, 10)
+        extinction_range = range(10, 21)
+        if diff in speciation_range:
+            # 0 0.008 0.064 0.216 0.512 1
+            diff_weight = pow(resize_range(diff, speciation_range), 3)
+        elif diff in extant_range:
+            diff_weight = Decimal(1)
+        elif diff in extinction_range:
+            # 1, 0.999, 0.992, 0.973, 0.936, 0.875, 0.784, 0.657, 0.488, 0.271, 0
+            diff_weight = 1 - pow(resize_range(diff, extinction_range), 3)
+        else:
+            diff_weight = Decimal(0)
+        return diff_weight
 
     @property
     def strength(self):

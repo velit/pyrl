@@ -1,4 +1,4 @@
-PYTHON = python3
+PYTHON = python3.6
 TEST = $(PYTHON) -m pytest
 
 test-porcelain-output:

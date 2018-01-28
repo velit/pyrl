@@ -8,12 +8,36 @@ from enums.directions import Dir
 from enums.level_gen import LevelGen
 from enums.level_location import LevelLocation
 from game_actions import Action
-from game_data.creatures import creatures
+from game_data.default_creatures import default_creatures
 from game_data.levels import default_level_dimensions
 from generic_algorithms import bresenham, cross_product, add_vector
 from generic_structures import Event, Array2D, OneToOneMapping
 from rdg import generate_tiles_to
 from turn_scheduler import TurnScheduler
+
+
+class CreatureSpawn(object):
+    __slots__ = ('creatures', 'total_weight')
+
+    def __init__(self):
+        self.creatures = []
+        self.total_weight = 0
+
+    def set_creatures(self, creatures, danger_level):
+        self.creatures = []
+        accumulator = 0
+        for creature in creatures:
+            weight = creature.spawn_weight(danger_level)
+            if weight == 0:
+                continue
+            accumulator += weight
+            self.creatures.append((accumulator, creature))
+        self.total_weight = accumulator
+
+    def random_creature(self):
+        assert len(self.creatures) != 0, "Trying to spawn a random creature with no creatures defined"
+        index = random.randrange(self.total_weight)
+        return next(creature for (slot, creature) in self.creatures if index < slot)
 
 
 class Level(object):
@@ -24,8 +48,9 @@ class Level(object):
         self.danger_level = danger_level
         self.generation_type = generation_type
         self.custom_creatures = list(custom_creatures)
-        self.creature_spawning = creature_spawning
         self.creature_spawn_count = 99
+        self.creature_spawn = CreatureSpawn()
+        self.creature_spawning = creature_spawning
 
         # Normal usage
         if tiles is None:
@@ -60,11 +85,9 @@ class Level(object):
 
     def get_creature_spawn_list(self):
         creature_list = []
-        for creature in creatures:
-            start = creature.speciation_lvl
-            if start <= self.danger_level:
-                weight_coeff = self.danger_level - creature.speciation_lvl
-                creature_list.extend((creature, ) * weight_coeff)
+        for creature in default_creatures:
+            # creature_list.extend((creature, ) * creature.spawn_weight(self.danger_level))
+            creature_list.append(creature)
         return creature_list
 
     def finalize(self, level_key):
@@ -77,10 +100,10 @@ class Level(object):
             self.spawn_creature(creature)
 
         if self.creature_spawning:
-            self.creature_spawn_list = self.get_creature_spawn_list()
+            self.creature_spawn.set_creatures(default_creatures, self.danger_level)
 
             for _ in range(self.creature_spawn_count):
-                creature = random.choice(self.creature_spawn_list).copy()
+                creature = self.creature_spawn.random_creature().copy()
                 self.spawn_creature(creature)
         else:
             self.creature_spawn_list = []
