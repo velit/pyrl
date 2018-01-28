@@ -1,6 +1,17 @@
-import fractions
+from decimal import Decimal as D
+from fractions import Fraction as F
+import math
 
 from enums.directions import Dir
+
+
+def resize_range(x, old_range, new_range=range(2)):
+    N = type(x)
+    assert x in old_range, f"Value '{x}' is not inside {old_range}"
+    assert len(old_range) > 1, f"Number {old_range.start} is not a range"
+    old_min, old_max = N(old_range.start), N(old_range.stop - 1)
+    new_min, new_max = N(new_range.start), N(new_range.stop - 1)
+    return (((N(x) - N(old_min)) * (N(new_max) - N(new_min))) / (N(old_max) - N(old_min))) + N(new_min)
 
 
 def bresenham(coord_a, coord_b):
@@ -60,8 +71,16 @@ def cross_product(line_start_coord, wild_coord, line_finish_coord):
 
 def minimize_vector(vector):
     a, b = vector
-    gcd = abs(fractions.gcd(a, b))
+    gcd = abs(math.gcd(a, b))
     return a // gcd, b // gcd
+
+
+def resize_vector_to_len(vector, length):
+    a, b = vector
+    gcd = abs(math.gcd(a, b))
+    a, b = a // gcd, b // gcd
+    n = int(length / (a ** 2 + b ** 2) ** 0.5)
+    return n * a, n * b
 
 
 def get_vector(origin, target):
@@ -94,11 +113,3 @@ def anticlockwise_45(vector):
 
 def clockwise_45(vector):
     return Dir.clockwise[vector]
-
-
-def resize_vector_to_len(vector, length):
-    a, b = vector
-    gcd = abs(fractions.gcd(a, b))
-    a, b = a // gcd, b // gcd
-    n = int(length / (a ** 2 + b ** 2) ** 0.5)
-    return n * a, n * b
