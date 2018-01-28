@@ -1,7 +1,7 @@
 import sys
 from pstats import Stats
 
-from config.debug import Debug
+from pyrl.config.debug import Debug
 
 
 def write_results_log(profiler):

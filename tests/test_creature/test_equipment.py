@@ -1,7 +1,7 @@
-from enums.slot import Slot
-from creature.equipment import Equipment
-from creature.item import Weapon, Armor
-from creature.stats import Stat
+from pyrl.enums.slot import Slot
+from pyrl.creature.equipment import Equipment
+from pyrl.creature.item import Weapon, Armor
+from pyrl.creature.stats import Stat
 
 
 def test_creature_equipment():

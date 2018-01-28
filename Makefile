@@ -33,5 +33,6 @@ tags:
 
 clean:
 	find . -name '*.pyc' -delete
+	find . -name '__pycache__' -delete
 	rm -rf save_data dist
 	rm -f MANIFEST errors.err

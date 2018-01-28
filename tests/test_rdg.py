@@ -1,10 +1,10 @@
 import pytest
 
-import rdg
-from game_data.levels.shared_assets import construct_data
-from game_data.tiles import PyrlTile
-from generic_structures import Array2D
-from world.level import Level, LevelLocation
+from pyrl import rdg
+from pyrl.game_data.levels.shared_assets import construct_data
+from pyrl.game_data.tiles import PyrlTile
+from pyrl.generic_structures import Array2D
+from pyrl.world.level import Level, LevelLocation
 
 
 def pp_tm(tm, cols):

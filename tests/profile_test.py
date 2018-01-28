@@ -1,9 +1,9 @@
 from cProfile import Profile
 
-from enums.level_gen import LevelGen
-from rdg import generate_tiles_to
+from pyrl.enums.level_gen import LevelGen
+from pyrl.rdg import generate_tiles_to
 from tools import profile_util
-from world.level import Level
+from pyrl.world.level import Level
 
 
 def test_profile_rdg_generation():

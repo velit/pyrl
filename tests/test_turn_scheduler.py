@@ -1,4 +1,4 @@
-from turn_scheduler import TurnScheduler
+from pyrl.turn_scheduler import TurnScheduler
 
 
 def test_turn_scheduler():

@@ -1,4 +1,4 @@
-from generic_algorithms import resize_range
+from pyrl.generic_algorithms import resize_range
 
 
 def test_resize_in_range():

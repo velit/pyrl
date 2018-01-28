@@ -1,5 +1,5 @@
-from enums.colors import Pair
-from creature import Creature
+from pyrl.enums.colors import Pair
+from pyrl.creature import Creature
 from decimal import Decimal as D
 
 

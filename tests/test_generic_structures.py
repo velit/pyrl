@@ -1,6 +1,6 @@
 import pytest
 
-from generic_structures import Array2D, Event, OneToOneMapping
+from pyrl.generic_structures import Array2D, Event, OneToOneMapping
 
 
 def test_Array2D():

@@ -1,0 +1,1 @@
+from pyrl.game_data.levels.shared_assets import default_level_dimensions
