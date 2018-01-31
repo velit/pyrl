@@ -103,7 +103,7 @@ class CursesWindow(object):
     def draw_char(self, char, coord=(0, 0)):
         y, x = coord
         symbol, color = char
-        self.win.addch(y, x, symbol, self.color_map[color])
+        self.win.addstr(y, x, symbol, self.color_map[color])
 
     def draw_str(self, string, coord=(0, 0), color=None):
         y, x = coord
@@ -113,13 +113,13 @@ class CursesWindow(object):
             self.win.addstr(y, x, string, self.color_map[color])
 
     def draw(self, char_payload_sequence):
-        local_addch = self.win.addch
+        local_addch = self.win.addstr
         local_color = self.color_map
         for (y, x), (symbol, color) in char_payload_sequence:
             local_addch(y, x, symbol, local_color[color])
 
     def draw_reverse(self, char_payload_sequence):
-        local_addch = self.win.addch
+        local_addch = self.win.addstr
         local_color = self.color_map
         for (y, x), (symbol, (fg, bg)) in char_payload_sequence:
             local_addch(y, x, symbol, local_color[bg, fg])
