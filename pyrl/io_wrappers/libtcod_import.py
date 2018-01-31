@@ -1,11 +1,19 @@
 def import_libtcod():
     try:
-        import libtcod.libtcodpy as libtcod
-        return libtcod
+        import tcod
+        return tcod
+    except:
+        pass
+
+    try:
+        import libtcod.libtcodpy
+        return libtcod.libtcodpy
     except Exception as e:
         import sys
         print(e, file=sys.stderr)
-        print("\nCouldn't load libtcod. Tried both 64-bit and 32-bit libs.", file=sys.stderr)
-        print("It's possible this happens because libsdl isn't installed.", file=sys.stderr)
+        print("\nCouldn't load tcod or libtcod. Tried both 64-bit and 32-bit libs.",
+              "It's possible this happens because neither tcod or libsdl isn't installed.",
+              sep="\n",
+              file=sys.stderr)
         sys.exit(1)
 

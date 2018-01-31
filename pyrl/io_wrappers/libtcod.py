@@ -84,6 +84,8 @@ class TCODWindow(object):
             if event.c == ord('c') and event.lctrl or event.rctrl:
                 raise KeyboardInterrupt
             ch = chr(event.c)
+            if event.shift:
+                ch = ch.upper()
             if event.lctrl or event.rctrl:
                 ch = "^" + ch
             if event.lalt or event.ralt:
