@@ -17,7 +17,7 @@ def run():
     try:
         game(options).game_loop()
     finally:
-        if options.cursor_lib == "curses":
+        if options.output == "terminal":
             from pyrl.io_wrappers.curses import clean_curses
             clean_curses()
 
@@ -25,11 +25,11 @@ def run():
 def get_commandline_options(args=None):
     parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
 
-    parser.add_argument("-r", "--renderer",
-                        help="Select which renderer to use to display the game.",
+    parser.add_argument("-o", "--output",
+                        help="Select which output type to run the game in.",
                         action="store",
-                        dest="cursor_lib",
-                        choices=["sdl", "curses"],
+                        dest="output",
+                        choices=["sdl", "terminal"],
                         default="sdl")
 
     start_type = parser.add_mutually_exclusive_group()
@@ -58,7 +58,7 @@ def game(options, cursor_lib=None):
     init_logger_system()
 
     if cursor_lib is None:
-        cursor_lib = init_cursor_lib(options.cursor_lib)
+        cursor_lib = init_cursor_lib(options.output)
     if options.load:
         game = load_game(options.load, cursor_lib)
     else:
@@ -83,18 +83,18 @@ def init_logger_system():
     logging.debug("Starting new session")
 
 
-def init_cursor_lib(cursor_lib):
-    if cursor_lib == "curses":
+def init_cursor_lib(output):
+    if output == "terminal":
         from pyrl.io_wrappers.curses import CursesWrapper
         return CursesWrapper()
-    elif cursor_lib == "sdl":
+    elif output == "sdl":
         from pyrl.io_wrappers.libtcod import TCODWrapper
         return TCODWrapper()
-    elif cursor_lib == "test":
+    elif output == "test":
         from pyrl.io_wrappers.mock import MockWrapper
         return MockWrapper()
     else:
-        assert False, f"Unknown cursor_lib implementation {options.cursor_lib}"
+        assert False, f"Unknown output {options.output}"
 
 
 def load_game(game_name, cursor_lib):

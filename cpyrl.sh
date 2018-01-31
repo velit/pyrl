@@ -1,2 +1,2 @@
 #!/bin/sh
-./pyrl.py -r curses $@
+./pyrl.py -o terminal $@
