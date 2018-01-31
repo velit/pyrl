@@ -12,42 +12,34 @@ line of sight of the player.
 <br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/velit/pyrl" rel="dct:source">https://github.com/velit/pyrl</a>.
 <br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit/pyrl" rel="cc:morePermissions">https://github.com/velit/pyrl</a>.
 
-Running pyrl
+Installing pyrl
+===============
+
+Release packages might be available at some point if the project attains enough
+gameplay to warrant it. If you wish to try pyrl out before that happens then
+you need to download/clone the working directory of this repository and satisfy
+some requirements in the following section.
+
+Requirements
 ============
 
-Execute either 'pyrl.py' or 'sdlpyrl.py' depending on if you want the terminal or
-SDL version of the game. Windows supports only the SDL version.
+### SDL version, all platforms (pyrl.py)
 
-### Windows sdlpyrl.py requirements
+* Python 3.6 interpreter
 
-* Python 3.4 32-bit (Libtcod forces 32-bit)
+* The dorien library https://github.com/HexDecimal/python-tdl#installation
 
-### \*nix sdlpyrl.py requirements
+### Terminal version, \*nixes/OSX (terminal_pyrl.sh)
 
-* Python 3.4
-* libSDL (package name is libsdl1.2debian in debian based distros)
+* Python 3.6 interpreter
 
-### \*nix and Mac pyrl.py requirements
+* Most any terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
 
-* Python 3.4
-* Terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
-
-
-Installing SDL
---------------
-
-A .dll for SDL comes bundled with the game for windows.
-
-### Ubuntu or Debian
-    sudo apt-get install libsdl1.2debian (if incorrect, don't hesitate to use
-    google)
-
-
-Ncurses specific issues
+Ncurses specific topics
 =======================
 
 Information in this paragraph is only relevant when using the terminal version
-of the game, ie. when using 'pyrl.py'.
+of the game, ie. when using 'terminal_pyrl.sh'.
 
 More colors
 -----------
