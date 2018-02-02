@@ -11,7 +11,7 @@ all-tests:
 	$(TEST)
 
 debug:
-	$(PYTHON) -m pdb pyrl.py
+	$(PYTHON) -m pdb -c continue pyrl.py -o terminal
 
 test-debug:
 	$(TEST) -x --pdb

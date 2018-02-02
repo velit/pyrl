@@ -122,9 +122,8 @@ class DebugAction(GameActionsProperties, object):
 
     def display_curses_color_info(self):
         import curses
-        self.io.msg(curses.COLORS, curses.COLOR_PAIRS, curses.can_change_color())
-        self.io.msg(curses.A_ALTCHARSET, curses.A_BLINK, curses.A_BOLD, curses.A_DIM, curses.A_NORMAL,
-            curses.A_REVERSE, curses.A_STANDOUT, curses.A_UNDERLINE)
+        self.io.msg("Colors: {} Pairs: {} Can change color? {}".format(
+            curses.COLORS, curses.COLOR_PAIRS, "yes" if curses.can_change_color() else "no"))
 
     def print_message_debug_string(self):
         self.io.msg(Debug.debug_string)
