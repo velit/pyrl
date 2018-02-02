@@ -143,15 +143,30 @@ class CursesWindow(object):
         return self.win.getyx()
 
     def get_key(self):
+        while True:
+            try:
+                ch = self.win.get_wch()
+                break
+            except curses.error as err:
+                if err.args == ("no input", ):
+                    continue
+                else:
+                    raise
+        return self._interpret_ch(*self._handle_alt(ch))
+
+    def get_key_unguarded(self):
         return self._interpret_ch(*self._handle_alt(self.win.get_wch()))
 
     def check_key(self):
         """Non-blocking version of get_key."""
         self.win.nodelay(True)
         try:
-            return self.get_key()
-        except curses.error:
-            return Key.NO_INPUT
+            return self.get_key_unguarded()
+        except curses.error as err:
+            if err.args == ("no input", ):
+                return Key.NO_INPUT
+            else:
+                raise
         finally:
             self.win.nodelay(False)
 
