@@ -27,8 +27,8 @@ class Creature(object):
         self.hp = self.max_hp
 
     def get_damage_info(self):
-        dice = self.unarmed_dices
-        highest_side = self.unarmed_sides
+        dice = self.base_attack_dice
+        highest_side = self.base_attack_sides
         addition = self.damage
         return Dice(dice, highest_side, addition)
 
@@ -111,11 +111,11 @@ class Creature(object):
         return self.dexterity + self.intelligence // 2
 
     @property
-    def unarmed_dices(self):
+    def base_attack_dice(self):
         return self.strength // 20 + 1
 
     @property
-    def unarmed_sides(self):
+    def base_attack_sides(self):
         return self.strength // 3 + self.dexterity // 6
 
     @property
