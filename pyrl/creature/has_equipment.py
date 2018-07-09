@@ -13,7 +13,7 @@ def _get_equipment_property(stat):
 
 
 def _add_equipment_properties(cls):
-    """Add properties to cls that mesh/add inventory stats to normal stats."""
+    """Add equipment properties to cls that modify normal stats."""
     for stat in Stat:
         prop = _get_equipment_property(stat)
         setattr(cls, stat.name, prop)
@@ -34,8 +34,6 @@ class HasEquipment(object):
         if damage_info is not None:
             dices, highest_side, addition = damage_info
             addition += self.damage
+            return Dice(dices, highest_side, addition)
         else:
-            dices = self.unarmed_dices
-            highest_side = self.unarmed_sides
-            addition = self.damage
-        return Dice(dices, highest_side, addition)
+            return super().get_damage_info()
