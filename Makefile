@@ -2,10 +2,10 @@ PYTHON = python3
 TEST = $(PYTHON) -m pytest
 
 test-porcelain-output:
-	$(TEST) -q -k-slow --tb=line
+	$(TEST) -q -k 'not slow' --tb=line
 
 test:
-	$(TEST) -k-slow
+	$(TEST) -k 'not slow'
 
 all-tests:
 	$(TEST)
