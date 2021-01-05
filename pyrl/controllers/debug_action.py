@@ -1,7 +1,7 @@
 import code
 import random
 
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 from pyrl.config.debug import Debug
 from pyrl.creature import Creature
 from pyrl.game_actions import GameActionsProperties, feedback, Action
@@ -143,7 +143,7 @@ class DebugAction(GameActionsProperties, object):
         return self.actions.teleport(new_coord)
 
     def descend_to_end(self):
-        self.io.prepared_input.extend([Bind.Descend.key]*200)
+        self.io.prepared_input.extend([Binds.Descend.key] * 200)
 
     def ascend_to_surface(self):
-        self.io.prepared_input.extend([Bind.Ascend.key]*200)
+        self.io.prepared_input.extend([Binds.Ascend.key] * 200)

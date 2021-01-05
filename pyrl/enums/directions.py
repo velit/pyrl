@@ -1,4 +1,4 @@
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 
 
 class Dir(object):
@@ -42,15 +42,15 @@ class Dir(object):
 
     from_key = {}
     associate = lambda d, binds, direction: d.update((bind, direction) for bind in binds)
-    associate(from_key, Bind.SouthWest + Bind.Instant_SouthWest, SouthWest)
-    associate(from_key, Bind.South     + Bind.Instant_South,     South)
-    associate(from_key, Bind.SouthEast + Bind.Instant_SouthEast, SouthEast)
-    associate(from_key, Bind.West      + Bind.Instant_West,      West)
-    associate(from_key, Bind.Stay      + Bind.Instant_Stay,      Stay)
-    associate(from_key, Bind.East      + Bind.Instant_East,      East)
-    associate(from_key, Bind.NorthWest + Bind.Instant_NorthWest, NorthWest)
-    associate(from_key, Bind.North     + Bind.Instant_North,     North)
-    associate(from_key, Bind.NorthEast + Bind.Instant_NorthEast, NorthEast)
+    associate(from_key, Binds.SouthWest + Binds.Instant_SouthWest, SouthWest)
+    associate(from_key, Binds.South + Binds.Instant_South, South)
+    associate(from_key, Binds.SouthEast + Binds.Instant_SouthEast, SouthEast)
+    associate(from_key, Binds.West + Binds.Instant_West, West)
+    associate(from_key, Binds.Stay + Binds.Instant_Stay, Stay)
+    associate(from_key, Binds.East + Binds.Instant_East, East)
+    associate(from_key, Binds.NorthWest + Binds.Instant_NorthWest, NorthWest)
+    associate(from_key, Binds.North + Binds.Instant_North, North)
+    associate(from_key, Binds.NorthEast + Binds.Instant_NorthEast, NorthEast)
     del associate
 
     OrthogonalMoveMult = 1

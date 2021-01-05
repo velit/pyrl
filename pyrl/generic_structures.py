@@ -49,7 +49,7 @@ class Array2D(list):
         self.rows, self.cols = dimensions
         size = self.rows * self.cols
         assert len(init_values) <= size, \
-            "Given init_values ({}) exceed size by dimensions ({}).".format(len(init_values, size))
+            f"Given {len(init_values)=} exceed {size=}."
         init_seq = (value for _, value in zip_longest(range(size), init_values, fillvalue=fillvalue))
         super().__init__(init_seq)
 

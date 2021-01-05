@@ -1,4 +1,4 @@
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 from pyrl.enums.slot import Slot
 from pyrl.game_actions import ActionError, feedback
 from pyrl.interface.lines_view import lines_view, Line
@@ -16,7 +16,7 @@ def _get_equipment_item_str(equipment, slot):
 
 def equipment(actions):
     footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
-    footer = footer_fmt.format(Bind.Equipment_View_Backpack.key, Bind.Cancel.key)
+    footer = footer_fmt.format(Binds.Equipment_View_Backpack.key, Binds.Cancel.key)
     equipment = actions.creature.equipment
 
     while True:
@@ -24,14 +24,14 @@ def equipment(actions):
                       for slot in Slot)
         key, slot = lines_view(actions.io.whole_window, lines,
                                multi_select=False,
-                               select_keys=Bind.Equipment_Select_Keys,
-                               return_keys=Bind.Equipment_View_Backpack + Bind.Cancel,
+                               select_keys=Binds.Equipment_Select_Keys,
+                               return_keys=Binds.Equipment_View_Backpack + Binds.Cancel,
                                header="Equipment",
                                footer=footer)
 
-        if key in Bind.Cancel:
+        if key in Binds.Cancel:
             return
-        elif key in Bind.Equipment_View_Backpack:
+        elif key in Binds.Equipment_View_Backpack:
             backpack(actions)
         elif slot in Slot:
             if equipment.get_item(slot) is None:
@@ -45,9 +45,9 @@ def equipment(actions):
 def backpack_equip_item(actions, slot):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items())
                   if item.fits_slot(slot))
-    key, item = lines_view(actions.io.whole_window, lines, select_keys=Bind.Backpack_Select_Keys,
-                        header="Select item to equip")
-    if key in Bind.Cancel:
+    key, item = lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
+                           header="Select item to equip")
+    if key in Binds.Cancel:
         return
     else:
         actions.creature.equipment.equip_from_bag(item, slot)
@@ -59,13 +59,13 @@ def backpack(actions):
         actions.io.whole_window,
         lines,
         multi_select=True,
-        select_keys=Bind.Backpack_Select_Keys,
-        return_keys=Bind.Backpack_Drop_Items + Bind.Cancel,
-        header="Backpack".format(Bind.Backpack_Drop_Items.key),
+        select_keys=Binds.Backpack_Select_Keys,
+        return_keys=Binds.Backpack_Drop_Items + Binds.Cancel,
+        header="Backpack".format(Binds.Backpack_Drop_Items.key),
     )
-    if key in Bind.Cancel:
+    if key in Binds.Cancel:
         return
-    elif key in Bind.Backpack_Drop_Items:
+    elif key in Binds.Backpack_Drop_Items:
         return actions.drop_items(selections)
 
 
@@ -81,10 +81,10 @@ def pickup_items(actions):
         actions.io.whole_window,
         lines,
         multi_select=True,
-        select_keys=Bind.Backpack_Select_Keys,
+        select_keys=Binds.Backpack_Select_Keys,
         header="Select items to pick up"
     )
-    if key in Bind.Cancel and selections:
+    if key in Binds.Cancel and selections:
         return actions.pickup_items(selections)
 
 
@@ -94,8 +94,8 @@ def drop_items(actions):
         actions.io.whole_window,
         lines,
         multi_select=True,
-        select_keys=Bind.Backpack_Select_Keys,
-        header="Select items to drop".format(Bind.Backpack_Drop_Items.key)
+        select_keys=Binds.Backpack_Select_Keys,
+        header="Select items to drop".format(Binds.Backpack_Drop_Items.key)
     )
-    if key in Bind.Cancel and selections:
+    if key in Binds.Cancel and selections:
         return actions.drop_items(selections)

@@ -1,0 +1,86 @@
+# Modify this file to define the mappings you want.
+#
+# The first key in a list is used as an example for the action in menus.
+# If you wish to unbind a key fully assign []
+#
+# Special key names:
+#     Left, Right, Up, Down, Esc, Tab, Shift+Tab, Backspace,
+#     Space, Enter, Insert, Delete, Home, End, Page up, Page Down
+#     F1 - F12
+#     Numpad 0 - Numpad 9
+#
+# For other keys use a string representing that character. To use shift just write the
+# character that comes out of the shift combination directly (eg. Q or #). For alt/meta
+# prepend a ! character and for ctrl prepend a ^ character. Some rules:
+#     -If you use ^ use lower case letters for it to work (eg. ^d or ^n).
+#     -If you use both ! and ^ in the same bind put ! before ^ for it to work.
+#     -Modifiers do not work with special keys.
+
+[General]
+Yes                     = ["y", "Y"]
+Strong_Yes              = ["Y"]
+Cancel                  = ["z", "Space", "Esc"]
+Debug_Commands          = ["d"]
+
+[ScrollKeys]
+Next_Line               = ["+", "^n"]
+Previous_Line           = ["-", "^p"]
+Next_Page               = ["Page Down", "^d"]
+Previous_Page           = ["Page Up", "^u"]
+Filter                  = ["^f"]
+
+[MultiSelectKeys]
+Select_All              = ["^a"]
+Deselect_All            = ["^e"]
+
+[MainView]
+Help                    = ["F1", "F2"]
+Look_Mode               = ["q"]
+Equipment               = ["e"]
+Backpack                = ["b"]
+Drop_Items              = ["D"]
+Pick_Up_Items           = ["p"]
+Descend                 = ["X"]
+Ascend                  = ["x"]
+Quit                    = ["Q"]
+Save                    = ["S"]
+Attack                  = ["a"]
+Redraw                  = ["^r"]
+History                 = ["^h"]
+Walk_Mode               = ["w"]
+Show_Vision             = ["H"]
+Skip_To_Last_Message    = ["Enter"]
+
+[EquipmentView]         #   Head Armor  RightHand LeftHand Feet
+Equipment_Select_Keys   = ["h", "b",   "r",      "l",     "f"]
+Equipment_Select_Feet   = ["f"]
+Equipment_View_Backpack = ["v"]
+
+[BackpackView]
+Backpack_Drop_Items     = ["Tab"]
+Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
+                           "j", "k", "l", "m", "n", "o", "p", "q",
+                           "r", "s", "t", "u", "v", "w", "x", "y"]
+
+[Directions]
+SouthWest               = ["1", "m", "Numpad 1", "End"]
+South                   = ["2", ",", "Numpad 2", "Down"]
+SouthEast               = ["3", ".", "Numpad 3", "Page Down"]
+West                    = ["4", "j", "Numpad 4", "Left"]
+Stay                    = ["5", "k", "Numpad 5"]
+East                    = ["6", "l", "Numpad 6", "Right"]
+NorthWest               = ["7", "u", "Numpad 7", "Home"]
+North                   = ["8", "i", "Numpad 8", "Up"]
+NorthEast               = ["9", "o", "Numpad 9", "Page up"]
+
+# Initiate walk mode instantly to some direction.
+[InstantWalk]
+Instant_SouthWest = []
+Instant_South     = []
+Instant_SouthEast = []
+Instant_West      = []
+Instant_Stay      = []
+Instant_East      = []
+Instant_NorthWest = []
+Instant_North     = []
+Instant_NorthEast = []

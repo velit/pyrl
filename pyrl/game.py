@@ -1,7 +1,7 @@
 """pyrl; Python roguelike by Veli Tapani Kiiskinen."""
-from pyrl import state_store
+from pyrl import state_store, binds
 from pyrl.ai import AI
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 from pyrl.config.debug import Debug
 from pyrl.config.game import GameConf
 from pyrl.controllers.user_controller import UserController
@@ -36,7 +36,10 @@ class Game(object):
 
     def game_loop(self):
         ai_game_actions = GameActions(self)
-        self.io.msg("{0} for help menu".format(Bind.Help.key))
+        self.io.msg("{0} for help menu.".format(Binds.Help.key))
+        undefined_keys = binds.undefined_keys()
+        if undefined_keys:
+            self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
         while True:
             creature, time_delta = self.active_level.turn_scheduler.advance_time()
             self.time += time_delta
@@ -83,7 +86,7 @@ class Game(object):
     def creature_death(self, creature):
         self.ai.remove_creature_state(creature)
         if creature is self.player:
-            self.io.get_key("You die...", keys=Bind.Cancel)
+            self.io.get_key("You die...", keys=Binds.Cancel)
             self.endgame()
         creature.level.remove_creature(creature)
 

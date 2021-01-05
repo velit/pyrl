@@ -1,7 +1,7 @@
 from functools import partial
 
 import pyrl.interface.inventory
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 from pyrl.config.game import GameConf
 from pyrl.enums.colors import Color, Pair
 from pyrl.enums.directions import Dir
@@ -44,42 +44,42 @@ class UserController(GameActionsProperties, object):
         }
 
         unfinalized_actions = {
-            Bind.Debug_Commands:     self.debug_action.ask_action,
-            Bind.Quit:               self.quit,
-            Bind.Save:               self.save,
-            Bind.Attack:             self.attack,
-            Bind.Redraw:             self.redraw,
-            Bind.History:            self.print_history,
-            Bind.Look_Mode:          self.look,
-            Bind.Help:               self.help_screen,
-            Bind.Equipment:          self.equipment,
-            Bind.Backpack:           self.backpack,
-            Bind.Pick_Up_Items:      self.pickup_items,
-            Bind.Drop_Items:         self.drop_items,
-            Bind.Walk_Mode:          self.init_walk_mode,
-            Bind.Show_Vision:        self.show_vision,
-            Bind.Ascend:             self.ascend,
-            Bind.Descend:            self.descend,
+            Binds.Debug_Commands:     self.debug_action.ask_action,
+            Binds.Quit:               self.quit,
+            Binds.Save:               self.save,
+            Binds.Attack:             self.attack,
+            Binds.Redraw:             self.redraw,
+            Binds.History:            self.print_history,
+            Binds.Look_Mode:          self.look,
+            Binds.Help:               self.help_screen,
+            Binds.Equipment:          self.equipment,
+            Binds.Backpack:           self.backpack,
+            Binds.Pick_Up_Items:      self.pickup_items,
+            Binds.Drop_Items:         self.drop_items,
+            Binds.Walk_Mode:          self.init_walk_mode,
+            Binds.Show_Vision:        self.show_vision,
+            Binds.Ascend:             self.ascend,
+            Binds.Descend:            self.descend,
 
-            Bind.SouthWest:          partial(self.act_to_dir, Dir.SouthWest),
-            Bind.South:              partial(self.act_to_dir, Dir.South),
-            Bind.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
-            Bind.West:               partial(self.act_to_dir, Dir.West),
-            Bind.Stay:               self.wait,
-            Bind.East:               partial(self.act_to_dir, Dir.East),
-            Bind.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
-            Bind.North:              partial(self.act_to_dir, Dir.North),
-            Bind.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
+            Binds.SouthWest:          partial(self.act_to_dir, Dir.SouthWest),
+            Binds.South:              partial(self.act_to_dir, Dir.South),
+            Binds.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
+            Binds.West:               partial(self.act_to_dir, Dir.West),
+            Binds.Stay:               self.wait,
+            Binds.East:               partial(self.act_to_dir, Dir.East),
+            Binds.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
+            Binds.North:              partial(self.act_to_dir, Dir.North),
+            Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
 
-            Bind.Instant_SouthWest:  partial(self.init_walk_mode, Dir.SouthWest),
-            Bind.Instant_South:      partial(self.init_walk_mode, Dir.South),
-            Bind.Instant_SouthEast:  partial(self.init_walk_mode, Dir.SouthEast),
-            Bind.Instant_West:       partial(self.init_walk_mode, Dir.West),
-            Bind.Instant_Stay:       partial(self.init_walk_mode, Dir.Stay),
-            Bind.Instant_East:       partial(self.init_walk_mode, Dir.East),
-            Bind.Instant_NorthWest:  partial(self.init_walk_mode, Dir.NorthWest),
-            Bind.Instant_North:      partial(self.init_walk_mode, Dir.North),
-            Bind.Instant_NorthEast:  partial(self.init_walk_mode, Dir.NorthEast),
+            Binds.Instant_SouthWest:  partial(self.init_walk_mode, Dir.SouthWest),
+            Binds.Instant_South:      partial(self.init_walk_mode, Dir.South),
+            Binds.Instant_SouthEast:  partial(self.init_walk_mode, Dir.SouthEast),
+            Binds.Instant_West:       partial(self.init_walk_mode, Dir.West),
+            Binds.Instant_Stay:       partial(self.init_walk_mode, Dir.Stay),
+            Binds.Instant_East:       partial(self.init_walk_mode, Dir.East),
+            Binds.Instant_NorthWest:  partial(self.init_walk_mode, Dir.NorthWest),
+            Binds.Instant_North:      partial(self.init_walk_mode, Dir.North),
+            Binds.Instant_NorthEast:  partial(self.init_walk_mode, Dir.NorthEast),
         }
 
         for keys, action in unfinalized_actions.items():
@@ -160,7 +160,7 @@ class UserController(GameActionsProperties, object):
             key = self.io.get_key()
             self.actions.redraw()
             direction = Dir.Stay
-            if key in Bind.Directions:
+            if key in Binds.Directions:
                 direction = Dir.from_key[key]
             elif key == 'd':
                 drawline_flag = not drawline_flag
@@ -171,25 +171,25 @@ class UserController(GameActionsProperties, object):
             elif key == 's':
                 if coord in self.actions.level.creatures:
                     self.actions.game.register_status_texts(self.actions.level.creatures[coord])
-            elif key in Bind.Cancel or key in Bind.Look_Mode:
+            elif key in Binds.Cancel or key in Binds.Look_Mode:
                 break
 
     def quit(self, dont_ask=True):
-        query = "Do you wish to end the game? [{}]".format(Bind.Strong_Yes)
-        if dont_ask or self.io.get_key(query) in Bind.Strong_Yes:
+        query = "Do you wish to end the game? [{}]".format(Binds.Strong_Yes)
+        if dont_ask or self.io.get_key(query) in Binds.Strong_Yes:
             self.actions.quit()
 
     def save(self, dont_ask=True):
-        query = "Do you wish to save the game? [{}]".format(Bind.Yes)
-        if dont_ask or self.io.get_key(query) in Bind.Yes:
+        query = "Do you wish to save the game? [{}]".format(Binds.Yes)
+        if dont_ask or self.io.get_key(query) in Binds.Yes:
             self.io.msg("Saving...")
             self.io.refresh()
             self.io.msg(self.actions.save())
 
     def attack(self):
-        query = "Specify attack direction, {} to abort".format(Bind.Cancel.key)
-        key = self.io.get_key(query, keys=Bind.Directions + Bind.Cancel)
-        if key in Bind.Directions:
+        query = "Specify attack direction, {} to abort".format(Binds.Cancel.key)
+        key = self.io.get_key(query, keys=Binds.Directions + Binds.Cancel)
+        if key in Binds.Directions:
             return self.actions.attack(Dir.from_key[key])
 
     def redraw(self):
