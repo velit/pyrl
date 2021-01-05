@@ -498,6 +498,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1475764346" done="1531154246">
+        Change unarmed_dices and unarmed_sides into a more flexible stat system for creatures.
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -621,14 +627,14 @@
     <note priority="veryhigh" time="1475592380">
         Add item drops and progression through that
     </note>
+    <note priority="veryhigh" time="1609809005">
+        Separate Equipment_Select_Keys to head, armor, righthand, lefthand and feet
+    </note>
+    <note priority="veryhigh" time="1609809787">
+        Refactor .format strings to f-strings
+    </note>
     <note priority="high" time="1463834904">
         Add a game character class.
-    </note>
-    <note priority="high" time="1475764346" done="1531154246">
-        Change unarmed_dices and unarmed_sides into a more flexible stat system for creatures.
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="high" time="1475950694">
         Modify integration test to have a separate initialization setup (player items etc.) for testing.

@@ -1,7 +1,7 @@
 import collections
 import re
 
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 
 
 Line = collections.namedtuple("Line", ("display", "return_value"))
@@ -12,15 +12,15 @@ def build_lines(iterable):
 
 
 _single = "{}/{} scroll  {}/{} next/previous line  {} filter  {} close"
-_single = _single.format(Bind.Next_Page.key, Bind.Previous_Page.key, Bind.Next_Line.key,
-                         Bind.Previous_Line.key, Bind.Filter, Bind.Cancel.key)
+_single = _single.format(Binds.Next_Page.key, Binds.Previous_Page.key, Binds.Next_Line.key,
+                         Binds.Previous_Line.key, Binds.Filter, Binds.Cancel.key)
 _multi = "{}/{} scroll  {}/{} next/previous line  {}/{} (de)select all  {} filter  {} close"
-_multi = _multi.format(Bind.Next_Page.key, Bind.Previous_Page.key,
-                       Bind.Next_Line.key, Bind.Previous_Line.key,
-                       Bind.Deselect_All.key, Bind.Select_All.key, Bind.Filter, Bind.Cancel.key)
+_multi = _multi.format(Binds.Next_Page.key, Binds.Previous_Page.key,
+                       Binds.Next_Line.key, Binds.Previous_Line.key,
+                       Binds.Deselect_All.key, Binds.Select_All.key, Binds.Filter, Binds.Cancel.key)
 
 
-def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, select_keys=(),
+def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, select_keys=(),
                header="", footer=None):
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
@@ -45,7 +45,7 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
         _print_view(window, print_lines, header + filter, footer)
         key = window.get_key(keys=all_keys, refresh=True)
 
-        if key in Bind.Filter:
+        if key in Binds.Filter:
             query = "Filter regex (empty to clear): "
             filter = window.get_str(query, (1, 0))
             window.draw_str(" " * (len(query + filter) + 1), (1, 0))
@@ -55,7 +55,7 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
                 lines = tuple(line for line in orig_lines if re.search(filter, line.display))
                 filter = " (Filter/{})".format(filter)
             scroll_offset = 0
-        elif key in Bind.ScrollKeys:
+        elif key in Binds.ScrollKeys:
             scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))
 
         elif multi_select:
@@ -63,9 +63,9 @@ def lines_view(window, lines, multi_select=False, return_keys=Bind.Cancel, selec
                 selected ^= {lines[select_keys.index(key) + scroll_offset]}
             elif key in return_keys:
                 return key, tuple(line.return_value for line in selected)
-            elif key in Bind.Select_All:
+            elif key in Binds.Select_All:
                 selected = set(range(len(lines)))
-            elif key in Bind.Deselect_All:
+            elif key in Binds.Deselect_All:
                 selected.clear()
             else:
                 assert False, "Got unhandled key as input {}".format(key)
@@ -85,9 +85,9 @@ def _get_vars(window, lines, multi_select, select_keys, return_keys):
         content_size = min(window.rows - 4, len(lines))
 
     select_keys = select_keys[:content_size]
-    all_keys = Bind.ScrollKeys + select_keys + return_keys
+    all_keys = Binds.ScrollKeys + select_keys + return_keys
     if multi_select:
-        all_keys += Bind.MultiSelectKeys
+        all_keys += Binds.MultiSelectKeys
 
     return content_size, select_keys, all_keys
 
@@ -133,13 +133,13 @@ def _slice_lines(seq, start_index=0, stop_index=None):
 
 
 def _new_offset(offset, key, visible_amount, lines_amount):
-    if key in Bind.Next_Line:
+    if key in Binds.Next_Line:
         offset += 1
-    elif key in Bind.Next_Page:
+    elif key in Binds.Next_Page:
         offset += visible_amount - 1
-    elif key in Bind.Previous_Line:
+    elif key in Binds.Previous_Line:
         offset -= 1
-    elif key in Bind.Previous_Page:
+    elif key in Binds.Previous_Page:
         offset -= visible_amount - 1
     max_offset = max(0, lines_amount - visible_amount)
     offset = min(max(0, offset), max_offset)

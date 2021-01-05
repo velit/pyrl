@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from pyrl.bindings import Bind
+from pyrl.binds import Binds
 from pyrl.config.game import GameConf
 from pyrl.enums.directions import Dir
 from pyrl.game_actions import Action, ActionError, GameActionsProperties
@@ -36,10 +36,10 @@ class WalkMode(GameActionsProperties, object):
             return
 
         if direction is None:
-            query = "Specify walking direction, {} to cancel.".format(Bind.Cancel.key)
-            key_seq = Bind.Directions + Bind.Cancel
+            query = "Specify walking direction, {} to cancel.".format(Binds.Cancel.key)
+            key_seq = Binds.Directions + Binds.Cancel
             key = self.io.get_key(query, keys=key_seq)
-            if key in Bind.Cancel:
+            if key in Binds.Cancel:
                 return
             direction = Dir.from_key[key]
 
@@ -83,11 +83,11 @@ class WalkMode(GameActionsProperties, object):
 
         msg = ""
         if self.state.show_msg_time < self.io.get_time():
-            msg = "Press {} or {} to interrupt walk mode.".format(Bind.Walk_Mode.key, Bind.Cancel.key)
-        key_seq = Bind.Walk_Mode + Bind.Cancel
+            msg = "Press {} or {} to interrupt walk mode.".format(Binds.Walk_Mode.key, Binds.Cancel.key)
+        key_seq = Binds.Walk_Mode + Binds.Cancel
         key = self.io.check_key(msg, keys=key_seq, until=self.state.next_walk_time)
 
-        if key in Bind.Walk_Mode + Bind.Cancel:
+        if key in Binds.Walk_Mode + Binds.Cancel:
             return None
 
         return next_direction

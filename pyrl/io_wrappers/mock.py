@@ -11,14 +11,14 @@ class MockInputEnd(Exception):
     pass
 
 
-class MockWrapper(object):
+class MockWrapper:
 
     implementation = IMPLEMENTATION
 
     def __init__(self):
         self._prepared_input = deque()
 
-    def _prepare_input(self, input_seq):
+    def prepare_input(self, input_seq):
         self._prepared_input.extend(input_seq)
 
     def flush(self):
@@ -34,7 +34,7 @@ class MockWrapper(object):
         return MockWrapperWindow(self)
 
 
-class MockWrapperWindow(object):
+class MockWrapperWindow:
 
     implementation = IMPLEMENTATION
 
