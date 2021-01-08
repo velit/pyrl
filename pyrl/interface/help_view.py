@@ -1,6 +1,6 @@
 from pyrl.binds import Binds
 
-def help_screen(io):
+def help_view(io):
     header = "Help Screen, ^ means ctrl, ! means alt"
     section = "{!s:16.16}"*2
     help_lines = (
@@ -63,7 +63,7 @@ def scroll_views_help_screen(io):
         "Toggle path debugs  dd        Change level types           dl",
         "Print debug string  dm        Set cross heuristic in path  dr",
         "",
-        "Colors available     dc (only on ncurses ie. pyrl.py)",
+        "Colors available     dc (only on ncurses)",
     )
     footer = "{0} to close".format(Binds.Cancel.key)
     io.menu(header, help_lines, footer, Binds.Cancel)

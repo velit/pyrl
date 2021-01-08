@@ -4,7 +4,7 @@ from pyrl.enums.colors import Pair
 from pyrl.enums.keys import Key
 from pyrl.generic_structures import TableDims, Coord
 
-class BaseWindow(object):
+class BaseWindow:
 
     # Seconds to sleep until next user input check in half-block functions
     half_block_input_responsiveness = 0.001

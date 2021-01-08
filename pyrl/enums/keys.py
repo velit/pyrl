@@ -1,6 +1,6 @@
 
 
-class Key(object):
+class Key:
     LEFT          = "Left"
     RIGHT         = "Right"
     UP            = "Up"

@@ -13,10 +13,10 @@ def mock_wrapper():
 
 @pytest.fixture
 def game(mock_wrapper):
-    return main.game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mock_wrapper)
+    return main.create_game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mock_wrapper)
 
 def load_game(mock_wrapper):
-    return main.game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mock_wrapper)
+    return main.create_game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mock_wrapper)
 
 def prepare_input_and_run(game, input_seq):
     input_seq = tuple(action if isinstance(action, str) else action.key for action in input_seq)
@@ -33,13 +33,13 @@ def test_save_and_load_game(game, mock_wrapper):
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
     game = prepare_input_and_run(game, input_seq)
     assert game.turn_counter == 4
-    assert game.player.level.key[1] == 3
+    assert game.player.level.level_key.index == 3
 
     game = load_game(mock_wrapper)
     input_seq = [Binds.Descend] * 4
     game = prepare_input_and_run(game, input_seq)
     assert game.turn_counter == 8
-    assert game.player.level.key[1] == 5
+    assert game.player.level.level_key.index == 5
 
 def test_subsystems(game):
 

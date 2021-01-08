@@ -1,4 +1,4 @@
-from pyrl.creature import Creature
+from pyrl.creature.creature import Creature
 from pyrl.enums.colors import Pair
 from pyrl.game_data.levels.shared_assets import construct_data, default_level_dimensions
 from pyrl.game_data.tiles import PyrlTile
@@ -57,5 +57,5 @@ def get_level(player):
         tiles=tiles,
         locations=locations,
         custom_creatures=creatures,
-        creature_spawning=False,
+        creature_spawning_enabled=False,
     )

@@ -16,14 +16,14 @@ def test_many_rdg_generation():
     for _ in range(100):
         level = Level(generation_type=rdg.LevelGen.Dungeon)
         rdg.generate_tiles_to(level)
-        level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
-        level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Up
+        assert level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
+        assert level.tiles[level.locations.getkey(LevelLocation.Passage_Up)] == PyrlTile.Stairs_Up
 
 def test_rdg_generation():
     level = Level(generation_type=rdg.LevelGen.Dungeon)
     rdg.generate_tiles_to(level)
-    level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
-    level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Up
+    assert level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
+    assert level.tiles[level.locations.getkey(LevelLocation.Passage_Up)] == PyrlTile.Stairs_Up
 
 @pytest.fixture
 def rectangles():
@@ -34,7 +34,7 @@ def rectangles():
         rdg.Rectangle(20, 20, -10, 10),
     )
 
-def test_Rectangle(rectangles):
+def test_rectangle(rectangles):
     r1, r2, r3, r4 = rectangles
     assert r1 == (0, 0, 10, 5)
     assert r2 == (0, 0, 10, 10)

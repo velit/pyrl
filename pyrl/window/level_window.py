@@ -15,11 +15,11 @@ class LevelWindow(BaseWindow):
             char = symbol, (bg, fg)
         super().draw_char(char, coord)
 
-    def draw_line(self, coordA, coordB, char=('*', Pair.Yellow), includeFirst=False):
-        if includeFirst:
-            for coord in bresenham(coordA, coordB):
+    def draw_line(self, coord_a, coord_b, char=('*', Pair.Yellow), include_first=False):
+        if include_first:
+            for coord in bresenham(coord_a, coord_b):
                 self.draw_char(coord, char)
         else:
-            for coord in bresenham(coordA, coordB):
-                if coord != coordA:
+            for coord in bresenham(coord_a, coord_b):
+                if coord != coord_a:
                     self.draw_char(coord, char)

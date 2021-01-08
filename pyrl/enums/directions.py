@@ -8,22 +8,22 @@ def set_every_to(every: Iterable, to: Any, at: MutableMapping):
     for item in every:
         at[item] = to
 
-class Dir(object):
+class Dir:
 
     All = (-1, -1),  (-1,  0), (-1,  1),  (0,   1), (1,   1),  (1,   0), (1,  -1),  (0,  -1)
     (     NorthWest, North,    NorthEast, East,     SouthEast, South,    SouthWest, West) = All
     Stay = (0, 0)
-    AllPlusStay = All + Stay
+    AllPlusStay = All + (Stay, )
     Diagonals = NorthWest, NorthEast, SouthEast, SouthWest
     Orthogonals = North, East, South, West
 
     @classmethod
     def clockwise(cls, direction: Tuple[int, int]):
-        return cls.All[cls.All.index(direction) + 1 % len(cls.All)]
+        return cls.All[(cls.All.index(direction) + 1) % len(cls.All)]
 
     @classmethod
     def counter_clockwise(cls, direction: Tuple[int, int]):
-        return cls.All[cls.All.index(direction) - 1 % len(cls.All)]
+        return cls.All[(cls.All.index(direction) - 1) % len(cls.All)]
 
     from_key: Dict[Bind, Direction] = {}
     set_every_to(Binds.SouthWest + Binds.Instant_SouthWest, to=SouthWest, at=from_key)

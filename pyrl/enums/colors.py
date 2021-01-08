@@ -34,7 +34,7 @@ class Color(Enum):
     def __str__(self):
         return self.value
 
-class Pair(object):
+class Pair:
     Red          = (Color.Red,           Color.Black)
     Green        = (Color.Green,         Color.Black)
     Blue         = (Color.Blue,          Color.Black)

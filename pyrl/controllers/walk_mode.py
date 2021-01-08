@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from pyrl.binds import Binds
-from pyrl.config.game import GameConf
+from pyrl.config.config import Config
 from pyrl.enums.directions import Dir
 from pyrl.game_actions import Action, ActionError, GameActionsProperties
 from pyrl.generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_vector,
@@ -49,7 +49,7 @@ class WalkMode(GameActionsProperties, object):
             return feedback
 
         self.state = WalkModeState(direction, walk_type,
-                                   self.io.get_future_time(GameConf.animation_period),
+                                   self.io.get_future_time(Config.animation_period),
                                    self.io.get_future_time(INTERRUPT_MSG_TIME))
         return feedback
 
@@ -61,9 +61,9 @@ class WalkMode(GameActionsProperties, object):
             assert feedback.type == Action.Move, \
                 "Bug in walk_mode. Move failed: {} {}".format(feedback.type, feedback.params)
 
-            next_walk_time = self.io.get_future_time(GameConf.animation_period)
+            next_walk_time = self.io.get_future_time(Config.animation_period)
             self.state = WalkModeState(next_direction, self.state.walk_type, next_walk_time,
-                                    self.state.show_msg_time)
+                                       self.state.show_msg_time)
             return feedback
 
         self.state = None
@@ -121,17 +121,17 @@ class WalkMode(GameActionsProperties, object):
         return self.actions.can_move(direction)
 
     def _get_neighbor_passables(self, direction):
-            upper_left_dir = anticlockwise_45(direction)
-            upper_right_dir = clockwise_45(direction)
+        upper_left_dir = anticlockwise_45(direction)
+        upper_right_dir = clockwise_45(direction)
 
-            forward = self._passable(direction)
-            left = self._passable(anticlockwise(direction))
-            right = self._passable(clockwise(direction))
-            up_left = self._passable(upper_left_dir)
-            down_left = self._passable(anticlockwise(upper_left_dir))
-            up_right = self._passable(upper_right_dir)
-            down_right = self._passable(clockwise(upper_right_dir))
-            return forward, up_left, up_right, left, right, down_left, down_right
+        forward = self._passable(direction)
+        left = self._passable(anticlockwise(direction))
+        right = self._passable(clockwise(direction))
+        up_left = self._passable(upper_left_dir)
+        down_left = self._passable(anticlockwise(upper_left_dir))
+        up_right = self._passable(upper_right_dir)
+        down_right = self._passable(clockwise(upper_right_dir))
+        return forward, up_left, up_right, left, right, down_left, down_right
 
     def _get_initial_walk_type(self, direction):
         if direction == Dir.Stay:

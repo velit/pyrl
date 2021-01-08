@@ -2,21 +2,21 @@ import pytest
 
 from pyrl.generic_structures import Array2D, Event, OneToOneMapping
 
-def test_Array2D():
+def test_array():
     dims = 2, 2
-    l = Array2D(dims, (0, 1, 2))
-    assert l.dimensions == dims
+    array = Array2D(dims, (0, 1, 2))
+    assert array.dimensions == dims
 
-    l[l.get_coord(0)] == 0
-    l[l.get_coord(1)] == 1
-    l[l.get_coord(2)] == 2
-    l[l.get_coord(3)] is None
+    assert array[array.get_coord(0)] == 0
+    assert array[array.get_coord(1)] == 1
+    assert array[array.get_coord(2)] == 2
+    assert array[array.get_coord(3)] is None
 
-    assert l.is_legal((0, 0))
-    assert l.is_legal((1, 1))
+    assert array.is_legal((0, 0))
+    assert array.is_legal((1, 1))
 
-    assert not l.is_legal((-1, -1))
-    assert not l.is_legal((3, 2))
+    assert not array.is_legal((-1, -1))
+    assert not array.is_legal((3, 2))
 
 def test_one_to_one_mapping():
     mapping = OneToOneMapping()

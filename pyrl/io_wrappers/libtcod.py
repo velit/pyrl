@@ -1,16 +1,15 @@
-from pyrl.io_wrappers.libtcod_import import import_libtcod
-libtcod = import_libtcod()
-
-from pyrl.config.game import GameConf
-
+from pyrl.config.config import Config
+from pyrl.enums.colors import Pair, Color
 from pyrl.enums.keys import Key
 from pyrl.io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
+from pyrl.io_wrappers.libtcod_import import import_libtcod
 from pyrl.window.window_system import WindowSystem
-from pyrl.enums.colors import Pair, Color
+
+libtcod = import_libtcod()
 
 IMPLEMENTATION = "tcod"
 
-class TCODWrapper(object):
+class TCODWrapper:
 
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""
 
@@ -21,7 +20,7 @@ class TCODWrapper(object):
         flags = libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_ASCII_INROW
         libtcod.console_set_custom_font(b"resources/terminal10x18_gs_ro.png", flags)
         rows, cols = WindowSystem.game_dimensions
-        libtcod.console_init_root(cols, rows, GameConf.default_game_name.encode(), False,
+        libtcod.console_init_root(cols, rows, Config.default_game_name.encode(), False,
                                   libtcod.RENDERER_SDL)
 
     def new_window(self, dimensions):
@@ -46,7 +45,7 @@ class TCODWrapper(object):
         else:
             libtcod.console_set_fullscreen(True)
 
-class TCODWindow(object):
+class TCODWindow:
 
     implementation = IMPLEMENTATION
     key_map = libtcod_key_map

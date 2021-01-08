@@ -1,8 +1,10 @@
 def import_libtcod():
+
+    # noinspection PyBroadException
     try:
         import tcod
         return tcod
-    except:
+    except Exception:
         pass
 
     try:
@@ -16,4 +18,3 @@ def import_libtcod():
               sep="\n",
               file=sys.stderr)
         sys.exit(1)
-

@@ -8,6 +8,7 @@ class AI(GameActionsProperties, object):
 
     def __init__(self):
         self.ai_state = {}
+        self.actions = None
 
     def act(self, game_actions, alert_coord):
         self.actions = game_actions
@@ -73,7 +74,7 @@ class AI(GameActionsProperties, object):
             else:
                 continue
 
-            cost = self.level.distance_heuristic(coord, target_coord)
+            cost = self.level.distance(coord, target_coord)
             if best_cost is None or cost < best_cost:
                 best_action = action
                 best_direction = direction

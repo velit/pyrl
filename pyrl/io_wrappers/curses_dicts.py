@@ -1,4 +1,5 @@
 import curses
+import curses.ascii
 
 from pyrl.enums.colors import Color
 from pyrl.enums.keys import Key

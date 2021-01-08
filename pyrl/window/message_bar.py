@@ -66,7 +66,8 @@ class MessageBar(BaseWindow):
             self.draw_str(line, (i % self.rows, 0))
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
                 self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), Pair.Green)
-                if self.get_key(keys=Binds.Skip_To_Last_Message + Binds.Cancel, refresh=True) in Binds.Skip_To_Last_Message:
+                key = self.get_key(keys=Binds.Skip_To_Last_Message + Binds.Cancel, refresh=True)
+                if key in Binds.Skip_To_Last_Message:
                     skip = True
                     break
                 self.clear()

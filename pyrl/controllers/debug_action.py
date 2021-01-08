@@ -1,9 +1,7 @@
 import code
-import random
 
 from pyrl.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.creature import Creature
 from pyrl.game_actions import GameActionsProperties, feedback, Action
 from pyrl.enums.level_gen import LevelGen
 from pyrl.enums.level_location import LevelLocation
@@ -48,8 +46,8 @@ class DebugAction(GameActionsProperties, object):
             self.io.msg("Undefined debug key: {}".format(c))
 
     def add_monster(self):
-        if self.level.creature_spawn_list:
-            self.level.spawn_creature(Creature(random.choice(self.level.creature_spawn_list)))
+        if self.level.creature_spawning_enabled:
+            self.level.spawn_creature(self.level.creature_spawner.random_creature())
             self.update_without_acting()
         else:
             self.io.msg("No random spawning on this level. Can't add monster.")
@@ -93,7 +91,7 @@ class DebugAction(GameActionsProperties, object):
         for i in creature_list:
             self.level.remove_creature(i)
         self.update_without_acting()
-        self.io.msg("Abrakadabra.")
+        self.io.msg("Abracadabra.")
 
     def draw_path_to_passage_down(self):
         passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)

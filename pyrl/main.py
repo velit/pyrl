@@ -1,20 +1,20 @@
 import argparse
 import atexit
-# import locale
 import logging
 import os
 import sys
 from cProfile import Profile
 
 from pyrl import state_store
+from pyrl.config.config import Config
 from pyrl.config.debug import Debug
-from pyrl.config.game import GameConf
 from tools import profile_util
+
 
 def run():
     options = get_commandline_options()
     try:
-        game(options).game_loop()
+        create_game(options).game_loop()
     finally:
         if options.output == "terminal":
             from pyrl.io_wrappers.curses import clean_curses
@@ -34,13 +34,13 @@ def get_commandline_options(args=None):
     start_type.add_argument("-g", "--game",
                             help="Specify the name for a new game.",
                             nargs="?",
-                            const=GameConf.default_game_name,
-                            default=GameConf.default_game_name)
+                            const=Config.default_game_name,
+                            default=Config.default_game_name)
 
     start_type.add_argument("-l", "--load",
                             help="Specify the game to be loaded.",
                             nargs="?",
-                            const=GameConf.default_game_name)
+                            const=Config.default_game_name)
 
     parser.add_argument("-p", "--profile",
                         help="Generate profiling data during the game.",
@@ -48,14 +48,13 @@ def get_commandline_options(args=None):
 
     return parser.parse_args(args)
 
-def game(options, cursor_lib=None):
+def create_game(options, cursor_lib=None):
     init_files_and_folders()
-
-    # locale.setlocale(locale.LC_ALL, "")
     init_logger_system()
 
     if cursor_lib is None:
         cursor_lib = init_cursor_lib(options.output)
+
     if options.load:
         game = load_game(options.load, cursor_lib)
     else:
@@ -89,7 +88,7 @@ def init_cursor_lib(output):
         from pyrl.io_wrappers.mock import MockWrapper
         return MockWrapper()
     else:
-        assert False, f"Unknown output {options.output}"
+        assert False, f"Unknown output {output}"
 
 def load_game(game_name, cursor_lib):
     try:
@@ -102,5 +101,5 @@ def load_game(game_name, cursor_lib):
     return game
 
 def init_files_and_folders():
-    if not os.path.exists(GameConf.save_folder):
-        os.makedirs(GameConf.save_folder)
+    if not os.path.exists(Config.save_folder):
+        os.makedirs(Config.save_folder)

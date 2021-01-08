@@ -7,10 +7,10 @@ def test_creature_equipment():
     equipment = Equipment()
     items = {
         Slot.Right_Hand: Weapon("short sword +1", 0, (1, 6, 1)),
-        Slot.Left_Hand:  Weapon("short sword",    0, (1, 6, 0)),
+        Slot.Left_Hand:  Weapon("short sword", 0, (1, 6, 0)),
         Slot.Head:       Armor("helmet", 0, 1, [Slot.Head]),
-        Slot.Body:       Armor("armor",  0, 4, [Slot.Body], stats=[(Stat.strength, 2)]),
-        Slot.Feet:       Armor("boots",  0, 1, [Slot.Feet]),
+        Slot.Body:       Armor("armor", 0, 4, [Slot.Body], stats=[(Stat.strength, 2)]),
+        Slot.Feet:       Armor("boots", 0, 1, [Slot.Feet]),
     }
 
     # bag items

@@ -44,15 +44,15 @@ def get_level():
     )
 
     # Overworld movement multiplier
-    MULT = min(default_level_dimensions)
+    mult = min(default_level_dimensions)
     custom_tiles = {
-        '"': Tile("grassland",      ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=MULT),
-        '¨': Tile("mountains",      ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=MULT),
-        '=': Tile("river",          ('=', Pair.Blue),  ('=', Pair.Blue),  False, False, move_mult=MULT),
-        'T': Tile("forest",         ('T', Pair.Green), ('T', Pair.Green), True,  True,  move_mult=MULT),
-        't': Tile("town",           ('*', Pair.Green), ('*', Pair.Green), True,  True,  move_mult=MULT),
-        '*': Tile("dungeon",        ('*', Pair.Brown), ('*', Pair.Brown), True,  True,  move_mult=MULT),
-        '^': Tile("high mountains", ('^', Pair.Brown), ('^', Pair.Brown), False, False, move_mult=MULT),
+        '"': Tile("grassland",      ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=mult),
+        '¨': Tile("mountains",      ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=mult),
+        '=': Tile("river",          ('=', Pair.Blue),  ('=', Pair.Blue),  False, False, move_mult=mult),
+        'T': Tile("forest",         ('T', Pair.Green), ('T', Pair.Green), True,  True,  move_mult=mult),
+        't': Tile("town",           ('*', Pair.Green), ('*', Pair.Green), True,  True,  move_mult=mult),
+        '*': Tile("dungeon",        ('*', Pair.Brown), ('*', Pair.Brown), True,  True,  move_mult=mult),
+        '^': Tile("high mountains", ('^', Pair.Brown), ('^', Pair.Brown), False, False, move_mult=mult),
     }
     custom_locations = {
         '*': OverWorldLocation.Dungeon,
@@ -69,5 +69,5 @@ def get_level():
         tiles=tiles,
         locations=locations,
         custom_creatures=creatures,
-        creature_spawning=False,
+        creature_spawning_enabled=False,
     )

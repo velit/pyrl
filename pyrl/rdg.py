@@ -11,33 +11,34 @@ from pyrl.enums.level_location import LevelLocation
 def generate_tiles_to(level):
     RDG(level).generate_tiles()
 
-def Rectangle(y, x, height, width):
+class Rectangle(tuple):
     """
-    Return a rectangle which consists of start coords and limit coords.
-
-    Accepts negative height and width: think of them as a vector which in
-    combination with y, x define the rectangle.
-
-    y_start and x_start are always calculated to be top left and y_limit and
-    x_limit are calculated to be positive.
+    A Rectangle consists of start coords and limit coords.
     """
-    if height < 0:
-        y_start = y + height + 1
-        y_limit = y + 1
-    else:
-        y_start = y
-        y_limit = y + height
 
-    if width < 0:
-        x_start = x + width + 1
-        x_limit = x + 1
-    else:
-        x_start = x
-        x_limit = x + width
+    def __new__(cls, y, x, height, width):
+        """
+        Accepts negative height and width: think of them as a vector which in
+        combination with y, x define the rectangle.
 
-    return _Rectangle((y_start, x_start, y_limit, x_limit))
+        y_start and x_start are always calculated to be top left and y_limit and
+        x_limit are calculated to be positive.
+        """
+        if height < 0:
+            y_start = y + height + 1
+            y_limit = y + 1
+        else:
+            y_start = y
+            y_limit = y + height
 
-class _Rectangle(tuple):
+        if width < 0:
+            x_start = x + width + 1
+            x_limit = x + 1
+        else:
+            x_start = x
+            x_limit = x + width
+
+        return super().__new__(cls, (y_start, x_start, y_limit, x_limit))
 
     def iterate(self):
 
@@ -47,7 +48,7 @@ class _Rectangle(tuple):
             for x in range(x_start, x_limit):
                 yield y, x
 
-class RDG(object):
+class RDG:
 
     F = PyrlTile.Floor
     W = PyrlTile.Wall
@@ -107,7 +108,7 @@ class RDG(object):
 
                 if y_dir:
                     corridor_length = rand_corridor_height()
-                elif x_dir:
+                else:
                     corridor_length = rand_corridor_width()
                 self.attempt_corridor((door_y, door_x), (y_dir, x_dir), corridor_length)
 

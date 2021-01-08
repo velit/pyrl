@@ -1,6 +1,6 @@
 
 
-class Tile(object):
+class Tile:
 
     """Permanent portion of a square. Eg. walls or floor."""
 

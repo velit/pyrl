@@ -1,8 +1,8 @@
-from pyrl.io_wrappers.libtcod_import import import_libtcod
-libtcod = import_libtcod()
-
 from pyrl.enums.colors import Color
 from pyrl.enums.keys import Key
+from pyrl.io_wrappers.libtcod_import import import_libtcod
+
+libtcod = import_libtcod()
 
 libtcod_color_map = {
     Color.Red:           libtcod.Color(175, 0, 0),

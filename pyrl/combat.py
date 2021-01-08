@@ -9,9 +9,9 @@ def get_melee_attack_cr(creature, target):
 def get_melee_attack(accuracy, damage_info, defense, armor):
     roll = randint(1, 100) + accuracy - defense
     if roll > 25:
-        return (True, max(dice_roll(*damage_info) - armor, 0))
+        return True, max(dice_roll(*damage_info) - armor, 0)
     else:
-        return (False, 0)
+        return False, 0
 
 def get_combat_message(attack_succeeds, damage, dies, player_attacker,
                        player_target, attacker_name, defender_name):

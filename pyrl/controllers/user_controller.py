@@ -1,16 +1,17 @@
 from functools import partial
 
-import pyrl.interface.inventory
 from pyrl.binds import Binds
-from pyrl.config.game import GameConf
+from pyrl.config.config import Config
 from pyrl.enums.colors import Color, Pair
 from pyrl.enums.directions import Dir
 from pyrl.enums.keys import Key
+from pyrl.enums.level_location import LevelLocation
 from pyrl.game_actions import ActionError, Action, GameActionsProperties
 from pyrl.generic_algorithms import add_vector
-from pyrl.interface.help_screen import help_screen
+from pyrl.interface.help_view import help_view
+from pyrl.interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
 from pyrl.interface.lines_view import lines_view, build_lines
-from pyrl.enums.level_location import LevelLocation
+
 
 class UserController(GameActionsProperties, object):
 
@@ -32,11 +33,10 @@ class UserController(GameActionsProperties, object):
 
         from pyrl.controllers.debug_action import DebugAction
         self.debug_action = DebugAction(self.actions)
+        self.actions_funcs = self.define_actions()
 
-        self.set_actions()
-
-    def set_actions(self):
-        self.actions_funcs = {
+    def define_actions(self):
+        actions_funcs = {
             '+':                     partial(self.debug_action.sight_change, 1),
             '-':                     partial(self.debug_action.sight_change, -1),
             Key.CLOSE_WINDOW:        self.quit,
@@ -51,8 +51,8 @@ class UserController(GameActionsProperties, object):
             Binds.History:            self.print_history,
             Binds.Look_Mode:          self.look,
             Binds.Help:               self.help_screen,
-            Binds.Equipment:          self.equipment,
-            Binds.Backpack:           self.backpack,
+            Binds.Equipment:          self.manage_equipment,
+            Binds.Backpack:           self.manage_backpack,
             Binds.Pick_Up_Items:      self.pickup_items,
             Binds.Drop_Items:         self.drop_items,
             Binds.Walk_Mode:          self.init_walk_mode,
@@ -83,7 +83,9 @@ class UserController(GameActionsProperties, object):
 
         for keys, action in unfinalized_actions.items():
             for key in keys:
-                self.actions_funcs[key] = action
+                actions_funcs[key] = action
+
+        return actions_funcs
 
     def _act(self):
         if self.walk_mode.is_walk_mode_active():
@@ -117,7 +119,7 @@ class UserController(GameActionsProperties, object):
                 else:
                     self.io.msg(feedback.type, feedback.params)
             elif feedback.type in (Action.Move, Action.Teleport, Action.Swap, Action.Spawn):
-                items = self.actions.view_floor_items()
+                items = self.actions.inspect_floor_items()
 
                 if self.actions.get_passage():
                     self.io.msg("There is a {} here.".format(self.actions.get_tile().name))
@@ -200,39 +202,39 @@ class UserController(GameActionsProperties, object):
             return self.actions.enter_passage()
         else:
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
-            #return "You don't find any downwards passage."
+            # return "You don't find any downwards passage."
 
     def ascend(self):
         location = self.actions.get_passage()
         if location != LevelLocation.Passage_Up:
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
-            #return "You don't find any upwards passage."
+            # return "You don't find any upwards passage."
         else:
             return self.actions.enter_passage()
 
     def show_vision(self):
-        GameConf.clearly_show_vision = not GameConf.clearly_show_vision
+        Config.clearly_show_vision = not Config.clearly_show_vision
         self.actions.redraw()
 
     def print_history(self):
         header = "History"
         lines_view(self.io.whole_window, build_lines(reversed(self.io.message_bar.history)), header=header)
 
-    def equipment(self):
-        return pyrl.interface.inventory.equipment(self.actions)
+    def manage_equipment(self):
+        return equipment_view(self.actions)
 
-    def backpack(self):
-        return pyrl.interface.inventory.backpack(self.actions)
+    def manage_backpack(self):
+        return backpack_view(self.actions)
 
     def pickup_items(self):
-        return pyrl.interface.inventory.pickup_items(self.actions)
+        return pickup_items_view(self.actions)
 
     def drop_items(self):
-        return pyrl.interface.inventory.drop_items(self.actions)
+        return drop_items_view(self.actions)
 
     def init_walk_mode(self, instant_direction=None):
         return self.walk_mode.init_walk_mode(instant_direction)
 
     def help_screen(self):
-        help_screen(self.io)
+        help_view(self.io)
         self.actions.redraw()

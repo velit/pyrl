@@ -1,7 +1,7 @@
 import heapq
 from collections import deque
 
-class PollingTurnScheduler(object):
+class PollingTurnScheduler:
     _TURN_DELIMITER = "Turn delimiter"
 
     def __init__(self):
@@ -23,7 +23,7 @@ class PollingTurnScheduler(object):
     def remove(self, actor):
         self.queue.remove(actor)
 
-class TurnScheduler(object):
+class TurnScheduler:
 
     """Priority queue based turn scheduler. Behaves in LIFO fashion with equal time values."""
 

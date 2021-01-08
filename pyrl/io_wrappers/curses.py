@@ -26,7 +26,7 @@ def clean_curses():
     except curses.error:
         pass
 
-class CursesWrapper(object):
+class CursesWrapper:
 
     implementation = IMPLEMENTATION
 
@@ -73,7 +73,7 @@ class CursesWrapper(object):
     def resume(self):
         curses.reset_prog_mode()
 
-class CursesWindow(object):
+class CursesWindow:
 
     implementation = IMPLEMENTATION
     color_map = None

@@ -18,7 +18,7 @@ def _add_equipment_properties(cls):
     return cls
 
 @_add_equipment_properties
-class HasEquipment(object):
+class HasEquipment:
 
     """Creatures with this mixin class have an equipment and a bag."""
 

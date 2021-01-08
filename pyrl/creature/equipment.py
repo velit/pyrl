@@ -1,14 +1,17 @@
+from typing import Dict, Optional, List
+
+from pyrl.creature.item import Item
 from pyrl.enums.slot import Slot
 from pyrl.creature.stats import Stat, ComplexStat
 
-class Equipment(object):
+class Equipment:
 
     def __init__(self):
 
         self.applied_stats = {stat: 0 for stat in Stat}
 
-        self._bag = []
-        self._worn_items = {
+        self._bag: List[Item] = []
+        self._worn_items: Dict[Slot, Optional[Item]] = {
             Slot.Head:        None,
             Slot.Body:        None,
             Slot.Right_Hand:  None,
@@ -82,7 +85,7 @@ class Equipment(object):
         else:
             return None
 
-    def view_items(self):
+    def inspect_items(self):
         return tuple(self._bag)
 
     def _add_stats(self, item):
