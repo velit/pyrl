@@ -1,13 +1,16 @@
 from importlib import resources
 from itertools import chain
-from typing import Union, Iterable
+from typing import Union, Iterable, NewType
 
 import toml
 
 from pyrl import config
 
 
-class Bind(tuple):
+Bind = NewType("Bind", str)
+
+
+class BindSequence(tuple):
 
     def __new__(cls, iterable_or_str: Union[str, Iterable[str]] = (), /):
         if isinstance(iterable_or_str, str):
@@ -26,7 +29,7 @@ class Bind(tuple):
         return "/".join("{}".format(key) for key in self)
 
 
-undefined = Bind()
+undefined = BindSequence()
 
 
 class Binds:
@@ -107,9 +110,9 @@ with resources.open_text(config, "binds.toml") as f:
 # Set all hotkeys and their categories to Binds namespace
 for category_name, category in hotkeys.items():
     for bind_name, binds in category.items():
-        setattr(Binds, bind_name, Bind(binds))
+        setattr(Binds, bind_name, BindSequence(binds))
     category_binds = chain.from_iterable(binds for binds in category.values())
-    setattr(Binds, category_name, Bind(category_binds))
+    setattr(Binds, category_name, BindSequence(category_binds))
 
 
 def undefined_keys():

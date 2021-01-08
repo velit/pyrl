@@ -1,3 +1,6 @@
+from typing import Dict
+
+from pyrl.creature import Creature
 from pyrl.enums.directions import Dir
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
@@ -19,7 +22,7 @@ base_tiles = {
     '<': PyrlTile.Stairs_Up,
 }
 
-base_creatures = {
+base_creatures: Dict[str, Creature] = {
 }
 
 base_locations = {

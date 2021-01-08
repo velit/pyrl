@@ -1,4 +1,5 @@
 import math
+from typing import TypeVar, Iterable, MutableMapping
 
 from pyrl.enums.directions import Dir
 
@@ -106,8 +107,8 @@ def anticlockwise(vector):
 
 
 def anticlockwise_45(vector):
-    return Dir.counter_clockwise[vector]
+    return Dir.counter_clockwise(vector)
 
 
 def clockwise_45(vector):
-    return Dir.clockwise[vector]
+    return Dir.clockwise(vector)
