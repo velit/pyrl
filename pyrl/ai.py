@@ -4,7 +4,6 @@ from pyrl.enums.directions import Dir
 from pyrl.game_actions import Action, ActionError, GameActionsProperties
 from pyrl.generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
-
 class AI(GameActionsProperties, object):
 
     def __init__(self):

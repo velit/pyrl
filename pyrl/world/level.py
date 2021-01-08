@@ -15,7 +15,6 @@ from pyrl.generic_structures import Event, Array2D, OneToOneMapping
 from pyrl.rdg import generate_tiles_to
 from pyrl.turn_scheduler import TurnScheduler
 
-
 class CreatureSpawn(object):
     __slots__ = ('creatures', 'total_weight')
 
@@ -38,7 +37,6 @@ class CreatureSpawn(object):
         assert len(self.creatures) != 0, "Trying to spawn a random creature with no creatures defined"
         index = random.randrange(self.total_weight)
         return next(creature for (slot, creature) in self.creatures if index < slot)
-
 
 class Level(object):
 

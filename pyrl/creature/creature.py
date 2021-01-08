@@ -5,7 +5,6 @@ from pyrl.generic_algorithms import resize_range
 from pyrl.creature.stats import ensure_stats
 from pyrl.dice import Dice
 
-
 @ensure_stats
 class Creature:
 

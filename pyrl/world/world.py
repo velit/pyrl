@@ -3,13 +3,10 @@ from collections import Counter, namedtuple
 from pyrl.enums.level_location import LevelLocation
 from pyrl.world.level import Level
 
-
 class LevelNotFound(Exception): pass
-
 
 LevelKey = namedtuple("LevelKey", ("dungeon, index"))
 WorldPoint = namedtuple("WorldPoint", ("level_key, level_location"))
-
 
 class World(object):
 

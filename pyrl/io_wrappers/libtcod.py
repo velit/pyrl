@@ -8,9 +8,7 @@ from pyrl.io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
 from pyrl.window.window_system import WindowSystem
 from pyrl.enums.colors import Pair, Color
 
-
 IMPLEMENTATION = "tcod"
-
 
 class TCODWrapper(object):
 
@@ -47,7 +45,6 @@ class TCODWrapper(object):
             libtcod.console_set_fullscreen(False)
         else:
             libtcod.console_set_fullscreen(True)
-
 
 class TCODWindow(object):
 

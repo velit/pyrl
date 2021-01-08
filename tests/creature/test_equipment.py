@@ -3,7 +3,6 @@ from pyrl.creature.equipment import Equipment
 from pyrl.creature.item import Weapon, Armor
 from pyrl.creature.stats import Stat
 
-
 def test_creature_equipment():
     equipment = Equipment()
     items = {

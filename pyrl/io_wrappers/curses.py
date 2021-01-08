@@ -13,9 +13,7 @@ from pyrl.enums.keys import Key
 from pyrl.io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
 from pyrl.window.window_system import WindowSystem
 
-
 IMPLEMENTATION = "curses"
-
 
 def clean_curses():
     """Resume normal shell state. Does nothing if curses wasn't initialized."""
@@ -27,7 +25,6 @@ def clean_curses():
         curses.endwin()
     except curses.error:
         pass
-
 
 class CursesWrapper(object):
 
@@ -75,7 +72,6 @@ class CursesWrapper(object):
 
     def resume(self):
         curses.reset_prog_mode()
-
 
 class CursesWindow(object):
 

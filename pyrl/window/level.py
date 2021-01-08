@@ -2,7 +2,6 @@ from pyrl.enums.colors import Pair
 from pyrl.generic_algorithms import bresenham
 from pyrl.window.base_window import BaseWindow
 
-
 class LevelWindow(BaseWindow):
 
     """Handles the level display."""

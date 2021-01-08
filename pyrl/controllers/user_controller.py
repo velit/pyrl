@@ -12,7 +12,6 @@ from pyrl.interface.help_screen import help_screen
 from pyrl.interface.lines_view import lines_view, build_lines
 from pyrl.enums.level_location import LevelLocation
 
-
 class UserController(GameActionsProperties, object):
 
     error_messages = {

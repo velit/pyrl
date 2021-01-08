@@ -3,7 +3,6 @@ from pyrl.game_data.player import Player
 from pyrl.enums.level_location import LevelLocation
 from pyrl.world.world import World, LevelKey, WorldPoint
 
-
 def get_world():
 
     world = World(Player())

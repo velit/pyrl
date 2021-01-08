@@ -4,7 +4,6 @@ libtcod = import_libtcod()
 from pyrl.enums.colors import Color
 from pyrl.enums.keys import Key
 
-
 libtcod_color_map = {
     Color.Red:           libtcod.Color(175, 0, 0),
     Color.Green:         libtcod.Color(0, 175, 0),

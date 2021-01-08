@@ -4,24 +4,19 @@ from pyrl import main
 from pyrl.binds import Binds
 from pyrl.io_wrappers.mock import MockInputEnd
 
-
 TEST_GameConf_NAME = "test"
-
 
 @pytest.fixture
 def mock_wrapper():
     from pyrl.io_wrappers.mock import MockWrapper
     return MockWrapper()
 
-
 @pytest.fixture
 def game(mock_wrapper):
     return main.game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mock_wrapper)
 
-
 def load_game(mock_wrapper):
     return main.game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mock_wrapper)
-
 
 def prepare_input_and_run(game, input_seq):
     input_seq = tuple(action if isinstance(action, str) else action.key for action in input_seq)
@@ -31,7 +26,6 @@ def prepare_input_and_run(game, input_seq):
         assert False
     except MockInputEnd:
         return game
-
 
 @pytest.mark.skip(reason="Disabled until save system is fixed")
 def test_save_and_load_game(game, mock_wrapper):
@@ -46,7 +40,6 @@ def test_save_and_load_game(game, mock_wrapper):
     game = prepare_input_and_run(game, input_seq)
     assert game.turn_counter == 8
     assert game.player.level.key[1] == 5
-
 
 def test_subsystems(game):
 

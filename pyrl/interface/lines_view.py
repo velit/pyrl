@@ -3,13 +3,10 @@ import re
 
 from pyrl.binds import Binds
 
-
 Line = collections.namedtuple("Line", ("display", "return_value"))
-
 
 def build_lines(iterable):
     return tuple(Line(value, i) for i, value in enumerate(iterable))
-
 
 _single = "{}/{} scroll  {}/{} next/previous line  {} filter  {} close"
 _single = _single.format(Binds.Next_Page.key, Binds.Previous_Page.key, Binds.Next_Line.key,
@@ -18,7 +15,6 @@ _multi = "{}/{} scroll  {}/{} next/previous line  {}/{} (de)select all  {} filte
 _multi = _multi.format(Binds.Next_Page.key, Binds.Previous_Page.key,
                        Binds.Next_Line.key, Binds.Previous_Line.key,
                        Binds.Deselect_All.key, Binds.Select_All.key, Binds.Filter, Binds.Cancel.key)
-
 
 def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, select_keys=(),
                header="", footer=None):
@@ -77,7 +73,6 @@ def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, sele
             else:
                 assert False, "Got unhandled key as input {}".format(key)
 
-
 def _get_vars(window, lines, multi_select, select_keys, return_keys):
     if select_keys:
         content_size = min(window.rows - 4, len(lines), len(select_keys))
@@ -91,7 +86,6 @@ def _get_vars(window, lines, multi_select, select_keys, return_keys):
 
     return content_size, select_keys, all_keys
 
-
 def _get_print_lines(lines, offset, content_size, selected, select_keys):
     sliced_lines = _slice_lines(lines, offset, offset + content_size)
     if select_keys:
@@ -100,10 +94,8 @@ def _get_print_lines(lines, offset, content_size, selected, select_keys):
     else:
         return tuple(line.display for line in sliced_lines)
 
-
 def _selection_symbol(selected, index):
     return "+" if index in selected else "-"
-
 
 def _capitalize_single_chars(seq):
     for key in seq:
@@ -111,7 +103,6 @@ def _capitalize_single_chars(seq):
             yield key.upper()
         else:
             yield key
-
 
 def _print_view(window, print_lines, header="", footer="",
                 main_view_pos=2, header_pos=0, footer_pos=-1):
@@ -122,7 +113,6 @@ def _print_view(window, print_lines, header="", footer="",
     if footer is not None:
         window.draw_banner(footer, y_offset=footer_pos)
 
-
 def _slice_lines(seq, start_index=0, stop_index=None):
     if stop_index is not None:
         for i in range(start_index, stop_index):
@@ -130,7 +120,6 @@ def _slice_lines(seq, start_index=0, stop_index=None):
     else:
         for i in range(start_index, len(seq)):
             yield seq[i]
-
 
 def _new_offset(offset, key, visible_amount, lines_amount):
     if key in Binds.Next_Line:

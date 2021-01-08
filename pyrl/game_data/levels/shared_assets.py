@@ -7,9 +7,7 @@ from pyrl.generic_algorithms import add_vector
 from pyrl.generic_structures import Array2D, TableDims
 from pyrl.enums.level_location import LevelLocation
 
-
 default_level_dimensions = TableDims(26, 96)
-
 
 base_tiles = {
     '.': PyrlTile.Floor,
@@ -30,7 +28,6 @@ base_locations = {
     '>': LevelLocation.Passage_Down,
 }
 
-
 def construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures):
     _assert_size(charstr, dimensions)
     unfinalized_tiles = Array2D(dimensions, charstr)
@@ -46,11 +43,9 @@ def construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_c
 
     return _construct_data(unfinalized_tiles, tiles_lookup, locations, creatures_lookup)
 
-
 def _assert_size(charstr, dimensions):
     assert len(charstr) == dimensions[0] * dimensions[1], \
         "Wrong dimensions for custom level definition."
-
 
 def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures_lookup):
     tiles = unfinalized_tiles
@@ -71,11 +66,9 @@ def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures
     _finalize_tiles(tiles)
     return tiles, locations, creatures
 
-
 def _finalize_tiles(tiles):
     for coord, tile in tiles.enumerate():
         tiles[coord] = _finalize_tile(coord, tile, tiles)
-
 
 def _finalize_tile(coord, tile, tiles):
     if tile != PyrlTile.Dynamic_Wall:

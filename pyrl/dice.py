@@ -1,13 +1,10 @@
 from collections import namedtuple
 from random import randint
 
-
 Dice = namedtuple("Dice", ["dices", "highest_side", "addition"])
-
 
 def dice_roll(dices, highest_side, addition):
     return sum(randint(0, highest_side) for _ in range(dices)) + addition
-
 
 def dice_str(dices, highest_side, addition):
     min_roll = addition

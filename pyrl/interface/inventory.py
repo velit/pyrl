@@ -3,7 +3,6 @@ from pyrl.enums.slot import Slot
 from pyrl.game_actions import ActionError, feedback
 from pyrl.interface.lines_view import lines_view, Line
 
-
 def _get_equipment_item_str(equipment, slot):
     item = equipment.get_item(slot)
     if item is None:
@@ -12,7 +11,6 @@ def _get_equipment_item_str(equipment, slot):
         return str(item)
     else:
         return "{}".format(item.name)
-
 
 def equipment(actions):
     footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
@@ -41,7 +39,6 @@ def equipment(actions):
         else:
             assert False, "Got unhandled return values, key: {} value: {}".format(key, slot)
 
-
 def backpack_equip_item(actions, slot):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items())
                   if item.fits_slot(slot))
@@ -51,7 +48,6 @@ def backpack_equip_item(actions, slot):
         return
     else:
         actions.creature.equipment.equip_from_bag(item, slot)
-
 
 def backpack(actions):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items()))
@@ -67,7 +63,6 @@ def backpack(actions):
         return
     elif key in Binds.Backpack_Drop_Items:
         return actions.drop_items(selections)
-
 
 def pickup_items(actions):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_floor_items()))
@@ -86,7 +81,6 @@ def pickup_items(actions):
     )
     if key in Binds.Cancel and selections:
         return actions.pickup_items(selections)
-
 
 def drop_items(actions):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items()))

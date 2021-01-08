@@ -6,9 +6,7 @@ import toml
 
 from pyrl import config
 
-
 Bind = NewType("Bind", str)
-
 
 class BindSequence(tuple):
 
@@ -28,9 +26,7 @@ class BindSequence(tuple):
     def __str__(self):
         return "/".join("{}".format(key) for key in self)
 
-
 undefined = BindSequence()
-
 
 class Binds:
 
@@ -102,10 +98,8 @@ class Binds:
     Instant_North = undefined
     Instant_NorthEast = undefined
 
-
 with resources.open_text(config, "binds.toml") as f:
     hotkeys = toml.load(f)
-
 
 # Set all hotkeys and their categories to Binds namespace
 for category_name, category in hotkeys.items():
@@ -113,7 +107,6 @@ for category_name, category in hotkeys.items():
         setattr(Binds, bind_name, BindSequence(binds))
     category_binds = chain.from_iterable(binds for binds in category.values())
     setattr(Binds, category_name, BindSequence(category_binds))
-
 
 def undefined_keys():
     return [key for key, value in vars(Binds).items() if value is undefined]

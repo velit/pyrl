@@ -1,6 +1,5 @@
 from pyrl.generic_algorithms import bresenham
 
-
 class ShadowCast(object):
 
     # Multipliers for transforming coordinates to other octants:
@@ -71,7 +70,6 @@ class ShadowCast(object):
             # Row is scanned; do next row unless last square was blocked:
             if blocked:
                 break
-
 
 class Bresenham(object):
 

@@ -8,10 +8,8 @@ from pyrl.enums.colors import Pair
 from pyrl.window.base_window import BaseWindow
 from pyrl.io_wrappers import mock
 
-
 MORE_STR = " More"
 MORE_STR_LEN = len(MORE_STR)
-
 
 class MessageBar(BaseWindow):
 

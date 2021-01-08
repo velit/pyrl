@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Color(Enum):
     Red          = "Red"
     Green        = "Green"
@@ -34,7 +33,6 @@ class Color(Enum):
 
     def __str__(self):
         return self.value
-
 
 class Pair(object):
     Red          = (Color.Red,           Color.Black)

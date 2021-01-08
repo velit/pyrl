@@ -7,10 +7,8 @@ from pyrl.game_actions import Action, ActionError, GameActionsProperties
 from pyrl.generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_vector,
                                      clockwise_45, anticlockwise_45)
 
-
 WalkType = namedtuple("WalkType", "left_passable, right_passable")
 WalkModeState = namedtuple("WalkModeState", "direction, walk_type, next_walk_time, show_msg_time")
-
 
 WALK_IN_PLACE = WalkType(None,  None)
 CORRIDOR      = WalkType(False, False)
@@ -19,7 +17,6 @@ RIGHT         = WalkType(False, True)
 OPEN          = WalkType(True,  True)
 
 INTERRUPT_MSG_TIME = 1
-
 
 class WalkMode(GameActionsProperties, object):
 

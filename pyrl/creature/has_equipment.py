@@ -2,7 +2,6 @@ from pyrl.creature.equipment import Equipment
 from pyrl.creature.stats import Stat
 from pyrl.dice import Dice
 
-
 def _get_equipment_property(stat):
 
     def get_stat(self):
@@ -11,14 +10,12 @@ def _get_equipment_property(stat):
 
     return property(get_stat)
 
-
 def _add_equipment_properties(cls):
     """Add equipment properties to cls that modify normal stats."""
     for stat in Stat:
         prop = _get_equipment_property(stat)
         setattr(cls, stat.name, prop)
     return cls
-
 
 @_add_equipment_properties
 class HasEquipment(object):

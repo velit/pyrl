@@ -1,6 +1,5 @@
 from pyrl.turn_scheduler import TurnScheduler
 
-
 def test_turn_scheduler():
     ts = TurnScheduler()
     ts.add("D", 2)

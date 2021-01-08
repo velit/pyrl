@@ -3,19 +3,16 @@ from pyrl.enums.colors import Pair
 from pyrl.creature.stats import Stat, ComplexStat
 from pyrl.dice import dice_str
 
-
 def Weapon(name, accuracy, weapon_dice, two_handed=False, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
            stats=(), char=('(', Pair.Normal)):
     stats = ((ComplexStat.weapon_dice, weapon_dice), (Stat.accuracy, accuracy), *stats)
     return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
                 occupies_all_slots=two_handed)
 
-
 def Armor(name, defense, armor, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
     stats = ((Stat.defense, defense), (Stat.armor, armor), *stats)
     return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
                 occupies_all_slots=False)
-
 
 class Item(object):
     def __init__(self, name, compatible_slots, stats, char, occupies_all_slots):

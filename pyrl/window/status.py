@@ -3,7 +3,6 @@ from functools import wraps
 
 from pyrl.window.base_window import BaseWindow
 
-
 class StatusBar(BaseWindow):
 
     """Handles the status bar system."""

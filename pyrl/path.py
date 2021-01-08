@@ -2,19 +2,15 @@ from heapq import heappush, heappop
 
 from pyrl.generic_algorithms import chebyshev
 
-
 class PathException(Exception):
     pass
-
 
 def path(start_coord, goal_coord, neighbor_function, heuristic):
     return _iterate_path(_a_star(start_coord, goal_coord, neighbor_function, heuristic), start_coord, goal_coord)
 
-
 def heuristic(coordA, coordB, default_movement_cost, diagonal_modifier):
     orthogonal_steps, diagonal_steps = chebyshev(coordA, coordB)
     return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
-
 
 def _a_star(start, goal, neighbors, heuristic):
     start, goal = goal, start
@@ -43,7 +39,6 @@ def _a_star(start, goal, neighbors, heuristic):
                     openmember.add(node)
     else:
         raise PathException("No possible paths between arguments start:{} goal:{}".format(start, goal))
-
 
 def _iterate_path(came_from, start, goal):
     """Iterate the path structure returned by _path()."""
