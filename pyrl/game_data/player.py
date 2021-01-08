@@ -7,7 +7,6 @@ from pyrl.creature.creature import Creature
 from pyrl.creature.has_equipment import HasEquipment
 from pyrl.creature.remembers_vision import RemembersVision
 
-
 class Player(HasEquipment, RemembersVision, Creature):
     def __init__(self):
         super().__init__(name="player", char=('@', (Color.Green, Color.Black)))

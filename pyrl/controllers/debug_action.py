@@ -8,7 +8,6 @@ from pyrl.game_actions import GameActionsProperties, feedback, Action
 from pyrl.enums.level_gen import LevelGen
 from pyrl.enums.level_location import LevelLocation
 
-
 class DebugAction(GameActionsProperties, object):
 
     def __init__(self, game_actions):

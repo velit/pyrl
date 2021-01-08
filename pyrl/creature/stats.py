@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Stat(Enum):
     strength       = "Str"
     dexterity      = "Dex"
@@ -15,10 +14,8 @@ class Stat(Enum):
     speed          = "Speed"
     damage         = "Dmg"
 
-
 class ComplexStat(Enum):
     weapon_dice = "Damage"
-
 
 def ensure_stats(obj):
     for stat in Stat:

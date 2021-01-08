@@ -2,7 +2,6 @@ from pyrl.enums.colors import Pair
 from pyrl.creature import Creature
 from decimal import Decimal as D
 
-
 def test_danger_level_spawn_mult():
     c = Creature("test", ('t', Pair.Cyan), danger_level=0)
 

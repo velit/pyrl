@@ -4,7 +4,6 @@ from pyrl.enums.colors import Pair
 from pyrl.enums.keys import Key
 from pyrl.generic_structures import TableDims, Coord
 
-
 class BaseWindow(object):
 
     # Seconds to sleep until next user input check in half-block functions

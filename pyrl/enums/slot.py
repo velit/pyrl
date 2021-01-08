@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Slot(Enum):
 
     Head       = "Head"

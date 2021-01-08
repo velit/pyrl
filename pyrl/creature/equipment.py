@@ -1,7 +1,6 @@
 from pyrl.enums.slot import Slot
 from pyrl.creature.stats import Stat, ComplexStat
 
-
 class Equipment(object):
 
     def __init__(self):

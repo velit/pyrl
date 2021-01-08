@@ -1,6 +1,5 @@
 from pyrl.binds import Binds
 
-
 def help_screen(io):
     header = "Help Screen, ^ means ctrl, ! means alt"
     section = "{!s:16.16}"*2
@@ -34,7 +33,6 @@ def help_screen(io):
     )
     footer = "{0} to close".format(Binds.Cancel.key)
     io.menu(header, help_lines, footer, Binds.Cancel)
-
 
 def scroll_views_help_screen(io):
     header = "Help Screen, ^ means ctrl, ! means alt"

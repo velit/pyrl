@@ -6,14 +6,11 @@ from pyrl.enums.level_gen import LevelGen
 from pyrl.world.level import Level
 from pyrl.world.tile import Tile
 
-
 name = "overworld"
-
 
 class OverWorldLocation(Enum):
     Dungeon = 1
     Village = 2
-
 
 def get_level():
     dimensions = default_level_dimensions

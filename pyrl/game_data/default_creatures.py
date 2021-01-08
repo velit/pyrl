@@ -1,7 +1,6 @@
 from pyrl.creature import Creature
 from pyrl.enums.colors import Pair
 
-
 default_creatures = (#name       char                      danger_level    spawn_weight_class
     Creature("giant bat",        ('B', Pair.Brown),        -10,            1),
     Creature("giant worm",       ('w', Pair.Brown),         -5,            1),

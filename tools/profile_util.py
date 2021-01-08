@@ -3,13 +3,11 @@ from pstats import Stats
 
 from pyrl.config.debug import Debug
 
-
 def write_results_log(profiler):
 
     with open(Debug.profiling_output_file, "w") as f:
         stats = Stats(profiler, stream=f)
         print_results(stats)
-
 
 def print_results(stats):
     stats.strip_dirs()
@@ -17,7 +15,6 @@ def print_results(stats):
     stats.sort_stats('time').print_stats(15)
     stats.sort_stats('cumulative').print_stats(15)
     stats.sort_stats('module', 'nfl').print_stats()
-
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

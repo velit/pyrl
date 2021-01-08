@@ -1,7 +1,6 @@
 from pyrl.enums.colors import Pair
 from pyrl.world.tile import Tile
 
-
 class PyrlTile(object):
     #Name          Description                     Visible char        Memory char          Pathable Transparency
     Unknown      = Tile("nothing",                 (' ', Pair.Normal), (' ', Pair.Normal),  False,   False)

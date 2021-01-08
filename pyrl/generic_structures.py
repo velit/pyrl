@@ -2,10 +2,8 @@ from collections import namedtuple
 from itertools import zip_longest
 from random import randrange
 
-
 Coord = namedtuple("Coord", "y, x")
 TableDims = namedtuple("TableDims", "rows, cols")
-
 
 def _disable_list_dynamicness(cls):
     _disabled_methods = ('append', 'copy', 'extend', 'insert', 'pop', 'remove', 'reverse',
@@ -17,7 +15,6 @@ def _disable_list_dynamicness(cls):
         disabled.__doc__ = "This method isn't implemented in a non-dynamic array."
         setattr(cls, method, disabled)
     return cls
-
 
 @_disable_list_dynamicness
 class Array2D(list):
@@ -89,7 +86,6 @@ class Array2D(list):
     def dimensions(self):
         return self.rows, self.cols
 
-
 class OneToOneMapping(dict):
 
     """A dict-like object which guarantees uniqueness for values in addition to keys."""
@@ -115,7 +111,6 @@ class OneToOneMapping(dict):
                     self[key] = value
         for key in kwords:
             self[key] = kwords[key]
-
 
 class Event(object):
 

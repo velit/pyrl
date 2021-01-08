@@ -13,7 +13,6 @@ from pyrl.window.window_system import WindowSystem
 from pyrl.world.world import LevelNotFound
 from pyrl.creature.remembers_vision import RemembersVision
 
-
 class Game(object):
 
     def __init__(self, game_name, cursor_lib):

@@ -3,7 +3,6 @@ import curses
 from pyrl.enums.colors import Color
 from pyrl.enums.keys import Key
 
-
 curses_key_map = {
     chr(curses.ascii.CR):   Key.ENTER,
     chr(curses.ascii.ESC):  Key.ESC,
@@ -43,7 +42,6 @@ curses_key_map = {
     curses.KEY_SELECT:      Key.NUMPAD_1,
     curses.KEY_UP:          Key.UP,
 }
-
 
 class Curses256ColorDict(dict):
 
@@ -89,7 +87,6 @@ class Curses256ColorDict(dict):
             self[key] = color_pair
             self.pair_nr += 1
             return color_pair
-
 
 class CursesColorDict(dict):
 

@@ -2,11 +2,9 @@ from random import randint
 
 from pyrl.dice import dice_roll
 
-
 def get_melee_attack_cr(creature, target):
     return get_melee_attack(creature.accuracy, creature.get_damage_info(),
                             target.defense, target.armor)
-
 
 def get_melee_attack(accuracy, damage_info, defense, armor):
     roll = randint(1, 100) + accuracy - defense
@@ -14,7 +12,6 @@ def get_melee_attack(accuracy, damage_info, defense, armor):
         return (True, max(dice_roll(*damage_info) - armor, 0))
     else:
         return (False, 0)
-
 
 def get_combat_message(attack_succeeds, damage, dies, player_attacker,
                        player_target, attacker_name, defender_name):

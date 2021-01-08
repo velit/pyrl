@@ -2,14 +2,11 @@ from typing import Tuple, Dict, Iterable, Any, MutableMapping
 
 from pyrl.binds import Binds, Bind
 
-
 Direction = Tuple[int, int]
-
 
 def set_every_to(every: Iterable, to: Any, at: MutableMapping):
     for item in every:
         at[item] = to
-
 
 class Dir(object):
 

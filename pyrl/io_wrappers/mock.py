@@ -3,13 +3,10 @@ from collections import deque
 
 from pyrl.enums.keys import Key
 
-
 IMPLEMENTATION = "mock"
-
 
 class MockInputEnd(Exception):
     pass
-
 
 class MockWrapper:
 
@@ -32,7 +29,6 @@ class MockWrapper:
 
     def new_window(self, dimensions):
         return MockWrapperWindow(self)
-
 
 class MockWrapperWindow:
 

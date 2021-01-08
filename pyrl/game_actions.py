@@ -6,9 +6,7 @@ from pyrl.combat import get_melee_attack_cr, get_combat_message
 from pyrl.enums.directions import Dir
 from pyrl.generic_algorithms import add_vector, get_vector
 
-
 GameFeedback = namedtuple("GameFeedback", "type, params")
-
 
 class ActionError(Enum):
     AlreadyActed        = "Creature tried to act multiple times."
@@ -23,7 +21,6 @@ class ActionError(Enum):
 
     def __str__(self):
         return self.value
-
 
 class Action(Enum):
     Generic        = "Creature did a generic action."
@@ -47,12 +44,10 @@ class Action(Enum):
     def __str__(self):
         return self.value
 
-
 action_cost = {
     Action.Generic: 1000,
     Action.Spawn:   500,
 }
-
 
 action_params = {
     Action.Move:          namedtuple("Action", "direction"),
@@ -62,14 +57,12 @@ action_params = {
     Action.Enter_Passage: namedtuple("Action", "passage"),
 }
 
-
 def feedback(feedback, *params):
     if params:
         assert feedback in action_params, "No entry found in action_params for {}".format(feedback)
         return GameFeedback(feedback, action_params[feedback](*params))
     else:
         return GameFeedback(feedback, ())
-
 
 def player_action(func):
 
@@ -80,7 +73,6 @@ def player_action(func):
         else:
             return func(self, *args, **kwargs)
     return player_check_wrapper
-
 
 class GameActions(object):
 
@@ -302,7 +294,6 @@ class GameActions(object):
 
     def _do_action(self, cost):
         self.action_cost = cost
-
 
 class GameActionsProperties(object):
 

@@ -5,7 +5,6 @@ from pyrl.rdg import generate_tiles_to
 from tools import profile_util
 from pyrl.world.level import Level
 
-
 def test_profile_rdg_generation():
     profiler = Profile()
     profiler.enable()

@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-
 class RemembersVision(object):
 
     """Creatures with this mixin class remember the level squares they've seen."""

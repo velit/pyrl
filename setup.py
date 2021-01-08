@@ -1,6 +1,5 @@
 from distutils.core import setup
 
-
 setup(
     name='pyrl',
     description='Python roguelike game',

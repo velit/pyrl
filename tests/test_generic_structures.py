@@ -2,7 +2,6 @@ import pytest
 
 from pyrl.generic_structures import Array2D, Event, OneToOneMapping
 
-
 def test_Array2D():
     dims = 2, 2
     l = Array2D(dims, (0, 1, 2))
@@ -18,7 +17,6 @@ def test_Array2D():
 
     assert not l.is_legal((-1, -1))
     assert not l.is_legal((3, 2))
-
 
 def test_one_to_one_mapping():
     mapping = OneToOneMapping()
@@ -50,7 +48,6 @@ def test_one_to_one_mapping():
 
     with pytest.raises(ValueError):
         mapping.update({"a": 10, "b": 10})
-
 
 def test_observable_event():
     event = Event()

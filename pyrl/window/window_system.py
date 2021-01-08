@@ -11,7 +11,6 @@ from pyrl.window.level import LevelWindow
 from pyrl.window.message import MessageBar
 from pyrl.window.status import StatusBar
 
-
 class WindowSystem(object):
 
     message_dimensions = TableDims(GameConf.message_bar_height, default_level_dimensions.cols)

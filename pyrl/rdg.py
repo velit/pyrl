@@ -8,10 +8,8 @@ from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
 from pyrl.enums.level_location import LevelLocation
 
-
 def generate_tiles_to(level):
     RDG(level).generate_tiles()
-
 
 def Rectangle(y, x, height, width):
     """
@@ -39,7 +37,6 @@ def Rectangle(y, x, height, width):
 
     return _Rectangle((y_start, x_start, y_limit, x_limit))
 
-
 class _Rectangle(tuple):
 
     def iterate(self):
@@ -49,7 +46,6 @@ class _Rectangle(tuple):
         for y in range(y_start, y_limit):
             for x in range(x_start, x_limit):
                 yield y, x
-
 
 class RDG(object):
 

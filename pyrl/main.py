@@ -11,7 +11,6 @@ from pyrl.config.debug import Debug
 from pyrl.config.game import GameConf
 from tools import profile_util
 
-
 def run():
     options = get_commandline_options()
     try:
@@ -20,7 +19,6 @@ def run():
         if options.output == "terminal":
             from pyrl.io_wrappers.curses import clean_curses
             clean_curses()
-
 
 def get_commandline_options(args=None):
     parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
@@ -50,7 +48,6 @@ def get_commandline_options(args=None):
 
     return parser.parse_args(args)
 
-
 def game(options, cursor_lib=None):
     init_files_and_folders()
 
@@ -77,11 +74,9 @@ def game(options, cursor_lib=None):
 
     return game
 
-
 def init_logger_system():
     logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
     logging.debug("Starting new session")
-
 
 def init_cursor_lib(output):
     if output == "terminal":
@@ -96,7 +91,6 @@ def init_cursor_lib(output):
     else:
         assert False, f"Unknown output {options.output}"
 
-
 def load_game(game_name, cursor_lib):
     try:
         game = state_store.load(game_name)
@@ -106,7 +100,6 @@ def load_game(game_name, cursor_lib):
     game.init_nonserialized_state(cursor_lib)
     game.redraw()
     return game
-
 
 def init_files_and_folders():
     if not os.path.exists(GameConf.save_folder):

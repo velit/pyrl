@@ -6,7 +6,6 @@ from pyrl.enums.level_gen import LevelGen
 from pyrl.world.level import Level
 from pyrl.enums.level_location import LevelLocation
 
-
 def get_level(player):
 
     dimensions = default_level_dimensions
