@@ -1,15 +1,15 @@
 import math
-from typing import TypeVar, Iterable, MutableMapping
 
 from pyrl.enums.directions import Dir
 
-def resize_range(x, old_range, new_range=range(2)):
-    N = type(x)
-    assert x in old_range, f"Value '{x}' is not inside {old_range}"
+
+def resize_range(n, old_range, new_range=range(2)):
+    N = type(n)
+    assert n in old_range, f"Value '{n}' is not inside {old_range}"
     assert len(old_range) > 1, f"Number {old_range.start} is not a range"
     old_min, old_max = N(old_range.start), N(old_range.stop - 1)
     new_min, new_max = N(new_range.start), N(new_range.stop - 1)
-    return (((N(x) - N(old_min)) * (N(new_max) - N(new_min))) / (N(old_max) - N(old_min))) + N(new_min)
+    return (((N(n) - N(old_min)) * (N(new_max) - N(new_min))) / (N(old_max) - N(old_min))) + N(new_min)
 
 def bresenham(coord_a, coord_b):
     (ay, ax), (by, bx) = coord_a, coord_b
@@ -49,9 +49,9 @@ def bresenham_old(coord_a, coord_b, includelast=True):
             x += xstep
             error += deltay
 
-def chebyshev(coordA, coordB):
-    ay, ax = coordA
-    by, bx = coordB
+def chebyshev(coord_a, coord_b):
+    ay, ax = coord_a
+    by, bx = coord_b
     diagonal_steps = min(abs(ay - by), abs(ax - bx))
     orthogonal_steps = abs(ay - by) + abs(ax - bx) - 2 * diagonal_steps
     return orthogonal_steps, diagonal_steps
@@ -77,8 +77,8 @@ def resize_vector_to_len(vector, length):
 def get_vector(origin, target):
     return target[0] - origin[0], target[1] - origin[1]
 
-def add_vector(vectorA, vectorB):
-    return vectorA[0] + vectorB[0], vectorA[1] + vectorB[1]
+def add_vector(vector_a, vector_b):
+    return vector_a[0] + vector_b[0], vector_a[1] + vector_b[1]
 
 def scalar_mult(scalar, vector):
     return scalar * vector[0], scalar * vector[1]
@@ -92,8 +92,8 @@ def clockwise(vector):
 def anticlockwise(vector):
     return -vector[1], vector[0]
 
-def anticlockwise_45(vector):
-    return Dir.counter_clockwise(vector)
+def anticlockwise_45(direction):
+    return Dir.counter_clockwise(direction)
 
-def clockwise_45(vector):
-    return Dir.clockwise(vector)
+def clockwise_45(direction):
+    return Dir.clockwise(direction)

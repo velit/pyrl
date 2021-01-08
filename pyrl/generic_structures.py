@@ -9,7 +9,7 @@ def _disable_list_dynamicness(cls):
     _disabled_methods = ('append', 'copy', 'extend', 'insert', 'pop', 'remove', 'reverse',
                          'sort', '__delitem__', '__iadd__', '__imul__')
     for method in _disabled_methods:
-        def disabled(not_implemented):
+        def disabled(*args, **kwargs):
             raise NotImplementedError
         disabled.__name__ = method
         disabled.__doc__ = "This method isn't implemented in a non-dynamic array."
@@ -69,7 +69,7 @@ class Array2D(list):
 
     def clear(self):
         for i in range(self.rows * self.cols):
-            super().__setitem__(self, i, None)
+            super().__setitem__(i, None)
 
     def enumerate(self):
         for i, item in enumerate(self):
@@ -101,18 +101,18 @@ class OneToOneMapping(dict):
                 return key
         raise KeyError("Value {} not found in mapping.".format(arg_value))
 
-    def update(self, E=None, **kwords):
-        if E is not None:
-            if hasattr(E, "keys"):
-                for key in E:
-                    self[key] = E[key]
+    def update(self, arg=None, **kwords):
+        if arg is not None:
+            if hasattr(arg, "keys"):
+                for key in arg:
+                    self[key] = arg[key]
             else:
-                for key, value in E:
+                for key, value in arg:
                     self[key] = value
         for key in kwords:
             self[key] = kwords[key]
 
-class Event(object):
+class Event:
 
     def __init__(self):
         self.observers = []

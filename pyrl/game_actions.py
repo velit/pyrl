@@ -57,12 +57,12 @@ action_params = {
     Action.Enter_Passage: namedtuple("Action", "passage"),
 }
 
-def feedback(feedback, *params):
+def feedback(action, *params):
     if params:
-        assert feedback in action_params, "No entry found in action_params for {}".format(feedback)
-        return GameFeedback(feedback, action_params[feedback](*params))
+        assert action in action_params, "No entry found in action_params for {}".format(action)
+        return GameFeedback(action, action_params[action](*params))
     else:
-        return GameFeedback(feedback, ())
+        return GameFeedback(action, ())
 
 def player_action(func):
 
@@ -74,7 +74,7 @@ def player_action(func):
             return func(self, *args, **kwargs)
     return player_check_wrapper
 
-class GameActions(object):
+class GameActions:
 
     """
     GameActions is the interface between creature controllers (player, ai) and the game.
@@ -116,7 +116,7 @@ class GameActions(object):
         if self.coord not in self.level.locations:
             return feedback(ActionError.NoPassage)
 
-        source_point = (self.level.key, self.level.locations[self.coord])
+        source_point = (self.level.level_key, self.level.locations[self.coord])
 
         if not self.game.world.has_destination(source_point):
             return feedback(ActionError.PassageLeadsNoWhere)
@@ -195,9 +195,9 @@ class GameActions(object):
     def _attack_user_message(self, succeeds, damage, died, target):
         player_attacker = self.creature is self.player
         player_target = target is self.player
-        if (player_attacker or player_target):
+        if player_attacker or player_target:
             msg = get_combat_message(succeeds, damage, died, player_attacker, player_target,
-                                    self.creature.name, target.name)
+                                     self.creature.name, target.name)
             self.game.io.msg(msg)
 
     def drop_items(self, item_indexes):
@@ -239,17 +239,17 @@ class GameActions(object):
         else:
             return self.creature.vision & self.level.creatures.keys() - {self.coord}
 
-    def view_floor_items(self):
+    def inspect_floor_items(self):
         """Free action."""
-        return self.level.view_items(self.coord)
+        return self.level.inspect_items(self.coord)
 
-    def view_character_items(self):
+    def inspect_character_items(self):
         """Free action."""
-        return self.creature.equipment.view_items()
+        return self.creature.equipment.inspect_items()
 
     def can_reach(self, target_coord):
         """Free action."""
-        return (self.coord == target_coord or get_vector(self.coord, target_coord) in Dir.All)
+        return self.coord == target_coord or get_vector(self.coord, target_coord) in Dir.All
 
     def can_move(self, direction):
         """Free action."""
@@ -295,7 +295,7 @@ class GameActions(object):
     def _do_action(self, cost):
         self.action_cost = cost
 
-class GameActionsProperties(object):
+class GameActionsProperties:
 
     """
     Helper class to access the hierarchy of the game easier in controller classes.

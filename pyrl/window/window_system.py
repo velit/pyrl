@@ -2,19 +2,19 @@ from collections import deque
 from functools import wraps
 
 from pyrl.config.debug import Debug
-from pyrl.config.game import GameConf
+from pyrl.config.config import Config
 from pyrl.enums.colors import Pair
-from pyrl.game_data.levels import default_level_dimensions
+from pyrl.game_data.levels.shared_assets import default_level_dimensions
 from pyrl.generic_structures import TableDims, Coord
 from pyrl.window.base_window import BaseWindow
-from pyrl.window.level import LevelWindow
-from pyrl.window.message import MessageBar
-from pyrl.window.status import StatusBar
+from pyrl.window.level_window import LevelWindow
+from pyrl.window.message_bar import MessageBar
+from pyrl.window.status_bar import StatusBar
 
-class WindowSystem(object):
+class WindowSystem:
 
-    message_dimensions = TableDims(GameConf.message_bar_height, default_level_dimensions.cols)
-    status_dimensions = TableDims(GameConf.status_bar_height, default_level_dimensions.cols)
+    message_dimensions = TableDims(Config.message_bar_height, default_level_dimensions.cols)
+    status_dimensions = TableDims(Config.status_bar_height, default_level_dimensions.cols)
     game_dimensions = TableDims(message_dimensions.rows + status_dimensions.rows +
                                 default_level_dimensions.rows, default_level_dimensions.cols)
 

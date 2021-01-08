@@ -9,12 +9,12 @@ def Weapon(name, accuracy, weapon_dice, two_handed=False, compatible_slots=(Slot
     return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
                 occupies_all_slots=two_handed)
 
-def Armor(name, defense, armor, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
-    stats = ((Stat.defense, defense), (Stat.armor, armor), *stats)
+def Armor(name, defense, armor_value, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
+    stats = ((Stat.defense, defense), (Stat.armor, armor_value), *stats)
     return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
                 occupies_all_slots=False)
 
-class Item(object):
+class Item:
     def __init__(self, name, compatible_slots, stats, char, occupies_all_slots):
         self.name = name
         self.compatible_slots = tuple(compatible_slots)
@@ -43,9 +43,9 @@ class Item(object):
 
     def armor_str(self):
         defense = self.get_stat(Stat.defense, default=0)
-        armor = self.get_stat(Stat.armor, default=0)
-        if defense or armor:
-            return " [{:+}, {:+}]".format(defense, armor)
+        armor_value = self.get_stat(Stat.armor, default=0)
+        if defense or armor_value:
+            return " [{:+}, {:+}]".format(defense, armor_value)
         else:
             return ""
 

@@ -1,8 +1,8 @@
 from pyrl.enums.colors import Pair
 from pyrl.world.tile import Tile
 
-class PyrlTile(object):
-    #Name          Description                     Visible char        Memory char          Pathable Transparency
+class PyrlTile:
+    # Name         Description                       Visible char        Memory char        Pathable Transparency
     Unknown      = Tile("nothing",                 (' ', Pair.Normal), (' ', Pair.Normal),  False,   False)
     Floor        = Tile("dungeon floor",           ('.', Pair.Light),  ('.', Pair.Gray),    True,    True)
     Black_Floor  = Tile("obisidian dungeon floor", ('.', Pair.Red),    ('.', Pair.Red),     True,    True)

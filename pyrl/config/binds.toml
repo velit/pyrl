@@ -9,6 +9,8 @@
 #     F1 - F12
 #     Numpad 0 - Numpad 9
 #
+# Due to a bug in the python toml parser use the value "\u002C" instead of "," to bind the comma key to something
+#
 # For other keys use a string representing that character. To use shift just write the
 # character that comes out of the shift combination directly (eg. Q or #). For alt/meta
 # prepend a ! character and for ctrl prepend a ^ character. Some rules:
@@ -64,7 +66,7 @@ Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
 
 [Directions]
 SouthWest               = ["1", "m", "Numpad 1", "End"]
-South                   = ["2", ",", "Numpad 2", "Down"]
+South                   = ["2", "\u002C", "Numpad 2", "Down"]
 SouthEast               = ["3", ".", "Numpad 3", "Page Down"]
 West                    = ["4", "j", "Numpad 4", "Left"]
 Stay                    = ["5", "k", "Numpad 5"]

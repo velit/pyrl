@@ -8,8 +8,8 @@ class PathException(Exception):
 def path(start_coord, goal_coord, neighbor_function, heuristic):
     return _iterate_path(_a_star(start_coord, goal_coord, neighbor_function, heuristic), start_coord, goal_coord)
 
-def heuristic(coordA, coordB, default_movement_cost, diagonal_modifier):
-    orthogonal_steps, diagonal_steps = chebyshev(coordA, coordB)
+def distance(coord_a, coord_b, default_movement_cost, diagonal_modifier):
+    orthogonal_steps, diagonal_steps = chebyshev(coord_a, coord_b)
     return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
 
 def _a_star(start, goal, neighbors, heuristic):

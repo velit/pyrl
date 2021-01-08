@@ -32,24 +32,24 @@ def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, sele
     orig_select_keys = tuple(select_keys)
     scroll_offset = 0
     selected = set()
-    filter = ""
+    filter_regex = ""
     while True:
         content_size, select_keys, all_keys = _get_vars(window, lines, multi_select,
                                                         orig_select_keys, return_keys)
         print_lines = _get_print_lines(lines, scroll_offset, content_size,
                                        selected, select_keys)
-        _print_view(window, print_lines, header + filter, footer)
+        _print_view(window, print_lines, header + filter_regex, footer)
         key = window.get_key(keys=all_keys, refresh=True)
 
         if key in Binds.Filter:
             query = "Filter regex (empty to clear): "
-            filter = window.get_str(query, (1, 0))
-            window.draw_str(" " * (len(query + filter) + 1), (1, 0))
-            if filter == "":
-                lines = orig_lines
+            filter_regex = window.get_str(query, (1, 0))
+            window.draw_str(" " * (len(query + filter_regex) + 1), (1, 0))
+            if filter_regex:
+                lines = tuple(line for line in orig_lines if re.search(filter_regex, line.display))
+                filter_regex = " (Filter/{})".format(filter_regex)
             else:
-                lines = tuple(line for line in orig_lines if re.search(filter, line.display))
-                filter = " (Filter/{})".format(filter)
+                lines = orig_lines
             scroll_offset = 0
         elif key in Binds.ScrollKeys:
             scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))

@@ -3,17 +3,18 @@ from pyrl import state_store, binds
 from pyrl.ai import AI
 from pyrl.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.config.game import GameConf
+from pyrl.config.config import Config
 from pyrl.controllers.user_controller import UserController
+from pyrl.creature.creature import Creature
 from pyrl.fov import ShadowCast
 from pyrl.game_actions import GameActions
 from pyrl.game_data.pyrl_world import get_world
 from pyrl.interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.world import LevelNotFound
-from pyrl.creature.remembers_vision import RemembersVision
+from pyrl.creature.mixins.remembers_vision import RemembersVision
 
-class Game(object):
+class Game:
 
     def __init__(self, game_name, cursor_lib):
         self.game_name = game_name
@@ -102,7 +103,7 @@ class Game(object):
             msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
         return msg_str
 
-    def update_view(self, creature):
+    def update_view(self, creature: Creature):
         """
         Update the vision set of the creature.
 
@@ -111,6 +112,8 @@ class Game(object):
         """
         if not isinstance(creature, RemembersVision):
             raise ValueError("Creature {} doesn't have the capacity to remember its vision.")
+        if not isinstance(creature, Creature):
+            raise ValueError(f"{creature} is not a creature!")
 
         lvl = creature.level
         new_vision = ShadowCast.get_light_set(lvl.is_see_through, creature.coord,
@@ -120,13 +123,13 @@ class Game(object):
 
         if Debug.show_map:
             vision_info = lvl.get_vision_information(lvl.tiles.coord_iter(), new_vision,
-                                                       always_show_creatures=True)
+                                                     always_show_creatures=True)
         else:
             vision_info = lvl.get_vision_information(potentially_modified_vision, new_vision)
 
         self.io.draw(vision_info)
 
-        if GameConf.clearly_show_vision:
+        if Config.clearly_show_vision:
             reverse_data = lvl.get_vision_information(new_vision, new_vision)
             self.io.draw(reverse_data, True)
 
@@ -143,7 +146,7 @@ class Game(object):
             vision_info = lvl.get_vision_information(draw_coords, self.player.vision)
         self.io.draw(vision_info)
 
-        if GameConf.clearly_show_vision:
+        if Config.clearly_show_vision:
             reverse_data = lvl.get_vision_information(self.player.vision, self.player.vision)
             self.io.draw(reverse_data, True)
 

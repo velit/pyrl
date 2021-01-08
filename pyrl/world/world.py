@@ -3,12 +3,13 @@ from collections import Counter, namedtuple
 from pyrl.enums.level_location import LevelLocation
 from pyrl.world.level import Level
 
-class LevelNotFound(Exception): pass
+class LevelNotFound(Exception):
+    pass
 
-LevelKey = namedtuple("LevelKey", ("dungeon, index"))
-WorldPoint = namedtuple("WorldPoint", ("level_key, level_location"))
+LevelKey = namedtuple("LevelKey", ("dungeon", "index"))
+WorldPoint = namedtuple("WorldPoint", ("level_key", "level_location"))
 
-class World(object):
+class World:
 
     def __init__(self, player):
         self.levels = {}
@@ -33,7 +34,9 @@ class World(object):
             passage_down = LevelLocation.Passage_Down
             passage_up = LevelLocation.Passage_Up
             if previous_level.will_have_location(passage_down) and level.will_have_location(passage_up):
-                self.set_two_way_connection(WorldPoint(prev_level_key, passage_down), WorldPoint(curr_level_key, passage_up))
+                prev_level_point = WorldPoint(prev_level_key, passage_down)
+                cur_level_point = WorldPoint(curr_level_key, passage_up)
+                self.set_two_way_connection(prev_level_point, cur_level_point)
 
     def get_level(self, level_key):
         if level_key not in self.levels:
@@ -50,18 +53,18 @@ class World(object):
     def get_destination(self, world_point):
         return self.level_connections[world_point]
 
-    def set_two_way_connection(self, world_point_A, world_point_B, do_Assert=True):
+    def set_two_way_connection(self, world_point_a, world_point_b, do_assert=True):
 
-        if do_Assert:
-            level_A = self.levels[world_point_A.level_key]
-            level_B = self.levels[world_point_B.level_key]
-            assert level_A.will_have_location(world_point_A.level_location), \
-                "{} doesn't have location {}.".format(level_A, world_point_A.level_location)
-            assert level_B.will_have_location(world_point_B.level_location), \
-                "{} doesn't have location {}.".format(level_B, world_point_B.level_location)
+        if do_assert:
+            level_a = self.levels[world_point_a.level_key]
+            level_b = self.levels[world_point_b.level_key]
+            assert level_a.will_have_location(world_point_a.level_location), \
+                "{} doesn't have location {}.".format(level_a, world_point_a.level_location)
+            assert level_b.will_have_location(world_point_b.level_location), \
+                "{} doesn't have location {}.".format(level_b, world_point_b.level_location)
 
-        self.set_connection(world_point_A, world_point_B)
-        self.set_connection(world_point_B, world_point_A)
+        self.set_connection(world_point_a, world_point_b)
+        self.set_connection(world_point_b, world_point_a)
 
-    def set_connection(self, world_point_A, world_point_B):
-        self.level_connections[world_point_A] = world_point_B
+    def set_connection(self, world_point_a, world_point_b):
+        self.level_connections[world_point_a] = world_point_b

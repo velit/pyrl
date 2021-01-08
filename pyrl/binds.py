@@ -4,8 +4,6 @@ from typing import Union, Iterable, NewType
 
 import toml
 
-from pyrl import config
-
 Bind = NewType("Bind", str)
 
 class BindSequence(tuple):
@@ -75,7 +73,6 @@ class Binds:
     Backpack_Drop_Items = undefined
 
     Directions = undefined
-
     SouthWest = undefined
     South = undefined
     SouthEast = undefined
@@ -87,7 +84,6 @@ class Binds:
     NorthEast = undefined
 
     InstantWalk = undefined
-
     Instant_SouthWest = undefined
     Instant_South = undefined
     Instant_SouthEast = undefined
@@ -98,7 +94,7 @@ class Binds:
     Instant_North = undefined
     Instant_NorthEast = undefined
 
-with resources.open_text(config, "binds.toml") as f:
+with resources.open_text("pyrl.config", "binds.toml") as f:
     hotkeys = toml.load(f)
 
 # Set all hotkeys and their categories to Binds namespace
@@ -110,4 +106,3 @@ for category_name, category in hotkeys.items():
 
 def undefined_keys():
     return [key for key, value in vars(Binds).items() if value is undefined]
-

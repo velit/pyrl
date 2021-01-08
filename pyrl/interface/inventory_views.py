@@ -12,7 +12,7 @@ def _get_equipment_item_str(equipment, slot):
     else:
         return "{}".format(item.name)
 
-def equipment(actions):
+def equipment_view(actions):
     footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
     footer = footer_fmt.format(Binds.Equipment_View_Backpack.key, Binds.Cancel.key)
     equipment = actions.creature.equipment
@@ -30,17 +30,17 @@ def equipment(actions):
         if key in Binds.Cancel:
             return
         elif key in Binds.Equipment_View_Backpack:
-            backpack(actions)
+            backpack_view(actions)
         elif slot in Slot:
             if equipment.get_item(slot) is None:
-                backpack_equip_item(actions, slot)
+                backpack_equip_item_view(actions, slot)
             else:
                 equipment.unequip(slot)
         else:
             assert False, "Got unhandled return values, key: {} value: {}".format(key, slot)
 
-def backpack_equip_item(actions, slot):
-    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items())
+def backpack_equip_item_view(actions, slot):
+    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items())
                   if item.fits_slot(slot))
     key, item = lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
                            header="Select item to equip")
@@ -49,23 +49,23 @@ def backpack_equip_item(actions, slot):
     else:
         actions.creature.equipment.equip_from_bag(item, slot)
 
-def backpack(actions):
-    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items()))
+def backpack_view(actions):
+    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = lines_view(
         actions.io.whole_window,
         lines,
         multi_select=True,
         select_keys=Binds.Backpack_Select_Keys,
         return_keys=Binds.Backpack_Drop_Items + Binds.Cancel,
-        header="Backpack".format(Binds.Backpack_Drop_Items.key),
+        header="Backpack",
     )
     if key in Binds.Cancel:
         return
     elif key in Binds.Backpack_Drop_Items:
         return actions.drop_items(selections)
 
-def pickup_items(actions):
-    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_floor_items()))
+def pickup_items_view(actions):
+    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_floor_items()))
 
     if not lines:
         return feedback(ActionError.NoItemsOnGround)
@@ -82,14 +82,14 @@ def pickup_items(actions):
     if key in Binds.Cancel and selections:
         return actions.pickup_items(selections)
 
-def drop_items(actions):
-    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.view_character_items()))
+def drop_items_view(actions):
+    lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = lines_view(
         actions.io.whole_window,
         lines,
         multi_select=True,
         select_keys=Binds.Backpack_Select_Keys,
-        header="Select items to drop".format(Binds.Backpack_Drop_Items.key)
+        header="Select items to drop"
     )
     if key in Binds.Cancel and selections:
         return actions.drop_items(selections)

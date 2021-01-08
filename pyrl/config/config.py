@@ -1,6 +1,6 @@
 
 
-class GameConf(object):
+class Config:
 
     """Configure variables above the data section to suit your needs."""
 

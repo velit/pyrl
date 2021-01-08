@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pyrl.creature import Creature
+from pyrl.creature.creature import Creature
 from pyrl.enums.directions import Dir
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
