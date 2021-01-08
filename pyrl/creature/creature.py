@@ -7,7 +7,7 @@ from pyrl.dice import Dice
 
 
 @ensure_stats
-class Creature(object):
+class Creature:
 
     def __init__(self, name, char, danger_level=0, spawn_weight_class=1, coord=None):
         self.name = name

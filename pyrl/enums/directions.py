@@ -1,57 +1,43 @@
-from pyrl.binds import Binds
+from typing import Tuple, Dict, Iterable, Any, MutableMapping
+
+from pyrl.binds import Binds, Bind
+
+
+Direction = Tuple[int, int]
+
+
+def set_every_to(every: Iterable, to: Any, at: MutableMapping):
+    for item in every:
+        at[item] = to
 
 
 class Dir(object):
 
-    NorthWest = (-1, -1)
-    North     = (-1,  0)
-    NorthEast = (-1,  1)
-    West      = (0,  -1)
-    Stay      = (0,   0)
-    East      = (0,   1)
-    SouthWest = (1,  -1)
-    South     = (1,   0)
-    SouthEast = (1,   1)
+    All = (-1, -1),  (-1,  0), (-1,  1),  (0,   1), (1,   1),  (1,   0), (1,  -1),  (0,  -1)
+    (     NorthWest, North,    NorthEast, East,     SouthEast, South,    SouthWest, West) = All
+    Stay = (0, 0)
+    AllPlusStay = All + Stay
+    Diagonals = NorthWest, NorthEast, SouthEast, SouthWest
+    Orthogonals = North, East, South, West
 
-    All = (NorthWest, North, NorthEast, West, East, SouthWest, South, SouthEast)
-    AllPlusStay = (NorthWest, North, NorthEast, West, Stay, East, SouthWest, South, SouthEast)
-    Diagonals = (NorthWest, NorthEast, SouthWest, SouthEast)
-    Orthogonals = (North, East, South, West)
+    @classmethod
+    def clockwise(cls, direction: Tuple[int, int]):
+        return cls.All[cls.All.index(direction) + 1 % len(cls.All)]
 
-    clockwise = {
-        NorthWest:  North,
-        North:      NorthEast,
-        NorthEast:  East,
-        East:       SouthEast,
-        SouthEast:  South,
-        South:      SouthWest,
-        SouthWest:  West,
-        West:       NorthWest,
-    }
+    @classmethod
+    def counter_clockwise(cls, direction: Tuple[int, int]):
+        return cls.All[cls.All.index(direction) - 1 % len(cls.All)]
 
-    counter_clockwise = {
-        NorthWest:  West,
-        West:       SouthWest,
-        SouthWest:  South,
-        South:      SouthEast,
-        SouthEast:  East,
-        East:       NorthEast,
-        NorthEast:  North,
-        North:      NorthWest,
-    }
-
-    from_key = {}
-    associate = lambda d, binds, direction: d.update((bind, direction) for bind in binds)
-    associate(from_key, Binds.SouthWest + Binds.Instant_SouthWest, SouthWest)
-    associate(from_key, Binds.South + Binds.Instant_South, South)
-    associate(from_key, Binds.SouthEast + Binds.Instant_SouthEast, SouthEast)
-    associate(from_key, Binds.West + Binds.Instant_West, West)
-    associate(from_key, Binds.Stay + Binds.Instant_Stay, Stay)
-    associate(from_key, Binds.East + Binds.Instant_East, East)
-    associate(from_key, Binds.NorthWest + Binds.Instant_NorthWest, NorthWest)
-    associate(from_key, Binds.North + Binds.Instant_North, North)
-    associate(from_key, Binds.NorthEast + Binds.Instant_NorthEast, NorthEast)
-    del associate
+    from_key: Dict[Bind, Direction] = {}
+    set_every_to(Binds.SouthWest + Binds.Instant_SouthWest, to=SouthWest, at=from_key)
+    set_every_to(Binds.South     + Binds.Instant_South,     to=South,     at=from_key)
+    set_every_to(Binds.SouthEast + Binds.Instant_SouthEast, to=SouthEast, at=from_key)
+    set_every_to(Binds.West      + Binds.Instant_West,      to=West,      at=from_key)
+    set_every_to(Binds.Stay      + Binds.Instant_Stay,      to=Stay,      at=from_key)
+    set_every_to(Binds.East      + Binds.Instant_East,      to=East,      at=from_key)
+    set_every_to(Binds.NorthWest + Binds.Instant_NorthWest, to=NorthWest, at=from_key)
+    set_every_to(Binds.North     + Binds.Instant_North,     to=North,     at=from_key)
+    set_every_to(Binds.NorthEast + Binds.Instant_NorthEast, to=NorthEast, at=from_key)
 
     OrthogonalMoveMult = 1
     DiagonalMoveMult = 2 ** 0.5

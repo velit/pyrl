@@ -4,7 +4,7 @@ from random import randrange
 
 
 Coord = namedtuple("Coord", "y, x")
-TableDims = namedtuple("Size2D", "rows, cols")
+TableDims = namedtuple("TableDims", "rows, cols")
 
 
 def _disable_list_dynamicness(cls):
