@@ -32,7 +32,7 @@ class MessageBar(BaseWindow):
         self.blit()
 
     def debug_msg(self, obj):
-        logging.debug("io.msg: {}".format(obj))
+        logging.debug(f"io.msg: {obj}")
 
     def queue_msg(self, *args):
         if self.cursor_win.implementation == mock.IMPLEMENTATION:
@@ -47,14 +47,14 @@ class MessageBar(BaseWindow):
             lastitem = self.history[-1] if self.history else ""
 
             if msg == lastitem:
-                self.history[-1] = "{} (x{})".format(msg, 2)
+                self.history[-1] = f"{msg} (x2)"
                 continue
 
             if msg == lastitem[:len(msg)]:
                 result = re.match(r" \(x(\d+)\)", lastitem[len(msg):])
                 if result:
                     repeat_number = int(result.group(1)) + 1
-                    self.history[-1] = "{} (x{})".format(msg, repeat_number)
+                    self.history[-1] = f"{msg} (x{repeat_number})"
                     continue
 
             self.history.append(msg)

@@ -93,13 +93,13 @@ class BaseWindow:
         for i, line in enumerate(lines):
             self.draw_str(line, (i + y_offset, x_offset))
 
-    def draw_banner(self, banner_text, y_offset=0, color=Pair.Brown):
-        format_str = "{0:+^" + str(self.cols) + "}"
-        banner_text = format_str.format("  " + banner_text + "  ")
+    def draw_banner(self, banner_content, y_offset=0, color=Pair.Brown):
+        space_padded = f"  {banner_content}  "
+        full_banner = f"{space_padded:+^{self.cols}}"
         if y_offset < 0:
-            self.draw_str(banner_text, (self.rows + y_offset, 0), color)
+            self.draw_str(full_banner, (self.rows + y_offset, 0), color)
         else:
-            self.draw_str(banner_text, (y_offset, 0), color)
+            self.draw_str(full_banner, (y_offset, 0), color)
 
     def get_str(self, ask_line="", coord=(0, 0)):
         self.draw_str(ask_line, coord)

@@ -10,15 +10,16 @@ def _get_equipment_item_str(equipment, slot):
     if not item.occupies_all_slots or slot == item.compatible_slots[0]:
         return str(item)
     else:
-        return "{}".format(item.name)
+        return item.name
 
 def equipment_view(actions):
-    footer_fmt = "Press a slot key to (un)equip  {} to view backpack  {} to close"
-    footer = footer_fmt.format(Binds.Equipment_View_Backpack.key, Binds.Cancel.key)
+    footer = f"Press a slot key to (un)equip" \
+             f"  {Binds.Equipment_View_Backpack.key} to view backpack" \
+             f"  {Binds.Cancel.key} to close"
     equipment = actions.creature.equipment
 
     while True:
-        lines = tuple(Line("{:11}: {}".format(slot.value, _get_equipment_item_str(equipment, slot)), slot)
+        lines = tuple(Line(f"{slot.value:11}: {_get_equipment_item_str(equipment, slot)}", slot)
                       for slot in Slot)
         key, slot = lines_view(actions.io.whole_window, lines,
                                multi_select=False,
@@ -37,7 +38,7 @@ def equipment_view(actions):
             else:
                 equipment.unequip(slot)
         else:
-            assert False, "Got unhandled return values, key: {} value: {}".format(key, slot)
+            assert False, f"Got unhandled return values {key=} {slot=}"
 
 def backpack_equip_item_view(actions, slot):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items())
@@ -57,7 +58,7 @@ def backpack_view(actions):
         multi_select=True,
         select_keys=Binds.Backpack_Select_Keys,
         return_keys=Binds.Backpack_Drop_Items + Binds.Cancel,
-        header="Backpack",
+        header=f"Backpack ({Binds.Backpack_Drop_Items.key} to drop selected items)",
     )
     if key in Binds.Cancel:
         return
@@ -70,7 +71,7 @@ def pickup_items_view(actions):
     if not lines:
         return feedback(ActionError.NoItemsOnGround)
     elif len(lines) == 1:
-        return actions.pickup_items((lines[0][0], ))
+        return actions.pickup_items((lines[0].return_value, ))
 
     key, selections = lines_view(
         actions.io.whole_window,

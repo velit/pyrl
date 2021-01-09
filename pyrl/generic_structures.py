@@ -35,8 +35,7 @@ class Array2D(list):
         if second_dim < second_dim_bound:
             return first_dim * second_dim_bound + second_dim
         else:
-            msg = "Second dimension index out of range: {} < {}"
-            raise IndexError(msg.format(second_dim, second_dim_bound))
+            raise IndexError(f"Second dimension index out of range: {second_dim=} < {second_dim_bound=}")
 
     @staticmethod
     def get_coord_from_index(index, second_dim_bound):
@@ -92,14 +91,14 @@ class OneToOneMapping(dict):
 
     def __setitem__(self, key, value):
         if value in self.values():
-            raise ValueError("Value {} already exists in mapping.".format(value))
+            raise ValueError(f"{value=} already exists in mapping.")
         super().__setitem__(key, value)
 
-    def getkey(self, arg_value):
-        for key, value in self.items():
-            if value == arg_value:
+    def getkey(self, value):
+        for key, existing_value in self.items():
+            if value == existing_value:
                 return key
-        raise KeyError("Value {} not found in mapping.".format(arg_value))
+        raise KeyError(f"{value=} not found in mapping.")
 
     def update(self, arg=None, **kwords):
         if arg is not None:

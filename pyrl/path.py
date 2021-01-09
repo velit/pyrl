@@ -38,7 +38,7 @@ def _a_star(start, goal, neighbors, heuristic):
                     heappush(openprio, (g[node] + heuristic(node, goal, start), node))
                     openmember.add(node)
     else:
-        raise PathException("No possible paths between arguments start:{} goal:{}".format(start, goal))
+        raise PathException(f"No possible paths between {start=} and {goal=}")
 
 def _iterate_path(came_from, start, goal):
     """Iterate the path structure returned by _path()."""

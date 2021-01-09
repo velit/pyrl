@@ -19,5 +19,5 @@ class ComplexStat(Enum):
 
 def ensure_stats(obj):
     for stat in Stat:
-        assert hasattr(obj, stat.name), "Attribute {} must be found in {}".format(stat.name, obj)
+        assert hasattr(obj, stat.name), f"Attribute {stat.name} must be found in {obj}"
     return obj

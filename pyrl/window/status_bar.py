@@ -23,7 +23,9 @@ class StatusBar(BaseWindow):
         self.elements.append((string, getter))
 
     def print_elements(self):
-        status_string = "  ".join("{}:{}".format(string, getter()) for string, getter in self.elements)
+        status_string = "  ".join(
+            f"{string}:{getter()}" for string, getter in self.elements
+        )
         lines = self.wrapper.wrap(status_string)
         for i, line in enumerate(lines):
             self.draw_str(line, (i, 0))

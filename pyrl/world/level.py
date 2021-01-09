@@ -4,6 +4,7 @@ from functools import wraps
 
 from pyrl import path
 from pyrl.config.debug import Debug
+from pyrl.creature.creature import Creature
 from pyrl.enums.directions import Dir
 from pyrl.enums.level_gen import LevelGen
 from pyrl.enums.level_location import LevelLocation
@@ -211,16 +212,12 @@ class Level:
 
     def look_information(self, coord):
         # if coord in creature.visited_location_coords:
-        information = "{}x{} ".format(*coord)
+        information = f"{coord[0]}x{coord[1]} "
         if coord in self.creatures:
-            c = self.creatures[coord]
-            msg = "{} hp:{}/{} sight:{} armor:{} dr:{} ar:{} attack:{}D{}+{}"
-            information += msg.format(c.name, c.hp, c.max_hp, c.sight, c.armor,
-                                      c.defense, c.accuracy, *c.get_damage_info())
-            if hasattr(c, "target_coord"):
-                information += " target:{}".format(c.target_coord)
-            if hasattr(c, "chase_vector"):
-                information += " direction:{}".format(c.chase_vector)
+            c: Creature = self.creatures[coord]
+            damage = c.get_damage_info()
+            information += f"{c.name} hp:{c.hp}/{c.max_hp} sight:{c.sight} armor:{c.armor} dr:{c.defense} " \
+                           f"ar:{c.accuracy} attack:{damage.dices}D{damage.highest_side}+{damage.addition}"
         else:
             information += self.tiles[coord].name
         return information
@@ -230,9 +227,8 @@ class Level:
     def spawn_creature(self, creature):
         coord = None
         if creature.coord is not None:
-            if not self.is_passable(creature.coord):
-                fmt = "Attempting to spawn creature {} to already occupied square: {}"
-                raise AssertionError(fmt.format(creature.name, creature.coord))
+            assert self.is_passable(creature.coord), \
+                f"Attempting to spawn {creature.name} to already occupied square: {creature.coord}"
             coord = creature.coord
 
         self.add_creature(creature, coord)
@@ -292,7 +288,7 @@ class Level:
         if not item_indexes:
             return ()
 
-        assert coord in self.items, "Trying to take items from a coord {} that doesn't have any.".format(coord)
+        assert coord in self.items, f"Trying to take items from {coord=} that doesn't have any."
 
         current_items = self.items[coord]
         taken_items = tuple(current_items[index] for index in item_indexes)

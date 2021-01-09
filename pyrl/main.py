@@ -94,7 +94,7 @@ def load_game(game_name, cursor_lib):
     try:
         game = state_store.load(game_name)
     except FileNotFoundError:
-        print("Game '{}' not found.".format(game_name), file=sys.stderr)
+        print(f"Save file '{game_name}' not found.", file=sys.stderr)
         sys.exit(1)
     game.init_nonserialized_state(cursor_lib)
     game.redraw()

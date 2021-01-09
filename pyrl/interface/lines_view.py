@@ -1,5 +1,6 @@
 import collections
 import re
+from typing import Sequence, Set
 
 from pyrl.binds import Binds
 
@@ -8,15 +9,21 @@ Line = collections.namedtuple("Line", ("display", "return_value"))
 def build_lines(iterable):
     return tuple(Line(value, i) for i, value in enumerate(iterable))
 
-_single = "{}/{} scroll  {}/{} next/previous line  {} filter  {} close"
-_single = _single.format(Binds.Next_Page.key, Binds.Previous_Page.key, Binds.Next_Line.key,
-                         Binds.Previous_Line.key, Binds.Filter, Binds.Cancel.key)
-_multi = "{}/{} scroll  {}/{} next/previous line  {}/{} (de)select all  {} filter  {} close"
-_multi = _multi.format(Binds.Next_Page.key, Binds.Previous_Page.key,
-                       Binds.Next_Line.key, Binds.Previous_Line.key,
-                       Binds.Deselect_All.key, Binds.Select_All.key, Binds.Filter, Binds.Cancel.key)
 
-def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, select_keys=(),
+def define_footers():
+    pages = f"{Binds.Next_Page.key}/{Binds.Previous_Page.key} scroll"
+    lines = f"{Binds.Next_Line.key}/{Binds.Previous_Line.key} next/previous line"
+    selects = f"{Binds.Deselect_All.key}/{Binds.Select_All.key} (de)select all"
+    filt = f"{Binds.Filter.key} filter"
+    close = f"{Binds.Cancel.key} close"
+
+    single_footer = f"{pages}  {lines}  {filt}  {close}"
+    multi_footer = f"{pages}  {lines}  {selects}  {filt}  {close}"
+    return single_footer, multi_footer
+
+single_select_footer, multi_select_footer = define_footers()
+
+def lines_view(window, lines: Sequence[Line], multi_select=False, return_keys=Binds.Cancel, select_keys=(),
                header="", footer=None):
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
@@ -26,12 +33,12 @@ def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, sele
     In multi_select mode returns (return_key, selected_items)
     """
     if footer is None:
-        footer = _multi if multi_select else _single
+        footer = multi_select_footer if multi_select else single_select_footer
 
     orig_lines = tuple(lines)
     orig_select_keys = tuple(select_keys)
     scroll_offset = 0
-    selected = set()
+    selected: Set[Line] = set()
     filter_regex = ""
     while True:
         content_size, select_keys, all_keys = _get_vars(window, lines, multi_select,
@@ -47,7 +54,7 @@ def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, sele
             window.draw_str(" " * (len(query + filter_regex) + 1), (1, 0))
             if filter_regex:
                 lines = tuple(line for line in orig_lines if re.search(filter_regex, line.display))
-                filter_regex = " (Filter/{})".format(filter_regex)
+                filter_regex = f" (Filter/{filter_regex})"
             else:
                 lines = orig_lines
             scroll_offset = 0
@@ -60,18 +67,18 @@ def lines_view(window, lines, multi_select=False, return_keys=Binds.Cancel, sele
             elif key in return_keys:
                 return key, tuple(line.return_value for line in selected)
             elif key in Binds.Select_All:
-                selected = set(range(len(lines)))
+                selected = set(lines)
             elif key in Binds.Deselect_All:
                 selected.clear()
             else:
-                assert False, "Got unhandled key as input {}".format(key)
+                assert False, f"Unhandled {key=}"
         else:
             if key in select_keys:
                 return key, lines[select_keys.index(key) + scroll_offset].return_value
             elif key in return_keys:
                 return key, None
             else:
-                assert False, "Got unhandled key as input {}".format(key)
+                assert False, f"Unhandled {key=}"
 
 def _get_vars(window, lines, multi_select, select_keys, return_keys):
     if select_keys:
@@ -89,8 +96,8 @@ def _get_vars(window, lines, multi_select, select_keys, return_keys):
 def _get_print_lines(lines, offset, content_size, selected, select_keys):
     sliced_lines = _slice_lines(lines, offset, offset + content_size)
     if select_keys:
-        return tuple("{} {} {}".format(key, "+" if line in selected else "-",
-                     line.display) for key, line in zip(select_keys, sliced_lines))
+        return tuple(f"{key} {'+' if line in selected else '-'} {line.display}"
+                     for key, line in zip(select_keys, sliced_lines))
     else:
         return tuple(line.display for line in sliced_lines)
 

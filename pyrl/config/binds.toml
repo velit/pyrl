@@ -5,7 +5,7 @@
 #
 # Special key names:
 #     Left, Right, Up, Down, Esc, Tab, Shift+Tab, Backspace,
-#     Space, Enter, Insert, Delete, Home, End, Page up, Page Down
+#     Space, Enter, Insert, Delete, Home, End, Page Up, Page Down
 #     F1 - F12
 #     Numpad 0 - Numpad 9
 #
@@ -25,10 +25,10 @@ Cancel                  = ["z", "Space", "Esc"]
 Debug_Commands          = ["d"]
 
 [ScrollKeys]
-Next_Line               = ["+", "^n"]
-Previous_Line           = ["-", "^p"]
-Next_Page               = ["Page Down", "^d"]
-Previous_Page           = ["Page Up", "^u"]
+Next_Line               = ["^n", "+"]
+Previous_Line           = ["^p", "-"]
+Next_Page               = ["^d", "Page Down"]
+Previous_Page           = ["^u", "Page Up"]
 Filter                  = ["^f"]
 
 [MultiSelectKeys]
@@ -42,8 +42,8 @@ Equipment               = ["e"]
 Backpack                = ["b"]
 Drop_Items              = ["D"]
 Pick_Up_Items           = ["p"]
-Descend                 = ["X"]
-Ascend                  = ["x"]
+Descend                 = ["x"]
+Ascend                  = ["X"]
 Quit                    = ["Q"]
 Save                    = ["S"]
 Attack                  = ["a"]
@@ -65,15 +65,15 @@ Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
                            "r", "s", "t", "u", "v", "w", "x", "y"]
 
 [Directions]
-SouthWest               = ["1", "m", "Numpad 1", "End"]
+SouthWest               = ["1", "m",      "Numpad 1", "End"]
 South                   = ["2", "\u002C", "Numpad 2", "Down"]
-SouthEast               = ["3", ".", "Numpad 3", "Page Down"]
-West                    = ["4", "j", "Numpad 4", "Left"]
-Stay                    = ["5", "k", "Numpad 5"]
-East                    = ["6", "l", "Numpad 6", "Right"]
-NorthWest               = ["7", "u", "Numpad 7", "Home"]
-North                   = ["8", "i", "Numpad 8", "Up"]
-NorthEast               = ["9", "o", "Numpad 9", "Page up"]
+SouthEast               = ["3", ".",      "Numpad 3", "Page Down"]
+West                    = ["4", "j",      "Numpad 4", "Left"]
+East                    = ["6", "l",      "Numpad 6", "Right"]
+NorthWest               = ["7", "u",      "Numpad 7", "Home"]
+North                   = ["8", "i",      "Numpad 8", "Up"]
+NorthEast               = ["9", "o",      "Numpad 9", "Page Up"]
+Stay                    = ["5", "k",      "Numpad 5"]
 
 # Initiate walk mode instantly to some direction.
 [InstantWalk]

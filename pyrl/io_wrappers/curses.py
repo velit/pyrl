@@ -188,7 +188,7 @@ class CursesWindow:
                 key = alt * "!" + key
 
         if Debug.show_keycodes and key != Key.NO_INPUT:
-            logging.debug("User input: raw: {} interp: {}{}".format(raw, key, " alt:yes" * alt))
+            logging.debug(f"User input: raw: {raw} interp: {key}{' alt:yes' * alt}")
 
         return key
 
@@ -205,10 +205,8 @@ class CursesWindow:
         rows, cols = self.root_win.get_dimensions()
         min_rows, min_cols = WindowSystem.game_dimensions
         while rows < min_rows or cols < min_cols:
-            message = ("Game needs at least a screen size of {}x{} while the "
-                    "current size is {}x{}. Please resize the screen or "
-                    "press Q to quit.")
-            message = message.format(min_cols, min_rows, cols, rows)
+            message = (f"Game needs at least a screen size of {min_cols}x{min_rows} while the "
+                       f"current size is {cols}x{rows}. Please resize the screen or press Q to quit.")
             self.root_win.draw_str(message)
             self.root_win.win.refresh()
 

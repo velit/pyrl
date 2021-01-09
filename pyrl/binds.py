@@ -22,7 +22,7 @@ class BindSequence(tuple):
             return "Unbound"
 
     def __str__(self):
-        return "/".join("{}".format(key) for key in self)
+        return "/".join(f"{key}" for key in self)
 
 undefined = BindSequence()
 

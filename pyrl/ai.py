@@ -59,7 +59,7 @@ class AI(GameActionsProperties, object):
             self.remove_creature_state(self.creature)
 
         assert feedback.type not in ActionError, \
-            "AI state bug. Got error from game: {} {}".format(feedback.type, feedback.params)
+            f"AI state bug. Got error from game: {feedback.type} {feedback.params}"
 
     def _move_towards(self, target_coord):
         best_action = Action.Move
@@ -85,7 +85,7 @@ class AI(GameActionsProperties, object):
         elif best_action == Action.Swap:
             return self.actions.swap(best_direction)
         else:
-            assert False, "AI state bug. Best action was: {}".format(best_action)
+            assert False, f"AI state bug. Best action was: {best_action}"
 
     def _move_random(self):
         valid_dirs = [direction for direction in Dir.All if self.actions.can_move(direction)]
