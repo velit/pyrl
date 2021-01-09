@@ -95,7 +95,7 @@ class UserController(GameActionsProperties, object):
             if key in self.actions_funcs:
                 feedback = self.actions_funcs[key]()
             else:
-                self.io.msg("Undefined key: {}".format(key))
+                self.io.msg(f"Undefined key: {key}")
                 feedback = None
 
         if feedback is None:
@@ -122,14 +122,18 @@ class UserController(GameActionsProperties, object):
                 items = self.actions.inspect_floor_items()
 
                 if self.actions.get_passage():
-                    self.io.msg("There is a {} here.".format(self.actions.get_tile().name))
+                    self.io.msg(f"There is a {self.actions.get_tile().name} here.")
 
                 if len(items) == 1:
-                    self.io.msg("A {} is lying here.".format(items[0].name))
+                    self.io.msg(f"A {items[0].name} is lying here.")
                 elif 1 < len(items) <= 10:
                     self.io.msg("There are several items lying here.")
                 elif 10 < len(items):
                     self.io.msg("There is a stack of items lying here.")
+            elif feedback.type == Action.Pick_Items:
+                self.io.msg(f"Picked up {feedback.params.item_description}")
+            elif feedback.type == Action.Drop_Items:
+                self.io.msg(f"Dropped {feedback.params.item_description}")
 
             if self.actions.already_acted():
                 return
@@ -152,7 +156,7 @@ class UserController(GameActionsProperties, object):
             if drawline_flag:
                 self.io.draw_line(self.coord, coord, ("*", Pair.Yellow))
                 self.io.draw_line(coord, self.coord, ("*", Pair.Yellow))
-                self.io.msg("LoS: {}".format(self.actions.level.check_los(self.coord, coord)))
+                self.io.msg(f"LoS: {self.actions.level.check_los(self.coord, coord)}")
             if coord != self.coord:
                 symbol, (foreground, background) = self.actions.level.visible_char(coord)
                 char = symbol, (foreground, Color.Green)
@@ -176,19 +180,19 @@ class UserController(GameActionsProperties, object):
                 break
 
     def quit(self, dont_ask=True):
-        query = "Do you wish to end the game? [{}]".format(Binds.Strong_Yes)
+        query = f"Do you wish to end the game? [{Binds.Strong_Yes}]"
         if dont_ask or self.io.get_key(query) in Binds.Strong_Yes:
             self.actions.quit()
 
     def save(self, dont_ask=True):
-        query = "Do you wish to save the game? [{}]".format(Binds.Yes)
+        query = f"Do you wish to save the game? [{Binds.Yes}]"
         if dont_ask or self.io.get_key(query) in Binds.Yes:
             self.io.msg("Saving...")
             self.io.refresh()
             self.io.msg(self.actions.save())
 
     def attack(self):
-        query = "Specify attack direction, {} to abort".format(Binds.Cancel.key)
+        query = f"Specify attack direction, {Binds.Cancel.key} to abort"
         key = self.io.get_key(query, keys=Binds.Directions + Binds.Cancel)
         if key in Binds.Directions:
             return self.actions.attack(Dir.from_key[key])

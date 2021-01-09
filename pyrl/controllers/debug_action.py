@@ -15,18 +15,18 @@ class DebugAction(GameActionsProperties, object):
             'a': self.add_monster,
             'c': self.display_curses_color_info,
             'd': self.show_path_debug,
+            'g': self.print_user_input,
             'i': self.interactive_console,
             'k': self.kill_creatures_in_level,
             'l': self.cycle_level_type,
             'm': self.print_message_debug_string,
-            'g': self.print_user_input,
             'o': self.draw_path_to_passage_down,
             'p': self.draw_path_from_up_to_down,
             'r': self.toggle_path_heuristic_cross,
             'v': self.show_map,
-            'x': self.ascend_to_surface,
+            'x': self.descend_to_end,
             'y': self.toggle_log_keycodes,
-            'X': self.descend_to_end,
+            'X': self.ascend_to_surface,
         }
 
     def print_user_input(self):
@@ -43,7 +43,7 @@ class DebugAction(GameActionsProperties, object):
             self.action_funcs[c]()
             return feedback(Action.Debug)
         else:
-            self.io.msg("Undefined debug key: {}".format(c))
+            self.io.msg(f"Undefined debug key: {c}")
 
     def add_monster(self):
         if self.level.creature_spawning_enabled:
@@ -55,11 +55,11 @@ class DebugAction(GameActionsProperties, object):
     def show_map(self):
         Debug.show_map = not Debug.show_map
         self.actions.redraw()
-        self.io.msg("Show map set to {}".format(Debug.show_map))
+        self.io.msg(f"Show map set to {Debug.show_map}")
 
     def toggle_path_heuristic_cross(self):
         Debug.cross = not Debug.cross
-        self.io.msg("Path heuristic cross set to {}".format(Debug.cross))
+        self.io.msg(f"Path heuristic cross set to {Debug.cross}")
 
     def cycle_level_type(self):
         last_level_type = "All levels are already generated"
@@ -71,7 +71,7 @@ class DebugAction(GameActionsProperties, object):
             elif level.generation_type == LevelGen.Arena:
                 level.generation_type = LevelGen.Dungeon
             last_level_type = level.generation_type
-        self.io.msg("Level type set to {}".format(last_level_type))
+        self.io.msg(f"Level type set to {last_level_type}")
 
     def show_path_debug(self):
         if not Debug.path:
@@ -115,12 +115,11 @@ class DebugAction(GameActionsProperties, object):
 
     def toggle_log_keycodes(self):
         Debug.show_keycodes = not Debug.show_keycodes
-        self.io.msg("Input code debug set to {}".format(Debug.show_keycodes))
+        self.io.msg(f"Input code debug set to {Debug.show_keycodes}")
 
     def display_curses_color_info(self):
         import curses
-        self.io.msg("Colors: {} Pairs: {} Can change color? {}".format(
-            curses.COLORS, curses.COLOR_PAIRS, "yes" if curses.can_change_color() else "no"))
+        self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")
 
     def print_message_debug_string(self):
         self.io.msg(Debug.debug_string)
@@ -133,7 +132,7 @@ class DebugAction(GameActionsProperties, object):
         try:
             new_coord = self.level.get_location_coord(location)
         except KeyError:
-            self.io.msg("This level doesn't seem to have a {} location".format(location))
+            self.io.msg(f"This level doesn't seem to have a {location} location")
             return
         if not self.level.is_passable(new_coord):
             self.level.remove_creature(self.level.creatures[new_coord])

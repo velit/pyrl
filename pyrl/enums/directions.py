@@ -48,4 +48,4 @@ class Dir:
             return cls.DiagonalMoveMult
         elif direction == cls.Stay:
             return cls.StayMoveMult
-        assert False, "Invalid direction: {}".format(direction)
+        assert False, f"Invalid {direction=}"

@@ -35,9 +35,9 @@ class Item:
         weapon_dice = self.get_stat(ComplexStat.weapon_dice)
         accuracy = self.get_stat(Stat.accuracy, default=0)
         if weapon_dice is not None:
-            return " ({:+}, {})".format(accuracy, dice_str(*weapon_dice))
+            return f" ({accuracy:+}, {dice_str(*weapon_dice)})"
         elif accuracy:
-            return " ({:+})".format(accuracy)
+            return f" ({accuracy:+})"
         else:
             return ""
 
@@ -45,27 +45,25 @@ class Item:
         defense = self.get_stat(Stat.defense, default=0)
         armor_value = self.get_stat(Stat.armor, default=0)
         if defense or armor_value:
-            return " [{:+}, {:+}]".format(defense, armor_value)
+            return f" [{defense:+}, {armor_value:+}]"
         else:
             return ""
 
     def stats_str(self):
         skip_stats = (Stat.accuracy, ComplexStat.weapon_dice, Stat.defense, Stat.armor)
-        stats = ", ".join("{}:{:+}".format(stat.value, value) for stat, value in self.stats if stat not
-                          in skip_stats)
+        stats = ", ".join(f"{stat.value}:{value:+}"
+                          for stat, value in self.stats
+                          if stat not in skip_stats)
         if stats:
             return " {%s}" % stats
         else:
             return ""
 
     def __str__(self):
-        return "{}{}{}{}".format(self.name, self.weapon_str(), self.armor_str(), self.stats_str())
+        return f"{self.name}{self.weapon_str()}{self.armor_str()}{self.stats_str()}"
 
     def __lt__(self, other):
         return str(self) < str(other)
 
     def __repr__(self):
-        return ("Item(name={self.name}, "
-                "char={self.char}, "
-                "compatible_slots={self.compatible_slots}, "
-                "stats={self.stats})").format(self=self)
+        return f"Item({self.name=}, {self.char=}, {self.compatible_slots=}, {self.stats=})"

@@ -36,7 +36,7 @@ class Game:
 
     def game_loop(self):
         ai_game_actions = GameActions(self)
-        self.io.msg("{0} for help menu.".format(Binds.Help.key))
+        self.io.msg(f"{Binds.Help.key} for help menu.")
         undefined_keys = binds.undefined_keys()
         if undefined_keys:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
@@ -58,7 +58,7 @@ class Game:
                 action_cost = ai_game_actions.action_cost
 
             assert action_cost >= 0, \
-                "Negative cost actions are not allowed (yet at least).{}".format(action_cost)
+                f"Negative {action_cost=} are not allowed (yet at least)."
 
             creature_check, time_delta = self.active_level.turn_scheduler.addpop(creature, action_cost)
             assert creature is creature_check
@@ -99,8 +99,8 @@ class Game:
         except IOError as e:
             msg_str = str(e)
         else:
-            msg_str = "Saved game '{}', file size: {:,} b, {:,} b compressed. Ratio: {:.2%}"
-            msg_str = msg_str.format(self.game_name, raw, compressed, raw / compressed)
+            msg_str = f"Saved game '{self.game_name}', file size: {raw:,} b," \
+                      f" {compressed:,} b compressed. Ratio: {raw / compressed:.2%}"
         return msg_str
 
     def update_view(self, creature: Creature):

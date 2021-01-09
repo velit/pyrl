@@ -1,6 +1,7 @@
 from typing import Dict, Optional, List
 
 from pyrl.creature.item import Item
+from pyrl.dice import Dice
 from pyrl.enums.slot import Slot
 from pyrl.creature.stats import Stat, ComplexStat
 
@@ -32,7 +33,7 @@ class Equipment:
 
     def equip(self, item, select_slot):
         assert select_slot in item.compatible_slots, \
-            "Item {} does not fit into slot {}".format(item, select_slot)
+            f"{item=} does not fit into {select_slot=}"
 
         if item.occupies_all_slots:
             equip_slots = item.compatible_slots
@@ -46,7 +47,8 @@ class Equipment:
         self._add_stats(item)
 
     def unequip(self, select_slot):
-        assert self._worn_items[select_slot] is not None, "Slot is already empty"
+        assert self._worn_items[select_slot] is not None, \
+            "Slot is already empty"
 
         item = self._worn_items[select_slot]
         if item.occupies_all_slots:
@@ -75,7 +77,7 @@ class Equipment:
         self._bag = [item for index, item in enumerate(self._bag) if index not in index_set]
         return unbagged_items
 
-    def get_damage_info(self):
+    def get_damage_info(self) -> Optional[Dice]:
         right_hand = self._worn_items[Slot.Right_Hand]
         left_hand = self._worn_items[Slot.Left_Hand]
         if right_hand is not None and right_hand.get_stat(ComplexStat.weapon_dice) is not None:

@@ -33,7 +33,7 @@ class WalkMode(GameActionsProperties, object):
             return
 
         if direction is None:
-            query = "Specify walking direction, {} to cancel.".format(Binds.Cancel.key)
+            query = f"Specify walking direction, {Binds.Cancel.key} to cancel."
             key_seq = Binds.Directions + Binds.Cancel
             key = self.io.get_key(query, keys=key_seq)
             if key in Binds.Cancel:
@@ -59,7 +59,7 @@ class WalkMode(GameActionsProperties, object):
         if next_direction is not None:
             feedback = self.actions.move(next_direction)
             assert feedback.type == Action.Move, \
-                "Bug in walk_mode. Move failed: {} {}".format(feedback.type, feedback.params)
+                f"Bug in walk_mode. Move failed: {feedback.type} {feedback.params}"
 
             next_walk_time = self.io.get_future_time(Config.animation_period)
             self.state = WalkModeState(next_direction, self.state.walk_type, next_walk_time,
@@ -80,7 +80,7 @@ class WalkMode(GameActionsProperties, object):
 
         msg = ""
         if self.state.show_msg_time < self.io.get_time():
-            msg = "Press {} or {} to interrupt walk mode.".format(Binds.Walk_Mode.key, Binds.Cancel.key)
+            msg = f"Press {Binds.Walk_Mode.key} or {Binds.Cancel.key} to interrupt walk mode."
         key_seq = Binds.Walk_Mode + Binds.Cancel
         key = self.io.check_key(msg, keys=key_seq, until=self.state.next_walk_time)
 
@@ -157,7 +157,7 @@ class WalkMode(GameActionsProperties, object):
             left = self._passable(anticlockwise_45(direction))
             right = self._passable(clockwise_45(direction))
         else:
-            raise Exception("Not a valid direction: {0}".format(direction))
+            raise Exception(f"Not a valid {direction=}")
         return WalkType(left, right)
 
     def _any_creatures_visible(self):

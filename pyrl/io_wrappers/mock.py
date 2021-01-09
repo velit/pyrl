@@ -40,7 +40,7 @@ class MockWrapperWindow:
     def get_key(self):
         try:
             key = self.wrapper._prepared_input.popleft()
-            logging.debug("Returning key {}".format(key))
+            logging.debug(f"Returning key {key}")
             return key
         except IndexError:
             raise MockInputEnd()

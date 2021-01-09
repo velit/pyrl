@@ -20,7 +20,7 @@ def get_combat_message(attack_succeeds, damage, dies, player_attacker,
         attacker = "You"
         third_person_singular = False
     else:
-        attacker = "The {}".format(attacker_name)
+        attacker = f"The {attacker_name}"
         third_person_singular = True
 
     if player_attacker and player_target:
@@ -30,7 +30,7 @@ def get_combat_message(attack_succeeds, damage, dies, player_attacker,
         target = "you"
         indirect_target = "you"
     else:
-        target = "the {}".format(defender_name)
+        target = f"the {defender_name}"
         indirect_target = "it"
 
     if third_person_singular:
@@ -42,13 +42,13 @@ def get_combat_message(attack_succeeds, damage, dies, player_attacker,
 
     message = ""
     if damage:
-        message += "{} hit{} {} for {} damage".format(attacker, s, target, damage)
+        message += f"{attacker} hit{s} {target} for {damage} damage"
         if dies:
-            message += " and kill{} {}.".format(s, indirect_target)
+            message += f" and kill{s} {indirect_target}."
         else:
             message += "."
     elif attack_succeeds:
-        message += "{} fail{} to hurt {}.".format(attacker, s, target)
+        message += f"{attacker} fail{s} to hurt {target}."
     else:
-        message += "{} miss{} {}.".format(attacker, es, target)
+        message += f"{attacker} miss{es} {target}."
     return message

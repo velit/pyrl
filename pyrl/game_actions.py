@@ -28,7 +28,8 @@ class Action(Enum):
     Wait           = "Creature waited."
     Attack         = "Creature attacked."
     Swap           = "Creature swapped."
-    Exchange_Items = "Creature exchanged items."
+    Pick_Items     = "Creature picked up items."
+    Drop_Items     = "Creature dropped items."
     Enter_Passage  = "Creature entered a passage."
     Spawn          = "Creature spawned."
     Teleport       = "Creature teleported."
@@ -50,16 +51,18 @@ action_cost = {
 }
 
 action_params = {
-    Action.Move:          namedtuple("Action", "direction"),
-    Action.Attack:        namedtuple("Action", "target, succeeds, damage, died"),
-    Action.Swap:          namedtuple("Action", "direction, target"),
-    Action.Teleport:      namedtuple("Action", "destination"),
-    Action.Enter_Passage: namedtuple("Action", "passage"),
+    Action.Move:          namedtuple("MoveParams", "direction"),
+    Action.Attack:        namedtuple("AttackParams", "target, succeeds, damage, died"),
+    Action.Swap:          namedtuple("SwapParams", "direction, target"),
+    Action.Teleport:      namedtuple("TeleportParams", "destination"),
+    Action.Enter_Passage: namedtuple("EnterPassageParams", "passage"),
+    Action.Drop_Items:    namedtuple("DropItemsParams", "item_description"),
+    Action.Pick_Items:    namedtuple("PickItemsParams", "item_description"),
 }
 
 def feedback(action, *params):
     if params:
-        assert action in action_params, "No entry found in action_params for {}".format(action)
+        assert action in action_params, f"No entry found in action_params for {action}"
         return GameFeedback(action, action_params[action](*params))
     else:
         return GameFeedback(action, ())
@@ -203,14 +206,20 @@ class GameActions:
     def drop_items(self, item_indexes):
         items = self.creature.equipment.unbag_items(item_indexes)
         self.level.add_items(self.coord, items)
-        self._do_action(self.creature.action_cost(Action.Exchange_Items))
-        return feedback(Action.Exchange_Items)
+        self._do_action(self.creature.action_cost(Action.Drop_Items))
+        if len(items) == 1:
+            return feedback(Action.Drop_Items, f"a {items[0].name}")
+        else:
+            return feedback(Action.Drop_Items, f"a collection of items")
 
     def pickup_items(self, item_indexes):
         items = self.level.pop_items(self.coord, item_indexes)
         self.creature.equipment.bag_items(items)
-        self._do_action(self.creature.action_cost(Action.Exchange_Items))
-        return feedback(Action.Exchange_Items)
+        self._do_action(self.creature.action_cost(Action.Pick_Items))
+        if len(items) == 1:
+            return feedback(Action.Pick_Items, f"a {items[0].name}")
+        else:
+            return feedback(Action.Pick_Items, f"a collection of items")
 
     def wait(self):
         self._do_action(self.creature.action_cost(Action.Wait))
@@ -254,7 +263,7 @@ class GameActions:
     def can_move(self, direction):
         """Free action."""
         if direction not in Dir.AllPlusStay:
-            raise ValueError("Illegal movement direction: {}".format(direction))
+            raise ValueError(f"Illegal movement direction: {direction}")
         elif direction == Dir.Stay:
             return True
         else:

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pyrl.creature.equipment import Equipment
 from pyrl.creature.stats import Stat
 from pyrl.dice import Dice
@@ -26,7 +28,7 @@ class HasEquipment:
         self.equipment = Equipment()
         super().__init__(*args, **kwargs)
 
-    def get_damage_info(self):
+    def get_damage_info(self) -> Dice:
         damage_info = self.equipment.get_damage_info()
         if damage_info is not None:
             dices, highest_side, addition = damage_info

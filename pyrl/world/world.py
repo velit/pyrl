@@ -40,7 +40,7 @@ class World:
 
     def get_level(self, level_key):
         if level_key not in self.levels:
-            raise LevelNotFound("Nonexistant level key: {}".format(level_key))
+            raise LevelNotFound(f"Nonexistant level key: {level_key}")
 
         level = self.levels[level_key]
         if not level.is_finalized:
@@ -59,9 +59,9 @@ class World:
             level_a = self.levels[world_point_a.level_key]
             level_b = self.levels[world_point_b.level_key]
             assert level_a.will_have_location(world_point_a.level_location), \
-                "{} doesn't have location {}.".format(level_a, world_point_a.level_location)
+                f"{level_a} doesn't have location {world_point_a.level_location}."
             assert level_b.will_have_location(world_point_b.level_location), \
-                "{} doesn't have location {}.".format(level_b, world_point_b.level_location)
+                f"{level_b} doesn't have location {world_point_b.level_location}."
 
         self.set_connection(world_point_a, world_point_b)
         self.set_connection(world_point_b, world_point_a)

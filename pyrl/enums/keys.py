@@ -27,8 +27,8 @@ class Key:
     DELETE        = "Delete"
     HOME          = "Home"
     END           = "End"
-    PAGE_UP       = "Page up"
-    PAGE_DOWN     = "Page down"
+    PAGE_UP       = "Page Up"
+    PAGE_DOWN     = "Page Down"
     NUMPAD_0      = "Numpad 0"
     NUMPAD_1      = "Numpad 1"
     NUMPAD_2      = "Numpad 2"
@@ -39,8 +39,8 @@ class Key:
     NUMPAD_7      = "Numpad 7"
     NUMPAD_8      = "Numpad 8"
     NUMPAD_9      = "Numpad 9"
-    WINDOW_RESIZE = "Window resize"
-    CLOSE_WINDOW  = "Close window"
+    WINDOW_RESIZE = "Window Resize"
+    CLOSE_WINDOW  = "Close Window"
 
     # Do not use
     NO_INPUT = "No Input"
