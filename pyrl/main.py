@@ -88,7 +88,7 @@ def init_cursor_lib(output):
         from pyrl.io_wrappers.mock import MockWrapper
         return MockWrapper()
     else:
-        assert False, f"Unknown output {output}"
+        assert False, f"Unknown output parameter '{output}'"
 
 def load_game(game_name, cursor_lib):
     try:
