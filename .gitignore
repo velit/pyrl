@@ -4,6 +4,8 @@
 save_data
 .ropeproject/
 .cache/
+.mypy_cache/
+.pytest_cache/
 __pycache__/
 tags
 dist
