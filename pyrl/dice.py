@@ -1,16 +1,20 @@
-from collections import namedtuple
+from dataclasses import dataclass
 from random import randint
 
-Dice = namedtuple("Dice", ["dices", "highest_side", "addition"])
+@dataclass(frozen=True, slots=True)
+class Dice:
+    dices: int
+    faces: int
+    addition: int
 
-def dice_roll(dices, highest_side, addition):
-    return sum(randint(0, highest_side) for _ in range(dices)) + addition
+    def roll(self):
+        return sum(randint(0, self.faces) for _ in range(self.dices)) + self.addition
 
-def dice_str(dices, highest_side, addition):
-    min_roll = addition
-    max_roll = dices * highest_side + addition
-    if min_roll < 0:
-        min_roll = f"({min_roll})"
-    if max_roll < 0:
-        max_roll = f"({max_roll}"
-    return f"{min_roll}-{max_roll}"
+    def __str__(self):
+        min_roll = self.addition
+        max_roll = self.dices * self.faces + self.addition
+        if min_roll < 0:
+            min_roll = f"({min_roll})"
+        if max_roll < 0:
+            max_roll = f"({max_roll}"
+        return f"{min_roll}-{max_roll}"

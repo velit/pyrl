@@ -217,7 +217,7 @@ class Level:
             c: Creature = self.creatures[coord]
             damage = c.get_damage_info()
             information += f"{c.name} hp:{c.hp}/{c.max_hp} sight:{c.sight} armor:{c.armor} dr:{c.defense} " \
-                           f"ar:{c.accuracy} attack:{damage.dices}D{damage.highest_side}+{damage.addition}"
+                           f"ar:{c.accuracy} attack:{damage.dices}D{damage.faces}+{damage.addition}"
         else:
             information += self.tiles[coord].name
         return information

@@ -1,5 +1,3 @@
-from typing import Dict
-
 from pyrl.creature.creature import Creature
 from pyrl.enums.directions import Dir
 from pyrl.game_data.tiles import PyrlTile
@@ -20,7 +18,7 @@ base_tiles = {
     '<': PyrlTile.Stairs_Up,
 }
 
-base_creatures: Dict[str, Creature] = {
+base_creatures: dict[str, Creature] = {
 }
 
 base_locations = {

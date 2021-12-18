@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from importlib import resources
 from itertools import chain
-from typing import Union, Iterable, NewType
+from typing import NewType
+from collections.abc import Iterable
 
 import toml
 
@@ -8,11 +11,11 @@ Bind = NewType("Bind", str)
 
 class BindSequence(tuple):
 
-    def __new__(cls, iterable_or_str: Union[str, Iterable[str]] = (), /):
-        if isinstance(iterable_or_str, str):
-            return super().__new__(cls, (iterable_or_str, ))  # type: ignore
+    def __new__(cls, str_or_iterable: str | Iterable[str] = (), /):
+        if isinstance(str_or_iterable, str):
+            return super().__new__(cls, (str_or_iterable,))  # type: ignore
         else:
-            return super().__new__(cls, iterable_or_str)  # type: ignore
+            return super().__new__(cls, str_or_iterable)  # type: ignore
 
     @property
     def key(self):

@@ -1,6 +1,6 @@
 import collections
 import re
-from typing import Sequence, Set
+from collections.abc import Sequence
 
 from pyrl.binds import Binds
 
@@ -38,7 +38,7 @@ def lines_view(window, lines: Sequence[Line], multi_select=False, return_keys=Bi
     orig_lines = tuple(lines)
     orig_select_keys = tuple(select_keys)
     scroll_offset = 0
-    selected: Set[Line] = set()
+    selected: set[Line] = set()
     filter_regex = ""
     while True:
         content_size, select_keys, all_keys = _get_vars(window, lines, multi_select,

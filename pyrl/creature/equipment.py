@@ -1,4 +1,6 @@
-from typing import Dict, Optional, List
+from __future__ import annotations
+
+from typing import Optional
 
 from pyrl.creature.item import Item
 from pyrl.dice import Dice
@@ -11,8 +13,8 @@ class Equipment:
 
         self.applied_stats = {stat: 0 for stat in Stat}
 
-        self._bag: List[Item] = []
-        self._worn_items: Dict[Slot, Optional[Item]] = {
+        self._bag: list[Item] = []
+        self._worn_items: dict[Slot, Optional[Item]] = {
             Slot.Head:        None,
             Slot.Body:        None,
             Slot.Right_Hand:  None,
@@ -77,12 +79,12 @@ class Equipment:
         self._bag = [item for index, item in enumerate(self._bag) if index not in index_set]
         return unbagged_items
 
-    def get_damage_info(self) -> Optional[Dice]:
+    def get_damage_info(self) -> Dice | None:
         right_hand = self._worn_items[Slot.Right_Hand]
         left_hand = self._worn_items[Slot.Left_Hand]
-        if right_hand is not None and right_hand.get_stat(ComplexStat.weapon_dice) is not None:
+        if right_hand and right_hand.get_stat(ComplexStat.weapon_dice):
             return right_hand.get_stat(ComplexStat.weapon_dice)
-        elif left_hand is not None and left_hand.get_stat(ComplexStat.weapon_dice) is not None:
+        elif left_hand and left_hand.get_stat(ComplexStat.weapon_dice):
             return left_hand.get_stat(ComplexStat.weapon_dice)
         else:
             return None

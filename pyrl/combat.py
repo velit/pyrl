@@ -1,15 +1,15 @@
 from random import randint
 
-from pyrl.dice import dice_roll
+from pyrl.dice import Dice
+
 
 def get_melee_attack_cr(creature, target):
-    return get_melee_attack(creature.accuracy, creature.get_damage_info(),
-                            target.defense, target.armor)
+    return get_melee_attack(creature.get_damage_info(), creature.accuracy, target.defense, target.armor)
 
-def get_melee_attack(accuracy, damage_info, defense, armor):
+def get_melee_attack(damage_info: Dice, accuracy: int, defense: int, armor: int):
     roll = randint(1, 100) + accuracy - defense
     if roll > 25:
-        return True, max(dice_roll(*damage_info) - armor, 0)
+        return True, max(damage_info.roll() - armor, 0)
     else:
         return False, 0
 

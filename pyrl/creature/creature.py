@@ -1,11 +1,9 @@
 from copy import deepcopy
 from decimal import Decimal
-from typing import Optional
 
 from pyrl.generic_algorithms import resize_range
 from pyrl.creature.stats import ensure_stats
 from pyrl.dice import Dice
-
 
 @ensure_stats
 class Creature:
@@ -27,7 +25,7 @@ class Creature:
 
         self.hp = self.max_hp
 
-    def get_damage_info(self):
+    def get_damage_info(self) -> Dice:
         dice = self.base_attack_dice
         highest_side = self.base_attack_sides
         addition = self.damage
@@ -130,3 +128,4 @@ class Creature:
     @property
     def speed_multiplier(self):
         return 100 / self.speed
+

@@ -1,10 +1,9 @@
 from pyrl.creature.stats import Stat
-from pyrl.dice import dice_str
 
 
 def register_status_texts(io, game, creature):
     add_element = io.status_bar.add_element
-    add_element("Dmg",                   lambda: dice_str(*creature.get_damage_info()))
+    add_element("Dmg",                   lambda: creature.get_damage_info())
     add_element("HP",                    lambda: f"{creature.hp}/{creature.max_hp}")
     add_element(Stat.sight.value,        lambda: creature.sight)
     add_element(Stat.accuracy.value,     lambda: creature.accuracy)

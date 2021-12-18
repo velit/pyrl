@@ -1,5 +1,6 @@
-from typing import Optional
+import typing
 
+from pyrl.creature.creature import Creature
 from pyrl.creature.equipment import Equipment
 from pyrl.creature.stats import Stat
 from pyrl.dice import Dice
@@ -19,8 +20,13 @@ def _add_equipment_properties(cls):
         setattr(cls, stat.name, prop)
     return cls
 
+if typing.TYPE_CHECKING:
+    CreatureHint = Creature
+else:
+    CreatureHint = object
+
 @_add_equipment_properties
-class HasEquipment:
+class HasEquipment(CreatureHint):
 
     """Creatures with this mixin class have an equipment and a bag."""
 
@@ -29,10 +35,8 @@ class HasEquipment:
         super().__init__(*args, **kwargs)
 
     def get_damage_info(self) -> Dice:
-        damage_info = self.equipment.get_damage_info()
-        if damage_info is not None:
-            dices, highest_side, addition = damage_info
-            addition += self.damage
-            return Dice(dices, highest_side, addition)
+        info = self.equipment.get_damage_info()
+        if info is not None:
+            return Dice(info.dices, info.faces, info.addition + self.damage)
         else:
             return super().get_damage_info()

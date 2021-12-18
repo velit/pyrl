@@ -1,4 +1,12 @@
+import typing
 from collections import defaultdict
+
+from pyrl.creature.creature import Creature
+
+if typing.TYPE_CHECKING:
+    CreatureHint = Creature
+else:
+    CreatureHint = object
 
 class RemembersVision:
 

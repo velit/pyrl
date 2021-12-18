@@ -1,8 +1,9 @@
-from typing import Tuple, Dict, Iterable, Any, MutableMapping
+from typing import Any
+from collections.abc import Iterable, MutableMapping
 
 from pyrl.binds import Binds, Bind
 
-Direction = Tuple[int, int]
+Direction = tuple[int, int]
 
 def set_every_to(every: Iterable, to: Any, at: MutableMapping):
     for item in every:
@@ -18,14 +19,14 @@ class Dir:
     Orthogonals = North, East, South, West
 
     @classmethod
-    def clockwise(cls, direction: Tuple[int, int]):
+    def clockwise(cls, direction: tuple[int, int]):
         return cls.All[(cls.All.index(direction) + 1) % len(cls.All)]
 
     @classmethod
-    def counter_clockwise(cls, direction: Tuple[int, int]):
+    def counter_clockwise(cls, direction: tuple[int, int]):
         return cls.All[(cls.All.index(direction) - 1) % len(cls.All)]
 
-    from_key: Dict[Bind, Direction] = {}
+    from_key: dict[Bind, Direction] = {}
     set_every_to(Binds.SouthWest + Binds.Instant_SouthWest, to=SouthWest, at=from_key)
     set_every_to(Binds.South     + Binds.Instant_South,     to=South,     at=from_key)
     set_every_to(Binds.SouthEast + Binds.Instant_SouthEast, to=SouthEast, at=from_key)

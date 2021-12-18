@@ -1,7 +1,10 @@
-from pyrl.enums.slot import Slot
-from pyrl.enums.colors import Pair
+from typing import Optional, Any
+
 from pyrl.creature.stats import Stat, ComplexStat
-from pyrl.dice import dice_str
+from pyrl.dice import Dice
+from pyrl.enums.colors import Pair
+from pyrl.enums.slot import Slot
+
 
 def Weapon(name, accuracy, weapon_dice, two_handed=False, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
            stats=(), char=('(', Pair.Normal)):
@@ -18,24 +21,24 @@ class Item:
     def __init__(self, name, compatible_slots, stats, char, occupies_all_slots):
         self.name = name
         self.compatible_slots = tuple(compatible_slots)
-        self.stats = tuple(stats)
+        self.stats: tuple[Any] = tuple(stats)
         self.char = char
         self.occupies_all_slots = occupies_all_slots
 
     def fits_slot(self, slot):
         return slot in self.compatible_slots
 
-    def get_stat(self, stat, default=None):
+    def get_stat(self, stat, default=None) -> Optional[int]:
         for stat0, value in self.stats:
             if stat0 is stat:
                 return value
         return default
 
     def weapon_str(self):
-        weapon_dice = self.get_stat(ComplexStat.weapon_dice)
+        weapon_dice: Dice = self.get_stat(ComplexStat.weapon_dice)
         accuracy = self.get_stat(Stat.accuracy, default=0)
         if weapon_dice is not None:
-            return f" ({accuracy:+}, {dice_str(*weapon_dice)})"
+            return f" ({accuracy:+}, {weapon_dice})"
         elif accuracy:
             return f" ({accuracy:+})"
         else:
