@@ -1,20 +1,26 @@
+from __future__ import annotations
+
+import typing
 from random import randint
 
 from pyrl.dice import Dice
 
+if typing.TYPE_CHECKING:
+    from pyrl.creature.creature import Creature
 
-def get_melee_attack_cr(creature, target):
-    return get_melee_attack(creature.get_damage_info(), creature.accuracy, target.defense, target.armor)
 
-def get_melee_attack(damage_info: Dice, accuracy: int, defense: int, armor: int):
+def get_melee_attack_cr(creature: Creature, target: Creature) -> tuple[bool, int]:
+    return get_melee_attack(creature.damage_dice, creature.accuracy, target.defense, target.armor)
+
+def get_melee_attack(damage_dice: Dice, accuracy: int, defense: int, armor: int) -> tuple[bool, int]:
     roll = randint(1, 100) + accuracy - defense
     if roll > 25:
-        return True, max(damage_info.roll() - armor, 0)
+        return True, max(damage_dice.roll() - armor, 0)
     else:
         return False, 0
 
-def get_combat_message(attack_succeeds, damage, dies, player_attacker,
-                       player_target, attacker_name, defender_name):
+def get_combat_message(attack_succeeds: bool, damage: int, dies: bool, player_attacker: str,
+                       player_target: str, attacker_name: str, defender_name: str) -> str:
 
     if player_attacker:
         attacker = "You"

@@ -1,7 +1,7 @@
 import tcod
 
 from pyrl.config.config import Config
-from pyrl.enums.colors import Pair, Color
+from pyrl.enums.colors import ColorPair, Color
 from pyrl.enums.keys import Key
 from pyrl.io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
 from pyrl.window.window_system import WindowSystem
@@ -108,7 +108,7 @@ class TCODWindow:
     def draw_str(self, string, coord=(0, 0), color=None):
         y, x = coord
         if color is None:
-            fg, bg = Pair.Normal
+            fg, bg = ColorPair.Normal
         else:
             fg, bg = color
         tcod.console_set_color_control(tcod.COLCTRL_1, self.color_map[fg], self.color_map[bg])

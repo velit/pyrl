@@ -3,7 +3,7 @@ from functools import wraps
 
 from pyrl.config.debug import Debug
 from pyrl.config.config import Config
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.game_data.levels.shared_assets import default_level_dimensions
 from pyrl.generic_structures import TableDims, Coord
 from pyrl.window.base_window import BaseWindow
@@ -78,7 +78,7 @@ class WindowSystem:
 
     def draw_path(self, path):
         for coord in path:
-            self.draw_char((" ", Pair.Green), coord, reverse=True)
+            self.draw_char((" ", ColorPair.Green), coord, reverse=True)
             if Debug.path_step:
                 self.level_window.get_key(refresh=True)
         if not Debug.path_step:

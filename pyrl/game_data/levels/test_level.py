@@ -1,5 +1,5 @@
 from pyrl.creature.creature import Creature
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.game_data.levels.shared_assets import construct_data, default_level_dimensions
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.enums.level_gen import LevelGen
@@ -45,7 +45,7 @@ def get_level(player):
         'P': LevelLocation.Passage_Up,
     }
     custom_creatures = {
-        '@': Creature("The Crone", ('@', Pair.Purple)),
+        '@': Creature("The Crone", ('@', ColorPair.Purple)),
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures

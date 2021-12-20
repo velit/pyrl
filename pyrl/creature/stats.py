@@ -1,8 +1,9 @@
+from __future__ import annotations
+
+import dataclasses
 from dataclasses import dataclass
 from enum import Enum
-
-from pyrl.dice import Dice
-
+from typing import Type
 
 class Stat(Enum):
     strength       = "Str"
@@ -10,21 +11,13 @@ class Stat(Enum):
     intelligence   = "Int"
     endurance      = "End"
     perception     = "Per"
-    sight          = "Sight"
-    max_hp         = "HP"
-    armor          = "Armor"
     accuracy       = "Acc"
-    defense        = "Def"
-    speed          = "Speed"
+    armor          = "Armor"
     damage         = "Dmg"
-
-class ComplexStat(Enum):
-    weapon_dice = "Damage"
-
-def ensure_stats(obj):
-    for stat in Stat:
-        assert hasattr(obj, stat.name), f"Attribute {stat.name} must be found in {obj}"
-    return obj
+    defense        = "Def"
+    max_hp         = "HP"
+    sight          = "Sight"
+    speed          = "Speed"
 
 @dataclass(kw_only=True, slots=True)
 class Stats:
@@ -33,11 +26,18 @@ class Stats:
     intelligence:        int = 0
     endurance:           int = 0
     perception:          int = 0
-    sight:               int = 0
-    max_hp:              int = 0
-    armor:               int = 0
     accuracy:            int = 0
-    defense:             int = 0
-    speed:               int = 0
+    armor:               int = 0
     damage:              int = 0
-    weapon_dice: Dice | None = None
+    defense:             int = 0
+    max_hp:              int = 0
+    sight:               int = 0
+    speed:               int = 0
+
+    @classmethod
+    def combine(cls: Type[Stats], *stats_instances: Stats) -> Stats:
+        combined = cls()
+        for stats in stats_instances:
+            for key, value in dataclasses.asdict(stats).items():
+                setattr(combined, key, getattr(combined, key) + value)
+        return combined

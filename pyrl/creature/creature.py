@@ -1,57 +1,63 @@
+from __future__ import annotations
+
+import typing
 from copy import deepcopy
+from dataclasses import dataclass, field
 from decimal import Decimal
 
+from pyrl.enums.colors import Char
+from pyrl.game_actions import Action
 from pyrl.generic_algorithms import resize_range
-from pyrl.creature.stats import ensure_stats
 from pyrl.dice import Dice
 
-@ensure_stats
+if typing.TYPE_CHECKING:
+    from pyrl.world.level import Level
+
+@dataclass(eq=False, slots=True)
 class Creature:
+    name:                     str
+    char:                    Char
+    danger_level:             int = 0
+    spawn_weight_class:       int = 1
+    coord: tuple[int, int] | None = None
 
-    def __init__(self, name, char, danger_level=0, spawn_weight_class=1, coord=None):
-        self.name = name
-        self.char = char
-        self.danger_level = danger_level
-        self.spawn_weight_class = spawn_weight_class
-        self.coord = coord
+    hp:                  int = field(init=False, repr=True)
+    level:      Level | None = field(init=False, repr=False, default=None)
+    base_strength:       int = field(init=False, repr=False, default=10)
+    base_dexterity:      int = field(init=False, repr=False, default=10)
+    base_endurance:      int = field(init=False, repr=False, default=10)
+    base_intelligence:   int = field(init=False, repr=False, default=10)
+    base_perception:     int = field(init=False, repr=False, default=10)
 
-        self.level = None
-
-        self.base_strength     = 10
-        self.base_dexterity    = 10
-        self.base_endurance    = 10
-        self.base_intelligence = 10
-        self.base_perception   = 10
-
+    def __post_init__(self) -> None:
         self.hp = self.max_hp
 
-    def get_damage_info(self) -> Dice:
-        dice = self.base_attack_dice
-        highest_side = self.base_attack_sides
-        addition = self.damage
-        return Dice(dice, highest_side, addition)
+    @property
+    def damage_dice(self) -> Dice:
+        base_attack_dices = self.strength // 20 + 1
+        base_attack_faces = self.strength // 3 + self.dexterity // 6
+        return Dice(base_attack_dices, base_attack_faces, self.damage)
 
-    def receive_damage(self, amount):
+    def receive_damage(self, amount: int) -> None:
         if amount > 0:
             self.hp -= amount
 
-    def is_dead(self):
+    def is_dead(self) -> bool:
         return self.hp <= 0
 
-    def action_cost(self, action, multiplier=1):
+    def action_cost(self, action: Action, multiplier: int = 1) -> int:
         return round(action.base_cost * multiplier * self.speed_multiplier)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Creature(name={self.name})"
 
-    def copy(self):
+    def copy(self) -> Creature:
         return deepcopy(self)
 
-    def spawn_weight(self, external_danger_level):
-        return round(1000 * self.danger_level_spawn_mult(external_danger_level) *
-                     self.spawn_weight_class)
+    def spawn_weight(self, external_danger_level: int) -> int:
+        return round(1000 * self.danger_level_spawn_mult(external_danger_level) * self.spawn_weight_class)
 
-    def danger_level_spawn_mult(self, external_danger_level):
+    def danger_level_spawn_mult(self, external_danger_level: int) -> Decimal:
         diff = Decimal(external_danger_level - self.danger_level)
 
         speciation_range = range(-5, 1)
@@ -64,68 +70,59 @@ class Creature:
             diff_weight = Decimal(1)
         elif diff in extinction_range:
             # 1, 0.999, 0.992, 0.973, 0.936, 0.875, 0.784, 0.657, 0.488, 0.271, 0
-            diff_weight = 1 - pow(resize_range(diff, extinction_range), 3)
+            diff_weight = Decimal(1 - pow(resize_range(diff, extinction_range), 3))
         else:
             diff_weight = Decimal(0)
         return diff_weight
 
     @property
-    def strength(self):
+    def strength(self) -> int:
         return self.base_strength
 
     @property
-    def dexterity(self):
+    def dexterity(self) -> int:
         return self.base_dexterity
 
     @property
-    def intelligence(self):
+    def intelligence(self) -> int:
         return self.base_intelligence
 
     @property
-    def endurance(self):
+    def endurance(self) -> int:
         return self.base_endurance
 
     @property
-    def perception(self):
+    def perception(self) -> int:
         return self.base_perception
 
     @property
-    def sight(self):
-        return min(self.perception // 2, int((self.perception * 5) ** 0.5))
-
-    @property
-    def max_hp(self):
-        return self.endurance + self.strength // 2
-
-    @property
-    def armor(self):
-        return self.endurance // 10
-
-    @property
-    def accuracy(self):
+    def accuracy(self) -> int:
         return self.dexterity + self.perception // 2
 
     @property
-    def defense(self):
-        return self.dexterity + self.intelligence // 2
+    def armor(self) -> int:
+        return self.endurance // 10
 
     @property
-    def base_attack_dice(self):
-        return self.strength // 20 + 1
-
-    @property
-    def base_attack_sides(self):
-        return self.strength // 3 + self.dexterity // 6
-
-    @property
-    def damage(self):
+    def damage(self) -> int:
         return self.strength // 5 + self.dexterity // 10
 
     @property
-    def speed(self):
+    def defense(self) -> int:
+        return self.dexterity + self.intelligence // 2
+
+    @property
+    def max_hp(self) -> int:
+        return self.endurance + self.strength // 2
+
+    @property
+    def sight(self) -> int:
+        return min(self.perception // 2, int((self.perception * 5) ** 0.5))
+
+    @property
+    def speed(self) -> int:
         return 93 + self.dexterity // 2 + self.strength // 5
 
     @property
-    def speed_multiplier(self):
+    def speed_multiplier(self) -> float:
         return 100 / self.speed
-

@@ -1,72 +1,83 @@
-from typing import Optional, Any
+from collections.abc import Iterable
+from dataclasses import dataclass, field, asdict
+from typing import Any
 
-from pyrl.creature.stats import Stat, ComplexStat
+from pyrl.creature.stats import Stats, Stat
 from pyrl.dice import Dice
-from pyrl.enums.colors import Pair
-from pyrl.enums.slot import Slot
+from pyrl.enums.colors import ColorPair, Char
+from pyrl.enums.equipment_slot import Slot
 
-
-def Weapon(name, accuracy, weapon_dice, two_handed=False, compatible_slots=(Slot.Right_Hand, Slot.Left_Hand),
-           stats=(), char=('(', Pair.Normal)):
-    stats = ((ComplexStat.weapon_dice, weapon_dice), (Stat.accuracy, accuracy), *stats)
-    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
-                occupies_all_slots=two_handed)
-
-def Armor(name, defense, armor_value, compatible_slots=(), stats=(), char=(']', Pair.Normal)):
-    stats = ((Stat.defense, defense), (Stat.armor, armor_value), *stats)
-    return Item(name=name, compatible_slots=compatible_slots, stats=stats, char=char,
-                occupies_all_slots=False)
-
+@dataclass(eq=False, slots=True)
 class Item:
-    def __init__(self, name, compatible_slots, stats, char, occupies_all_slots):
-        self.name = name
-        self.compatible_slots = tuple(compatible_slots)
-        self.stats: tuple[Any] = tuple(stats)
-        self.char = char
-        self.occupies_all_slots = occupies_all_slots
+    name: str
+    char: Char
+    stats: Stats                       = field(repr=False)
+    compatible_slots: tuple[Slot, ...] = field(repr=False)
+    uses_all_slots: bool               = False
+    damage_dice: Dice | None           = None
 
-    def fits_slot(self, slot):
+    def fits_slot(self, slot: Slot) -> bool:
         return slot in self.compatible_slots
 
-    def get_stat(self, stat, default=None) -> Optional[int]:
-        for stat0, value in self.stats:
-            if stat0 is stat:
-                return value
-        return default
-
-    def weapon_str(self):
-        weapon_dice: Dice = self.get_stat(ComplexStat.weapon_dice)
-        accuracy = self.get_stat(Stat.accuracy, default=0)
-        if weapon_dice is not None:
-            return f" ({accuracy:+}, {weapon_dice})"
-        elif accuracy:
-            return f" ({accuracy:+})"
+    def weapon_str(self) -> str:
+        if self.damage_dice is not None:
+            return f" ({self.stats.accuracy:+}, {self.damage_dice})"
+        elif self.stats.accuracy:
+            return f" ({self.stats.accuracy:+})"
         else:
             return ""
 
-    def armor_str(self):
-        defense = self.get_stat(Stat.defense, default=0)
-        armor_value = self.get_stat(Stat.armor, default=0)
-        if defense or armor_value:
-            return f" [{defense:+}, {armor_value:+}]"
+    def armor_str(self) -> str:
+        if self.stats.defense or self.stats.armor:
+            return f" [{self.stats.defense:+}, {self.stats.armor:+}]"
         else:
             return ""
 
-    def stats_str(self):
-        skip_stats = (Stat.accuracy, ComplexStat.weapon_dice, Stat.defense, Stat.armor)
-        stats = ", ".join(f"{stat.value}:{value:+}"
-                          for stat, value in self.stats
-                          if stat not in skip_stats)
+    def stats_str(self) -> str:
+        skip_stats = ("weapon_dice", "accuracy", "defense", "armor")
+        stats_dict: dict[str, int] = asdict(self.stats)
+        stat: str
+        value: int
+        stats = ", ".join(f"{Stat[stat].value}:{value:+}"
+                          for stat, value in stats_dict.items()
+                          if value and stat not in skip_stats)
         if stats:
-            return " {%s}" % stats
+            return f" {stats}"
         else:
             return ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}{self.weapon_str()}{self.armor_str()}{self.stats_str()}"
 
-    def __lt__(self, other):
+    def __lt__(self, other: Any) -> bool:
         return str(self) < str(other)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Item({self.name=}, {self.char=}, {self.compatible_slots=}, {self.stats=})"
+
+# noinspection PyPep8Naming
+def Weapon(name: str,
+           accuracy: int,
+           damage_dice: Dice,
+           two_handed: bool = False,
+           compatible_slots: Iterable[Slot] = (Slot.Right_Hand, Slot.Left_Hand),
+           stats: Stats = None,
+           char: Char = ('(', ColorPair.Normal)) -> Item:
+    if stats is None:
+        stats = Stats()
+    stats.accuracy = accuracy
+    return Item(name=name, char=char, stats=stats, compatible_slots=tuple(compatible_slots),
+                uses_all_slots=two_handed, damage_dice=damage_dice)
+
+# noinspection PyPep8Naming
+def Armor(name: str,
+          defense: int,
+          armor: int,
+          compatible_slots: Iterable[Slot] = (),
+          stats: Stats = None,
+          char: Char = (']', ColorPair.Normal)) -> Item:
+    if stats is None:
+        stats = Stats()
+    stats.defense = defense
+    stats.armor = armor
+    return Item(name=name, char=char, stats=stats, compatible_slots=tuple(compatible_slots))

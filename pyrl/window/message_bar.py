@@ -4,7 +4,7 @@ import textwrap
 from functools import wraps
 
 from pyrl.binds import Binds
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.window.base_window import BaseWindow
 from pyrl.io_wrappers import mock
 
@@ -65,7 +65,7 @@ class MessageBar(BaseWindow):
         for i, line in enumerate(lines):
             self.draw_str(line, (i % self.rows, 0))
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-                self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), Pair.Green)
+                self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), ColorPair.Green)
                 key = self.get_key(keys=Binds.Skip_To_Last_Message + Binds.Cancel, refresh=True)
                 if key in Binds.Skip_To_Last_Message:
                     skip = True

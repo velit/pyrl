@@ -1,9 +1,9 @@
 from pyrl.creature.creature import Creature
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from decimal import Decimal
 
 def test_danger_level_spawn_mult():
-    c = Creature("test", ('t', Pair.Cyan), danger_level=0)
+    c = Creature("test", ('t', ColorPair.Cyan), danger_level=0)
 
     assert c.danger_level_spawn_mult(-6) == Decimal(0)
     assert c.danger_level_spawn_mult(-5) == Decimal(0)

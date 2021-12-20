@@ -1,15 +1,15 @@
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.world.tile import Tile
 
 class PyrlTile:
-    # Name         Description                       Visible char        Memory char        Pathable Transparency
-    Unknown      = Tile("nothing",                 (' ', Pair.Normal), (' ', Pair.Normal),  False,   False)
-    Floor        = Tile("dungeon floor",           ('.', Pair.Light),  ('.', Pair.Gray),    True,    True)
-    Black_Floor  = Tile("obisidian dungeon floor", ('.', Pair.Red),    ('.', Pair.Red),     True,    True)
-    Wall         = Tile("wall",                    ('#', Pair.Brown),  ('#', Pair.Dark),    False,   False)
-    Rock         = Tile("dungeon rock",            ('#', Pair.Dark),   ('#', Pair.Darkest), False,   False)
-    Dynamic_Wall = Tile("game creation wall",      ('#', Pair.Green),  ('#', Pair.Green),   False,   False)
-    Open_Door    = Tile("closed door",             ('+', Pair.Brown),  ('+', Pair.Brown),   False,   False)
-    Closed_Door  = Tile("open door",               ('/', Pair.Brown),  ('/', Pair.Brown),   True,    True)
-    Stairs_Down  = Tile("down staircase",          ('>', Pair.Red),    ('>', Pair.Normal),  True,    True)
-    Stairs_Up    = Tile("up staircase",            ('<', Pair.Red),    ('<', Pair.Normal),  True,    True)
+    # Name         Description                      Visible char        Memory char                Pathable Transparency
+    Unknown      = Tile("nothing",                 (' ', ColorPair.Normal), (' ', ColorPair.Normal),  False,   False)
+    Floor        = Tile("dungeon floor",           ('.', ColorPair.Light),  ('.', ColorPair.Gray),    True,    True)
+    Black_Floor  = Tile("obisidian dungeon floor", ('.', ColorPair.Red),    ('.', ColorPair.Red),     True,    True)
+    Wall         = Tile("wall",                    ('#', ColorPair.Brown),  ('#', ColorPair.Dark),    False,   False)
+    Rock         = Tile("dungeon rock",            ('#', ColorPair.Dark),   ('#', ColorPair.Darkest), False,   False)
+    Dynamic_Wall = Tile("game creation wall",      ('#', ColorPair.Green),  ('#', ColorPair.Green),   False,   False)
+    Open_Door    = Tile("closed door",             ('+', ColorPair.Brown),  ('+', ColorPair.Brown),   False,   False)
+    Closed_Door  = Tile("open door",               ('/', ColorPair.Brown),  ('/', ColorPair.Brown),   True,    True)
+    Stairs_Down  = Tile("down staircase",          ('>', ColorPair.Red),    ('>', ColorPair.Normal),  True,    True)
+    Stairs_Up    = Tile("up staircase",            ('<', ColorPair.Red),    ('<', ColorPair.Normal),  True,    True)

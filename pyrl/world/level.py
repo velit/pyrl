@@ -215,7 +215,7 @@ class Level:
         information = f"{coord[0]}x{coord[1]} "
         if coord in self.creatures:
             c: Creature = self.creatures[coord]
-            damage = c.get_damage_info()
+            damage = c.damage_dice
             information += f"{c.name} hp:{c.hp}/{c.max_hp} sight:{c.sight} armor:{c.armor} dr:{c.defense} " \
                            f"ar:{c.accuracy} attack:{damage.dices}D{damage.faces}+{damage.addition}"
         else:

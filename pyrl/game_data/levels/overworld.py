@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.game_data.levels.shared_assets import construct_data, default_level_dimensions
 from pyrl.enums.level_gen import LevelGen
 from pyrl.world.level import Level
@@ -46,13 +46,13 @@ def get_level():
     # Overworld movement multiplier
     mult = min(default_level_dimensions)
     custom_tiles = {
-        '"': Tile("grassland",      ('"', Pair.Green), ('"', Pair.Green), True,  True,  move_mult=mult),
-        '¨': Tile("mountains",      ('^', Pair.White), ('^', Pair.White), False, True,  move_mult=mult),
-        '=': Tile("river",          ('=', Pair.Blue),  ('=', Pair.Blue),  False, False, move_mult=mult),
-        'T': Tile("forest",         ('T', Pair.Green), ('T', Pair.Green), True,  True,  move_mult=mult),
-        't': Tile("town",           ('*', Pair.Green), ('*', Pair.Green), True,  True,  move_mult=mult),
-        '*': Tile("dungeon",        ('*', Pair.Brown), ('*', Pair.Brown), True,  True,  move_mult=mult),
-        '^': Tile("high mountains", ('^', Pair.Brown), ('^', Pair.Brown), False, False, move_mult=mult),
+        '"': Tile("grassland",      ('"', ColorPair.Green), ('"', ColorPair.Green), True,  True,  move_mult=mult),
+        '¨': Tile("mountains",      ('^', ColorPair.White), ('^', ColorPair.White), False, True,  move_mult=mult),
+        '=': Tile("river",          ('=', ColorPair.Blue),  ('=', ColorPair.Blue),  False, False, move_mult=mult),
+        'T': Tile("forest",         ('T', ColorPair.Green), ('T', ColorPair.Green), True,  True,  move_mult=mult),
+        't': Tile("town",           ('*', ColorPair.Green), ('*', ColorPair.Green), True,  True,  move_mult=mult),
+        '*': Tile("dungeon",        ('*', ColorPair.Brown), ('*', ColorPair.Brown), True,  True,  move_mult=mult),
+        '^': Tile("high mountains", ('^', ColorPair.Brown), ('^', ColorPair.Brown), False, False, move_mult=mult),
     }
     custom_locations = {
         '*': OverWorldLocation.Dungeon,

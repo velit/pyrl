@@ -1,15 +1,20 @@
 import math
+from decimal import Decimal
+from typing import Type, TypeVar
+from numbers import Number
 
 from pyrl.enums.directions import Dir
 
 
-def resize_range(n, old_range, new_range=range(2)):
-    N = type(n)
-    assert n in old_range, f"Value '{n}' is not inside {old_range}"
+N = TypeVar('N', int, float, Decimal)
+def resize_range(number: N, old_range: range, new_range: range = range(2)) -> N:
+    n_t: Type[N] = type(number)
+    assert number in old_range, f"Value '{number}' is not inside {old_range}"
     assert len(old_range) > 1, f"Number {old_range.start} is not a range"
-    old_min, old_max = N(old_range.start), N(old_range.stop - 1)
-    new_min, new_max = N(new_range.start), N(new_range.stop - 1)
-    return (((N(n) - N(old_min)) * (N(new_max) - N(new_min))) / (N(old_max) - N(old_min))) + N(new_min)
+    old_min, old_max = n_t(old_range.start), n_t(old_range.stop - 1)
+    new_min, new_max = n_t(new_range.start), n_t(new_range.stop - 1)
+    return (((n_t(number) - n_t(old_min)) * (n_t(new_max) - n_t(new_min)))
+            / (n_t(old_max) - n_t(old_min))) + n_t(new_min)
 
 def bresenham(coord_a, coord_b):
     (ay, ax), (by, bx) = coord_a, coord_b

@@ -1,15 +1,18 @@
-from pyrl.enums.slot import Slot
-from pyrl.creature.equipment import Equipment
+import dataclasses
+
+from pyrl.creature.inventory import Inventory
 from pyrl.creature.item import Weapon, Armor
-from pyrl.creature.stats import Stat
+from pyrl.creature.stats import Stat, Stats
+from pyrl.dice import Dice
+from pyrl.enums.equipment_slot import Slot
 
 def test_creature_equipment():
-    equipment = Equipment()
+    equipment = Inventory()
     items = {
-        Slot.Right_Hand: Weapon("short sword +1", 0, (1, 6, 1)),
-        Slot.Left_Hand:  Weapon("short sword", 0, (1, 6, 0)),
+        Slot.Right_Hand: Weapon("short sword +1", 0, Dice(1, 6, 1)),
+        Slot.Left_Hand:  Weapon("short sword", 0, Dice(1, 6, 0)),
         Slot.Head:       Armor("helmet", 0, 1, [Slot.Head]),
-        Slot.Body:       Armor("armor", 0, 4, [Slot.Body], stats=[(Stat.strength, 2)]),
+        Slot.Body:       Armor("armor", 0, 4, [Slot.Body], stats=Stats(strength=2)),
         Slot.Feet:       Armor("boots", 0, 1, [Slot.Feet]),
     }
 
@@ -26,8 +29,8 @@ def test_creature_equipment():
         assert equipment.get_item(slot) is item
 
     assert len(equipment._bag) == 0
-    assert equipment.applied_stats[Stat.armor] == 6
-    assert equipment.applied_stats[Stat.strength] == 2
+    assert equipment.stats.armor == 6
+    assert equipment.stats.strength == 2
 
     # unequip items
     for slot in items:
@@ -35,12 +38,12 @@ def test_creature_equipment():
 
     assert len(equipment._bag) == len(items)
 
-    two_hander = Weapon("two-handed sword", 0, (1, 6, 0), two_handed=True)
+    two_hander = Weapon("two-handed sword", 0, Dice(1, 6, 0), two_handed=True)
     equipment.equip(two_hander, two_hander.compatible_slots[0])
     equipment.unequip(two_hander.compatible_slots[1])
 
-    for worn_item in equipment._worn_items.values():
+    for worn_item in equipment._equipment.values():
         assert worn_item is None
 
-    for stat_value in equipment.applied_stats.values():
+    for stat_value in dataclasses.astuple(equipment.stats):
         assert stat_value == 0

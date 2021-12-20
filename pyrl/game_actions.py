@@ -204,7 +204,7 @@ class GameActions:
             self.game.io.msg(msg)
 
     def drop_items(self, item_indexes):
-        items = self.creature.equipment.unbag_items(item_indexes)
+        items = self.creature.inventory.unbag_items(item_indexes)
         self.level.add_items(self.coord, items)
         self._do_action(self.creature.action_cost(Action.Drop_Items))
         if len(items) == 1:
@@ -214,7 +214,7 @@ class GameActions:
 
     def pickup_items(self, item_indexes):
         items = self.level.pop_items(self.coord, item_indexes)
-        self.creature.equipment.bag_items(items)
+        self.creature.inventory.bag_items(items)
         self._do_action(self.creature.action_cost(Action.Pick_Items))
         if len(items) == 1:
             return feedback(Action.Pick_Items, f"a {items[0].name}")
@@ -254,7 +254,7 @@ class GameActions:
 
     def inspect_character_items(self):
         """Free action."""
-        return self.creature.equipment.inspect_items()
+        return self.creature.inventory.inspect_items()
 
     def can_reach(self, target_coord):
         """Free action."""

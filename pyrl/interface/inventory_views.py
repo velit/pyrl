@@ -1,5 +1,5 @@
 from pyrl.binds import Binds
-from pyrl.enums.slot import Slot
+from pyrl.enums.equipment_slot import Slot
 from pyrl.game_actions import ActionError, feedback
 from pyrl.interface.lines_view import lines_view, Line
 
@@ -7,7 +7,7 @@ def _get_equipment_item_str(equipment, slot):
     item = equipment.get_item(slot)
     if item is None:
         return "-"
-    if not item.occupies_all_slots or slot == item.compatible_slots[0]:
+    if not item.uses_all_slots or slot == item.compatible_slots[0]:
         return str(item)
     else:
         return item.name
@@ -16,7 +16,7 @@ def equipment_view(actions):
     footer = f"Press a slot key to (un)equip" \
              f"  {Binds.Equipment_View_Backpack.key} to view backpack" \
              f"  {Binds.Cancel.key} to close"
-    equipment = actions.creature.equipment
+    equipment = actions.creature.inventory
 
     while True:
         lines = tuple(Line(f"{slot.value:11}: {_get_equipment_item_str(equipment, slot)}", slot)
@@ -48,7 +48,7 @@ def backpack_equip_item_view(actions, slot):
     if key in Binds.Cancel:
         return
     else:
-        actions.creature.equipment.equip_from_bag(item, slot)
+        actions.creature.inventory.equip_from_bag(item, slot)
 
 def backpack_view(actions):
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))

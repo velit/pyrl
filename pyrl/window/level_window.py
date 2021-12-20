@@ -1,4 +1,4 @@
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.generic_algorithms import bresenham
 from pyrl.window.base_window import BaseWindow
 
@@ -15,7 +15,7 @@ class LevelWindow(BaseWindow):
             char = symbol, (bg, fg)
         super().draw_char(char, coord)
 
-    def draw_line(self, coord_a, coord_b, char=('*', Pair.Yellow), include_first=False):
+    def draw_line(self, coord_a, coord_b, char=('*', ColorPair.Yellow), include_first=False):
         if include_first:
             for coord in bresenham(coord_a, coord_b):
                 self.draw_char(coord, char)

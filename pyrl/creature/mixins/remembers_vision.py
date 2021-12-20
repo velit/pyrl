@@ -8,11 +8,11 @@ if typing.TYPE_CHECKING:
 else:
     CreatureHint = object
 
-class RemembersVision:
+class RemembersVision(CreatureHint):
 
     """Creatures with this mixin class remember the level squares they've seen."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.visited_locations = defaultdict(set)

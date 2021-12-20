@@ -1,31 +1,27 @@
-from pyrl.enums.slot import Slot
-from pyrl.creature.item import Weapon, Armor
-from pyrl.creature.stats import Stat
-from pyrl.enums.colors import Color, Pair
-from pyrl.dice import Dice
 from pyrl.creature.creature import Creature
-from pyrl.creature.mixins.has_equipment import HasEquipment
+from pyrl.creature.item import Weapon, Armor
+from pyrl.creature.mixins.has_inventory import HasInventory
 from pyrl.creature.mixins.remembers_vision import RemembersVision
+from pyrl.creature.stats import Stats
+from pyrl.dice import Dice
+from pyrl.enums.colors import Color, ColorPair
+from pyrl.enums.equipment_slot import Slot
 
-class Player(HasEquipment, RemembersVision, Creature):
-    def __init__(self):
+class Player(HasInventory, RemembersVision, Creature):
+    def __init__(self) -> None:
         super().__init__(name="player", char=('@', (Color.Green, Color.Black)))
 
-        armor_stats = (
-            (Stat.accuracy, 10),
-            (Stat.speed, 100),
-        )
-        aok = Armor("Armor of Kings", 10, 10, [Slot.Body], armor_stats, (']', Pair.Yellow))
-        self.equipment.equip(aok, Slot.Body)
+        aok = Armor("Armor of Kings", 10, 10, [Slot.Body], Stats(accuracy=10, speed=100), (']', ColorPair.Yellow))
+        self.inventory.equip(aok, Slot.Body)
 
-        # weapon = Weapon("Black Spike", 15, Dice(8, 8, 10), two_handed=True, char=('(', Pair.Darkest))
+        # weapon = Weapon("Black Spike", 15, Dice(8, 8, 10), two_handed=True, char=('(', ColorPair.Darkest))
         # self.equipment.equip(weapon, Slot.Right_Hand)
 
-        sting = Weapon("Sting", 0, Dice(1, 8, 20), char=('(', Pair.Green))
-        self.equipment.equip(sting, Slot.Right_Hand)
+        sting = Weapon("Sting", 0, Dice(1, 8, 20), char=('(', ColorPair.Green))
+        self.inventory.equip(sting, Slot.Right_Hand)
 
-        aok = Armor("Protector", 12, 20, [Slot.Right_Hand, Slot.Left_Hand], [(Stat.endurance, 2)])
-        self.equipment.equip(aok, Slot.Left_Hand)
+        aok = Armor("Protector", 12, 20, [Slot.Right_Hand, Slot.Left_Hand], Stats(endurance=2))
+        self.inventory.equip(aok, Slot.Left_Hand)
 
         items = (
             Weapon("Short Sword", 0, Dice(1, 6, 1)),
@@ -37,8 +33,8 @@ class Player(HasEquipment, RemembersVision, Creature):
             Weapon("Short Sword", 0, Dice(1, 6, 3)),
             Weapon("Short Sword", 0, Dice(1, 6, 0)),
             Weapon("Long Sword", 0, Dice(1, 8, 2)),
-            Weapon("Lance of Longinus", 0, Dice(4, 8, 8), stats=[(Stat.endurance, 8)], char=('(', Pair.Red)),
+            Weapon("Lance of Longinus", 0, Dice(4, 8, 8), stats=Stats(endurance=8), char=('(', ColorPair.Red)),
         )
-        items = items + tuple(Weapon("Short Sword", i, (1, 6, i)) for i in range(60))
-        for itam in items:
-            self.equipment.bag_item(itam)
+        items2 = tuple(Weapon("Short Sword", i, Dice(1, 6, i)) for i in range(60))
+        for itam in (items + items2):
+            self.inventory.bag_item(itam)

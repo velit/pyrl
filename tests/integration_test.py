@@ -118,11 +118,11 @@ def test_subsystems(game):
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    previous_bag_count = len(game.player.equipment._bag)
+    previous_bag_count = len(game.player.inventory._bag)
     game = prepare_input_and_run(game, inventory)
     assert game.turn_counter == 3
     assert coord == game.player.coord
-    assert len(game.player.equipment._bag) == previous_bag_count + 2
+    assert len(game.player.inventory._bag) == previous_bag_count + 2
 
     game = prepare_input_and_run(game, walk_mode)
     assert game.turn_counter == 7

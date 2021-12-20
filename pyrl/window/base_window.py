@@ -1,6 +1,6 @@
 import time
 
-from pyrl.enums.colors import Pair
+from pyrl.enums.colors import ColorPair
 from pyrl.enums.keys import Key
 from pyrl.generic_structures import TableDims, Coord
 
@@ -93,7 +93,7 @@ class BaseWindow:
         for i, line in enumerate(lines):
             self.draw_str(line, (i + y_offset, x_offset))
 
-    def draw_banner(self, banner_content, y_offset=0, color=Pair.Brown):
+    def draw_banner(self, banner_content, y_offset=0, color=ColorPair.Brown):
         space_padded = f"  {banner_content}  "
         full_banner = f"{space_padded:+^{self.cols}}"
         if y_offset < 0:
@@ -116,14 +116,14 @@ class BaseWindow:
 
             # Update vars
             cursor_coord = input_y, input_x + cursor_index
-            cursor_char = ((user_input + " ")[cursor_index], Pair.Cursor)
+            cursor_char = ((user_input + " ")[cursor_index], ColorPair.Cursor)
 
             # Print
             self.draw_str(user_input, input_coord)
             self.draw_char(cursor_char, cursor_coord)
             key = self.get_key(refresh=True)
             self.draw_str(" " * (len(user_input)), input_coord)
-            self.draw_char((" ", Pair.Normal), cursor_coord)
+            self.draw_char((" ", ColorPair.Normal), cursor_coord)
 
             if key == Key.SPACE:
                 key = " "

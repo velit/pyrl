@@ -2,7 +2,7 @@ from functools import partial
 
 from pyrl.binds import Binds
 from pyrl.config.config import Config
-from pyrl.enums.colors import Color, Pair
+from pyrl.enums.colors import Color, ColorPair
 from pyrl.enums.directions import Dir
 from pyrl.enums.keys import Key
 from pyrl.enums.level_location import LevelLocation
@@ -154,8 +154,8 @@ class UserController(GameActionsProperties, object):
                 coord = new_coord
             self.io.msg(self.actions.level.look_information(coord))
             if drawline_flag:
-                self.io.draw_line(self.coord, coord, ("*", Pair.Yellow))
-                self.io.draw_line(coord, self.coord, ("*", Pair.Yellow))
+                self.io.draw_line(self.coord, coord, ("*", ColorPair.Yellow))
+                self.io.draw_line(coord, self.coord, ("*", ColorPair.Yellow))
                 self.io.msg(f"LoS: {self.actions.level.check_los(self.coord, coord)}")
             if coord != self.coord:
                 symbol, (foreground, background) = self.actions.level.visible_char(coord)

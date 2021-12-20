@@ -34,7 +34,7 @@ class Color(Enum):
     def __str__(self):
         return self.value
 
-class Pair:
+class ColorPair:
     Red          = (Color.Red,           Color.Black)
     Green        = (Color.Green,         Color.Black)
     Blue         = (Color.Blue,          Color.Black)
@@ -60,3 +60,5 @@ class Pair:
     Darkest      = (Color.Darkest,       Color.Black)
     Black        = (Color.Black,         Color.Black)
     Cursor       = (Color.Black,         Color.Green)
+
+Char = tuple[str, tuple[Color, Color]]
