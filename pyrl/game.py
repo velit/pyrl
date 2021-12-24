@@ -1,4 +1,9 @@
 """pyrl; Python roguelike by Veli Tapani Kiiskinen."""
+from __future__ import annotations
+
+import sys
+from typing import NoReturn
+
 from pyrl import state_store, binds
 from pyrl.ai import AI
 from pyrl.binds import Binds
@@ -12,11 +17,11 @@ from pyrl.game_data.pyrl_world import get_world
 from pyrl.interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.world import LevelNotFound
-from pyrl.creature.mixins.remembers_vision import RemembersVision
+from pyrl.creature.mixins.visionary import Visionary
 
 class Game:
 
-    def __init__(self, game_name, cursor_lib):
+    def __init__(self, game_name: str, cursor_lib):
         self.game_name = game_name
         self.ai = AI()
         self.turn_counter = 0
@@ -90,10 +95,10 @@ class Game:
             self.endgame()
         creature.level.remove_creature(creature)
 
-    def endgame(self):
-        exit()
+    def endgame(self) -> NoReturn:
+        sys.exit(0)
 
-    def savegame(self):
+    def savegame(self) -> str:
         try:
             raw, compressed = state_store.save(self, self.game_name)
         except IOError as e:
@@ -108,9 +113,9 @@ class Game:
         Update the vision set of the creature.
 
         This operation should only be done on creatures that have the .vision
-        attribute ie. AdvancedCreatures for instance.
+        attribute i.e. Player for instance.
         """
-        if not isinstance(creature, RemembersVision):
+        if not isinstance(creature, Visionary):
             raise ValueError("Creature {} doesn't have the capacity to remember its vision.")
         if not isinstance(creature, Creature):
             raise ValueError(f"{creature} is not a creature!")
@@ -133,7 +138,7 @@ class Game:
             reverse_data = lvl.get_vision_information(new_vision, new_vision)
             self.io.draw(reverse_data, True)
 
-    def redraw(self):
+    def redraw(self) -> None:
         self.io.level_window.clear()
         lvl = self.active_level
 

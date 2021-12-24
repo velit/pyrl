@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pyrl.generic_algorithms import bresenham
 
 class ShadowCast:

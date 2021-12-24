@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 import code
+from collections.abc import Callable
+from typing import Literal
 
 from pyrl.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.game_actions import GameActionsProperties, feedback, Action
-from pyrl.enums.level_gen import LevelGen
-from pyrl.enums.level_location import LevelLocation
+from pyrl.constants.level_gen import LevelGen
+from pyrl.constants.level_location import LevelLocation
+from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.creature.actions import Action, NoValidTargetException
 
-class DebugAction(GameActionsProperties, object):
+class DebugAction(GameActionProperties, object):
 
-    def __init__(self, game_actions):
+    def __init__(self, game_actions: GameActions) -> None:
         self.actions = game_actions
 
-        self.action_funcs = {
+        self.action_funcs: dict[str, Callable[[], Action | None]] = {
             'a': self.add_monster,
             'c': self.display_curses_color_info,
             'd': self.show_path_debug,
@@ -29,39 +34,34 @@ class DebugAction(GameActionsProperties, object):
             'X': self.ascend_to_surface,
         }
 
-    def print_user_input(self):
+    def ask_action(self) -> Action:
+        c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
+        if c in self.action_funcs:
+            action = self.action_funcs[c]()
+            return action if action is not None else Action.Debug
+        self.io.msg(f"Undefined debug key: {c}")
+        return Action.No_Action
+
+    def print_user_input(self) -> None:
         self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
-    def update_without_acting(self):
-        self.actions._do_action(0)
-        return feedback(Action.Generic)
-
-    def ask_action(self):
-        c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
-
-        if c in self.action_funcs:
-            self.action_funcs[c]()
-            return feedback(Action.Debug)
-        else:
-            self.io.msg(f"Undefined debug key: {c}")
-
-    def add_monster(self):
+    def add_monster(self) -> None:
         if self.level.creature_spawning_enabled:
             self.level.spawn_creature(self.level.creature_spawner.random_creature())
-            self.update_without_acting()
+            self.actions.no_action()
         else:
             self.io.msg("No random spawning on this level. Can't add monster.")
 
-    def show_map(self):
+    def show_map(self) -> None:
         Debug.show_map = not Debug.show_map
         self.actions.redraw()
         self.io.msg(f"Show map set to {Debug.show_map}")
 
-    def toggle_path_heuristic_cross(self):
+    def toggle_path_heuristic_cross(self) -> None:
         Debug.cross = not Debug.cross
         self.io.msg(f"Path heuristic cross set to {Debug.cross}")
 
-    def cycle_level_type(self):
+    def cycle_level_type(self) -> None:
         last_level_type = "All levels are already generated"
         for level in self.world.levels.values():
             if level.is_finalized:
@@ -73,7 +73,7 @@ class DebugAction(GameActionsProperties, object):
             last_level_type = level.generation_type
         self.io.msg(f"Level type set to {last_level_type}")
 
-    def show_path_debug(self):
+    def show_path_debug(self) -> None:
         if not Debug.path:
             Debug.path = True
             self.io.msg("Path debug set")
@@ -85,26 +85,26 @@ class DebugAction(GameActionsProperties, object):
             Debug.path_step = False
             self.io.msg("Path debug unset")
 
-    def kill_creatures_in_level(self):
+    def kill_creatures_in_level(self) -> None:
         creature_list = list(self.level.creatures.values())
         creature_list.remove(self.creature)
         for i in creature_list:
             self.level.remove_creature(i)
-        self.update_without_acting()
+        self.actions.no_action()
         self.io.msg("Abracadabra.")
 
-    def draw_path_to_passage_down(self):
+    def draw_path_to_passage_down(self) -> None:
         passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
         self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
         self.actions.redraw()
 
-    def draw_path_from_up_to_down(self):
+    def draw_path_from_up_to_down(self) -> None:
         passage_up_coord = self.level.get_location_coord(LevelLocation.Passage_Up)
         passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
         self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
         self.actions.redraw()
 
-    def interactive_console(self):
+    def interactive_console(self) -> None:
         self.io.suspend()
         game = self.actions.game
         io = self.io
@@ -113,33 +113,32 @@ class DebugAction(GameActionsProperties, object):
         code.interact(local=locals())
         self.io.resume()
 
-    def toggle_log_keycodes(self):
+    def toggle_log_keycodes(self) -> None:
         Debug.show_keycodes = not Debug.show_keycodes
         self.io.msg(f"Input code debug set to {Debug.show_keycodes}")
 
-    def display_curses_color_info(self):
+    def display_curses_color_info(self) -> None:
         import curses
         self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")
 
-    def print_message_debug_string(self):
+    def print_message_debug_string(self) -> None:
         self.io.msg(Debug.debug_string)
 
-    def sight_change(self, amount):
+    def sight_change(self, amount: int) -> Action:
         self.creature.base_perception += amount
-        return self.update_without_acting()
+        return self.actions.no_action()
 
-    def teleport_to_location(self, location):
+    def teleport_to_location(self, location: LevelLocation) -> Literal[Action.Teleport]:
         try:
             new_coord = self.level.get_location_coord(location)
         except KeyError:
-            self.io.msg(f"This level doesn't seem to have a {location} location")
-            return
+            raise NoValidTargetException(f"This level doesn't seem to have a {location} location")
         if not self.level.is_passable(new_coord):
             self.level.remove_creature(self.level.creatures[new_coord])
         return self.actions.teleport(new_coord)
 
-    def descend_to_end(self):
+    def descend_to_end(self) -> None:
         self.io.prepared_input.extend([Binds.Descend.key] * 200)
 
-    def ascend_to_surface(self):
+    def ascend_to_surface(self) -> None:
         self.io.prepared_input.extend([Binds.Ascend.key] * 200)

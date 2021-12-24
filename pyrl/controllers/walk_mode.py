@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 from collections import namedtuple
+from typing import Literal
 
 from pyrl.binds import Binds
 from pyrl.config.config import Config
-from pyrl.enums.directions import Dir
-from pyrl.game_actions import Action, ActionError, GameActionsProperties
+from pyrl.constants import dir
+from pyrl.constants.coord import Coord
+from pyrl.constants.dir import Direction
+from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.creature.actions import Action, IllegalContextException
 from pyrl.generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_vector,
                                      clockwise_45, anticlockwise_45)
 
@@ -18,32 +24,28 @@ OPEN          = WalkType(True,  True)
 
 INTERRUPT_MSG_TIME = 1
 
-class WalkMode(GameActionsProperties, object):
+class WalkMode(GameActionProperties, object):
 
-    def __init__(self, game_actions):
+    def __init__(self, game_actions: GameActions):
         self.actions = game_actions
-        self.state = None
+        self.state: WalkModeState = None
 
-    def is_walk_mode_active(self):
+    def is_walk_mode_active(self) -> bool:
         return self.state is not None
 
-    def init_walk_mode(self, direction=None):
+    def init_walk_mode(self, direction: Direction | None = None) -> Literal[Action.Move, Action.No_Action]:
         if self._any_creatures_visible():
-            self.io.msg("Not while there are creatures in the vicinity.")
-            return
+            raise IllegalContextException("Not while there are creatures in the vicinity.")
 
         if direction is None:
             query = f"Specify walking direction, {Binds.Cancel.key} to cancel."
             key_seq = Binds.Directions + Binds.Cancel
             key = self.io.get_key(query, keys=key_seq)
             if key in Binds.Cancel:
-                return
-            direction = Dir.from_key[key]
+                return Action.No_Action
+            direction = dir.from_key[key]
 
         feedback = self.actions.move(direction)
-        if feedback.type in ActionError:
-            return feedback
-
         walk_type = self._get_initial_walk_type(direction)
         if not walk_type:
             return feedback
@@ -53,23 +55,19 @@ class WalkMode(GameActionsProperties, object):
                                    self.io.get_future_time(INTERRUPT_MSG_TIME))
         return feedback
 
-    def continue_walk(self):
+    def continue_walk(self) -> Literal[Action.Move, Action.No_Action]:
         next_direction = self._next_direction()
 
         if next_direction is not None:
             feedback = self.actions.move(next_direction)
-            assert feedback.type == Action.Move, \
-                f"Bug in walk_mode. Move failed: {feedback.type} {feedback.params}"
-
             next_walk_time = self.io.get_future_time(Config.animation_period)
-            self.state = WalkModeState(next_direction, self.state.walk_type, next_walk_time,
-                                       self.state.show_msg_time)
+            self.state = WalkModeState(next_direction, self.state.walk_type, next_walk_time, self.state.show_msg_time)
             return feedback
 
         self.state = None
-        return
+        return Action.No_Action
 
-    def _next_direction(self):
+    def _next_direction(self) -> Direction | None:
         if self._any_creatures_visible():
             return None
 
@@ -89,7 +87,7 @@ class WalkMode(GameActionsProperties, object):
 
         return next_direction
 
-    def _calculate_next_direction(self, old_direction, walk_type):
+    def _calculate_next_direction(self, old_direction: Direction, walk_type: WalkType) -> Direction | None:
         if walk_type == WALK_IN_PLACE:
             return old_direction
         elif walk_type == CORRIDOR:
@@ -99,7 +97,7 @@ class WalkMode(GameActionsProperties, object):
                 return new_direction
             elif len(forward_dirs) > 1 and len(orthogonal_dirs) == 1:
                 new_direction = orthogonal_dirs.pop()
-                if all(get_vector(new_direction, other) in Dir.AllPlusStay for other in forward_dirs):
+                if all(get_vector(new_direction, other) in dir.AllPlusStay for other in forward_dirs):
                     return new_direction
         else:
             forward = self._passable(old_direction)
@@ -108,33 +106,34 @@ class WalkMode(GameActionsProperties, object):
                 return old_direction
         return None
 
-    def _get_corridor_candidate_dirs(self, direction):
+    def _get_corridor_candidate_dirs(self, direction: Direction) \
+            -> tuple[set[Direction], set[Direction], set[Direction]]:
         reverse = reverse_vector(direction)
         back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
         candidate_dirs = set(self.level.get_passable_neighbors(self.creature.coord)) - {reverse}
         candidate_forward_dirs = candidate_dirs - back_sides
-        candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
+        candidate_orthogonal_dirs = candidate_dirs & set(dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides
         return candidate_forward_dirs, candidate_orthogonal_dirs, ignored_dirs
 
-    def _passable(self, direction):
+    def _passable(self, direction: Direction) -> bool:
         return self.actions.can_move(direction)
 
-    def _get_neighbor_passables(self, direction):
+    def _get_neighbor_passables(self, direction: Direction) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
         upper_left_dir = anticlockwise_45(direction)
         upper_right_dir = clockwise_45(direction)
 
         forward = self._passable(direction)
+        up_left = self._passable(upper_left_dir)
+        up_right = self._passable(upper_right_dir)
         left = self._passable(anticlockwise(direction))
         right = self._passable(clockwise(direction))
-        up_left = self._passable(upper_left_dir)
         down_left = self._passable(anticlockwise(upper_left_dir))
-        up_right = self._passable(upper_right_dir)
         down_right = self._passable(clockwise(upper_right_dir))
         return forward, up_left, up_right, left, right, down_left, down_right
 
-    def _get_initial_walk_type(self, direction):
-        if direction == Dir.Stay:
+    def _get_initial_walk_type(self, direction: Direction) -> WalkType | None:
+        if direction == dir.Stay:
             return WALK_IN_PLACE
 
         walk_type = self._get_side_passables(direction)
@@ -149,16 +148,16 @@ class WalkMode(GameActionsProperties, object):
             walk_type = CORRIDOR
         return walk_type
 
-    def _get_side_passables(self, direction):
-        if direction in Dir.Orthogonals:
+    def _get_side_passables(self, direction: Coord) -> WalkType:
+        if direction in dir.Orthogonals:
             left = self._passable(anticlockwise(direction))
             right = self._passable(clockwise(direction))
-        elif direction in Dir.Diagonals:
+        elif direction in dir.Diagonals:
             left = self._passable(anticlockwise_45(direction))
             right = self._passable(clockwise_45(direction))
         else:
             raise Exception(f"Not a valid {direction=}")
         return WalkType(left, right)
 
-    def _any_creatures_visible(self):
+    def _any_creatures_visible(self) -> int:
         return len(self.actions.get_coords_of_creatures_in_vision())

@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 from collections import deque
 
-from pyrl.enums.keys import Key
+from pyrl.constants.keys import Key
 
 IMPLEMENTATION = "mock"
 

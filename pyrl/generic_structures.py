@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import namedtuple
 from itertools import zip_longest
 from random import randrange

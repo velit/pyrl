@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import typing
 from random import randint
+from typing import TYPE_CHECKING
 
 from pyrl.dice import Dice
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from pyrl.creature.creature import Creature
-
 
 def get_melee_attack_cr(creature: Creature, target: Creature) -> tuple[bool, int]:
     return get_melee_attack(creature.damage_dice, creature.accuracy, target.defense, target.armor)
@@ -19,8 +18,8 @@ def get_melee_attack(damage_dice: Dice, accuracy: int, defense: int, armor: int)
     else:
         return False, 0
 
-def get_combat_message(attack_succeeds: bool, damage: int, dies: bool, player_attacker: str,
-                       player_target: str, attacker_name: str, defender_name: str) -> str:
+def get_combat_message(attack_succeeds: bool, damage: int, dies: bool, player_attacker: bool,
+                       player_target: bool, attacker_name: str, defender_name: str) -> str:
 
     if player_attacker:
         attacker = "You"

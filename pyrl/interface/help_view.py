@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pyrl.binds import Binds
 
 def help_view(io):

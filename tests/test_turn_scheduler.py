@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pyrl.turn_scheduler import TurnScheduler
 
 def test_turn_scheduler():

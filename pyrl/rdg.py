@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from functools import partial
 from random import randrange, random, choice
 
 from pyrl.config.debug import Debug
-from pyrl.enums.directions import Dir
-from pyrl.enums.level_gen import LevelGen
+from pyrl.constants import dir
+from pyrl.constants.level_gen import LevelGen
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
-from pyrl.enums.level_location import LevelLocation
+from pyrl.constants.level_location import LevelLocation
 
 def generate_tiles_to(level):
     RDG(level).generate_tiles()
@@ -229,10 +231,10 @@ class RDG:
             return False
 
         neighbors = self.get_up_down_left_right_neighbors(coord)
-        dir_map = {(self.R, self.F, self.W, self.W): Dir.North,
-                   (self.F, self.R, self.W, self.W): Dir.South,
-                   (self.W, self.W, self.R, self.F): Dir.West,
-                   (self.W, self.W, self.F, self.R): Dir.East}
+        dir_map = {(self.R, self.F, self.W, self.W): dir.North,
+                   (self.F, self.R, self.W, self.W): dir.South,
+                   (self.W, self.W, self.R, self.F): dir.West,
+                   (self.W, self.W, self.F, self.R): dir.East}
         try:
             return dir_map[neighbors]
         except KeyError:
@@ -241,10 +243,10 @@ class RDG:
     def get_up_down_left_right_neighbors(self, coord):
         tiles = self.level.tiles
         neighbors = (
-            tiles[add_vector(coord, Dir.North)],
-            tiles[add_vector(coord, Dir.South)],
-            tiles[add_vector(coord, Dir.West)],
-            tiles[add_vector(coord, Dir.East)],
+            tiles[add_vector(coord, dir.North)],
+            tiles[add_vector(coord, dir.South)],
+            tiles[add_vector(coord, dir.West)],
+            tiles[add_vector(coord, dir.East)],
         )
         return neighbors
 

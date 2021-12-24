@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from pyrl.creature.creature import Creature
-from pyrl.enums.colors import ColorPair
+from pyrl.constants.colors import ColorPair
 
 default_creatures = (
     #        name                 char                      danger_level   spawn_weight_class

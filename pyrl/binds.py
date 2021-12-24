@@ -11,20 +11,20 @@ Bind = NewType("Bind", str)
 
 class BindSequence(tuple):
 
-    def __new__(cls, str_or_iterable: str | Iterable[str] = (), /):
+    def __new__(cls, str_or_iterable: str | Iterable[str] = (), /) -> BindSequence:
         if isinstance(str_or_iterable, str):
             return super().__new__(cls, (str_or_iterable,))  # type: ignore
         else:
             return super().__new__(cls, str_or_iterable)  # type: ignore
 
     @property
-    def key(self):
+    def key(self) -> str:
         if self:
             return self[0]
         else:
             return "Unbound"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "/".join(f"{key}" for key in self)
 
 undefined = BindSequence()
@@ -107,5 +107,5 @@ for category_name, category in hotkeys.items():
     category_binds = chain.from_iterable(binds for binds in category.values())
     setattr(Binds, category_name, BindSequence(category_binds))
 
-def undefined_keys():
+def undefined_keys() -> Iterable[str]:
     return [key for key, value in vars(Binds).items() if value is undefined]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 
 class Color(Enum):
@@ -31,7 +33,7 @@ class Color(Enum):
     Darkest      = "Darkest"     # 18
     Black        = "Black"       # 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 class ColorPair:
@@ -60,5 +62,3 @@ class ColorPair:
     Darkest      = (Color.Darkest,       Color.Black)
     Black        = (Color.Black,         Color.Black)
     Cursor       = (Color.Black,         Color.Green)
-
-Char = tuple[str, tuple[Color, Color]]

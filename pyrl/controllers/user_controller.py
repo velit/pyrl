@@ -1,31 +1,28 @@
-from functools import partial
+from __future__ import annotations
 
-from pyrl.binds import Binds
+from collections.abc import Callable
+from functools import partial
+from typing import Literal
+
+from pyrl.binds import Binds, BindSequence
 from pyrl.config.config import Config
-from pyrl.enums.colors import Color, ColorPair
-from pyrl.enums.directions import Dir
-from pyrl.enums.keys import Key
-from pyrl.enums.level_location import LevelLocation
-from pyrl.game_actions import ActionError, Action, GameActionsProperties
+from pyrl.constants import dir
+from pyrl.constants.colors import Color, ColorPair
+from pyrl.constants.dir import Direction
+from pyrl.constants.keys import Key
+from pyrl.constants.level_location import LevelLocation
+from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.creature.actions import Action, ActionException
 from pyrl.generic_algorithms import add_vector
 from pyrl.interface.help_view import help_view
 from pyrl.interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
 from pyrl.interface.lines_view import lines_view, build_lines
 
+ActionCallable = Callable[[], Action]
 
-class UserController(GameActionsProperties, object):
+class UserController(GameActionProperties, object):
 
-    error_messages = {
-        ActionError.IllegalMove:          "You can't move there.",
-        ActionError.IllegalTeleport:      "You can't teleport there.",
-        ActionError.SwapTargetResists:    "The creature resists your swap attempt.",
-        ActionError.NoSwapTarget:         "There isn't a creature there to swap with.",
-        ActionError.PassageLeadsNoWhere:  "This passage doesn't seem to lead anywhere.",
-        ActionError.NoPassage:            "This location doesn't have a passage.",
-        ActionError.NoItemsOnGround:      "There aren't any items here to pick up.",
-    }
-
-    def __init__(self, game_actions):
+    def __init__(self, game_actions: GameActions):
         self.actions = game_actions
 
         from pyrl.controllers.walk_mode import WalkMode
@@ -35,14 +32,14 @@ class UserController(GameActionsProperties, object):
         self.debug_action = DebugAction(self.actions)
         self.actions_funcs = self.define_actions()
 
-    def define_actions(self):
-        actions_funcs = {
+    def define_actions(self) -> dict[str, ActionCallable]:
+        actions_funcs: dict[str, ActionCallable] = {
             '+':                     partial(self.debug_action.sight_change, 1),
             '-':                     partial(self.debug_action.sight_change, -1),
             Key.CLOSE_WINDOW:        self.quit,
         }
 
-        unfinalized_actions = {
+        unfinalized_actions: dict[BindSequence, ActionCallable] = {
             Binds.Debug_Commands:     self.debug_action.ask_action,
             Binds.Quit:               self.quit,
             Binds.Save:               self.save,
@@ -60,25 +57,25 @@ class UserController(GameActionsProperties, object):
             Binds.Ascend:             self.ascend,
             Binds.Descend:            self.descend,
 
-            Binds.SouthWest:          partial(self.act_to_dir, Dir.SouthWest),
-            Binds.South:              partial(self.act_to_dir, Dir.South),
-            Binds.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
-            Binds.West:               partial(self.act_to_dir, Dir.West),
+            Binds.SouthWest:          partial(self.act_to_dir, dir.SouthWest),
+            Binds.South:              partial(self.act_to_dir, dir.South),
+            Binds.SouthEast:          partial(self.act_to_dir, dir.SouthEast),
+            Binds.West:               partial(self.act_to_dir, dir.West),
             Binds.Stay:               self.wait,
-            Binds.East:               partial(self.act_to_dir, Dir.East),
-            Binds.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
-            Binds.North:              partial(self.act_to_dir, Dir.North),
-            Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
+            Binds.East:               partial(self.act_to_dir, dir.East),
+            Binds.NorthWest:          partial(self.act_to_dir, dir.NorthWest),
+            Binds.North:              partial(self.act_to_dir, dir.North),
+            Binds.NorthEast:          partial(self.act_to_dir, dir.NorthEast),
 
-            Binds.Instant_SouthWest:  partial(self.init_walk_mode, Dir.SouthWest),
-            Binds.Instant_South:      partial(self.init_walk_mode, Dir.South),
-            Binds.Instant_SouthEast:  partial(self.init_walk_mode, Dir.SouthEast),
-            Binds.Instant_West:       partial(self.init_walk_mode, Dir.West),
-            Binds.Instant_Stay:       partial(self.init_walk_mode, Dir.Stay),
-            Binds.Instant_East:       partial(self.init_walk_mode, Dir.East),
-            Binds.Instant_NorthWest:  partial(self.init_walk_mode, Dir.NorthWest),
-            Binds.Instant_North:      partial(self.init_walk_mode, Dir.North),
-            Binds.Instant_NorthEast:  partial(self.init_walk_mode, Dir.NorthEast),
+            Binds.Instant_SouthWest:  partial(self.init_walk_mode, dir.SouthWest),
+            Binds.Instant_South:      partial(self.init_walk_mode, dir.South),
+            Binds.Instant_SouthEast:  partial(self.init_walk_mode, dir.SouthEast),
+            Binds.Instant_West:       partial(self.init_walk_mode, dir.West),
+            Binds.Instant_Stay:       partial(self.init_walk_mode, dir.Stay),
+            Binds.Instant_East:       partial(self.init_walk_mode, dir.East),
+            Binds.Instant_NorthWest:  partial(self.init_walk_mode, dir.NorthWest),
+            Binds.Instant_North:      partial(self.init_walk_mode, dir.North),
+            Binds.Instant_NorthEast:  partial(self.init_walk_mode, dir.NorthEast),
         }
 
         for keys, action in unfinalized_actions.items():
@@ -87,38 +84,30 @@ class UserController(GameActionsProperties, object):
 
         return actions_funcs
 
-    def _act(self):
+    def _act(self) -> Action:
+        action: Action
         if self.walk_mode.is_walk_mode_active():
-            feedback = self.walk_mode.continue_walk()
+            action = self.walk_mode.continue_walk()
         else:
             key = self.io.get_key()
             if key in self.actions_funcs:
-                feedback = self.actions_funcs[key]()
+                action = self.actions_funcs[key]()
             else:
                 self.io.msg(f"Undefined key: {key}")
-                feedback = None
+                action = Action.No_Action
+        return action
 
-        if feedback is None:
-            assert not self.actions.already_acted(), \
-                "Player did something but user_controller got no feedback from the game from it."
-
-        return feedback
-
-    def act(self):
+    def act(self) -> None:
         while True:
-            feedback = self._act()
-            if feedback is None and not self.actions.already_acted():
+            try:
+                action = self._act()
+                if action in (Action.No_Action, Action.Free_Action):
+                    continue
+            except ActionException as exception:
+                self.io.msg(exception.player_message)
                 continue
 
-            assert feedback.type != ActionError.AlreadyActed, "Player attempted to act twice."
-            assert feedback.type != ActionError.PlayerAction, "Player was denied a player only action."
-
-            if feedback.type in ActionError:
-                if feedback.type in self.error_messages:
-                    self.io.msg(self.error_messages[feedback.type])
-                else:
-                    self.io.msg(feedback.type, feedback.params)
-            elif feedback.type in (Action.Move, Action.Teleport, Action.Swap, Action.Spawn):
+            if action in (Action.Move, Action.Teleport, Action.Swap, Action.Spawn):
                 items = self.actions.inspect_floor_items()
 
                 if self.actions.get_passage():
@@ -130,24 +119,20 @@ class UserController(GameActionsProperties, object):
                     self.io.msg("There are several items lying here.")
                 elif 10 < len(items):
                     self.io.msg("There is a stack of items lying here.")
-            elif feedback.type == Action.Pick_Items:
-                self.io.msg(f"Picked up {feedback.params.item_description}")
-            elif feedback.type == Action.Drop_Items:
-                self.io.msg(f"Dropped {feedback.params.item_description}")
 
             if self.actions.already_acted():
                 return
 
-    def act_to_dir(self, direction):
+    def act_to_dir(self, direction: Direction) -> Literal[Action.Move] | Literal[Action.Attack]:
         return self.actions.act_to_dir(direction)
 
-    def wait(self):
+    def wait(self) -> Literal[Action.Wait]:
         return self.actions.wait()
 
-    def look(self):
+    def look(self) -> Literal[Action.No_Action]:
         coord = self.coord
         drawline_flag = False
-        direction = Dir.Stay
+        direction = dir.Stay
         while True:
             new_coord = add_vector(coord, direction)
             if self.actions.level.is_legal(new_coord):
@@ -164,9 +149,9 @@ class UserController(GameActionsProperties, object):
                 self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
             key = self.io.get_key()
             self.actions.redraw()
-            direction = Dir.Stay
+            direction = dir.Stay
             if key in Binds.Directions:
-                direction = Dir.from_key[key]
+                direction = dir.from_key[key]
             elif key == 'd':
                 drawline_flag = not drawline_flag
             elif key == 'b':
@@ -178,67 +163,74 @@ class UserController(GameActionsProperties, object):
                     self.actions.game.register_status_texts(self.actions.level.creatures[coord])
             elif key in Binds.Cancel or key in Binds.Look_Mode:
                 break
+        return Action.No_Action
 
-    def quit(self, dont_ask=True):
+    def quit(self, dont_ask: bool = True) -> Literal[Action.No_Action]:
         query = f"Do you wish to end the game? [{Binds.Strong_Yes}]"
         if dont_ask or self.io.get_key(query) in Binds.Strong_Yes:
             self.actions.quit()
+        return Action.No_Action
 
-    def save(self, dont_ask=True):
+    def save(self, dont_ask: bool = True) -> Literal[Action.Save, Action.No_Action]:
         query = f"Do you wish to save the game? [{Binds.Yes}]"
         if dont_ask or self.io.get_key(query) in Binds.Yes:
             self.io.msg("Saving...")
             self.io.refresh()
-            self.io.msg(self.actions.save())
+            action, save_message = self.actions.save()
+            self.io.msg(save_message)
+            return action
+        return Action.No_Action
 
-    def attack(self):
+    def attack(self) -> Literal[Action.Attack, Action.No_Action]:
         query = f"Specify attack direction, {Binds.Cancel.key} to abort"
         key = self.io.get_key(query, keys=Binds.Directions + Binds.Cancel)
         if key in Binds.Directions:
-            return self.actions.attack(Dir.from_key[key])
+            return self.actions.attack(dir.from_key[key])
+        return Action.No_Action
 
-    def redraw(self):
-        self.actions.redraw()
+    def redraw(self) -> Literal[Action.Redraw]:
+        return self.actions.redraw()
 
-    def descend(self):
+    def descend(self) -> Literal[Action.Enter_Passage, Action.Teleport]:
         location = self.actions.get_passage()
-        if location not in (None, LevelLocation.Passage_Up):
+        if location == LevelLocation.Passage_Down:
             return self.actions.enter_passage()
         else:
             return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
-            # return "You don't find any downwards passage."
+            # raise NoValidTargetException("You don't find any downwards passage.")
 
-    def ascend(self):
+    def ascend(self) -> Literal[Action.Enter_Passage, Action.Teleport]:
         location = self.actions.get_passage()
-        if location != LevelLocation.Passage_Up:
-            return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
-            # return "You don't find any upwards passage."
-        else:
+        if location == LevelLocation.Passage_Up:
             return self.actions.enter_passage()
+        else:
+            return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
+            # raise NoValidTargetException("You don't find any upwards passage.")
 
-    def show_vision(self):
+    def show_vision(self) -> Literal[Action.Redraw]:
         Config.clearly_show_vision = not Config.clearly_show_vision
-        self.actions.redraw()
+        return self.actions.redraw()
 
-    def print_history(self):
+    def print_history(self) -> Literal[Action.No_Action]:
         header = "History"
         lines_view(self.io.whole_window, build_lines(reversed(self.io.message_bar.history)), header=header)
+        return Action.No_Action
 
-    def manage_equipment(self):
+    def manage_equipment(self) -> Literal[Action.No_Action, Action.Drop_Items]:
         return equipment_view(self.actions)
 
-    def manage_backpack(self):
+    def manage_backpack(self) -> Literal[Action.Drop_Items, Action.No_Action]:
         return backpack_view(self.actions)
 
-    def pickup_items(self):
+    def pickup_items(self) -> Literal[Action.Pick_Items, Action.No_Action]:
         return pickup_items_view(self.actions)
 
-    def drop_items(self):
+    def drop_items(self) -> Literal[Action.Drop_Items, Action.No_Action]:
         return drop_items_view(self.actions)
 
-    def init_walk_mode(self, instant_direction=None):
+    def init_walk_mode(self, instant_direction: Direction | None = None) -> Literal[Action.Move, Action.No_Action]:
         return self.walk_mode.init_walk_mode(instant_direction)
 
-    def help_screen(self):
+    def help_screen(self) -> Literal[Action.Redraw]:
         help_view(self.io)
-        self.actions.redraw()
+        return self.actions.redraw()

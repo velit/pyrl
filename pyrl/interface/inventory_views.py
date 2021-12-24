@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import Literal
+
 from pyrl.binds import Binds
-from pyrl.enums.equipment_slot import Slot
-from pyrl.game_actions import ActionError, feedback
+from pyrl.constants.equipment_slot import Slot
+from pyrl.game_actions import GameActions
+from pyrl.creature.actions import Action, NoValidTargetException
+from pyrl.creature.inventory import Inventory
 from pyrl.interface.lines_view import lines_view, Line
 
-def _get_equipment_item_str(equipment, slot):
-    item = equipment.get_item(slot)
+def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:
+    item = inventory.get_item(slot)
     if item is None:
         return "-"
     if not item.uses_all_slots or slot == item.compatible_slots[0]:
@@ -12,14 +18,14 @@ def _get_equipment_item_str(equipment, slot):
     else:
         return item.name
 
-def equipment_view(actions):
+def equipment_view(actions: GameActions) -> Literal[Action.No_Action, Action.Drop_Items]:
     footer = f"Press a slot key to (un)equip" \
              f"  {Binds.Equipment_View_Backpack.key} to view backpack" \
              f"  {Binds.Cancel.key} to close"
-    equipment = actions.creature.inventory
+    inventory: Inventory = actions.creature.inventory
 
     while True:
-        lines = tuple(Line(f"{slot.value:11}: {_get_equipment_item_str(equipment, slot)}", slot)
+        lines = tuple(Line(f"{slot.value:11}: {_get_equipment_item_str(inventory, slot)}", slot)
                       for slot in Slot)
         key, slot = lines_view(actions.io.whole_window, lines,
                                multi_select=False,
@@ -29,18 +35,18 @@ def equipment_view(actions):
                                footer=footer)
 
         if key in Binds.Cancel:
-            return
+            return Action.No_Action
         elif key in Binds.Equipment_View_Backpack:
             backpack_view(actions)
         elif slot in Slot:
-            if equipment.get_item(slot) is None:
+            if inventory.get_item(slot) is None:
                 backpack_equip_item_view(actions, slot)
             else:
-                equipment.unequip(slot)
+                inventory.unequip(slot)
         else:
             assert False, f"Got unhandled return values {key=} {slot=}"
 
-def backpack_equip_item_view(actions, slot):
+def backpack_equip_item_view(actions: GameActions, slot: Slot) -> None:
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items())
                   if item.fits_slot(slot))
     key, item = lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
@@ -50,7 +56,7 @@ def backpack_equip_item_view(actions, slot):
     else:
         actions.creature.inventory.equip_from_bag(item, slot)
 
-def backpack_view(actions):
+def backpack_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = lines_view(
         actions.io.whole_window,
@@ -60,18 +66,22 @@ def backpack_view(actions):
         return_keys=Binds.Backpack_Drop_Items + Binds.Cancel,
         header=f"Backpack ({Binds.Backpack_Drop_Items.key} to drop selected items)",
     )
-    if key in Binds.Cancel:
-        return
-    elif key in Binds.Backpack_Drop_Items:
-        return actions.drop_items(selections)
+    if key in Binds.Backpack_Drop_Items:
+        action, item_description = actions.drop_items(selections)
+        actions.io.msg(f"Dropped {item_description}")
+        return action
+    return Action.No_Action
 
-def pickup_items_view(actions):
+def pickup_items_view(actions: GameActions) -> Literal[Action.Pick_Items, Action.No_Action]:
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_floor_items()))
 
     if not lines:
-        return feedback(ActionError.NoItemsOnGround)
+        raise NoValidTargetException("Creature tried to pick up items in a place without any.",
+                                     "There aren't any items here to pick up.")
     elif len(lines) == 1:
-        return actions.pickup_items((lines[0].return_value, ))
+        action, item_description = actions.pickup_items((lines[0].return_value, ))
+        actions.io.msg(f"Picked up {item_description}")
+        return action
 
     key, selections = lines_view(
         actions.io.whole_window,
@@ -81,9 +91,12 @@ def pickup_items_view(actions):
         header="Select items to pick up"
     )
     if key in Binds.Cancel and selections:
-        return actions.pickup_items(selections)
+        action, item_description = actions.pickup_items(selections)
+        actions.io.msg(f"Picked up {item_description}")
+        return action
+    return Action.No_Action
 
-def drop_items_view(actions):
+def drop_items_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = lines_view(
         actions.io.whole_window,
@@ -93,4 +106,8 @@ def drop_items_view(actions):
         header="Select items to drop"
     )
     if key in Binds.Cancel and selections:
-        return actions.drop_items(selections)
+        action, item_description = actions.drop_items(selections)
+        actions.io.msg(f"Dropped {item_description}")
+        return action
+    return Action.No_Action
+

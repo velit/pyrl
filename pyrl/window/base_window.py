@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import time
 
-from pyrl.enums.colors import ColorPair
-from pyrl.enums.keys import Key
+from pyrl.constants.colors import ColorPair
+from pyrl.constants.keys import Key
 from pyrl.generic_structures import TableDims, Coord
 
 class BaseWindow:

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from pyrl.creature.creature import Creature
-from pyrl.enums.colors import ColorPair
+from pyrl.constants.colors import ColorPair
 from decimal import Decimal
 
 def test_danger_level_spawn_mult():

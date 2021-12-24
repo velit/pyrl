@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import tcod
 
-from pyrl.enums.colors import Color
-from pyrl.enums.keys import Key
+from pyrl.constants.colors import Color
+from pyrl.constants.keys import Key
 
 libtcod_color_map = {
     Color.Red:           tcod.Color(175, 0, 0),

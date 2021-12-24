@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 try:
     import curses
 except ImportError:
@@ -9,7 +11,7 @@ import curses.ascii
 import logging
 
 from pyrl.config.debug import Debug
-from pyrl.enums.keys import Key
+from pyrl.constants.keys import Key
 from pyrl.io_wrappers.curses_dicts import Curses256ColorDict, CursesColorDict, curses_key_map
 from pyrl.window.window_system import WindowSystem
 

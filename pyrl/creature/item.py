@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 from dataclasses import dataclass, field, asdict
 from typing import Any
 
 from pyrl.creature.stats import Stats, Stat
 from pyrl.dice import Dice
-from pyrl.enums.colors import ColorPair, Char
-from pyrl.enums.equipment_slot import Slot
+from pyrl.constants.colors import ColorPair
+from pyrl.constants.char import Char
+from pyrl.constants.equipment_slot import Slot
 
 @dataclass(eq=False, slots=True)
 class Item:

@@ -1,17 +1,17 @@
-from typing import Any, TYPE_CHECKING
+from __future__ import annotations
+
+from typing import Any, TypeGuard
 
 from pyrl.creature.creature import Creature
 from pyrl.creature.inventory import Inventory
 from pyrl.dice import Dice
 
-if TYPE_CHECKING:
-    CreatureHint = Creature
-else:
-    CreatureHint = object
+def has_inventory(creature: Creature) -> TypeGuard[Hoarder]:
+    return isinstance(creature, Hoarder)
 
-class HasInventory(CreatureHint):
-    """Creatures with this mixin class have an equipment and a bag."""
-    def __init__(self, *args: Any, **kwargs) -> None:
+class Hoarder(Creature):
+    """Creatures with this class have an inventory."""
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.inventory = Inventory()
         super().__init__(*args, **kwargs)
 

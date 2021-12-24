@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import atexit
 import logging
@@ -77,7 +79,7 @@ def init_logger_system():
     logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
     logging.debug("Starting new session")
 
-def init_cursor_lib(output):
+def init_cursor_lib(output: str) -> CursesWrapper | TCODWrapper | MockWrapper:
     if output == "terminal":
         from pyrl.io_wrappers.curses import CursesWrapper
         return CursesWrapper()

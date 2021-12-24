@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections import deque
 from functools import wraps
 
 from pyrl.config.debug import Debug
 from pyrl.config.config import Config
-from pyrl.enums.colors import ColorPair
+from pyrl.constants.colors import ColorPair
 from pyrl.game_data.levels.shared_assets import default_level_dimensions
 from pyrl.generic_structures import TableDims, Coord
 from pyrl.window.base_window import BaseWindow

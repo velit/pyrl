@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import typing
 from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from pyrl.enums.colors import Char
-from pyrl.game_actions import Action
-from pyrl.generic_algorithms import resize_range
+from pyrl.constants.char import Char
 from pyrl.dice import Dice
+from pyrl.creature.actions import Action
+from pyrl.generic_algorithms import resize_range
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from pyrl.world.level import Level
 
 @dataclass(eq=False, slots=True)
@@ -22,7 +22,7 @@ class Creature:
     coord: tuple[int, int] | None = None
 
     hp:                  int = field(init=False, repr=True)
-    level:      Level | None = field(init=False, repr=False, default=None)
+    level:             Level = field(init=False, repr=False, default=None)
     base_strength:       int = field(init=False, repr=False, default=10)
     base_dexterity:      int = field(init=False, repr=False, default=10)
     base_endurance:      int = field(init=False, repr=False, default=10)

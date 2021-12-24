@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 
 from pyrl.creature.item import Item
 from pyrl.creature.stats import Stats
 from pyrl.dice import Dice
-from pyrl.enums.equipment_slot import Slot
+from pyrl.constants.equipment_slot import Slot
 
 class Inventory:
 

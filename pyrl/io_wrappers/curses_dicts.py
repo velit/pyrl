@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import curses
 import curses.ascii
 
-from pyrl.enums.colors import Color
-from pyrl.enums.keys import Key
+from pyrl.constants.colors import Color
+from pyrl.constants.keys import Key
 
 curses_key_map = {
     chr(curses.ascii.CR):   Key.ENTER,

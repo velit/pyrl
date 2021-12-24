@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pyrl.creature.creature import Creature
 from pyrl.creature.stats import Stat
 

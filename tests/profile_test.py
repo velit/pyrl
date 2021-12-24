@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from cProfile import Profile
 
-from pyrl.enums.level_gen import LevelGen
+from pyrl.constants.level_gen import LevelGen
 from pyrl.rdg import generate_tiles_to
 from tools import profile_util
 from pyrl.world.level import Level

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 
 class LevelGen(Enum):
@@ -14,5 +16,5 @@ class LevelGen(Enum):
     Dungeon        = 3
     Arena          = 4
 
-    def is_used(self):
+    def is_used(self) -> bool:
         return self != LevelGen.NoGeneration

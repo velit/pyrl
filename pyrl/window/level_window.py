@@ -1,4 +1,6 @@
-from pyrl.enums.colors import ColorPair
+from __future__ import annotations
+
+from pyrl.constants.colors import ColorPair
 from pyrl.generic_algorithms import bresenham
 from pyrl.window.base_window import BaseWindow
 

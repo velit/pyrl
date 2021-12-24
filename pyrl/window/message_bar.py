@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import logging
 import re
 import textwrap
 from functools import wraps
 
 from pyrl.binds import Binds
-from pyrl.enums.colors import ColorPair
+from pyrl.constants.colors import ColorPair
 from pyrl.window.base_window import BaseWindow
 from pyrl.io_wrappers import mock
 

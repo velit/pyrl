@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from collections import Counter, namedtuple
 
-from pyrl.enums.level_location import LevelLocation
+from pyrl.constants.level_location import LevelLocation
 from pyrl.world.level import Level
 
 class LevelNotFound(Exception):

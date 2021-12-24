@@ -1,13 +1,14 @@
-from pyrl.creature.creature import Creature
+from __future__ import annotations
+
+from pyrl.constants.colors import Color, ColorPair
+from pyrl.constants.equipment_slot import Slot
 from pyrl.creature.item import Weapon, Armor
-from pyrl.creature.mixins.has_inventory import HasInventory
-from pyrl.creature.mixins.remembers_vision import RemembersVision
+from pyrl.creature.mixins.hoarder import Hoarder
+from pyrl.creature.mixins.visionary import Visionary
 from pyrl.creature.stats import Stats
 from pyrl.dice import Dice
-from pyrl.enums.colors import Color, ColorPair
-from pyrl.enums.equipment_slot import Slot
 
-class Player(HasInventory, RemembersVision, Creature):
+class Player(Hoarder, Visionary):
     def __init__(self) -> None:
         super().__init__(name="player", char=('@', (Color.Green, Color.Black)))
 

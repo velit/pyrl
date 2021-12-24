@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from heapq import heappush, heappop
 
 from pyrl.generic_algorithms import chebyshev

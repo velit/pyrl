@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from pyrl.creature.creature import Creature
-from pyrl.enums.colors import ColorPair
+from pyrl.constants.colors import ColorPair
 from pyrl.game_data.levels.shared_assets import construct_data, default_level_dimensions
 from pyrl.game_data.tiles import PyrlTile
-from pyrl.enums.level_gen import LevelGen
+from pyrl.constants.level_gen import LevelGen
 from pyrl.world.level import Level
-from pyrl.enums.level_location import LevelLocation
+from pyrl.constants.level_location import LevelLocation
 
 def get_level(player):
 

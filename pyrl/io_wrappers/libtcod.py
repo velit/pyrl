@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import tcod
 
 from pyrl.config.config import Config
-from pyrl.enums.colors import ColorPair, Color
-from pyrl.enums.keys import Key
+from pyrl.constants.colors import ColorPair, Color
+from pyrl.constants.keys import Key
 from pyrl.io_wrappers.libtcod_dicts import libtcod_color_map, libtcod_key_map
 from pyrl.window.window_system import WindowSystem
 

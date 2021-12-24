@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import dataclasses
 
+from pyrl.constants.equipment_slot import Slot
 from pyrl.creature.inventory import Inventory
 from pyrl.creature.item import Weapon, Armor
-from pyrl.creature.stats import Stat, Stats
+from pyrl.creature.stats import Stats
 from pyrl.dice import Dice
-from pyrl.enums.equipment_slot import Slot
 
 def test_creature_equipment():
     equipment = Inventory()

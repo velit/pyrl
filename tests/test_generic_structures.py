@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from pyrl.generic_structures import Array2D, Event, OneToOneMapping

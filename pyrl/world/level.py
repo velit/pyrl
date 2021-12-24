@@ -1,20 +1,28 @@
+from __future__ import annotations
+
 import itertools
 import random
+from collections.abc import Iterable
 from functools import wraps
+from typing import TYPE_CHECKING
 
 from pyrl import path
 from pyrl.config.debug import Debug
-from pyrl.creature.creature import Creature
-from pyrl.enums.directions import Dir
-from pyrl.enums.level_gen import LevelGen
-from pyrl.enums.level_location import LevelLocation
-from pyrl.game_actions import Action
+from pyrl.constants import dir
+from pyrl.constants.coord import Coord
+from pyrl.constants.level_gen import LevelGen
+from pyrl.constants.level_location import LevelLocation
+from pyrl.creature.actions import Action
+from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import default_level_dimensions
 from pyrl.generic_algorithms import bresenham, cross_product, add_vector
 from pyrl.generic_structures import Event, Array2D, OneToOneMapping
 from pyrl.rdg import generate_tiles_to
 from pyrl.turn_scheduler import TurnScheduler
+
+if TYPE_CHECKING:
+    from pyrl.creature.creature import Creature
 
 class CreatureSpawner:
     __slots__ = ('creatures', 'total_weight')
@@ -164,7 +172,7 @@ class Level:
             yield neighbor_coord, round(multiplier * Action.Move.base_cost)
 
     def get_passable_neighbors(self, coord):
-        for direction in Dir.All:
+        for direction in dir.All:
             neighbor_coord = add_vector(coord, direction)
             if self.is_legal(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
@@ -190,7 +198,7 @@ class Level:
                     any(not self.is_see_through(coord) for coord in bresenham(coord_b, coord_a)))
 
     def distance(self, coord_a, coord_b):
-        return round(path.distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))
+        return round(path.distance(coord_a, coord_b, Action.Move.base_cost, dir.DiagonalMoveMult))
 
     def movement_multiplier(self, coord, direction):
         origin_multiplier = self.tiles[coord].movement_multiplier
@@ -198,7 +206,7 @@ class Level:
         target_multiplier = self.tiles[target_coord].movement_multiplier
 
         tile_multiplier = (origin_multiplier + target_multiplier) / 2
-        return tile_multiplier * Dir.move_mult(direction)
+        return tile_multiplier * dir.move_mult(direction)
 
     # nudge_coord nudges towards a line between end_coord and nudge_coord
     def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
@@ -278,13 +286,13 @@ class Level:
         self.visible_change.trigger(creature_a.coord)
         self.visible_change.trigger(creature_b.coord)
 
-    def inspect_items(self, coord):
+    def inspect_items(self, coord: Coord) -> tuple[Item, ...]:
         if coord in self.items:
             return tuple(self.items[coord])
         else:
             return ()
 
-    def pop_items(self, coord, item_indexes):
+    def pop_items(self, coord: Coord, item_indexes: Iterable[int]) -> tuple[Item, ...]:
         if not item_indexes:
             return ()
 

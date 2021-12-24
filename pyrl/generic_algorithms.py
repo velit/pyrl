@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import math
 from decimal import Decimal
 from typing import Type, TypeVar
-from numbers import Number
 
-from pyrl.enums.directions import Dir
-
+from pyrl.constants import dir
+from pyrl.constants.coord import Coord
 
 N = TypeVar('N', int, float, Decimal)
 def resize_range(number: N, old_range: range, new_range: range = range(2)) -> N:
@@ -82,7 +83,7 @@ def resize_vector_to_len(vector, length):
 def get_vector(origin, target):
     return target[0] - origin[0], target[1] - origin[1]
 
-def add_vector(vector_a, vector_b):
+def add_vector(vector_a: Coord, vector_b: Coord) -> Coord:
     return vector_a[0] + vector_b[0], vector_a[1] + vector_b[1]
 
 def scalar_mult(scalar, vector):
@@ -98,7 +99,7 @@ def anticlockwise(vector):
     return -vector[1], vector[0]
 
 def anticlockwise_45(direction):
-    return Dir.counter_clockwise(direction)
+    return dir.counter_clockwise(direction)
 
 def clockwise_45(direction):
-    return Dir.clockwise(direction)
+    return dir.clockwise(direction)
