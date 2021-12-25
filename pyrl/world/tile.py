@@ -1,24 +1,26 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
+from pyrl.constants.char import Glyph
+
+@dataclass(eq=False, frozen=True, slots=True)
 class Tile:
-
-    """Permanent portion of a square. Eg. walls or floor."""
-
-    def __init__(self, name, visible_char, mem_char, passable=True, see_through=True, move_mult=1):
-        self.name = name
-        self.visible_char = visible_char
-        self.memory_char = mem_char
-        self.is_passable = passable
-        self.is_see_through = see_through
-        self.movement_multiplier = move_mult
+    """Permanent portion of a square. E.g. walls or floor."""
+    name: str
+    visible_char: Glyph
+    memory_char: Glyph
+    is_passable: bool = True
+    is_see_through: bool = True
+    move_multiplier: int = 1
 
     @property
-    def defense(self):
+    def defense(self) -> int:
         return 0
 
     @property
-    def armor(self):
+    def armor(self) -> int:
         return 100 if self.is_passable else 40
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Tile({self.name}: {self.visible_char[0]})"

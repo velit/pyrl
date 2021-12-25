@@ -3,6 +3,4 @@ from __future__ import annotations
 from enum import Enum
 
 class LevelLocation(Enum):
-    Passage_Up      = 1
-    Passage_Down    = 2
-    Random_Location = 3
+    pass

@@ -6,13 +6,13 @@ from typing import Literal
 
 from pyrl.binds import Binds, BindSequence
 from pyrl.config.config import Config
-from pyrl.constants import dir
 from pyrl.constants.colors import Color, ColorPair
-from pyrl.constants.dir import Direction
+from pyrl.constants.direction import Direction, Dir
 from pyrl.constants.keys import Key
 from pyrl.constants.level_location import LevelLocation
-from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.creature.actions import Action, ActionException
+from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.generic_algorithms import add_vector
 from pyrl.interface.help_view import help_view
 from pyrl.interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
@@ -57,25 +57,25 @@ class UserController(GameActionProperties, object):
             Binds.Ascend:             self.ascend,
             Binds.Descend:            self.descend,
 
-            Binds.SouthWest:          partial(self.act_to_dir, dir.SouthWest),
-            Binds.South:              partial(self.act_to_dir, dir.South),
-            Binds.SouthEast:          partial(self.act_to_dir, dir.SouthEast),
-            Binds.West:               partial(self.act_to_dir, dir.West),
+            Binds.North:              partial(self.act_to_dir, Dir.North),
+            Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
+            Binds.East:               partial(self.act_to_dir, Dir.East),
+            Binds.SouthEast:          partial(self.act_to_dir, Dir.SouthEast),
+            Binds.South:              partial(self.act_to_dir, Dir.South),
+            Binds.SouthWest:          partial(self.act_to_dir, Dir.SouthWest),
+            Binds.West:               partial(self.act_to_dir, Dir.West),
+            Binds.NorthWest:          partial(self.act_to_dir, Dir.NorthWest),
             Binds.Stay:               self.wait,
-            Binds.East:               partial(self.act_to_dir, dir.East),
-            Binds.NorthWest:          partial(self.act_to_dir, dir.NorthWest),
-            Binds.North:              partial(self.act_to_dir, dir.North),
-            Binds.NorthEast:          partial(self.act_to_dir, dir.NorthEast),
 
-            Binds.Instant_SouthWest:  partial(self.init_walk_mode, dir.SouthWest),
-            Binds.Instant_South:      partial(self.init_walk_mode, dir.South),
-            Binds.Instant_SouthEast:  partial(self.init_walk_mode, dir.SouthEast),
-            Binds.Instant_West:       partial(self.init_walk_mode, dir.West),
-            Binds.Instant_Stay:       partial(self.init_walk_mode, dir.Stay),
-            Binds.Instant_East:       partial(self.init_walk_mode, dir.East),
-            Binds.Instant_NorthWest:  partial(self.init_walk_mode, dir.NorthWest),
-            Binds.Instant_North:      partial(self.init_walk_mode, dir.North),
-            Binds.Instant_NorthEast:  partial(self.init_walk_mode, dir.NorthEast),
+            Binds.Instant_North:      partial(self.init_walk_mode, Dir.North),
+            Binds.Instant_NorthEast:  partial(self.init_walk_mode, Dir.NorthEast),
+            Binds.Instant_East:       partial(self.init_walk_mode, Dir.East),
+            Binds.Instant_SouthEast:  partial(self.init_walk_mode, Dir.SouthEast),
+            Binds.Instant_South:      partial(self.init_walk_mode, Dir.South),
+            Binds.Instant_SouthWest:  partial(self.init_walk_mode, Dir.SouthWest),
+            Binds.Instant_West:       partial(self.init_walk_mode, Dir.West),
+            Binds.Instant_NorthWest:  partial(self.init_walk_mode, Dir.NorthWest),
+            Binds.Instant_Stay:       partial(self.init_walk_mode, Dir.Stay),
         }
 
         for keys, action in unfinalized_actions.items():
@@ -132,7 +132,7 @@ class UserController(GameActionProperties, object):
     def look(self) -> Literal[Action.No_Action]:
         coord = self.coord
         drawline_flag = False
-        direction = dir.Stay
+        direction = Dir.Stay
         while True:
             new_coord = add_vector(coord, direction)
             if self.actions.level.is_legal(new_coord):
@@ -149,9 +149,9 @@ class UserController(GameActionProperties, object):
                 self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
             key = self.io.get_key()
             self.actions.redraw()
-            direction = dir.Stay
+            direction = Dir.Stay
             if key in Binds.Directions:
-                direction = dir.from_key[key]
+                direction = Binds.get_direction(key)
             elif key == 'd':
                 drawline_flag = not drawline_flag
             elif key == 'b':
@@ -185,7 +185,7 @@ class UserController(GameActionProperties, object):
         query = f"Specify attack direction, {Binds.Cancel.key} to abort"
         key = self.io.get_key(query, keys=Binds.Directions + Binds.Cancel)
         if key in Binds.Directions:
-            return self.actions.attack(dir.from_key[key])
+            return self.actions.attack(Binds.get_direction(key))
         return Action.No_Action
 
     def redraw(self) -> Literal[Action.Redraw]:
@@ -193,18 +193,18 @@ class UserController(GameActionProperties, object):
 
     def descend(self) -> Literal[Action.Enter_Passage, Action.Teleport]:
         location = self.actions.get_passage()
-        if location == LevelLocation.Passage_Down:
+        if location == DefaultLocation.Passage_Down:
             return self.actions.enter_passage()
         else:
-            return self.debug_action.teleport_to_location(LevelLocation.Passage_Down)
+            return self.debug_action.teleport_to_location(DefaultLocation.Passage_Down)
             # raise NoValidTargetException("You don't find any downwards passage.")
 
     def ascend(self) -> Literal[Action.Enter_Passage, Action.Teleport]:
         location = self.actions.get_passage()
-        if location == LevelLocation.Passage_Up:
+        if location == DefaultLocation.Passage_Up:
             return self.actions.enter_passage()
         else:
-            return self.debug_action.teleport_to_location(LevelLocation.Passage_Up)
+            return self.debug_action.teleport_to_location(DefaultLocation.Passage_Up)
             # raise NoValidTargetException("You don't find any upwards passage.")
 
     def show_vision(self) -> Literal[Action.Redraw]:

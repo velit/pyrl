@@ -1,28 +1,30 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Callable
 from heapq import heappush, heappop
 
-from pyrl.generic_algorithms import chebyshev
+from pyrl.constants.coord import Coord
+from pyrl.generic_algorithms import chebyshev_distance
 
-class PathException(Exception):
-    pass
+NeighbourCall = Callable[[Coord], Iterable[tuple[Coord, int]]]
+HeuristicCall = Callable[[Coord, Coord, Coord], float]
 
-def path(start_coord, goal_coord, neighbor_function, heuristic):
-    return _iterate_path(_a_star(start_coord, goal_coord, neighbor_function, heuristic), start_coord, goal_coord)
+def path(start: Coord, goal: Coord, neighbours: NeighbourCall, heuristic: HeuristicCall) -> Iterable[Coord]:
+    return _iterate_path(_a_star(start, goal, neighbours, heuristic), start, goal)
 
-def distance(coord_a, coord_b, default_movement_cost, diagonal_modifier):
-    orthogonal_steps, diagonal_steps = chebyshev(coord_a, coord_b)
+def distance(coord_a: Coord, coord_b: Coord, default_movement_cost: int, diagonal_modifier: float) -> float:
+    orthogonal_steps, diagonal_steps = chebyshev_distance(coord_a, coord_b)
     return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
 
-def _a_star(start, goal, neighbors, heuristic):
+def _a_star(start: Coord, goal: Coord, neighbors: NeighbourCall, heuristic: HeuristicCall) -> dict[Coord, Coord]:
     start, goal = goal, start
-    came_from = {}
+    came_from: dict[Coord, Coord] = {}
     closedset = set()
     openmember = set()
     openmember.add(start)
 
     g = {start: 0}
-    openprio = []
+    openprio: list[tuple[int, Coord]] = []
     heappush(openprio, (0, start))
 
     while openprio:
@@ -40,9 +42,9 @@ def _a_star(start, goal, neighbors, heuristic):
                     heappush(openprio, (g[node] + heuristic(node, goal, start), node))
                     openmember.add(node)
     else:
-        raise PathException(f"No possible paths between {start=} and {goal=}")
+        raise ValueError(f"No possible paths between {start=} and {goal=}")
 
-def _iterate_path(came_from, start, goal):
+def _iterate_path(came_from: dict[Coord, Coord], start: Coord, goal: Coord) -> Iterable[Coord]:
     """Iterate the path structure returned by _path()."""
     cur = start
     while cur != goal:

@@ -18,8 +18,8 @@ def register_status_texts(io, game, creature: Creature):
     add_element(Stat.intelligence.value, lambda: creature.intelligence)
     add_element(Stat.endurance.value,    lambda: creature.endurance)
     add_element(Stat.perception.value,   lambda: creature.perception)
-    add_element("Wloc",                  lambda: f"{creature.level.level_key.dungeon}"
-                                                 f"/{creature.level.level_key.index:02}")
+    add_element("Wloc", lambda: f"{creature.level.level_key.dungeon}"
+                                                 f"/{creature.level.level_key.idx:02}")
     add_element("Loc",                   lambda: ",".join(f"{dim:02}" for dim in creature.coord))
     add_element("Turns",                 lambda: game.turn_counter)
     add_element("Game Time",             lambda: game.time)

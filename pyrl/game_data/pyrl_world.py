@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from pyrl.game_data.levels import test_level, overworld
+from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.player import Player
-from pyrl.constants.level_location import LevelLocation
 from pyrl.world.world import World, LevelKey, WorldPoint
 
 def get_world():
@@ -18,7 +18,7 @@ def get_world():
 
     world.set_two_way_connection(
         WorldPoint(LevelKey(overworld.name, 1), overworld.OverWorldLocation.Dungeon),
-        WorldPoint(start, LevelLocation.Passage_Up))
+        WorldPoint(start, DefaultLocation.Passage_Up))
 
     world.get_level(start)
     return world

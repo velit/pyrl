@@ -4,8 +4,8 @@ import math
 from decimal import Decimal
 from typing import Type, TypeVar
 
-from pyrl.constants import dir
 from pyrl.constants.coord import Coord
+from pyrl.constants.direction import Dir
 
 N = TypeVar('N', int, float, Decimal)
 def resize_range(number: N, old_range: range, new_range: range = range(2)) -> N:
@@ -55,14 +55,14 @@ def bresenham_old(coord_a, coord_b, includelast=True):
             x += xstep
             error += deltay
 
-def chebyshev(coord_a, coord_b):
+def chebyshev_distance(coord_a: Coord, coord_b: Coord) -> tuple[int, int]:
     ay, ax = coord_a
     by, bx = coord_b
     diagonal_steps = min(abs(ay - by), abs(ax - bx))
     orthogonal_steps = abs(ay - by) + abs(ax - bx) - 2 * diagonal_steps
     return orthogonal_steps, diagonal_steps
 
-def cross_product(line_start_coord, wild_coord, line_finish_coord):
+def cross_product(line_start_coord: Coord, wild_coord: Coord, line_finish_coord: Coord) -> int:
     start_y, start_x = line_start_coord
     wild_y, wild_x = wild_coord
     finish_y, finish_x = line_finish_coord
@@ -73,7 +73,7 @@ def minimize_vector(vector):
     gcd = abs(math.gcd(a, b))
     return a // gcd, b // gcd
 
-def resize_vector_to_len(vector, length):
+def resize_vector_to_len(vector: Coord, length: int) -> Coord:
     a, b = vector
     gcd = abs(math.gcd(a, b))
     a, b = a // gcd, b // gcd
@@ -99,7 +99,7 @@ def anticlockwise(vector):
     return -vector[1], vector[0]
 
 def anticlockwise_45(direction):
-    return dir.counter_clockwise(direction)
+    return Dir.counter_clockwise(direction)
 
 def clockwise_45(direction):
-    return dir.clockwise(direction)
+    return Dir.clockwise(direction)

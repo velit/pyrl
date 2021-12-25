@@ -3,10 +3,10 @@ from __future__ import annotations
 import random
 from typing import Literal, TYPE_CHECKING
 
-from pyrl.constants import dir
 from pyrl.constants.coord import Coord
-from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.constants.direction import Dir
 from pyrl.creature.actions import Action
+from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.generic_algorithms import resize_vector_to_len, get_vector, add_vector
 
 if TYPE_CHECKING:
@@ -70,9 +70,9 @@ class AI(GameActionProperties, object):
 
     def _move_towards(self, target_coord: Coord) -> Literal[Action.Move, Action.Swap]:
         best_action = Action.Move
-        best_direction = dir.Stay
+        best_direction = Dir.Stay
         best_cost = None
-        for direction in dir.AllPlusStay:
+        for direction in Dir.AllPlusStay:
             coord = add_vector(self.coord, direction)
             if self.level.is_passable(coord):
                 action = Action.Move
@@ -95,11 +95,11 @@ class AI(GameActionProperties, object):
             assert False, f"AI state bug. Best action was: {best_action}"
 
     def _move_random(self) -> Literal[Action.Move]:
-        valid_dirs = [direction for direction in dir.All if self.actions.can_move(direction)]
+        valid_dirs = [direction for direction in Dir.All if self.actions.can_move(direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
             return self.actions.move(random.choice(valid_dirs))
         else:
-            return self.actions.move(dir.Stay)
+            return self.actions.move(Dir.Stay)
 
     def remove_creature_state(self, creature: Creature) -> None:
         if creature in self.ai_state:

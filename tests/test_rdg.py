@@ -3,10 +3,11 @@ from __future__ import annotations
 import pytest
 
 from pyrl import rdg
-from pyrl.game_data.levels.shared_assets import construct_data
+from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation
 from pyrl.game_data.tiles import PyrlTile
-from pyrl.generic_structures import Array2D
-from pyrl.world.level import Level, LevelLocation
+from pyrl.generic_structures.dimensions import Dimensions
+from pyrl.generic_structures.table import Table
+from pyrl.world.level import Level
 
 def pp_tm(tm, cols):
     """Pretty print tiles."""
@@ -18,14 +19,14 @@ def test_many_rdg_generation():
     for _ in range(100):
         level = Level(generation_type=rdg.LevelGen.Dungeon)
         rdg.generate_tiles_to(level)
-        assert level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
-        assert level.tiles[level.locations.getkey(LevelLocation.Passage_Up)] == PyrlTile.Stairs_Up
+        assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTile.Stairs_Down
+        assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTile.Stairs_Up
 
 def test_rdg_generation():
     level = Level(generation_type=rdg.LevelGen.Dungeon)
     rdg.generate_tiles_to(level)
-    assert level.tiles[level.locations.getkey(LevelLocation.Passage_Down)] == PyrlTile.Stairs_Down
-    assert level.tiles[level.locations.getkey(LevelLocation.Passage_Up)] == PyrlTile.Stairs_Up
+    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTile.Stairs_Down
+    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTile.Stairs_Up
 
 @pytest.fixture
 def rectangles():
@@ -43,12 +44,11 @@ def test_rectangle(rectangles):
     assert r3 == (1, 1, 11, 11)
     assert r4 == (11, 20, 21, 30)
 
-TEST_DIMENSIONS = (10, 10)
+TEST_DIMENSIONS = Dimensions(10, 10)
 
 @pytest.fixture
 def generator():
-
-    level = Level(tiles=Array2D(TEST_DIMENSIONS))
+    level = Level(tiles=Table(TEST_DIMENSIONS))
     generator = rdg.RDG(level)
     generator.init_tiles()
     return generator

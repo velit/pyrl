@@ -35,13 +35,13 @@ def test_save_and_load_game(game, mock_wrapper):
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
     game = prepare_input_and_run(game, input_seq)
     assert game.turn_counter == 4
-    assert game.player.level.level_key.index == 3
+    assert game.player.level.level_key.idx == 3
 
     game = load_game(mock_wrapper)
     input_seq = [Binds.Descend] * 4
     game = prepare_input_and_run(game, input_seq)
     assert game.turn_counter == 8
-    assert game.player.level.level_key.index == 5
+    assert game.player.level.level_key.idx == 5
 
 def test_subsystems(game):
 

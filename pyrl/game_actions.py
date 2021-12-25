@@ -3,9 +3,8 @@ from __future__ import annotations
 from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING
 
 from pyrl.combat import get_melee_attack_cr, get_combat_message
-from pyrl.constants import dir
 from pyrl.constants.coord import Coord
-from pyrl.constants.dir import Direction
+from pyrl.constants.direction import Direction, Dir
 from pyrl.constants.level_location import LevelLocation
 from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetException
 from pyrl.creature.item import Item
@@ -117,7 +116,7 @@ class GameActions:
                                          "There isn't a creature there to swap with.")
 
         self.level.swap_creature(self.creature, target_creature)
-        move_multiplier = self.level.movement_multiplier(self.coord, direction)
+        move_multiplier = self.level.move_multiplier(self.coord, direction)
         self._apply_action_cost(self.creature.action_cost(Action.Move, move_multiplier))
         return Action.Swap
 
@@ -228,12 +227,12 @@ class GameActions:
         return self.creature.inventory.inspect_items()
 
     def can_reach(self, target_coord: Coord) -> bool:
-        return self.coord == target_coord or get_vector(self.coord, target_coord) in dir.All
+        return self.coord == target_coord or get_vector(self.coord, target_coord) in Dir.All
 
     def can_move(self, direction: Direction) -> bool:
-        if direction not in dir.AllPlusStay:
+        if direction not in Dir.AllPlusStay:
             raise ValueError(f"Illegal movement direction: {direction}")
-        elif direction == dir.Stay:
+        elif direction == Dir.Stay:
             return True
         else:
             coord = add_vector(self.coord, direction)

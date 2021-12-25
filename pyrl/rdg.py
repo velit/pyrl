@@ -4,11 +4,11 @@ from functools import partial
 from random import randrange, random, choice
 
 from pyrl.config.debug import Debug
-from pyrl.constants import dir
+from pyrl.constants.direction import Dir
 from pyrl.constants.level_gen import LevelGen
+from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
-from pyrl.constants.level_location import LevelLocation
 
 def generate_tiles_to(level):
     RDG(level).generate_tiles()
@@ -58,7 +58,7 @@ class RDG:
 
     def __init__(self, level):
         self.level = level
-        self.rows, self.cols = level.tiles.dimensions
+        self.rows, self.cols = level.tiles.dimensions.params
         self.generation_type = level.generation_type
 
         self.level_cycles          = 300
@@ -84,10 +84,10 @@ class RDG:
             self.make_room(Rectangle(0, 0, self.rows, self.cols))
 
         if self.generation_type.value >= LevelGen.Dungeon.value:
-            if LevelLocation.Passage_Up not in self.level.locations.values():
-                self.add_location(PyrlTile.Stairs_Up, LevelLocation.Passage_Up)
-            if LevelLocation.Passage_Down not in self.level.locations.values():
-                self.add_location(PyrlTile.Stairs_Down, LevelLocation.Passage_Down)
+            if DefaultLocation.Passage_Up not in self.level.locations.values():
+                self.add_location(PyrlTile.Stairs_Up, DefaultLocation.Passage_Up)
+            if DefaultLocation.Passage_Down not in self.level.locations.values():
+                self.add_location(PyrlTile.Stairs_Down, DefaultLocation.Passage_Down)
 
     def init_tiles(self):
         for coord, item in self.level.tiles.enumerate():
@@ -231,10 +231,10 @@ class RDG:
             return False
 
         neighbors = self.get_up_down_left_right_neighbors(coord)
-        dir_map = {(self.R, self.F, self.W, self.W): dir.North,
-                   (self.F, self.R, self.W, self.W): dir.South,
-                   (self.W, self.W, self.R, self.F): dir.West,
-                   (self.W, self.W, self.F, self.R): dir.East}
+        dir_map = {(self.R, self.F, self.W, self.W): Dir.North,
+                   (self.F, self.R, self.W, self.W): Dir.South,
+                   (self.W, self.W, self.R, self.F): Dir.West,
+                   (self.W, self.W, self.F, self.R): Dir.East}
         try:
             return dir_map[neighbors]
         except KeyError:
@@ -243,10 +243,10 @@ class RDG:
     def get_up_down_left_right_neighbors(self, coord):
         tiles = self.level.tiles
         neighbors = (
-            tiles[add_vector(coord, dir.North)],
-            tiles[add_vector(coord, dir.South)],
-            tiles[add_vector(coord, dir.West)],
-            tiles[add_vector(coord, dir.East)],
+            tiles[add_vector(coord, Dir.North)],
+            tiles[add_vector(coord, Dir.South)],
+            tiles[add_vector(coord, Dir.West)],
+            tiles[add_vector(coord, Dir.East)],
         )
         return neighbors
 

@@ -7,13 +7,13 @@ from typing import Any
 from pyrl.creature.stats import Stats, Stat
 from pyrl.dice import Dice
 from pyrl.constants.colors import ColorPair
-from pyrl.constants.char import Char
+from pyrl.constants.char import Glyph
 from pyrl.constants.equipment_slot import Slot
 
 @dataclass(eq=False, slots=True)
 class Item:
     name: str
-    char: Char
+    char: Glyph
     stats: Stats                       = field(repr=False)
     compatible_slots: tuple[Slot, ...] = field(repr=False)
     uses_all_slots: bool               = False
@@ -65,7 +65,7 @@ def Weapon(name: str,
            two_handed: bool = False,
            compatible_slots: Iterable[Slot] = (Slot.Right_Hand, Slot.Left_Hand),
            stats: Stats = None,
-           char: Char = ('(', ColorPair.Normal)) -> Item:
+           char: Glyph = ('(', ColorPair.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.accuracy = accuracy
@@ -78,7 +78,7 @@ def Armor(name: str,
           armor: int,
           compatible_slots: Iterable[Slot] = (),
           stats: Stats = None,
-          char: Char = (']', ColorPair.Normal)) -> Item:
+          char: Glyph = (']', ColorPair.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.defense = defense

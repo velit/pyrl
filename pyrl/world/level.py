@@ -1,37 +1,40 @@
 from __future__ import annotations
 
-import itertools
 import random
-from collections.abc import Iterable
-from functools import wraps
+from collections.abc import Iterable, Container
 from typing import TYPE_CHECKING
 
 from pyrl import path
 from pyrl.config.debug import Debug
-from pyrl.constants import dir
+from pyrl.constants.char import Glyph
 from pyrl.constants.coord import Coord
+from pyrl.constants.direction import Direction, Dir
 from pyrl.constants.level_gen import LevelGen
 from pyrl.constants.level_location import LevelLocation
 from pyrl.creature.actions import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
-from pyrl.game_data.levels.shared_assets import default_level_dimensions
+from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
 from pyrl.generic_algorithms import bresenham, cross_product, add_vector
-from pyrl.generic_structures import Event, Array2D, OneToOneMapping
+from pyrl.generic_structures.event import Event
+from pyrl.generic_structures.one_to_one_mapping import OneToOneMapping
+from pyrl.generic_structures.table import Table
 from pyrl.rdg import generate_tiles_to
 from pyrl.turn_scheduler import TurnScheduler
 
 if TYPE_CHECKING:
+    from pyrl.world.tile import Tile
     from pyrl.creature.creature import Creature
+    from pyrl.world.world import LevelKey
 
 class CreatureSpawner:
     __slots__ = ('creatures', 'total_weight')
 
-    def __init__(self):
-        self.creatures = []
+    def __init__(self) -> None:
+        self.creatures: list[tuple[int, Creature]] = []
         self.total_weight = 0
 
-    def set_creatures(self, creatures, danger_level):
+    def set_creatures(self, creatures: Iterable[Creature], danger_level: int) -> None:
         self.creatures = []
         accumulator = 0
         for creature in creatures:
@@ -42,15 +45,20 @@ class CreatureSpawner:
             self.creatures.append((accumulator, creature))
         self.total_weight = accumulator
 
-    def random_creature(self):
-        assert len(self.creatures) != 0, "Trying to spawn a random creature with no creatures defined"
+    def random_creature(self) -> Creature:
+        assert self.creatures, "Trying to spawn a random creature with no creatures defined"
         index = random.randrange(self.total_weight)
         return next(creature for (slot, creature) in self.creatures if index < slot).copy()
 
 class Level:
 
-    def __init__(self, danger_level=0, generation_type=LevelGen.Dungeon, tiles=None,
-                 locations=(), custom_creatures=(), creature_spawning_enabled=True):
+    def __init__(self,
+                 danger_level: int = 0,
+                 generation_type: LevelGen = LevelGen.Dungeon,
+                 tiles: Table[Tile] | None = None,
+                 locations: dict[Coord, LevelLocation] = {},
+                 custom_creatures: list[Creature] = [],
+                 creature_spawning_enabled: bool = True):
         # Generation
         self.danger_level = danger_level
         self.generation_type = generation_type
@@ -58,48 +66,46 @@ class Level:
         self.creature_spawn_count = 99
         self.creature_spawning_enabled = creature_spawning_enabled
         self.creature_spawner = CreatureSpawner()
-        self.creature_spawn_list = []
-        self.level_key = None
+        self.level_key: LevelKey = None
 
         # Normal usage
+        self.tiles: Table[Tile]
         if tiles is None:
-            self.tiles = Array2D(default_level_dimensions)
+            self.tiles = Table(default_dims)
         else:
             self.tiles = tiles
 
-        self.locations = OneToOneMapping(locations)
+        self.locations: OneToOneMapping[Coord, LevelLocation] = OneToOneMapping(locations)
         self.visible_change = Event()
         self.turn_scheduler = TurnScheduler()
-        self.creatures = {}
-        self.items = {}
-
-        if self.generation_type.value > LevelGen.ExtendExisting.value:
-            self.rows, self.cols = self.tiles.dimensions
-        else:
-            self.rows, self.cols = default_level_dimensions
-
+        self.creatures: dict[Coord, Creature] = {}
+        self.items: dict[Coord, tuple[Item, ...]] = {}
         self.is_finalized = False
 
-    def will_have_location(self, location):
-        if location == LevelLocation.Random_Location:
+    @property
+    def rows(self) -> int:
+        return self.tiles.rows
+
+    @property
+    def cols(self) -> int:
+        return self.tiles.cols
+
+    def will_have_location(self, location: LevelLocation) -> bool:
+        if location == DefaultLocation.Random_Location:
             return True
 
         if location in self.locations.values():
             return True
 
         if self.generation_type != LevelGen.NoGeneration:
-            return location in LevelLocation
+            return location in DefaultLocation
 
         return False
 
-    def get_creature_spawn_list(self):
-        creature_list = []
-        for creature in default_creatures:
-            # creature_list.extend((creature, ) * creature.spawn_weight(self.danger_level))
-            creature_list.append(creature)
-        return creature_list
+    def get_creature_spawn_list(self) -> list[Creature]:
+        return list(default_creatures)
 
-    def finalize(self, level_key):
+    def finalize(self, level_key: LevelKey) -> None:
         if self.generation_type.is_used():
             generate_tiles_to(self)
 
@@ -114,18 +120,16 @@ class Level:
             for _ in range(self.creature_spawn_count):
                 creature = self.creature_spawner.random_creature()
                 self.spawn_creature(creature)
-        else:
-            self.creature_spawn_list = []
 
         self.is_finalized = True
 
-    def get_location_coord(self, level_location):
-        if level_location == LevelLocation.Random_Location:
+    def get_location_coord(self, level_location: LevelLocation) -> Coord:
+        if level_location == DefaultLocation.Random_Location:
             return self.free_coord()
         else:
             return self.locations.getkey(level_location)
 
-    def free_coord(self):
+    def free_coord(self) -> Coord:
         for _ in range(Debug.max_loop_cycles):
             coord = self.tiles.random_coord()
             if self.is_passable(coord):
@@ -137,7 +141,7 @@ class Level:
         else:
             assert False, "Free coord search failed."
 
-    def visible_char(self, coord):
+    def visible_char(self, coord: Coord) -> Glyph:
         if coord in self.creatures:
             return self.creatures[coord].char
         elif coord in self.items:
@@ -145,10 +149,11 @@ class Level:
         else:
             return self.tiles[coord].visible_char
 
-    def memory_char(self, coord):
+    def memory_char(self, coord: Coord) -> Glyph:
         return self.tiles[coord].memory_char
 
-    def get_vision_information(self, coords, visible_coords, always_show_creatures=False):
+    def get_vision_information(self, coords: Iterable[Coord], visible_coords: Container[Coord],
+                               always_show_creatures: bool = False) -> Iterable[tuple[Coord, Glyph]]:
         for coord in coords:
             if coord in visible_coords:
                 yield coord, self.visible_char(coord)
@@ -158,67 +163,76 @@ class Level:
                 else:
                     yield coord, self.memory_char(coord)
 
-    def get_last_pathable_coord(self, coord_start, coord_end):
+    def get_last_pathable_coord(self, coord_start: Coord, coord_end: Coord) -> Coord | None:
         last = None
         for coord in bresenham(coord_start, coord_end):
             if not self.is_pathable(coord):
-                return last
+                break
             last = coord
+        return last
 
-    def get_neighbor_location_coords_and_costs(self, coord):
+    def get_neighbor_location_coords_and_costs(self, coord: Coord) -> Iterable[tuple[Coord, int]]:
         for direction in self.get_passable_neighbors(coord):
             neighbor_coord = add_vector(coord, direction)
             multiplier = self.movement_multiplier(coord, direction)
             yield neighbor_coord, round(multiplier * Action.Move.base_cost)
 
-    def get_passable_neighbors(self, coord):
-        for direction in dir.All:
+    def get_passable_neighbors(self, coord: Coord) -> Iterable[Direction]:
+        for direction in Dir.All:
             neighbor_coord = add_vector(coord, direction)
             if self.is_legal(neighbor_coord) and self.tiles[neighbor_coord].is_passable:
                 yield direction
 
-    @wraps(Array2D.is_legal, assigned=())
-    def is_legal(self, *args, **kwargs):
-        return self.tiles.is_legal(*args, **kwargs)
+    def is_legal(self, coord: Coord) -> bool:
+        return self.tiles.is_legal(coord)
 
-    def is_passable(self, coord):
+    def is_passable(self, coord: Coord) -> bool:
         if coord in self.creatures:
             return False
         else:
             return self.tiles[coord].is_passable
 
-    def is_pathable(self, coord):
+    def is_pathable(self, coord: Coord) -> bool:
         return self.tiles[coord].is_passable
 
-    def is_see_through(self, coord):
+    def is_see_through(self, coord: Coord) -> bool:
         return self.tiles[coord].is_see_through
 
-    def check_los(self, coord_a, coord_b):
+    def check_los(self, coord_a: Coord, coord_b: Coord) -> bool:
         return not (any(not self.is_see_through(coord) for coord in bresenham(coord_a, coord_b)) and
                     any(not self.is_see_through(coord) for coord in bresenham(coord_b, coord_a)))
 
-    def distance(self, coord_a, coord_b):
-        return round(path.distance(coord_a, coord_b, Action.Move.base_cost, dir.DiagonalMoveMult))
+    def distance(self, coord_a: Coord, coord_b: Coord) -> int:
+        return round(path.distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))
 
-    def movement_multiplier(self, coord, direction):
-        origin_multiplier = self.tiles[coord].movement_multiplier
+    def movement_multiplier(self, coord: Coord, direction: Direction) -> float:
+        origin_tile_multiplier = self.tiles[coord].move_multiplier
         target_coord = add_vector(coord, direction)
-        target_multiplier = self.tiles[target_coord].movement_multiplier
+        target_tile_multiplier = self.tiles[target_coord].move_multiplier
 
-        tile_multiplier = (origin_multiplier + target_multiplier) / 2
-        return tile_multiplier * dir.move_mult(direction)
+        tile_multiplier = (origin_tile_multiplier + target_tile_multiplier) / 2
+        return tile_multiplier * self.direction_multiplier(direction)
+
+    def direction_multiplier(self, direction: Direction) -> float:
+        if direction in Dir.Orthogonals:
+            return Dir.OrthogonalMoveMult
+        elif direction in Dir.Diagonals:
+            return Dir.DiagonalMoveMult
+        elif direction == Dir.Stay:
+            return Dir.StayMoveMult
+        assert False, f"Invalid {direction=}"
 
     # nudge_coord nudges towards a line between end_coord and nudge_coord
-    def _a_star_heuristic(self, start_coord, end_coord, nudge_coord):
-        cost = self.distance(start_coord, end_coord)
+    def _a_star_heuristic(self, start_coord: Coord, end_coord: Coord, nudge_coord: Coord) -> float:
+        cost: float = self.distance(start_coord, end_coord)
         if Debug.cross:
             cost += cross_product(start_coord, end_coord, nudge_coord) / Debug.cross_mod
         return cost
 
-    def path(self, start_coord, goal_coord):
+    def path(self, start_coord: Coord, goal_coord: Coord) -> Iterable[Coord]:
         return path.path(start_coord, goal_coord, self.get_neighbor_location_coords_and_costs, self._a_star_heuristic)
 
-    def look_information(self, coord):
+    def look_information(self, coord: Coord) -> str:
         # if coord in creature.visited_location_coords:
         information = f"{coord[0]}x{coord[1]} "
         if coord in self.creatures:
@@ -232,7 +246,7 @@ class Level:
         # else:
         #     return "You don't know anything about this place."
 
-    def spawn_creature(self, creature):
+    def spawn_creature(self, creature: Creature) -> None:
         coord = None
         if creature.coord is not None:
             assert self.is_passable(creature.coord), \
@@ -242,12 +256,12 @@ class Level:
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, creature.action_cost(Action.Spawn))
 
-    def add_creature_to_location(self, creature, level_location):
+    def add_creature_to_location(self, creature: Creature, level_location: LevelLocation) -> None:
         coord = self.get_location_coord(level_location)
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, 0)
 
-    def add_creature(self, creature, coord=None):
+    def add_creature(self, creature: Creature, coord: Coord | None = None) -> None:
         if coord is None:
             coord = self.free_coord()
         if coord in self.creatures:
@@ -258,7 +272,7 @@ class Level:
         creature.level = self
         self.visible_change.trigger(coord)
 
-    def remove_creature(self, creature):
+    def remove_creature(self, creature: Creature) -> None:
         coord = creature.coord
         del self.creatures[coord]
         creature.coord = None
@@ -266,7 +280,7 @@ class Level:
         self.turn_scheduler.remove(creature)
         self.visible_change.trigger(coord)
 
-    def move_creature(self, creature, new_coord):
+    def move_creature(self, creature: Creature, new_coord: Coord) -> None:
         old_coord = creature.coord
         del self.creatures[old_coord]
         self.creatures[new_coord] = creature
@@ -275,11 +289,11 @@ class Level:
         self.visible_change.trigger(old_coord)
         self.visible_change.trigger(new_coord)
 
-    def move_creature_to_dir(self, creature, direction):
+    def move_creature_to_dir(self, creature: Creature, direction: Direction) -> None:
         target_coord = add_vector(creature.coord, direction)
         self.move_creature(creature, target_coord)
 
-    def swap_creature(self, creature_a, creature_b):
+    def swap_creature(self, creature_a: Creature, creature_b: Creature) -> None:
         creature_a.coord, creature_b.coord = creature_b.coord, creature_a.coord
         self.creatures[creature_a.coord] = creature_a
         self.creatures[creature_b.coord] = creature_b
@@ -312,10 +326,10 @@ class Level:
         self.visible_change.trigger(coord)
         return taken_items
 
-    def add_items(self, coord, items):
+    def add_items(self, coord: Coord, items: tuple[Item, ...]) -> None:
         if coord in self.items:
             current_items = self.items[coord]
         else:
             current_items = ()
-        self.items[coord] = tuple(itertools.chain(current_items, items))
+        self.items[coord] = current_items + items
         self.visible_change.trigger(coord)

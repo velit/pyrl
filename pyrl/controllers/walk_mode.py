@@ -5,11 +5,10 @@ from typing import Literal
 
 from pyrl.binds import Binds
 from pyrl.config.config import Config
-from pyrl.constants import dir
 from pyrl.constants.coord import Coord
-from pyrl.constants.dir import Direction
-from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.constants.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
+from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_vector,
                                      clockwise_45, anticlockwise_45)
 
@@ -43,7 +42,7 @@ class WalkMode(GameActionProperties, object):
             key = self.io.get_key(query, keys=key_seq)
             if key in Binds.Cancel:
                 return Action.No_Action
-            direction = dir.from_key[key]
+            direction = Binds.get_direction(key)
 
         feedback = self.actions.move(direction)
         walk_type = self._get_initial_walk_type(direction)
@@ -97,7 +96,7 @@ class WalkMode(GameActionProperties, object):
                 return new_direction
             elif len(forward_dirs) > 1 and len(orthogonal_dirs) == 1:
                 new_direction = orthogonal_dirs.pop()
-                if all(get_vector(new_direction, other) in dir.AllPlusStay for other in forward_dirs):
+                if all(get_vector(new_direction, other) in Dir.AllPlusStay for other in forward_dirs):
                     return new_direction
         else:
             forward = self._passable(old_direction)
@@ -112,7 +111,7 @@ class WalkMode(GameActionProperties, object):
         back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
         candidate_dirs = set(self.level.get_passable_neighbors(self.creature.coord)) - {reverse}
         candidate_forward_dirs = candidate_dirs - back_sides
-        candidate_orthogonal_dirs = candidate_dirs & set(dir.Orthogonals)
+        candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides
         return candidate_forward_dirs, candidate_orthogonal_dirs, ignored_dirs
 
@@ -133,7 +132,7 @@ class WalkMode(GameActionProperties, object):
         return forward, up_left, up_right, left, right, down_left, down_right
 
     def _get_initial_walk_type(self, direction: Direction) -> WalkType | None:
-        if direction == dir.Stay:
+        if direction == Dir.Stay:
             return WALK_IN_PLACE
 
         walk_type = self._get_side_passables(direction)
@@ -149,10 +148,10 @@ class WalkMode(GameActionProperties, object):
         return walk_type
 
     def _get_side_passables(self, direction: Coord) -> WalkType:
-        if direction in dir.Orthogonals:
+        if direction in Dir.Orthogonals:
             left = self._passable(anticlockwise(direction))
             right = self._passable(clockwise(direction))
-        elif direction in dir.Diagonals:
+        elif direction in Dir.Diagonals:
             left = self._passable(anticlockwise_45(direction))
             right = self._passable(clockwise_45(direction))
         else:

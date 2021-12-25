@@ -8,8 +8,10 @@ from pyrl.binds import Binds
 from pyrl.config.debug import Debug
 from pyrl.constants.level_gen import LevelGen
 from pyrl.constants.level_location import LevelLocation
-from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.creature.actions import Action, NoValidTargetException
+from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.game_data.levels.shared_assets import DefaultLocation
+from pyrl.world.level import Level
 
 class DebugAction(GameActionProperties, object):
 
@@ -62,7 +64,8 @@ class DebugAction(GameActionProperties, object):
         self.io.msg(f"Path heuristic cross set to {Debug.cross}")
 
     def cycle_level_type(self) -> None:
-        last_level_type = "All levels are already generated"
+        last_level_type: LevelGen | str = "All levels are already generated"
+        level: Level
         for level in self.world.levels.values():
             if level.is_finalized:
                 continue
@@ -94,13 +97,13 @@ class DebugAction(GameActionProperties, object):
         self.io.msg("Abracadabra.")
 
     def draw_path_to_passage_down(self) -> None:
-        passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
+        passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
         self.actions.redraw()
 
     def draw_path_from_up_to_down(self) -> None:
-        passage_up_coord = self.level.get_location_coord(LevelLocation.Passage_Up)
-        passage_down_coord = self.level.get_location_coord(LevelLocation.Passage_Down)
+        passage_up_coord = self.level.get_location_coord(DefaultLocation.Passage_Up)
+        passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
         self.actions.redraw()
 

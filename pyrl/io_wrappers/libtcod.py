@@ -20,12 +20,13 @@ class TCODWrapper:
         """Init the SDL surface and prepare for draw calls."""
         flags = tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_ASCII_INROW
         tcod.console_set_custom_font(b"resources/terminal10x18_gs_ro.png", flags)
-        rows, cols = WindowSystem.game_dimensions
+        dims = WindowSystem.game_dimensions
+        rows, cols = dims.rows, dims.cols
         tcod.console_init_root(cols, rows, Config.default_game_name.encode(), False,
                                tcod.RENDERER_SDL)
 
     def new_window(self, dimensions):
-        rows, columns = dimensions
+        rows, columns = dimensions.params
         window = tcod.console_new(columns, rows)
         return TCODWindow(window)
 

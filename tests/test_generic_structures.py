@@ -2,23 +2,26 @@ from __future__ import annotations
 
 import pytest
 
-from pyrl.generic_structures import Array2D, Event, OneToOneMapping
+from pyrl.generic_structures.dimensions import Dimensions
+from pyrl.generic_structures.event import Event
+from pyrl.generic_structures.one_to_one_mapping import OneToOneMapping
+from pyrl.generic_structures.table import Table
 
-def test_array():
-    dims = 2, 2
-    array = Array2D(dims, (0, 1, 2))
-    assert array.dimensions == dims
+def test_table():
+    dims = Dimensions(2, 2)
+    table = Table(dims, (0, 1, 2))
+    assert table.dimensions == dims
 
-    assert array[array.get_coord(0)] == 0
-    assert array[array.get_coord(1)] == 1
-    assert array[array.get_coord(2)] == 2
-    assert array[array.get_coord(3)] is None
+    assert table[table.get_coord(0)] == 0
+    assert table[table.get_coord(1)] == 1
+    assert table[table.get_coord(2)] == 2
+    assert table[table.get_coord(3)] is None
 
-    assert array.is_legal((0, 0))
-    assert array.is_legal((1, 1))
+    assert table.is_legal((0, 0))
+    assert table.is_legal((1, 1))
 
-    assert not array.is_legal((-1, -1))
-    assert not array.is_legal((3, 2))
+    assert not table.is_legal((-1, -1))
+    assert not table.is_legal((3, 2))
 
 def test_one_to_one_mapping():
     mapping = OneToOneMapping()

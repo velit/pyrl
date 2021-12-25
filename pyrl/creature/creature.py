@@ -5,7 +5,8 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from pyrl.constants.char import Char
+from pyrl.constants.char import Glyph
+from pyrl.constants.coord import Coord
 from pyrl.dice import Dice
 from pyrl.creature.actions import Action
 from pyrl.generic_algorithms import resize_range
@@ -15,11 +16,11 @@ if TYPE_CHECKING:
 
 @dataclass(eq=False, slots=True)
 class Creature:
-    name:                     str
-    char:                    Char
-    danger_level:             int = 0
-    spawn_weight_class:       int = 1
-    coord: tuple[int, int] | None = None
+    name:                str
+    char:              Glyph
+    danger_level:        int = 0
+    spawn_weight_class:  int = 1
+    coord: Coord             = None
 
     hp:                  int = field(init=False, repr=True)
     level:             Level = field(init=False, repr=False, default=None)

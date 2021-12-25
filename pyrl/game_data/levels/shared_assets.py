@@ -1,15 +1,24 @@
 from __future__ import annotations
 
+from pyrl.constants.char import Letter
+from pyrl.constants.coord import Coord
+from pyrl.constants.direction import Dir
+from pyrl.constants.level_location import LevelLocation
 from pyrl.creature.creature import Creature
-from pyrl.constants import dir
 from pyrl.game_data.tiles import PyrlTile
 from pyrl.generic_algorithms import add_vector
-from pyrl.generic_structures import Array2D, TableDims
-from pyrl.constants.level_location import LevelLocation
+from pyrl.generic_structures.table import Table
+from pyrl.generic_structures.dimensions import Dimensions
+from pyrl.world.tile import Tile
 
-default_level_dimensions = TableDims(26, 96)
+default_dims = Dimensions(26, 96)
 
-base_tiles = {
+class DefaultLocation(LevelLocation):
+    Passage_Up      = 1
+    Passage_Down    = 2
+    Random_Location = 3
+
+base_tiles: dict[Letter, Tile] = {
     '.': PyrlTile.Floor,
     'w': PyrlTile.Wall,
     '#': PyrlTile.Dynamic_Wall,
@@ -20,17 +29,20 @@ base_tiles = {
     '<': PyrlTile.Stairs_Up,
 }
 
-base_creatures: dict[str, Creature] = {
+base_creatures: dict[Letter, Creature] = {
 }
 
-base_locations = {
-    '<': LevelLocation.Passage_Up,
-    '>': LevelLocation.Passage_Down,
+base_locations: dict[Letter, LevelLocation] = {
+    '<': DefaultLocation.Passage_Up,
+    '>': DefaultLocation.Passage_Down,
 }
 
-def construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures):
-    _assert_size(charstr, dimensions)
-    unfinalized_tiles = Array2D(dimensions, charstr)
+def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: dict[Letter, Tile],
+                   custom_locations: dict[Letter, LevelLocation], custom_creatures: dict[Letter, Creature]) \
+                   -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
+
+    _assert_dimensions(dimensions, table_data)
+    unfinalized_tiles = Table(dimensions, table_data)
 
     tiles_lookup = base_tiles.copy()
     tiles_lookup.update(custom_tiles)
@@ -43,11 +55,12 @@ def construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_c
 
     return _construct_data(unfinalized_tiles, tiles_lookup, locations, creatures_lookup)
 
-def _assert_size(charstr, dimensions):
-    assert len(charstr) == dimensions[0] * dimensions[1], \
-        "Wrong dimensions for custom level definition."
+def _assert_dimensions(dimensions: Dimensions, table_data: str) -> None:
+    assert len(table_data) == dimensions.area, "Wrong dimensions for custom level definition."
 
-def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures_lookup):
+def _construct_data(unfinalized_tiles: Table, tiles_lookup: dict[Letter, Tile],
+                    locations_lookup: dict[Letter, LevelLocation], creatures_lookup: dict[Letter, Creature]) \
+                        -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
     tiles = unfinalized_tiles
     locations = {}
     creatures = []
@@ -66,15 +79,15 @@ def _construct_data(unfinalized_tiles, tiles_lookup, locations_lookup, creatures
     _finalize_tiles(tiles)
     return tiles, locations, creatures
 
-def _finalize_tiles(tiles):
+def _finalize_tiles(tiles: Table) -> None:
     for coord, tile in tiles.enumerate():
         tiles[coord] = _finalize_tile(coord, tile, tiles)
 
-def _finalize_tile(coord, tile, tiles):
+def _finalize_tile(coord: Coord, tile: Tile, tiles: Table) -> Tile:
     if tile != PyrlTile.Dynamic_Wall:
         return tile
 
-    neighbor_coords = (add_vector(coord, direction) for direction in dir.All)
+    neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
     neighbor_tiles = (tiles[coord] for coord in neighbor_coords if tiles.is_legal(coord))
     rocks = (PyrlTile.Dynamic_Wall, PyrlTile.Wall, PyrlTile.Rock)
     if any(handle not in rocks for handle in neighbor_tiles):

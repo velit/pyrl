@@ -4,18 +4,27 @@ import time
 
 from pyrl.constants.colors import ColorPair
 from pyrl.constants.keys import Key
-from pyrl.generic_structures import TableDims, Coord
+from pyrl.generic_structures.dimensions import Dimensions
+from pyrl.generic_structures.position import Position
 
 class BaseWindow:
 
     # Seconds to sleep until next user input check in half-block functions
     half_block_input_responsiveness = 0.001
 
-    def __init__(self, cursor_lib, dimensions, screen_position):
+    def __init__(self, cursor_lib, dimensions: Dimensions, screen_position: Position) -> None:
         self.cursor_lib = cursor_lib
-        self.rows, self.cols = TableDims(*dimensions)
-        self.screen_position = Coord(*screen_position)
+        self.dimensions = dimensions
+        self.screen_position = screen_position
         self.cursor_win = cursor_lib.new_window(dimensions)
+
+    @property
+    def rows(self) -> int:
+        return self.dimensions.rows
+
+    @property
+    def cols(self) -> int:
+        return self.dimensions.cols
 
     def draw_char(self, char, coord):
         self.cursor_win.draw_char(char, coord)

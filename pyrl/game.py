@@ -4,20 +4,20 @@ from __future__ import annotations
 import sys
 from typing import NoReturn
 
-from pyrl import state_store, binds
+from pyrl import state_store
 from pyrl.ai import AI
 from pyrl.binds import Binds
-from pyrl.config.debug import Debug
 from pyrl.config.config import Config
+from pyrl.config.debug import Debug
 from pyrl.controllers.user_controller import UserController
 from pyrl.creature.creature import Creature
+from pyrl.creature.mixins.visionary import Visionary
 from pyrl.fov import ShadowCast
 from pyrl.game_actions import GameActions
 from pyrl.game_data.pyrl_world import get_world
 from pyrl.interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.world import LevelNotFound
-from pyrl.creature.mixins.visionary import Visionary
 
 class Game:
 
@@ -42,7 +42,7 @@ class Game:
     def game_loop(self):
         ai_game_actions = GameActions(self)
         self.io.msg(f"{Binds.Help.key} for help menu.")
-        undefined_keys = binds.undefined_keys()
+        undefined_keys = Binds.undefined_keys()
         if undefined_keys:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
         while True:
