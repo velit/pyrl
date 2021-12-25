@@ -4,16 +4,16 @@ import code
 from collections.abc import Callable
 from typing import Literal
 
-from pyrl.binds import Binds
+from pyrl.config.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.constants.level_gen import LevelGen
-from pyrl.constants.level_location import LevelLocation
+from pyrl.types.level_gen import LevelGen
+from pyrl.types.level_location import LevelLocation
 from pyrl.creature.actions import Action, NoValidTargetException
 from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.world.level import Level
 
-class DebugAction(GameActionProperties, object):
+class DebugAction(GameActionProperties):
 
     def __init__(self, game_actions: GameActions) -> None:
         self.actions = game_actions

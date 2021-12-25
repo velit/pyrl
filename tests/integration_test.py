@@ -1,36 +1,39 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 import pytest
 
 from pyrl import main
-from pyrl.binds import Binds
-from pyrl.io_wrappers.mock import MockInputEnd
+from pyrl.config.binds import Binds
+from pyrl.game import Game
+from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper, MockInputEnd
+from pyrl.types.keys import KeyTuple
 
 TEST_GameConf_NAME = "test"
 
 @pytest.fixture
-def mock_wrapper():
-    from pyrl.io_wrappers.mock import MockWrapper
+def mock_wrapper() -> MockWrapper:
     return MockWrapper()
 
 @pytest.fixture
-def game(mock_wrapper):
+def game(mock_wrapper: MockWrapper) -> Game:
     return main.create_game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mock_wrapper)
 
-def load_game(mock_wrapper):
+def load_game(mock_wrapper: MockWrapper) -> Game:
     return main.create_game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mock_wrapper)
 
-def prepare_input_and_run(game, input_seq):
-    input_seq = tuple(action if isinstance(action, str) else action.key for action in input_seq)
-    game.io.cursor_lib.prepare_input(input_seq)
+def prepare_input_and_run(game: Game, bind_iterable: Iterable[KeyTuple | str]) -> Game:
+    key_iterable = tuple(action if isinstance(action, str) else action.key for action in bind_iterable)
+    game.io.cursor_lib.prepare_input(key_iterable)
     try:
         game.game_loop()
-        assert False
+        assert False, "MockWrapper should raise MockInputEnd"
     except MockInputEnd:
         return game
 
 @pytest.mark.skip(reason="Disabled until save system is fixed")
-def test_save_and_load_game(game, mock_wrapper):
+def test_save_and_load_game(game: Game, mock_wrapper: MockWrapper) -> None:
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
     game = prepare_input_and_run(game, input_seq)
@@ -43,7 +46,7 @@ def test_save_and_load_game(game, mock_wrapper):
     assert game.turn_counter == 8
     assert game.player.level.level_key.idx == 5
 
-def test_subsystems(game):
+def test_subsystems(game) -> None:
 
     help_system = (Binds.Help, Binds.Cancel)
 
@@ -94,6 +97,8 @@ def test_subsystems(game):
 
     walk_mode = (Binds.Walk_Mode, Binds.East)
 
+    descend = (Binds.Descend, Binds.Descend)
+
     coord = game.player.coord
 
     game = prepare_input_and_run(game, help_system)
@@ -128,3 +133,7 @@ def test_subsystems(game):
 
     game = prepare_input_and_run(game, walk_mode)
     assert game.turn_counter == 7
+
+    game = prepare_input_and_run(game, descend)
+    assert game.turn_counter == 9
+    assert game.player.level.level_key.idx == 2

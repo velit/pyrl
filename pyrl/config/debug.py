@@ -41,9 +41,3 @@ class Debug:
                    "facilisis convallis. Aliquam eu nisi arcu. Proin convallis sagittis nisi id molestie. Aenean " \
                    "rutrum elementum mauris, vitae venenatis tellus semper et. Proin eu nisl ligula. Maecenas dui mi, " \
                    "varius eget adipiscing quis, commodo et libero. "
-
-def breakpoint():
-    import curses
-    curses.endwin()
-    import pdb
-    pdb.set_trace()

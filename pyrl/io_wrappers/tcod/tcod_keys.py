@@ -1,0 +1,46 @@
+from __future__ import annotations
+
+import tcod
+
+from pyrl.types.keys import Keys
+
+tcod_key_map: dict[int, str] = {
+    tcod.KEY_BACKSPACE: Keys.BACKSPACE,
+    tcod.KEY_DELETE:    Keys.DELETE,
+    tcod.KEY_DOWN:      Keys.DOWN,
+    tcod.KEY_END:       Keys.END,
+    tcod.KEY_ENTER:     Keys.ENTER,
+    tcod.KEY_ESCAPE:    Keys.ESC,
+    tcod.KEY_F1:        Keys.F1,
+    tcod.KEY_F2:        Keys.F2,
+    tcod.KEY_F3:        Keys.F3,
+    tcod.KEY_F4:        Keys.F4,
+    tcod.KEY_F5:        Keys.F5,
+    tcod.KEY_F6:        Keys.F6,
+    tcod.KEY_F7:        Keys.F7,
+    tcod.KEY_F8:        Keys.F8,
+    tcod.KEY_F9:        Keys.F9,
+    tcod.KEY_F10:       Keys.F10,
+    tcod.KEY_F11:       Keys.F11,
+    tcod.KEY_F12:       Keys.F12,
+    tcod.KEY_HOME:      Keys.HOME,
+    tcod.KEY_INSERT:    Keys.INSERT,
+    tcod.KEY_KP0:       Keys.NUMPAD_0,
+    tcod.KEY_KP1:       Keys.NUMPAD_1,
+    tcod.KEY_KP2:       Keys.NUMPAD_2,
+    tcod.KEY_KP3:       Keys.NUMPAD_3,
+    tcod.KEY_KP4:       Keys.NUMPAD_4,
+    tcod.KEY_KP5:       Keys.NUMPAD_5,
+    tcod.KEY_KP6:       Keys.NUMPAD_6,
+    tcod.KEY_KP7:       Keys.NUMPAD_7,
+    tcod.KEY_KP8:       Keys.NUMPAD_8,
+    tcod.KEY_KP9:       Keys.NUMPAD_9,
+    tcod.KEY_LEFT:      Keys.LEFT,
+    tcod.KEY_NONE:      Keys.NO_INPUT,
+    tcod.KEY_PAGEDOWN:  Keys.PAGE_DOWN,
+    tcod.KEY_PAGEUP:    Keys.PAGE_UP,
+    tcod.KEY_RIGHT:     Keys.RIGHT,
+    tcod.KEY_SPACE:     Keys.SPACE,
+    tcod.KEY_TAB:       Keys.TAB,
+    tcod.KEY_UP:        Keys.UP,
+}

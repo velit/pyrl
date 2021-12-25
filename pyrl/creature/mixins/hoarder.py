@@ -4,7 +4,7 @@ from typing import Any, TypeGuard
 
 from pyrl.creature.creature import Creature
 from pyrl.creature.inventory import Inventory
-from pyrl.dice import Dice
+from pyrl.structures.dice import Dice
 
 def has_inventory(creature: Creature) -> TypeGuard[Hoarder]:
     return isinstance(creature, Hoarder)

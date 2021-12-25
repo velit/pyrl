@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from pyrl.constants.colors import ColorPair
-from pyrl.constants.level_gen import LevelGen
+from pyrl.types.color import ColorPairs
+from pyrl.types.level_gen import LevelGen
 from pyrl.creature.creature import Creature
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, DefaultLocation
-from pyrl.game_data.tiles import PyrlTile
+from pyrl.game_data.pyrl_tiles import PyrlTiles
 from pyrl.world.level import Level
 
-def get_level(player):
+def get_level(player) -> Level:
 
     dimensions = default_dims
     charstr = (
@@ -39,14 +39,14 @@ def get_level(player):
         '################################################################################################'
     )
     custom_tiles = {
-        'P': PyrlTile.Stairs_Up,
-        '@': PyrlTile.Floor,
+        'P': PyrlTiles.Stairs_Up,
+        '@': PyrlTiles.Floor,
     }
     custom_locations = {
         'P': DefaultLocation.Passage_Up,
     }
     custom_creatures = {
-        '@': Creature("The Crone", ('@', ColorPair.Purple)),
+        '@': Creature("The Crone", ('@', ColorPairs.Purple)),
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures

@@ -4,28 +4,28 @@ import random
 from collections.abc import Iterable, Container
 from typing import TYPE_CHECKING
 
-from pyrl import path
+from pyrl.algorithms import path, bresenham, cross_product, add_vector
 from pyrl.config.debug import Debug
-from pyrl.constants.char import Glyph
-from pyrl.constants.coord import Coord
-from pyrl.constants.direction import Direction, Dir
-from pyrl.constants.level_gen import LevelGen
-from pyrl.constants.level_location import LevelLocation
 from pyrl.creature.actions import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
-from pyrl.generic_algorithms import bresenham, cross_product, add_vector
-from pyrl.generic_structures.event import Event
-from pyrl.generic_structures.one_to_one_mapping import OneToOneMapping
-from pyrl.generic_structures.table import Table
-from pyrl.rdg import generate_tiles_to
-from pyrl.turn_scheduler import TurnScheduler
+from pyrl.dungeon_generation.rdg import generate_tiles_to
+from pyrl.structures.event import Event
+from pyrl.structures.one_to_one_mapping import OneToOneMapping
+from pyrl.structures.table import Table
+from pyrl.structures.scheduler import Scheduler
+from pyrl.types.char import Glyph
+from pyrl.types.coord import Coord
+from pyrl.types.direction import Direction, Dir
+from pyrl.types.level_gen import LevelGen
+from pyrl.types.level_location import LevelLocation
+from pyrl.types.world_point import WorldPoint
+from pyrl.types.level_key import LevelKey
 
 if TYPE_CHECKING:
     from pyrl.world.tile import Tile
     from pyrl.creature.creature import Creature
-    from pyrl.world.world import LevelKey
 
 class CreatureSpawner:
     __slots__ = ('creatures', 'total_weight')
@@ -77,7 +77,7 @@ class Level:
 
         self.locations: OneToOneMapping[Coord, LevelLocation] = OneToOneMapping(locations)
         self.visible_change = Event()
-        self.turn_scheduler = TurnScheduler()
+        self.turn_scheduler: Scheduler[Creature] = Scheduler()
         self.creatures: dict[Coord, Creature] = {}
         self.items: dict[Coord, tuple[Item, ...]] = {}
         self.is_finalized = False
@@ -206,9 +206,9 @@ class Level:
         return round(path.distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))
 
     def movement_multiplier(self, coord: Coord, direction: Direction) -> float:
-        origin_tile_multiplier = self.tiles[coord].move_multiplier
+        origin_tile_multiplier = self.tiles[coord].move_multi
         target_coord = add_vector(coord, direction)
-        target_tile_multiplier = self.tiles[target_coord].move_multiplier
+        target_tile_multiplier = self.tiles[target_coord].move_multi
 
         tile_multiplier = (origin_tile_multiplier + target_tile_multiplier) / 2
         return tile_multiplier * self.direction_multiplier(direction)
@@ -245,6 +245,9 @@ class Level:
         return information
         # else:
         #     return "You don't know anything about this place."
+
+    def get_world_point(self, coord: Coord) -> WorldPoint:
+        return WorldPoint(self.level_key, self.locations[coord])
 
     def spawn_creature(self, creature: Creature) -> None:
         coord = None

@@ -4,23 +4,22 @@ from collections.abc import Callable
 from functools import partial
 from typing import Literal
 
-from pyrl.binds import Binds, BindSequence
+from pyrl.algorithms import add_vector
+from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.constants.colors import Color, ColorPair
-from pyrl.constants.direction import Direction, Dir
-from pyrl.constants.keys import Key
-from pyrl.constants.level_location import LevelLocation
 from pyrl.creature.actions import Action, ActionException
 from pyrl.game_actions import GameActionProperties, GameActions
 from pyrl.game_data.levels.shared_assets import DefaultLocation
-from pyrl.generic_algorithms import add_vector
-from pyrl.interface.help_view import help_view
-from pyrl.interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
-from pyrl.interface.lines_view import lines_view, build_lines
+from pyrl.types.color import Color, ColorPairs
+from pyrl.types.direction import Direction, Dir
+from pyrl.types.keys import Keys, KeyTuple
+from pyrl.user_interface.help_view import help_view
+from pyrl.user_interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
+from pyrl.user_interface.lines_view import lines_view, build_lines
 
 ActionCallable = Callable[[], Action]
 
-class UserController(GameActionProperties, object):
+class UserController(GameActionProperties):
 
     def __init__(self, game_actions: GameActions):
         self.actions = game_actions
@@ -34,12 +33,12 @@ class UserController(GameActionProperties, object):
 
     def define_actions(self) -> dict[str, ActionCallable]:
         actions_funcs: dict[str, ActionCallable] = {
-            '+':                     partial(self.debug_action.sight_change, 1),
-            '-':                     partial(self.debug_action.sight_change, -1),
-            Key.CLOSE_WINDOW:        self.quit,
+            '+':               partial(self.debug_action.sight_change, 1),
+            '-':               partial(self.debug_action.sight_change, -1),
+            Keys.CLOSE_WINDOW: self.quit,
         }
 
-        unfinalized_actions: dict[BindSequence, ActionCallable] = {
+        unfinalized_actions: dict[KeyTuple, ActionCallable] = {
             Binds.Debug_Commands:     self.debug_action.ask_action,
             Binds.Quit:               self.quit,
             Binds.Save:               self.save,
@@ -139,8 +138,8 @@ class UserController(GameActionProperties, object):
                 coord = new_coord
             self.io.msg(self.actions.level.look_information(coord))
             if drawline_flag:
-                self.io.draw_line(self.coord, coord, ("*", ColorPair.Yellow))
-                self.io.draw_line(coord, self.coord, ("*", ColorPair.Yellow))
+                self.io.draw_line(self.coord, coord, ("*", ColorPairs.Yellow))
+                self.io.draw_line(coord, self.coord, ("*", ColorPairs.Yellow))
                 self.io.msg(f"LoS: {self.actions.level.check_los(self.coord, coord)}")
             if coord != self.coord:
                 symbol, (foreground, background) = self.actions.level.visible_char(coord)
@@ -155,12 +154,13 @@ class UserController(GameActionProperties, object):
             elif key == 'd':
                 drawline_flag = not drawline_flag
             elif key == 'b':
-                from pyrl.generic_algorithms import bresenham
-                for coord in bresenham(self.actions.level.get_coord(self.coord), coord):
+                from pyrl.algorithms import bresenham
+                for coord in bresenham(self.coord, coord):
                     self.io.msg(coord)
             elif key == 's':
                 if coord in self.actions.level.creatures:
-                    self.actions.game.register_status_texts(self.actions.level.creatures[coord])
+                    from pyrl.user_interface.status_texts import register_status_texts
+                    register_status_texts(self.io, self.actions.game, self.actions.level.creatures[coord])
             elif key in Binds.Cancel or key in Binds.Look_Mode:
                 break
         return Action.No_Action

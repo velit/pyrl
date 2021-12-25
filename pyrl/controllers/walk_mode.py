@@ -3,14 +3,13 @@ from __future__ import annotations
 from collections import namedtuple
 from typing import Literal
 
-from pyrl.binds import Binds
+from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.constants.coord import Coord
-from pyrl.constants.direction import Direction, Dir
+from pyrl.types.coord import Coord
+from pyrl.types.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
 from pyrl.game_actions import GameActionProperties, GameActions
-from pyrl.generic_algorithms import (get_vector, clockwise, anticlockwise, reverse_vector,
-                                     clockwise_45, anticlockwise_45)
+from pyrl.algorithms import get_vector, reverse_vector, clockwise_90, anticlockwise_90, clockwise_45, anticlockwise_45
 
 WalkType = namedtuple("WalkType", "left_passable, right_passable")
 WalkModeState = namedtuple("WalkModeState", "direction, walk_type, next_walk_time, show_msg_time")
@@ -23,7 +22,7 @@ OPEN          = WalkType(True,  True)
 
 INTERRUPT_MSG_TIME = 1
 
-class WalkMode(GameActionProperties, object):
+class WalkMode(GameActionProperties):
 
     def __init__(self, game_actions: GameActions):
         self.actions = game_actions
@@ -119,16 +118,14 @@ class WalkMode(GameActionProperties, object):
         return self.actions.can_move(direction)
 
     def _get_neighbor_passables(self, direction: Direction) -> tuple[bool, bool, bool, bool, bool, bool, bool]:
-        upper_left_dir = anticlockwise_45(direction)
-        upper_right_dir = clockwise_45(direction)
-
-        forward = self._passable(direction)
-        up_left = self._passable(upper_left_dir)
-        up_right = self._passable(upper_right_dir)
-        left = self._passable(anticlockwise(direction))
-        right = self._passable(clockwise(direction))
-        down_left = self._passable(anticlockwise(upper_left_dir))
-        down_right = self._passable(clockwise(upper_right_dir))
+        forward    = self._passable(direction)
+        up_right   = self._passable(Dir.clockwise(direction, 1))
+        right      = self._passable(Dir.clockwise(direction, 2))
+        down_right = self._passable(Dir.clockwise(direction, 3))
+        # down     = self._passable(Dir.clockwise(direction, 4))
+        down_left  = self._passable(Dir.clockwise(direction, 5))
+        left       = self._passable(Dir.clockwise(direction, 6))
+        up_left    = self._passable(Dir.clockwise(direction, 7))
         return forward, up_left, up_right, left, right, down_left, down_right
 
     def _get_initial_walk_type(self, direction: Direction) -> WalkType | None:
@@ -147,15 +144,15 @@ class WalkMode(GameActionProperties, object):
             walk_type = CORRIDOR
         return walk_type
 
-    def _get_side_passables(self, direction: Coord) -> WalkType:
+    def _get_side_passables(self, direction: Direction) -> WalkType:
         if direction in Dir.Orthogonals:
-            left = self._passable(anticlockwise(direction))
-            right = self._passable(clockwise(direction))
+            turns = 2
         elif direction in Dir.Diagonals:
-            left = self._passable(anticlockwise_45(direction))
-            right = self._passable(clockwise_45(direction))
+            turns = 1
         else:
             raise Exception(f"Not a valid {direction=}")
+        left = self._passable(Dir.counter_clockwise(direction, turns))
+        right = self._passable(Dir.clockwise(direction, turns))
         return WalkType(left, right)
 
     def _any_creatures_visible(self) -> int:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from pyrl.constants.colors import ColorPair
-from pyrl.constants.level_gen import LevelGen
-from pyrl.constants.level_location import LevelLocation
+from pyrl.creature.creature import Creature
+from pyrl.types.char import Letter
+from pyrl.types.color import ColorPairs
+from pyrl.types.level_gen import LevelGen
+from pyrl.types.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims
 from pyrl.world.level import Level
 from pyrl.world.tile import Tile
@@ -47,19 +49,19 @@ def get_level() -> Level:
     # Overworld movement multiplier
     mult = default_dims.min
     custom_tiles = {
-        '"': Tile("grassland",      ('"', ColorPair.Green), ('"', ColorPair.Green), True,  True,  move_multiplier=mult),
-        '¨': Tile("mountains",      ('^', ColorPair.White), ('^', ColorPair.White), False, True,  move_multiplier=mult),
-        '=': Tile("river",          ('=', ColorPair.Blue),  ('=', ColorPair.Blue),  False, False, move_multiplier=mult),
-        'T': Tile("forest",         ('T', ColorPair.Green), ('T', ColorPair.Green), True,  True,  move_multiplier=mult),
-        't': Tile("town",           ('*', ColorPair.Green), ('*', ColorPair.Green), True,  True,  move_multiplier=mult),
-        '*': Tile("dungeon",        ('*', ColorPair.Brown), ('*', ColorPair.Brown), True,  True,  move_multiplier=mult),
-        '^': Tile("high mountains", ('^', ColorPair.Brown), ('^', ColorPair.Brown), False, False, move_multiplier=mult),
+        '"': Tile("grassland",      ('"', ColorPairs.Green), ('"', ColorPairs.Green), True,  True,  move_multi=mult),
+        '¨': Tile("mountains",      ('^', ColorPairs.White), ('^', ColorPairs.White), False, True,  move_multi=mult),
+        '=': Tile("river",          ('=', ColorPairs.Blue),  ('=', ColorPairs.Blue),  False, False, move_multi=mult),
+        'T': Tile("forest",         ('T', ColorPairs.Green), ('T', ColorPairs.Green), True,  True,  move_multi=mult),
+        't': Tile("town",           ('*', ColorPairs.Green), ('*', ColorPairs.Green), True,  True,  move_multi=mult),
+        '*': Tile("dungeon",        ('*', ColorPairs.Brown), ('*', ColorPairs.Brown), True,  True,  move_multi=mult),
+        '^': Tile("high mountains", ('^', ColorPairs.Brown), ('^', ColorPairs.Brown), False, False, move_multi=mult),
     }
-    custom_locations = {
+    custom_locations: dict[Letter, LevelLocation] = {
         '*': OverWorldLocation.Dungeon,
         't': OverWorldLocation.Village,
     }
-    custom_creatures = {
+    custom_creatures: dict[Letter, Creature] = {
     }
     tiles, locations, creatures = construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures)
 

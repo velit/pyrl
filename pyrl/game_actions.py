@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING
+from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING, Protocol
 
-from pyrl.combat import get_melee_attack_cr, get_combat_message
-from pyrl.constants.coord import Coord
-from pyrl.constants.direction import Direction, Dir
-from pyrl.constants.level_location import LevelLocation
+from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message
 from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetException
 from pyrl.creature.item import Item
 from pyrl.creature.mixins.hoarder import Hoarder, has_inventory
 from pyrl.creature.mixins.visionary import Visionary
-from pyrl.generic_algorithms import add_vector, get_vector
+from pyrl.creature.player import Player
+from pyrl.algorithms import get_vector, add_vector
+from pyrl.types.coord import Coord
+from pyrl.types.direction import Direction, Dir
+from pyrl.types.level_location import LevelLocation
+from pyrl.window.window_system import WindowSystem
 from pyrl.world.level import Level
 from pyrl.world.tile import Tile
 from pyrl.world.world import World
@@ -22,18 +24,13 @@ if TYPE_CHECKING:
 class GameActions:
 
     """
-    GameActions is the interface between creature controllers (player, ai) and the game.
+    GameActions is the interface between creature controllers (user_controller.py, ai.py) and the game.
 
     All the non-free actions return a GameFeedback namedtuple with .type and .params fields. The
     ActionError Enum is used to find out if the feedback didn't succeed. Action Enum can be used to
     find out which succeeded action was made and .params exists for some actions giving additional
     info about the action.
     """
-    coord: Coord     = property(lambda self: self.creature.coord)
-    level: Level     = property(lambda self: self.creature.level)
-    io               = property(lambda self: self.game.io)
-    world: World     = property(lambda self: self.game.world)
-    player: Creature = property(lambda self: self.game.world.player)
 
     def __init__(self, game: Game, creature: Creature | None = None) -> None:
         self.game: Game = game
@@ -64,8 +61,7 @@ class GameActions:
             raise NoValidTargetException("Creature tried to enter a passage in a place without one.",
                                          "This location doesn't have a passage.")
 
-        source_point = (self.level.level_key, self.level.locations[self.coord])
-
+        source_point = self.level.get_world_point(self.coord)
         if not self.game.world.has_destination(source_point):
             raise NoValidTargetException("Creature tried to enter a passage that leads nowhere.",
                                          "This passage doesn't seem to lead anywhere.")
@@ -116,7 +112,7 @@ class GameActions:
                                          "There isn't a creature there to swap with.")
 
         self.level.swap_creature(self.creature, target_creature)
-        move_multiplier = self.level.move_multiplier(self.coord, direction)
+        move_multiplier = self.level.movement_multiplier(self.coord, direction)
         self._apply_action_cost(self.creature.action_cost(Action.Move, move_multiplier))
         return Action.Swap
 
@@ -266,6 +262,30 @@ class GameActions:
     def _apply_action_cost(self, cost: int) -> None:
         self.action_cost = cost
 
+    @property
+    def coord(self) -> Coord:
+        return self.creature.coord
+
+    @property
+    def level(self) -> Level:
+        return self.creature.level
+
+    @property
+    def io(self) -> WindowSystem:
+        return self.game.io
+
+    @property
+    def world(self) -> World:
+        return self.game.world
+
+    @property
+    def player(self) -> Player:
+        return self.game.world.player
+
+
+class HasGameActions(Protocol):
+    actions: GameActions
+
 class GameActionProperties:
 
     """
@@ -274,9 +294,26 @@ class GameActionProperties:
     Remember to set the self.actions variable correctly in classes that use this.
     """
 
-    creature: Creature       = property(lambda self: self.actions.creature)
-    coord: Coord             = property(lambda self: self.actions.creature.coord)
-    level: Level             = property(lambda self: self.actions.creature.level)
-    io                       = property(lambda self: self.actions.game.io)
-    world: World             = property(lambda self: self.actions.game.world)
-    player: Creature         = property(lambda self: self.actions.game.world.player)
+    @property
+    def creature(self: HasGameActions) -> Creature:
+        return self.actions.creature
+
+    @property
+    def coord(self: HasGameActions) -> Coord:
+        return self.actions.creature.coord
+
+    @property
+    def level(self: HasGameActions) -> Level:
+        return self.actions.creature.level
+
+    @property
+    def io(self: HasGameActions) -> WindowSystem:
+        return self.actions.game.io
+
+    @property
+    def world(self: HasGameActions) -> World:
+        return self.actions.game.world
+
+    @property
+    def player(self: HasGameActions) -> Player:
+        return self.actions.game.world.player

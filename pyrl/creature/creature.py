@@ -5,11 +5,11 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from pyrl.constants.char import Glyph
-from pyrl.constants.coord import Coord
-from pyrl.dice import Dice
+from pyrl.types.char import Glyph
+from pyrl.types.coord import Coord
+from pyrl.structures.dice import Dice
 from pyrl.creature.actions import Action
-from pyrl.generic_algorithms import resize_range
+from pyrl.algorithms import resize_range
 
 if TYPE_CHECKING:
     from pyrl.world.level import Level
@@ -46,7 +46,7 @@ class Creature:
     def is_dead(self) -> bool:
         return self.hp <= 0
 
-    def action_cost(self, action: Action, multiplier: int = 1) -> int:
+    def action_cost(self, action: Action, multiplier: float = 1.0) -> int:
         return round(action.base_cost * multiplier * self.speed_multiplier)
 
     def __repr__(self) -> str:

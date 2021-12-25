@@ -4,8 +4,8 @@ from collections.abc import Iterable
 
 from pyrl.creature.item import Item
 from pyrl.creature.stats import Stats
-from pyrl.dice import Dice
-from pyrl.constants.equipment_slot import Slot
+from pyrl.structures.dice import Dice
+from pyrl.types.equipment_slot import Slot
 
 class Inventory:
 

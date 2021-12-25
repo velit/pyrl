@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from pyrl.constants.char import Letter
-from pyrl.constants.coord import Coord
-from pyrl.constants.direction import Dir
-from pyrl.constants.level_location import LevelLocation
+from pyrl.types.char import Letter
+from pyrl.types.coord import Coord
+from pyrl.types.direction import Dir
+from pyrl.types.level_location import LevelLocation
 from pyrl.creature.creature import Creature
-from pyrl.game_data.tiles import PyrlTile
-from pyrl.generic_algorithms import add_vector
-from pyrl.generic_structures.table import Table
-from pyrl.generic_structures.dimensions import Dimensions
+from pyrl.game_data.pyrl_tiles import PyrlTiles
+from pyrl.algorithms import add_vector
+from pyrl.structures.table import Table
+from pyrl.structures.dimensions import Dimensions
 from pyrl.world.tile import Tile
 
 default_dims = Dimensions(26, 96)
@@ -19,14 +19,14 @@ class DefaultLocation(LevelLocation):
     Random_Location = 3
 
 base_tiles: dict[Letter, Tile] = {
-    '.': PyrlTile.Floor,
-    'w': PyrlTile.Wall,
-    '#': PyrlTile.Dynamic_Wall,
-    'r': PyrlTile.Rock,
-    '/': PyrlTile.Open_Door,
-    '+': PyrlTile.Closed_Door,
-    '>': PyrlTile.Stairs_Down,
-    '<': PyrlTile.Stairs_Up,
+    '.': PyrlTiles.Floor,
+    'w': PyrlTiles.Wall,
+    '#': PyrlTiles.Dynamic_Wall,
+    'r': PyrlTiles.Rock,
+    '/': PyrlTiles.Open_Door,
+    '+': PyrlTiles.Closed_Door,
+    '>': PyrlTiles.Stairs_Down,
+    '<': PyrlTiles.Stairs_Up,
 }
 
 base_creatures: dict[Letter, Creature] = {
@@ -84,13 +84,13 @@ def _finalize_tiles(tiles: Table) -> None:
         tiles[coord] = _finalize_tile(coord, tile, tiles)
 
 def _finalize_tile(coord: Coord, tile: Tile, tiles: Table) -> Tile:
-    if tile != PyrlTile.Dynamic_Wall:
+    if tile != PyrlTiles.Dynamic_Wall:
         return tile
 
     neighbor_coords = (add_vector(coord, direction) for direction in Dir.All)
     neighbor_tiles = (tiles[coord] for coord in neighbor_coords if tiles.is_legal(coord))
-    rocks = (PyrlTile.Dynamic_Wall, PyrlTile.Wall, PyrlTile.Rock)
+    rocks = (PyrlTiles.Dynamic_Wall, PyrlTiles.Wall, PyrlTiles.Rock)
     if any(handle not in rocks for handle in neighbor_tiles):
-        return PyrlTile.Wall
+        return PyrlTiles.Wall
     else:
-        return PyrlTile.Rock
+        return PyrlTiles.Rock

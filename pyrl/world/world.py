@@ -1,31 +1,20 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import NamedTuple
 
-from pyrl.constants.level_location import LevelLocation
-from pyrl.creature.creature import Creature
+from pyrl.types.level_key import LevelKey
 from pyrl.game_data.levels.shared_assets import DefaultLocation
+from pyrl.creature.player import Player
+from pyrl.types.world_point import WorldPoint
 from pyrl.world.level import Level
-
-class LevelNotFound(Exception):
-    pass
-
-class LevelKey(NamedTuple):
-    dungeon: str
-    idx: int
-
-class WorldPoint(NamedTuple):
-    level_key: LevelKey
-    level_location: LevelLocation
 
 class World:
 
-    def __init__(self, player: Creature) -> None:
+    def __init__(self, player: Player) -> None:
         self.levels: dict[LevelKey, Level] = {}
         self.level_connections: dict[WorldPoint, WorldPoint] = {}
         self.dungeon_lengths: Counter[str] = Counter()
-        self.player = player
+        self.player: Player = player
         self.start_level_key = None
 
     def add_level(self, dungeon_key: str, level: Level | None = None) -> None:
@@ -50,7 +39,7 @@ class World:
 
     def get_level(self, level_key: LevelKey) -> Level:
         if level_key not in self.levels:
-            raise LevelNotFound(f"Nonexistant level key: {level_key}")
+            raise KeyError(f"Nonexistant level key: {level_key}")
 
         level = self.levels[level_key]
         if not level.is_finalized:

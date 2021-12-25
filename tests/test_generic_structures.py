@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pytest
 
-from pyrl.generic_structures.dimensions import Dimensions
-from pyrl.generic_structures.event import Event
-from pyrl.generic_structures.one_to_one_mapping import OneToOneMapping
-from pyrl.generic_structures.table import Table
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.event import Event
+from pyrl.structures.one_to_one_mapping import OneToOneMapping
+from pyrl.structures.table import Table
 
-def test_table():
+def test_table() -> None:
     dims = Dimensions(2, 2)
     table = Table(dims, (0, 1, 2))
     assert table.dimensions == dims
@@ -23,8 +25,8 @@ def test_table():
     assert not table.is_legal((-1, -1))
     assert not table.is_legal((3, 2))
 
-def test_one_to_one_mapping():
-    mapping = OneToOneMapping()
+def test_one_to_one_mapping() -> None:
+    mapping: OneToOneMapping[int, int] = OneToOneMapping()
     mapping[0] = 0
     mapping[1] = 1
     mapping[2] = 2
@@ -54,16 +56,16 @@ def test_one_to_one_mapping():
     with pytest.raises(ValueError):
         mapping.update({"a": 10, "b": 10})
 
-def test_observable_event():
+def test_observable_event() -> None:
     event = Event()
     sub1 = None
     sub2 = None
 
-    def sub_fun_1(x):
+    def sub_fun_1(x: Callable) -> None:
         nonlocal sub1
         sub1 = x
 
-    def sub_fun_2(x):
+    def sub_fun_2(x: Callable) -> None:
         nonlocal sub2
         sub2 = x
 

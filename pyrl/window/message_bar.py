@@ -3,10 +3,12 @@ from __future__ import annotations
 import logging
 import re
 import textwrap
+from collections.abc import Callable, Iterable
 from functools import wraps
+from typing import Any
 
-from pyrl.binds import Binds
-from pyrl.constants.colors import ColorPair
+from pyrl.config.binds import Binds
+from pyrl.types.color import ColorPairs
 from pyrl.window.base_window import BaseWindow
 from pyrl.io_wrappers import mock
 
@@ -18,14 +20,14 @@ class MessageBar(BaseWindow):
     """Handles the messaging bar system."""
 
     @wraps(BaseWindow.__init__, assigned=())
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         BaseWindow.__init__(self, *args, **kwargs)
 
-        self.history = []
-        self.msgqueue = []
+        self.history: list[str] = []
+        self.msgqueue: list[str] = []
         self.wrap = textwrap.TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
 
-    def update(self):
+    def update(self) -> None:
         self.clear()
         if self.msgqueue:
             self.print_event(self.msgqueue)
@@ -33,10 +35,11 @@ class MessageBar(BaseWindow):
             self.msgqueue = []
         self.blit()
 
-    def debug_msg(self, obj):
+    def debug_msg(self, obj: Any) -> None:
         logging.debug(f"io.msg: {obj}")
 
-    def queue_msg(self, *args):
+    def queue_msg(self, *args: Any) -> None:
+        output: Callable[[str], Any]
         if self.cursor_win.implementation == mock.IMPLEMENTATION:
             output = self.debug_msg
         else:
@@ -44,7 +47,7 @@ class MessageBar(BaseWindow):
         for obj in args:
             output(str(obj))
 
-    def add_lines_to_history(self, lines):
+    def add_lines_to_history(self, lines: Iterable[str]) -> None:
         for msg in lines:
             lastitem = self.history[-1] if self.history else ""
 
@@ -61,13 +64,13 @@ class MessageBar(BaseWindow):
 
             self.history.append(msg)
 
-    def print_event(self, event):
+    def print_event(self, event: Iterable[str]) -> None:
         skip = False
         lines = self.wrap(" ".join(event))
         for i, line in enumerate(lines):
             self.draw_str(line, (i % self.rows, 0))
             if i % self.rows == self.rows - 1 and i != len(lines) - 1:
-                self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), ColorPair.Green)
+                self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), ColorPairs.Green)
                 key = self.get_key(keys=Binds.Skip_To_Last_Message + Binds.Cancel, refresh=True)
                 if key in Binds.Skip_To_Last_Message:
                     skip = True

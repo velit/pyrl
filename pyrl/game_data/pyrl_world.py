@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from pyrl.game_data.levels import test_level, overworld
 from pyrl.game_data.levels.shared_assets import DefaultLocation
-from pyrl.game_data.player import Player
-from pyrl.world.world import World, LevelKey, WorldPoint
+from pyrl.game_data.pyrl_player import pyrl_player
+from pyrl.world.world import World
+from pyrl.types.world_point import WorldPoint
+from pyrl.types.level_key import LevelKey
 
-def get_world():
+def pyrl_world() -> World:
 
-    world = World(Player())
+    world = World(pyrl_player())
     start = LevelKey("dungeon", 1)
     world.add_level(start.dungeon, test_level.get_level(world.player))
 

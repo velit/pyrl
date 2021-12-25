@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pyrl.turn_scheduler import TurnScheduler
+from pyrl.structures.scheduler import Scheduler
 
-def test_turn_scheduler():
-    ts = TurnScheduler()
+def test_turn_scheduler() -> None:
+    ts: Scheduler[str] = Scheduler()
     ts.add("D", 2)
     ts.add("C", 1)
     ts.add("B", 1)

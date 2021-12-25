@@ -1,27 +1,29 @@
 from __future__ import annotations
 
-from pyrl.constants.colors import ColorPair
-from pyrl.generic_algorithms import bresenham
+from pyrl.types.char import Glyph
+from pyrl.types.color import ColorPairs
+from pyrl.algorithms import bresenham
+from pyrl.types.coord import Coord
 from pyrl.window.base_window import BaseWindow
 
 class LevelWindow(BaseWindow):
 
     """Handles the level display."""
 
-    def update(self):
+    def update(self) -> None:
         self.blit()
 
-    def draw_char(self, char, coord, reverse=False):
+    def draw_char(self, char: Glyph, coord: Coord, reverse: bool = False) -> None:
         if reverse:
             symbol, (fg, bg) = char
             char = symbol, (bg, fg)
         super().draw_char(char, coord)
 
-    def draw_line(self, coord_a, coord_b, char=('*', ColorPair.Yellow), include_first=False):
-        if include_first:
-            for coord in bresenham(coord_a, coord_b):
-                self.draw_char(coord, char)
+    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', ColorPairs.Yellow), draw_first: bool = False) -> None:
+        if draw_first:
+            for coord in bresenham(a, b):
+                self.draw_char(char, coord)
         else:
-            for coord in bresenham(coord_a, coord_b):
-                if coord != coord_a:
-                    self.draw_char(coord, char)
+            for coord in bresenham(a, b):
+                if coord != a:
+                    self.draw_char(char, coord)

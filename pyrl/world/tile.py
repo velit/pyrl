@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pyrl.constants.char import Glyph
+from pyrl.types.char import Glyph
 
 @dataclass(eq=False, frozen=True, slots=True)
 class Tile:
@@ -12,7 +12,7 @@ class Tile:
     memory_char: Glyph
     is_passable: bool = True
     is_see_through: bool = True
-    move_multiplier: int = 1
+    move_multi: int = 1
 
     @property
     def defense(self) -> int:

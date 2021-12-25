@@ -5,10 +5,10 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 
 from pyrl.creature.stats import Stats, Stat
-from pyrl.dice import Dice
-from pyrl.constants.colors import ColorPair
-from pyrl.constants.char import Glyph
-from pyrl.constants.equipment_slot import Slot
+from pyrl.structures.dice import Dice
+from pyrl.types.color import ColorPairs
+from pyrl.types.char import Glyph
+from pyrl.types.equipment_slot import Slot
 
 @dataclass(eq=False, slots=True)
 class Item:
@@ -65,7 +65,7 @@ def Weapon(name: str,
            two_handed: bool = False,
            compatible_slots: Iterable[Slot] = (Slot.Right_Hand, Slot.Left_Hand),
            stats: Stats = None,
-           char: Glyph = ('(', ColorPair.Normal)) -> Item:
+           char: Glyph = ('(', ColorPairs.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.accuracy = accuracy
@@ -78,7 +78,7 @@ def Armor(name: str,
           armor: int,
           compatible_slots: Iterable[Slot] = (),
           stats: Stats = None,
-          char: Glyph = (']', ColorPair.Normal)) -> Item:
+          char: Glyph = (']', ColorPairs.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.defense = defense

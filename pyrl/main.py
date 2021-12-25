@@ -6,14 +6,17 @@ import logging
 import os
 import sys
 from cProfile import Profile
+from collections.abc import Sequence
 
 from pyrl import state_store
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
+from pyrl.game import Game
+from pyrl.io_wrappers.io_wrapper import IoWrapper
 from tools import profile_util
 
 
-def run():
+def run() -> None:
     options = get_commandline_options()
     try:
         create_game(options).game_loop()
@@ -22,7 +25,7 @@ def run():
             from pyrl.io_wrappers.curses import clean_curses
             clean_curses()
 
-def get_commandline_options(args=None):
+def get_commandline_options(args: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
 
     parser.add_argument("-o", "--output",
@@ -50,7 +53,7 @@ def get_commandline_options(args=None):
 
     return parser.parse_args(args)
 
-def create_game(options, cursor_lib=None):
+def create_game(options: argparse.Namespace, cursor_lib: IoWrapper | None = None) -> Game:
     init_files_and_folders()
     init_logger_system()
 
@@ -60,14 +63,13 @@ def create_game(options, cursor_lib=None):
     if options.load:
         game = load_game(options.load, cursor_lib)
     else:
-        from pyrl.game import Game
         game = Game(options.game, cursor_lib)
 
     if options.profile:
         profiler = Profile()
         profiler.enable()
 
-        def write_profile():
+        def write_profile() -> None:
             profiler.disable()
             profile_util.write_results_log(profiler)
 
@@ -75,24 +77,24 @@ def create_game(options, cursor_lib=None):
 
     return game
 
-def init_logger_system():
+def init_logger_system() -> None:
     logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
     logging.debug("Starting new session")
 
-def init_cursor_lib(output: str) -> CursesWrapper | TCODWrapper | MockWrapper:
+def init_cursor_lib(output: str) -> IoWrapper:
     if output == "terminal":
-        from pyrl.io_wrappers.curses import CursesWrapper
+        from pyrl.io_wrappers.curses.curses_wrapper import CursesWrapper
         return CursesWrapper()
     elif output == "sdl":
-        from pyrl.io_wrappers.libtcod import TCODWrapper
+        from pyrl.io_wrappers.tcod.tcod_wrapper import TCODWrapper
         return TCODWrapper()
     elif output == "test":
-        from pyrl.io_wrappers.mock import MockWrapper
+        from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper
         return MockWrapper()
     else:
         assert False, f"Unknown output parameter '{output}'"
 
-def load_game(game_name, cursor_lib):
+def load_game(game_name: str, cursor_lib: IoWrapper) -> Game:
     try:
         game = state_store.load(game_name)
     except FileNotFoundError:
@@ -102,6 +104,6 @@ def load_game(game_name, cursor_lib):
     game.redraw()
     return game
 
-def init_files_and_folders():
+def init_files_and_folders() -> None:
     if not os.path.exists(Config.save_folder):
         os.makedirs(Config.save_folder)
