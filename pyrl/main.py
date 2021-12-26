@@ -86,8 +86,8 @@ def init_cursor_lib(output: str) -> IoWrapper:
         from pyrl.io_wrappers.curses.curses_wrapper import CursesWrapper
         return CursesWrapper()
     elif output == "sdl":
-        from pyrl.io_wrappers.tcod.tcod_wrapper import TCODWrapper
-        return TCODWrapper()
+        from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper
+        return TcodWrapper()
     elif output == "test":
         from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper
         return MockWrapper()

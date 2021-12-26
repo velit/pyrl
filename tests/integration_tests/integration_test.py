@@ -7,46 +7,49 @@ import pytest
 from pyrl import main
 from pyrl.config.binds import Binds
 from pyrl.game import Game
-from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper, MockInputEnd
-from pyrl.types.keys import KeyTuple
+from pyrl.io_wrappers.io_wrapper import IoWrapper
+from tests.integration_tests import dummy_plug_system
+from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem
 
-TEST_GameConf_NAME = "test"
+# from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
+from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
+
+# CONTINUE_AFTER_INTEGRATION_TEST = True
+CONTINUE_AFTER_INTEGRATION_TEST = False
 
 @pytest.fixture
-def mock_wrapper() -> MockWrapper:
-    return MockWrapper()
+def dummy() -> Iterable[DummyPlugSystem]:
+    # dummy = dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.2)
+    dummy = dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)
+    yield dummy
+    dummy.reset_modes()
 
 @pytest.fixture
-def game(mock_wrapper: MockWrapper) -> Game:
-    return main.create_game(main.get_commandline_options(args=("-g", TEST_GameConf_NAME)), mock_wrapper)
+def io_wrapper() -> IoWrapper:
+    return TestWrapper()
 
-def load_game(mock_wrapper: MockWrapper) -> Game:
-    return main.create_game(main.get_commandline_options(args=("-l", TEST_GameConf_NAME)), mock_wrapper)
+@pytest.fixture
+def game(io_wrapper: IoWrapper) -> Game:
+    return main.create_game(main.get_commandline_options(args=("-g", "test")), io_wrapper)
 
-def prepare_input_and_run(game: Game, bind_iterable: Iterable[KeyTuple | str]) -> Game:
-    key_iterable = tuple(action if isinstance(action, str) else action.key for action in bind_iterable)
-    game.io.cursor_lib.prepare_input(key_iterable)
-    try:
-        game.game_loop()
-        assert False, "MockWrapper should raise MockInputEnd"
-    except MockInputEnd:
-        return game
+def load_game(io_wrapper: IoWrapper) -> Game:
+    return main.create_game(main.get_commandline_options(args=("-l", "test")), io_wrapper)
 
 @pytest.mark.skip(reason="Disabled until save system is fixed")
-def test_save_and_load_game(game: Game, mock_wrapper: MockWrapper) -> None:
+def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy: DummyPlugSystem) -> None:
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
-    game = prepare_input_and_run(game, input_seq)
+    game = dummy.add_input_and_run(input_seq, game)
     assert game.turn_counter == 4
     assert game.player.level.level_key.idx == 3
 
-    game = load_game(mock_wrapper)
+    game = load_game(io_wrapper)
     input_seq = [Binds.Descend] * 4
-    game = prepare_input_and_run(game, input_seq)
+    game = dummy.add_input_and_run(input_seq, game)
     assert game.turn_counter == 8
     assert game.player.level.level_key.idx == 5
 
-def test_subsystems(game) -> None:
+def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
 
     help_system = (Binds.Help, Binds.Cancel)
 
@@ -101,39 +104,50 @@ def test_subsystems(game) -> None:
 
     coord = game.player.coord
 
-    game = prepare_input_and_run(game, help_system)
+    game = dummy.add_input_and_run(help_system, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    game = prepare_input_and_run(game, help_system)
+    game = dummy.add_input_and_run(help_system, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    game = prepare_input_and_run(game, movement_and_look_system)
+    game = dummy.add_input_and_run(movement_and_look_system, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    game = prepare_input_and_run(game, message_system)
+    game = dummy.add_input_and_run(message_system, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    game = prepare_input_and_run(game, whole_map)
+    game = dummy.add_input_and_run(whole_map, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
-    game = prepare_input_and_run(game, path_to_staircase)
+    game = dummy.add_input_and_run(path_to_staircase, game)
     assert game.turn_counter == 0
     assert coord == game.player.coord
 
     previous_bag_count = len(game.player.inventory._bag)
-    game = prepare_input_and_run(game, inventory)
+    game = dummy.add_input_and_run(inventory, game)
     assert game.turn_counter == 3
     assert coord == game.player.coord
     assert len(game.player.inventory._bag) == previous_bag_count + 2
 
-    game = prepare_input_and_run(game, walk_mode)
+    game = dummy.add_input_and_run(walk_mode, game)
     assert game.turn_counter == 7
 
-    game = prepare_input_and_run(game, descend)
+    game = dummy.add_input_and_run(descend, game)
     assert game.turn_counter == 9
     assert game.player.level.level_key.idx == 2
+
+    # equip armor and run to end
+    game = dummy.add_input_and_run(['e', 'b', 'a', 'z', 'd', 'x'], game)
+
+    if CONTINUE_AFTER_INTEGRATION_TEST:
+        dummy.reset_modes()
+        with pytest.raises(SystemExit) as e:
+            game.game_loop()
+    elif dummy.speed_mode != DummySpeed.Instant:
+        dummy.mode = DummyMode.Hybrid
+        game.io.get_key()

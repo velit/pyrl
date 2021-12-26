@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import curses
 
-from pyrl.structures.dimensions import Dimensions
 from pyrl.io_wrappers.curses import IMPLEMENTATION
 from pyrl.io_wrappers.curses.curses_window import CursesWindow
-from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.io_wrappers.io_window import IoWindow
+from pyrl.io_wrappers.io_wrapper import IoWrapper
+from pyrl.structures.dimensions import Dimensions
 
 class CursesWrapper(IoWrapper):
 

@@ -6,7 +6,7 @@ from pyrl.types.direction import Dir
 from pyrl.types.level_location import LevelLocation
 from pyrl.creature.creature import Creature
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.algorithms import add_vector
+from pyrl.algorithms.coord_algorithms import add_vector
 from pyrl.structures.table import Table
 from pyrl.structures.dimensions import Dimensions
 from pyrl.world.tile import Tile

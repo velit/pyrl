@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from pyrl.algorithms import bresenham
+from pyrl.algorithms.coord_algorithms import bresenham
 from pyrl.types.coord import Coord
 
-VisibilityCall = Callable[[Coord], bool]
+IsVisible = Callable[[Coord], bool]
 
 class ShadowCast:
 
@@ -18,25 +18,26 @@ class ShadowCast:
     )
 
     @classmethod
-    def get_light_set(cls, visibility: VisibilityCall, coord: Coord, sight: int,
+    def get_light_set(cls, visible: IsVisible, coord: Coord, sight: int,
                       max_rows: int, max_cols: int) -> set[Coord]:
         y, x = coord
         light_set = set()
         light_set.add(coord)
         for octant in range(8):
-            cls._shadow_cast(light_set, visibility, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
+            cls._shadow_cast(light_set, visible, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
                              cls._mult[0][octant], cls._mult[1][octant], cls._mult[2][octant], cls._mult[3][octant])
         return light_set
 
     # Based on an algorithm by Bjorn Bergstrom bjorn.bergstrom@roguelikedevelopment.org
     # http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
     @classmethod
-    def _shadow_cast(cls, light_set, visibility_func, cy, cx, row, start, end, r, max_rows, max_cols, xx, xy, yx, yy):
+    def _shadow_cast(cls, light_set: set[Coord], visible: IsVisible, cy: int, cx: int, row: int, start: float,
+                     end: float, radius: int, max_rows: int, max_cols: int, xx: int, xy: int, yx: int, yy: int) -> None:
         """Recursive lightcasting function."""
         if start < end:
             return
-        radius_squared = r * r
-        for j in range(row, r + 1):
+        radius_squared = radius * radius
+        for j in range(row, radius + 1):
             dx = -j - 1
             dy = -j
             blocked = False
@@ -62,16 +63,16 @@ class ShadowCast:
 
                         if blocked:
                             # we're scanning a row of blocked squares:
-                            if not visibility_func((map_y, map_x)):
+                            if not visible((map_y, map_x)):
                                 new_start = r_slope
                             else:
                                 blocked = False
                                 start = new_start
                         else:
-                            if not visibility_func((map_y, map_x)) and j < r:
+                            if not visible((map_y, map_x)) and j < radius:
                                 # This is a blocking square, start a child scan:
                                 blocked = True
-                                cls._shadow_cast(light_set, visibility_func, cy, cx, j + 1, start, l_slope, r,
+                                cls._shadow_cast(light_set, visible, cy, cx, j + 1, start, l_slope, radius,
                                                  max_rows, max_cols, xx, xy, yx, yy)
                                 new_start = r_slope
 
@@ -89,7 +90,7 @@ class Bresenham:
     )
 
     @classmethod
-    def get_light_set(cls, visibility: VisibilityCall, start_coord: Coord, sight: int) -> set[Coord]:
+    def get_light_set(cls, visibility: IsVisible, start_coord: Coord, sight: int) -> set[Coord]:
         light_set: set[Coord] = set()
         sight_squared = sight * sight
         start_y, start_x = start_coord

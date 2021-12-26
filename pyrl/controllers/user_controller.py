@@ -4,7 +4,7 @@ from collections.abc import Callable
 from functools import partial
 from typing import Literal
 
-from pyrl.algorithms import add_vector
+from pyrl.algorithms.coord_algorithms import add_vector
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.creature.actions import Action, ActionException
@@ -155,7 +155,7 @@ class UserController(GameActionsMixin):
             elif key == 'd':
                 drawline_flag = not drawline_flag
             elif key == 'b':
-                from pyrl.algorithms import bresenham
+                from pyrl.algorithms.coord_algorithms import bresenham
                 for coord in bresenham(self.coord, coord):
                     self.io.msg(coord)
             elif key == 's':

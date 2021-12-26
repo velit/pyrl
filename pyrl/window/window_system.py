@@ -36,25 +36,16 @@ class WindowSystem:
         self.status_bar   = StatusBar(cursor_lib, self.status_dimensions,
                                       Position(self.level_window.screen_position.y + self.level_window.rows, 0))
 
-        self.prepared_input: deque[Key] = deque()
-
     def get_key(self, message: str | None = None, keys: KeyTuple | None = None) -> Key:
         if message:
             self.msg(message)
-
         self.refresh()
-
-        if self.prepared_input:
-            return self.prepared_input.popleft()
-
         return self.whole_window.get_key(keys=keys)
 
     def check_key(self, message: str | None = None, keys: KeyTuple | None = None, until: float | None = None) -> Key:
         if message:
             self.msg(message)
-
         self.refresh()
-
         return self.whole_window.check_key(keys=keys, until=until)
 
     def msg(self, *messages: Any) -> None:

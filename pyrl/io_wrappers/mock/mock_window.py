@@ -1,36 +1,28 @@
 from __future__ import annotations
 
-import logging
-from typing import Iterable, TYPE_CHECKING
+from typing import Iterable
 
 from pyrl.game_data.levels.shared_assets import default_dims
+from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.mock import IMPLEMENTATION
 from pyrl.types.char import Glyph
 from pyrl.types.color import ColorPair
 from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys
-
-if TYPE_CHECKING:
-    from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper
+from pyrl.types.keys import Keys, Key
 
 class MockWindow(IoWindow):
 
     implementation = IMPLEMENTATION
 
-    def __init__(self, mockwrapper: MockWrapper):
-        self.wrapper = mockwrapper
+    def __init__(self) -> None:
+        pass
 
-    def get_key(self) -> str:
-        try:
-            key = self.wrapper._prepared_input.popleft()
-            logging.debug(f"Returning key {key}")
-            return key
-        except IndexError:
-            from pyrl.io_wrappers.mock.mock_wrapper import MockInputEnd
-            raise MockInputEnd()
+    @handle_dummy_input
+    def get_key(self) -> Key:
+        return Keys.NO_INPUT
 
-    def check_key(self) -> str:
+    def check_key(self) -> Key:
         return Keys.NO_INPUT
 
     def clear(self) -> None:

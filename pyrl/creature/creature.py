@@ -9,7 +9,7 @@ from pyrl.types.char import Glyph
 from pyrl.types.coord import Coord
 from pyrl.structures.dice import Dice
 from pyrl.creature.actions import Action
-from pyrl.algorithms import resize_range
+from pyrl.algorithms.coord_algorithms import resize_range
 
 if TYPE_CHECKING:
     from pyrl.world.level import Level

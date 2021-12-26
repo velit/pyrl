@@ -4,26 +4,27 @@ import random
 from collections.abc import Iterable, Container
 from typing import TYPE_CHECKING
 
-from pyrl.algorithms import path, bresenham, cross_product, add_vector
+from pyrl.algorithms.coord_algorithms import bresenham, cross_product, add_vector
+from pyrl.algorithms.dungeon_generator import generate_tiles_to
+from pyrl.algorithms.pathing import path, distance
 from pyrl.config.debug import Debug
 from pyrl.creature.actions import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
-from pyrl.algorithms.dungeon_generator import generate_tiles_to
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.one_to_one_mapping import OneToOneMapping
-from pyrl.structures.table import Table
 from pyrl.structures.scheduler import Scheduler
+from pyrl.structures.table import Table
 from pyrl.types.char import Glyph
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.level_gen import LevelGen
+from pyrl.types.level_key import LevelKey
 from pyrl.types.level_location import LevelLocation
 from pyrl.types.world_point import WorldPoint
-from pyrl.types.level_key import LevelKey
 
 if TYPE_CHECKING:
     from pyrl.world.tile import Tile
@@ -201,7 +202,7 @@ class Level(DimensionsMixin):
                     any(not self.is_see_through(coord) for coord in bresenham(coord_b, coord_a)))
 
     def distance(self, coord_a: Coord, coord_b: Coord) -> int:
-        return round(path.distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))
+        return round(distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))
 
     def movement_multiplier(self, coord: Coord, direction: Direction) -> float:
         origin_tile_multiplier = self.tiles[coord].move_multi
@@ -228,7 +229,7 @@ class Level(DimensionsMixin):
         return cost
 
     def path(self, start_coord: Coord, goal_coord: Coord) -> Iterable[Coord]:
-        return path.path(start_coord, goal_coord, self.get_neighbor_location_coords_and_costs, self._a_star_heuristic)
+        return path(start_coord, goal_coord, self.get_neighbor_location_coords_and_costs, self._a_star_heuristic)
 
     def look_information(self, coord: Coord) -> str:
         # if coord in creature.visited_location_coords:

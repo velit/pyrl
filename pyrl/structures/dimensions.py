@@ -7,7 +7,7 @@ class Dimensions:
     rows: int
     cols: int
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         assert self.rows and self.cols, f"Zero dimensions aren't legal {self}"
 
     @property

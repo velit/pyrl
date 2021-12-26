@@ -8,7 +8,7 @@ from pyrl.types.direction import Dir
 from pyrl.creature.actions import Action
 from pyrl.game_actions import GameActions
 from pyrl.structures.helper_mixins import GameActionsMixin
-from pyrl.algorithms import resize_vector_to_len, get_vector, add_vector
+from pyrl.algorithms.coord_algorithms import resize_vector_to_len, get_vector, add_vector
 
 if TYPE_CHECKING:
     from pyrl.creature.creature import Creature

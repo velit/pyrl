@@ -5,7 +5,7 @@ import sys
 from typing import NoReturn, Any
 
 from pyrl import state_store
-from pyrl.algorithms.fov import ShadowCast
+from pyrl.algorithms.field_of_vision import ShadowCast
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
@@ -48,11 +48,12 @@ class Game:
         return self.world.player.level
 
     def game_loop(self) -> NoReturn:
-        ai_game_actions = GameActions(self)
         self.io.msg(f"{Binds.Help.key} for help menu.")
         undefined_keys = Binds.undefined_keys()
         if undefined_keys:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
+
+        ai_game_actions = GameActions(self)
         while True:
             creature, time_delta = self.active_level.turn_scheduler.advance_time()
             self.time += time_delta

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pyrl.types.char import Glyph
 from pyrl.types.color import ColorPairs
-from pyrl.algorithms import bresenham
+from pyrl.algorithms.coord_algorithms import bresenham
 from pyrl.types.coord import Coord
 from pyrl.window.base_window import BaseWindow
 

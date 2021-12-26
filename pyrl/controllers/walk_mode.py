@@ -10,7 +10,8 @@ from pyrl.types.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
 from pyrl.game_actions import GameActions
 from pyrl.structures.helper_mixins import GameActionsMixin
-from pyrl.algorithms import get_vector, reverse_vector, clockwise_90, anticlockwise_90, clockwise_45, anticlockwise_45
+from pyrl.algorithms.coord_algorithms import get_vector, reverse_vector, clockwise_90, anticlockwise_90, clockwise_45, \
+    anticlockwise_45
 
 WalkType = namedtuple("WalkType", "left_passable, right_passable")
 WalkModeState = namedtuple("WalkModeState", "direction, walk_type, next_walk_time, show_msg_time")

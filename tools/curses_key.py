@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import curses
-from curses import wrapper
 from curses import ascii
+from curses import wrapper
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from _curses import _CursesWindow
 
 _MSG = "Press key to test, Q to quit."
 
-def main(w):
+def main(w: _CursesWindow) -> None:
     curses.raw()
     curses.meta(True)
     w.keypad(True)
@@ -19,7 +25,7 @@ def main(w):
 
     curses.endwin()
 
-def print_key(w, key, alt):
+def print_key(w: _CursesWindow, key: str | int, alt: bool) -> None:
     if isinstance(key, str):
         nr = ord(key)
         w.addstr(0, 0, _MSG)
@@ -33,7 +39,7 @@ def print_key(w, key, alt):
         w.addstr(0, 0, _MSG)
         w.addstr(1, 0, str((key, alt * "!" + curses.keyname(key).decode(), alt)))
 
-def get_key(w):
+def get_key(w: _CursesWindow) -> tuple[str | int, bool]:
     alt = False
     key = w.get_wch()
     if key == chr(ascii.ESC):

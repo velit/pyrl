@@ -3,19 +3,22 @@ from __future__ import annotations
 import curses
 import curses.ascii
 import logging
-from _curses import _CursesWindow
-from typing import Iterable
+from typing import Iterable, TYPE_CHECKING
 
 from pyrl.config.debug import Debug
-from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPair
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys
+from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.curses import IMPLEMENTATION, WideChar
 from pyrl.io_wrappers.curses.curses_dicts import Curses256ColorDict, CursesColorDict
 from pyrl.io_wrappers.curses.curses_keys import curses_key_map
 from pyrl.io_wrappers.io_window import IoWindow
+from pyrl.types.char import Glyph
+from pyrl.types.color import ColorPair
+from pyrl.types.coord import Coord
+from pyrl.types.keys import Keys, Key
 from pyrl.window.window_system import WindowSystem
+
+if TYPE_CHECKING:
+    from _curses import _CursesWindow
 
 class CursesWindow(IoWindow):
 
@@ -24,6 +27,7 @@ class CursesWindow(IoWindow):
     key_map: dict[WideChar, str] = curses_key_map
 
     def __init__(self, curses_window: _CursesWindow, root_window: CursesWindow | None = None) -> None:
+        self.win = curses_window
         if root_window is None:
             self.root_win = self
         else:
@@ -33,13 +37,12 @@ class CursesWindow(IoWindow):
                 CursesWindow.color_map = Curses256ColorDict()
             else:
                 CursesWindow.color_map = CursesColorDict()
-
-        self.win = curses_window
         self.win.keypad(True)
         self.win.immedok(False)
         self.win.scrollok(False)
 
-    def get_key(self) -> str:
+    @handle_dummy_input
+    def get_key(self) -> Key:
         while True:
             try:
                 ch = self.win.get_wch()
@@ -51,7 +54,7 @@ class CursesWindow(IoWindow):
                     raise
         return self._interpret_ch(*self._handle_alt(ch))
 
-    def check_key(self) -> str:
+    def check_key(self) -> Key:
         """Non-blocking version of get_key."""
         self.win.nodelay(True)
         try:

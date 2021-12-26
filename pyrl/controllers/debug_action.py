@@ -142,7 +142,9 @@ class DebugAction(GameActionsMixin):
         return self.actions.teleport(new_coord)
 
     def descend_to_end(self) -> None:
-        self.io.prepared_input.extend([Binds.Descend.key] * 200)
+        from tests.integration_tests import dummy_plug_system
+        dummy_plug_system.get().add_input([Binds.Descend.key] * 200)
 
     def ascend_to_surface(self) -> None:
-        self.io.prepared_input.extend([Binds.Ascend.key] * 200)
+        from tests.integration_tests import dummy_plug_system
+        dummy_plug_system.get().add_input([Binds.Ascend.key] * 200)

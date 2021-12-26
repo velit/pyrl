@@ -7,7 +7,7 @@ from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetExc
 from pyrl.creature.item import Item
 from pyrl.creature.mixins.hoarder import Hoarder, has_inventory
 from pyrl.creature.mixins.visionary import Visionary
-from pyrl.algorithms import get_vector, add_vector
+from pyrl.algorithms.coord_algorithms import get_vector, add_vector
 from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir

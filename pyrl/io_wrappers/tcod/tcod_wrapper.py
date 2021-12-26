@@ -3,14 +3,14 @@ from __future__ import annotations
 import tcod
 
 from pyrl.config.config import Config
-from pyrl.structures.dimensions import Dimensions
-from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.io_wrappers.io_window import IoWindow
+from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.io_wrappers.tcod import IMPLEMENTATION
 from pyrl.io_wrappers.tcod.tcod_window import TcodWindow
+from pyrl.structures.dimensions import Dimensions
 from pyrl.window.window_system import WindowSystem
 
-class TCODWrapper(IoWrapper):
+class TcodWrapper(IoWrapper):
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""
 
     implementation = IMPLEMENTATION

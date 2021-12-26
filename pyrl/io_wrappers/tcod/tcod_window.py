@@ -4,14 +4,15 @@ from typing import Iterable
 
 import tcod
 
-from pyrl.types.char import Glyph
-from pyrl.types.color import Color, ColorPair, ColorPairs
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys
+from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.tcod import IMPLEMENTATION
 from pyrl.io_wrappers.tcod.tcod_colors import tcod_color_map
 from pyrl.io_wrappers.tcod.tcod_keys import tcod_key_map
+from pyrl.types.char import Glyph
+from pyrl.types.color import Color, ColorPair, ColorPairs
+from pyrl.types.coord import Coord
+from pyrl.types.keys import Keys, Key
 
 class TcodWindow(IoWindow):
     implementation = IMPLEMENTATION
@@ -25,7 +26,8 @@ class TcodWindow(IoWindow):
         tcod.console_set_default_foreground(self.console, self.default_fg)
         tcod.console_set_default_background(self.console, self.default_bg)
 
-    def get_key(self) -> str:
+    @handle_dummy_input
+    def get_key(self) -> Key:
         while True:
             key_event = tcod.Key()
             mouse_event = tcod.Mouse()
@@ -34,11 +36,11 @@ class TcodWindow(IoWindow):
             if key != Keys.NO_INPUT:
                 return key
 
-    def check_key(self) -> str:
+    def check_key(self) -> Key:
         event = tcod.console_check_for_keypress(tcod.KEY_PRESSED)
         return self._interpret_event(event)
 
-    def _interpret_event(self, event: tcod.Key) -> str:
+    def _interpret_event(self, event: tcod.Key) -> Key:
         if tcod.console_is_window_closed():
             return Keys.CLOSE_WINDOW
         elif event.vk in self.key_map:
