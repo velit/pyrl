@@ -194,7 +194,8 @@ class UserController(GameActionsMixin):
 
     def descend(self) -> Literal[Action.Enter_Passage, Action.Teleport]:
         location = self.actions.get_passage()
-        if location == DefaultLocation.Passage_Down:
+        # Implicitly every non-up passage is a down-passage
+        if location and location != DefaultLocation.Passage_Up:
             return self.actions.enter_passage()
         else:
             return self.debug_action.teleport_to_location(DefaultLocation.Passage_Down)
