@@ -6,10 +6,11 @@ from random import randrange
 from typing import TypeVar, Generic, Iterator
 
 from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.types.coord import Coord
 
 T = TypeVar('T')
-class Table(Generic[T]):
+class Table(Generic[T], DimensionsMixin):
     """
     Mutable non-dynamic array with two-dimensional get- and setitem methods.
 
@@ -69,14 +70,6 @@ class Table(Generic[T]):
 
     def random_coord(self) -> Coord:
         return randrange(self.rows), randrange(self.cols)
-
-    @property
-    def rows(self) -> int:
-        return self.dimensions.rows
-
-    @property
-    def cols(self) -> int:
-        return self.dimensions.cols
 
     @staticmethod
     def get_index_from_coord(coord: Coord, second_dim_bound: int) -> int:

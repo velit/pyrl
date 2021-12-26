@@ -10,8 +10,10 @@ from pyrl.creature.actions import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
-from pyrl.dungeon_generation.rdg import generate_tiles_to
+from pyrl.algorithms.dungeon_generator import generate_tiles_to
+from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
+from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.one_to_one_mapping import OneToOneMapping
 from pyrl.structures.table import Table
 from pyrl.structures.scheduler import Scheduler
@@ -50,7 +52,7 @@ class CreatureSpawner:
         index = random.randrange(self.total_weight)
         return next(creature for (slot, creature) in self.creatures if index < slot).copy()
 
-class Level:
+class Level(DimensionsMixin):
 
     def __init__(self,
                  danger_level: int = 0,
@@ -83,12 +85,8 @@ class Level:
         self.is_finalized = False
 
     @property
-    def rows(self) -> int:
-        return self.tiles.rows
-
-    @property
-    def cols(self) -> int:
-        return self.tiles.cols
+    def dimensions(self) -> Dimensions:
+        return self.tiles.dimensions
 
     def will_have_location(self, location: LevelLocation) -> bool:
         if location == DefaultLocation.Random_Location:

@@ -7,6 +7,9 @@ class Dimensions:
     rows: int
     cols: int
 
+    def __post_init__(self):
+        assert self.rows and self.cols, f"Zero dimensions aren't legal {self}"
+
     @property
     def area(self) -> int:
         return self.rows * self.cols
@@ -18,3 +21,4 @@ class Dimensions:
     @property
     def params(self) -> tuple[int, int]:
         return self.rows, self.cols
+

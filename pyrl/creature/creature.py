@@ -127,3 +127,4 @@ class Creature:
     @property
     def speed_multiplier(self) -> float:
         return 100 / self.speed
+

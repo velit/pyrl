@@ -5,22 +5,22 @@ import sys
 from typing import NoReturn, Any
 
 from pyrl import state_store
-from pyrl.controllers.ai import AI
+from pyrl.algorithms.fov import ShadowCast
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
+from pyrl.controllers.ai import AI
 from pyrl.controllers.user_controller import UserController
 from pyrl.creature.creature import Creature
 from pyrl.creature.mixins.visionary import Visionary
-from pyrl.algorithms.fov import ShadowCast
-from pyrl.game_actions import GameActions
 from pyrl.creature.player import Player
+from pyrl.game_actions import GameActions
 from pyrl.game_data.pyrl_world import pyrl_world
-from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.io_wrappers.io_wrapper import IoWrapper
+from pyrl.types.world_point import WorldPoint
+from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.level import Level
-from pyrl.types.world_point import WorldPoint
 
 class Game:
 

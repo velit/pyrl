@@ -3,7 +3,7 @@ from __future__ import annotations
 from cProfile import Profile
 
 from pyrl.types.level_gen import LevelGen
-from pyrl.dungeon_generation.rdg import generate_tiles_to
+from pyrl.algorithms.dungeon_generator import generate_tiles_to
 from tools import profile_util
 from pyrl.world.level import Level
 

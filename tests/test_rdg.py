@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import astuple
 from typing import Any
 
 import pytest
 
-from pyrl.dungeon_generation import rdg
 from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.dungeon_generation.rdg import RDG
+from pyrl.algorithms.dungeon_generator import DungeonGenerator, generate_tiles_to
 from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.rectangle import Rectangle
 from pyrl.structures.table import Table
 from pyrl.types.level_gen import LevelGen
 from pyrl.world.level import Level
@@ -23,44 +24,44 @@ def pp_tm(tile_matrix: Iterable[Any], cols: int) -> None:
 def test_many_rdg_generation() -> None:
     for _ in range(100):
         level = Level(generation_type=LevelGen.Dungeon)
-        rdg.generate_tiles_to(level)
+        generate_tiles_to(level)
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
 
 def test_rdg_generation() -> None:
     level = Level(generation_type=LevelGen.Dungeon)
-    rdg.generate_tiles_to(level)
+    generate_tiles_to(level)
     assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
     assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
 
 
-Rectangles = tuple[rdg.Rectangle, rdg.Rectangle, rdg.Rectangle, rdg.Rectangle]
+Rectangles = tuple[Rectangle, Rectangle, Rectangle, Rectangle]
 @pytest.fixture
 def rectangles() -> Rectangles:
     return (
-        rdg.Rectangle(0, 0, 10, 5),
-        rdg.Rectangle(0, 0, 10, 10),
-        rdg.Rectangle(10, 10, -10, -10),
-        rdg.Rectangle(20, 20, -10, 10),
+        Rectangle((0,  0),  Dimensions(10,  5)),
+        Rectangle((0,  0),  Dimensions(10,  10)),
+        Rectangle((10, 10), Dimensions(-10, -10)),
+        Rectangle((20, 20), Dimensions(-10, 10)),
     )
 
 def test_rectangle(rectangles: Rectangles) -> None:
     r1, r2, r3, r4 = rectangles
-    assert r1 == (0, 0, 10, 5)
-    assert r2 == (0, 0, 10, 10)
-    assert r3 == (1, 1, 11, 11)
-    assert r4 == (11, 20, 21, 30)
+    assert astuple(r1) == (range(0, 10),  range(0, 5),   (10, 5))
+    assert astuple(r2) == (range(0, 10),  range(0, 10),  (10, 10))
+    assert astuple(r3) == (range(1, 11),  range(1, 11),  (10, 10))
+    assert astuple(r4) == (range(11, 21), range(20, 30), (10, 10))
 
 TEST_DIMENSIONS = Dimensions(10, 10)
 
 @pytest.fixture
-def generator() -> RDG:
+def generator() -> DungeonGenerator:
     level = Level(tiles=Table(TEST_DIMENSIONS))
-    generator = RDG(level)
+    generator = DungeonGenerator(level)
     generator.init_tiles()
     return generator
 
-def test_dungeon_generation(rectangles: Rectangles, generator: RDG) -> None:
+def test_dungeon_generation(rectangles: Rectangles, generator: DungeonGenerator) -> None:
     rect = rectangles[0]
 
     generator.attempt_room(rect, (0, 1))

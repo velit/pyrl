@@ -5,13 +5,14 @@ from collections.abc import Iterable, Sequence
 
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
 from pyrl.types.color import ColorPairs, ColorPair
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key, KeyTuple
 
-class BaseWindow:
+class BaseWindow(DimensionsMixin):
 
     # Seconds to sleep until next user input check in half-block functions
     half_block_input_responsiveness = 0.001
@@ -21,14 +22,6 @@ class BaseWindow:
         self.dimensions = dimensions
         self.screen_position = screen_position
         self.cursor_win = io_wrapper.new_window(dimensions)
-
-    @property
-    def rows(self) -> int:
-        return self.dimensions.rows
-
-    @property
-    def cols(self) -> int:
-        return self.dimensions.cols
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         self.cursor_win.draw_char(char, coord)

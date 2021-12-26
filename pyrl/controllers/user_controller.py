@@ -8,7 +8,8 @@ from pyrl.algorithms import add_vector
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.creature.actions import Action, ActionException
-from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.game_actions import GameActions
+from pyrl.structures.helper_mixins import GameActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.types.color import Color, ColorPairs
 from pyrl.types.direction import Direction, Dir
@@ -19,7 +20,7 @@ from pyrl.user_interface.lines_view import lines_view, build_lines
 
 ActionCallable = Callable[[], Action]
 
-class UserController(GameActionProperties):
+class UserController(GameActionsMixin):
 
     def __init__(self, game_actions: GameActions):
         self.actions = game_actions

@@ -1,27 +1,24 @@
 from __future__ import annotations
 
-from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING, Protocol
+from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING
 
 from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message
 from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetException
 from pyrl.creature.item import Item
 from pyrl.creature.mixins.hoarder import Hoarder, has_inventory
 from pyrl.creature.mixins.visionary import Visionary
-from pyrl.creature.player import Player
 from pyrl.algorithms import get_vector, add_vector
+from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.level_location import LevelLocation
-from pyrl.window.window_system import WindowSystem
-from pyrl.world.level import Level
 from pyrl.world.tile import Tile
-from pyrl.world.world import World
 
 if TYPE_CHECKING:
     from pyrl.creature.creature import Creature
     from pyrl.game import Game
 
-class GameActions:
+class GameActions(GameMixin, CreatureMixin):
 
     """
     GameActions is the interface between creature controllers (user_controller.py, ai.py) and the game.
@@ -261,59 +258,3 @@ class GameActions:
 
     def _apply_action_cost(self, cost: int) -> None:
         self.action_cost = cost
-
-    @property
-    def coord(self) -> Coord:
-        return self.creature.coord
-
-    @property
-    def level(self) -> Level:
-        return self.creature.level
-
-    @property
-    def io(self) -> WindowSystem:
-        return self.game.io
-
-    @property
-    def world(self) -> World:
-        return self.game.world
-
-    @property
-    def player(self) -> Player:
-        return self.game.world.player
-
-
-class HasGameActions(Protocol):
-    actions: GameActions
-
-class GameActionProperties:
-
-    """
-    Helper class to access the hierarchy of the game easier in controller classes.
-
-    Remember to set the self.actions variable correctly in classes that use this.
-    """
-
-    @property
-    def creature(self: HasGameActions) -> Creature:
-        return self.actions.creature
-
-    @property
-    def coord(self: HasGameActions) -> Coord:
-        return self.actions.creature.coord
-
-    @property
-    def level(self: HasGameActions) -> Level:
-        return self.actions.creature.level
-
-    @property
-    def io(self: HasGameActions) -> WindowSystem:
-        return self.actions.game.io
-
-    @property
-    def world(self: HasGameActions) -> World:
-        return self.actions.game.world
-
-    @property
-    def player(self: HasGameActions) -> Player:
-        return self.actions.game.world.player

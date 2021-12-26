@@ -8,7 +8,8 @@ from pyrl.config.config import Config
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
-from pyrl.game_actions import GameActionProperties, GameActions
+from pyrl.game_actions import GameActions
+from pyrl.structures.helper_mixins import GameActionsMixin
 from pyrl.algorithms import get_vector, reverse_vector, clockwise_90, anticlockwise_90, clockwise_45, anticlockwise_45
 
 WalkType = namedtuple("WalkType", "left_passable, right_passable")
@@ -22,7 +23,7 @@ OPEN          = WalkType(True,  True)
 
 INTERRUPT_MSG_TIME = 1
 
-class WalkMode(GameActionProperties):
+class WalkMode(GameActionsMixin):
 
     def __init__(self, game_actions: GameActions):
         self.actions = game_actions
