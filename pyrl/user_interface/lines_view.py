@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence, Iterable
-from typing import TypeVar
+from enum import Enum
+from typing import TypeVar, overload, Literal
 
 from pyrl.config.binds import Binds
 from pyrl.types.keys import Key, KeyTuple
@@ -25,22 +26,33 @@ def define_footers() -> tuple[str, str]:
 
 single_select_footer, multi_select_footer = define_footers()
 
-S = TypeVar('S')
-def lines_view(window: BaseWindow, lines: Sequence[Line[S]],
-               return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (),
-               header: str = "", footer: str | None = None) -> tuple[Key, S]:
-    return _lines_view(window, lines, False, return_keys, select_keys, header, footer)
-
-M = TypeVar('M')
-def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[M]],
-                            return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (),
-                            header: str = "", footer: str | None = None) -> tuple[Key, Sequence[M]]:
-    return _lines_view(window, lines, True, return_keys, select_keys, header, footer)
+class Mode(Enum):
+    Single = 1
+    Multi = 2
 
 T = TypeVar('T')
-def _lines_view(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool = False,
-                return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (),
-                header: str = "", footer: str | None = None) -> tuple[Key, T | None] | tuple[Key, Sequence[T]]:
+
+def lines_view(window: BaseWindow, lines: Sequence[Line[T]], return_keys: KeyTuple = Binds.Cancel,
+               select_keys: KeyTuple = (), header: str = "", footer: str | None = None) -> tuple[Key, T]:
+    return a_lines_view(Mode.Single, window, lines, return_keys, select_keys, header, footer)
+
+def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]],
+                            return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (),
+                            header: str = "", footer: str | None = None) -> tuple[Key, Sequence[T]]:
+    return a_lines_view(Mode.Multi, window, lines, return_keys, select_keys, header, footer)
+
+@overload
+def a_lines_view(mode: Literal[Mode.Single], window: BaseWindow, lines: Sequence[Line[T]],
+                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
+                 footer: str | None = None) -> tuple[Key, T]: ...
+@overload
+def a_lines_view(mode: Literal[Mode.Multi], window: BaseWindow, lines: Sequence[Line[T]],
+                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
+                 footer: str | None = None) -> tuple[Key, Sequence[T]]: ...
+
+def a_lines_view(mode: Literal[Mode.Single, Mode.Multi], window: BaseWindow, lines: Sequence[Line[T]],
+                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
+                 footer: str | None = None) -> tuple[Key, T | None] | tuple[Key, Sequence[T]]:
     """
     Render a view based on parameter lines which is a sequence of Line namedtuples.
 
@@ -48,6 +60,7 @@ def _lines_view(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool
     by return key.
     In multi_select mode returns (return_key, selected_items)
     """
+    multi_select = mode == Mode.Multi
     if footer is None:
         footer = multi_select_footer if multi_select else single_select_footer
 
@@ -77,7 +90,14 @@ def _lines_view(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool
         elif key in Binds.ScrollKeys:
             scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))
 
-        elif multi_select:
+        if mode == Mode.Single:
+            if key in select_keys:
+                return key, lines[select_keys.index(key) + scroll_offset].return_value
+            elif key in return_keys:
+                return key, None
+            else:
+                assert False, f"Unhandled {key=}"
+        elif mode == Mode.Multi:
             if key in select_keys:
                 selected ^= {lines[select_keys.index(key) + scroll_offset]}
             elif key in return_keys:
@@ -88,16 +108,8 @@ def _lines_view(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool
                 selected.clear()
             else:
                 assert False, f"Unhandled {key=}"
-        else:
-            if key in select_keys:
-                return key, lines[select_keys.index(key) + scroll_offset].return_value
-            elif key in return_keys:
-                return key, None
-            else:
-                assert False, f"Unhandled {key=}"
 
-A = TypeVar('A')
-def _get_vars(window: BaseWindow, lines: Sequence[Line[A]], multi_select: bool,
+def _get_vars(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool,
               select_keys: KeyTuple, return_keys: KeyTuple) -> tuple[int, KeyTuple, KeyTuple]:
     if select_keys:
         content_size = min(window.rows - 4, len(lines), len(select_keys))
@@ -111,9 +123,8 @@ def _get_vars(window: BaseWindow, lines: Sequence[Line[A]], multi_select: bool,
 
     return content_size, select_keys, all_keys
 
-B = TypeVar('B')
-def _get_print_lines(lines: Sequence[Line[B]], offset: int, content_size: int,
-                     selected: set[Line[B]], select_keys: KeyTuple) -> Sequence[str]:
+def _get_print_lines(lines: Sequence[Line[T]], offset: int, content_size: int,
+                     selected: set[Line[T]], select_keys: KeyTuple) -> Sequence[str]:
     sliced_lines = _slice_lines(lines, offset, offset + content_size)
     if select_keys:
         return tuple(f"{key} {'+' if line in selected else '-'} {line.display}"
@@ -121,8 +132,7 @@ def _get_print_lines(lines: Sequence[Line[B]], offset: int, content_size: int,
     else:
         return tuple(line.display for line in sliced_lines)
 
-C = TypeVar('C')
-def _slice_lines(seq: Sequence[S], start_index: int = 0, stop_index: int | None = None) -> Iterable[S]:
+def _slice_lines(seq: Sequence[T], start_index: int = 0, stop_index: int | None = None) -> Iterable[T]:
     if stop_index is not None:
         for i in range(start_index, stop_index):
             yield seq[i]

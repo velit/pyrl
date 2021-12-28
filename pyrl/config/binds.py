@@ -8,9 +8,9 @@ import toml
 
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.key_sequence import KeySequence
-from pyrl.types.keys import Key
+from pyrl.types.keys import Key, Keys
 
-unbound = KeySequence()
+unbound = KeySequence([Keys.UNDEFINED] * 25)
 
 class Binds:
 
@@ -49,9 +49,14 @@ class Binds:
     Show_Vision             = unbound
     Skip_To_Last_Message    = unbound
 
-    EquipmentView           = unbound
-    Equipment_Select_Keys   = unbound
+    EquipmentSelectKeys     = unbound
+    Equipment_Select_Head   = unbound
+    Equipment_Select_Body   = unbound
+    Equipment_Select_Right  = unbound
+    Equipment_Select_Left   = unbound
     Equipment_Select_Feet   = unbound
+
+    EquipmentView           = unbound
     Equipment_View_Backpack = unbound
 
     BackpackView            = unbound

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypeVar, Callable, TYPE_CHECKING
 from pyrl.io_wrappers.io_window import IoWindow
-from pyrl.types.key_sequence import KeySequence
+from pyrl.types.key_sequence import KeySequence, AnyKeys
 from pyrl.types.keys import Key
 
 if TYPE_CHECKING:
@@ -62,7 +62,7 @@ class DummyPlugSystem:
     def add_input(self, input_iterable: Iterable[Key]) -> None:
         self.dummy_input.extend(input_iterable)
 
-    def add_input_and_run(self, sequence_iterable: Iterable[KeySequence | Key], game: Game) -> Game:
+    def add_input_and_run(self, sequence_iterable: AnyKeys, game: Game) -> Game:
         key_iterable = tuple(seq.key if isinstance(seq, KeySequence) else seq for seq in sequence_iterable)
         self.add_input(key_iterable)
         try:

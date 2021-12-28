@@ -10,7 +10,7 @@ from pyrl.types.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
 from pyrl.game_actions import GameActions
 from pyrl.structures.helper_mixins import GameActionsMixin
-from pyrl.algorithms.coord_algorithms import get_vector, reverse_vector, clockwise_90, anticlockwise_90, clockwise_45, \
+from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_90, anticlockwise_90, clockwise_45, \
     anticlockwise_45
 
 WalkType = namedtuple("WalkType", "left_passable, right_passable")
@@ -108,9 +108,9 @@ class WalkMode(GameActionsMixin):
 
     def _get_corridor_candidate_dirs(self, direction: Direction) \
             -> tuple[set[Direction], set[Direction], set[Direction]]:
-        reverse = reverse_vector(direction)
-        back_sides = {anticlockwise_45(reverse), clockwise_45(reverse)}
-        candidate_dirs = set(self.level.get_passable_neighbors(self.creature.coord)) - {reverse}
+        back = reverse(direction)
+        back_sides = {anticlockwise_45(back), clockwise_45(back)}
+        candidate_dirs = set(self.level.get_passable_neighbors(self.creature.coord)) - {back}
         candidate_forward_dirs = candidate_dirs - back_sides
         candidate_orthogonal_dirs = candidate_dirs & set(Dir.Orthogonals)
         ignored_dirs = candidate_dirs & back_sides

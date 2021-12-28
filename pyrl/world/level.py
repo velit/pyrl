@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from collections.abc import Iterable, Container
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from pyrl.algorithms.coord_algorithms import bresenham, cross_product, add_vector
@@ -15,7 +16,7 @@ from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
 from pyrl.structures.helper_mixins import DimensionsMixin
-from pyrl.structures.one_to_one_mapping import OneToOneMapping
+from pyrl.structures.one_to_one_mapping import OTOMap
 from pyrl.structures.scheduler import Scheduler
 from pyrl.structures.table import Table
 from pyrl.types.char import Glyph
@@ -55,21 +56,22 @@ class CreatureSpawner:
 
 class Level(DimensionsMixin):
 
+    level_key: LevelKey
+
     def __init__(self,
                  danger_level: int = 0,
                  generation_type: LevelGen = LevelGen.Dungeon,
                  tiles: Table[Tile] | None = None,
-                 locations: dict[Coord, LevelLocation] = {},
-                 custom_creatures: list[Creature] = [],
+                 locations: dict[Coord, LevelLocation] | None = None,
+                 custom_creatures: list[Creature] | None = None,
                  creature_spawning_enabled: bool = True):
         # Generation
         self.danger_level = danger_level
         self.generation_type = generation_type
-        self.custom_creatures = list(custom_creatures)
+        self.custom_creatures = list(custom_creatures) if custom_creatures else []
         self.creature_spawn_count = 99
         self.creature_spawning_enabled = creature_spawning_enabled
         self.creature_spawner = CreatureSpawner()
-        self.level_key: LevelKey = None
 
         # Normal usage
         self.tiles: Table[Tile]
@@ -78,7 +80,7 @@ class Level(DimensionsMixin):
         else:
             self.tiles = tiles
 
-        self.locations: OneToOneMapping[Coord, LevelLocation] = OneToOneMapping(locations)
+        self.locations: OTOMap[Coord, LevelLocation] = OTOMap(locations) if locations else OTOMap()
         self.visible_change = Event()
         self.turn_scheduler: Scheduler[Creature] = Scheduler()
         self.creatures: dict[Coord, Creature] = {}
@@ -258,7 +260,8 @@ class Level(DimensionsMixin):
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, creature.action_cost(Action.Spawn))
 
-    def add_creature_to_location(self, creature: Creature, level_location: LevelLocation) -> None:
+    def move_creature_to_location(self, creature: Creature, level_location: LevelLocation) -> None:
+        creature.level.remove_creature(creature)
         coord = self.get_location_coord(level_location)
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, 0)
@@ -277,8 +280,6 @@ class Level(DimensionsMixin):
     def remove_creature(self, creature: Creature) -> None:
         coord = creature.coord
         del self.creatures[coord]
-        creature.coord = None
-        creature.level = None
         self.turn_scheduler.remove(creature)
         self.visible_change.trigger(coord)
 

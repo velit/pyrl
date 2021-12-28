@@ -20,10 +20,11 @@ class Creature:
     char:              Glyph
     danger_level:        int = 0
     spawn_weight_class:  int = 1
-    coord: Coord             = None
 
     hp:                  int = field(init=False, repr=True)
-    level:             Level = field(init=False, repr=False, default=None)
+
+    coord:             Coord = field(init=False, repr=False)
+    level:             Level = field(init=False, repr=False)
     base_strength:       int = field(init=False, repr=False, default=10)
     base_dexterity:      int = field(init=False, repr=False, default=10)
     base_endurance:      int = field(init=False, repr=False, default=10)

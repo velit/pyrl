@@ -1,3 +1,4 @@
+"""Bunch of property getter mixins to flatten the hierarchy of the game a bit in certain places"""
 from __future__ import annotations
 
 from typing import Protocol, TYPE_CHECKING
@@ -14,7 +15,9 @@ if TYPE_CHECKING:
     from pyrl.world.world import World
 
 class HasGame(Protocol):
-    game: Game
+    @property
+    def game(self) -> Game:
+        raise NotImplementedError
 
 class GameMixin:
 
@@ -31,7 +34,9 @@ class GameMixin:
         return self.game.world.player
 
 class HasCreature(Protocol):
-    creature: Creature
+    @property
+    def creature(self) -> Creature:
+        raise NotImplementedError
 
 class CreatureMixin:
 
@@ -44,7 +49,9 @@ class CreatureMixin:
         return self.creature.level
 
 class HasDimensions(Protocol):
-    dimensions: Dimensions
+    @property
+    def dimensions(self) -> Dimensions:
+        raise NotImplementedError
 
 class DimensionsMixin:
     @property
@@ -56,14 +63,11 @@ class DimensionsMixin:
         return self.dimensions.cols
 
 class HasGameActions(Protocol):
-    actions: GameActions
+    @property
+    def actions(self) -> GameActions:
+        raise NotImplementedError
 
 class GameActionsMixin:
-    """
-    Helper class to access the hierarchy of the game easier in controller classes.
-
-    Remember to set the self.actions variable correctly in classes that use this.
-    """
 
     @property
     def creature(self: HasGameActions) -> Creature:

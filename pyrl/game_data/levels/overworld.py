@@ -5,7 +5,8 @@ from pyrl.types.char import Letter
 from pyrl.types.color import ColorPairs
 from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_location import LevelLocation
-from pyrl.game_data.levels.shared_assets import construct_data, default_dims
+from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
+    AssetTileDict
 from pyrl.world.level import Level
 from pyrl.world.tile import Tile
 
@@ -48,7 +49,7 @@ def get_level() -> Level:
 
     # Overworld movement multiplier
     mult = default_dims.min
-    custom_tiles = {
+    custom_tiles: AssetTileDict = {
         '"': Tile("grassland",      ('"', ColorPairs.Green), ('"', ColorPairs.Green), True,  True,  move_multi=mult),
         '¨': Tile("mountains",      ('^', ColorPairs.White), ('^', ColorPairs.White), False, True,  move_multi=mult),
         '=': Tile("river",          ('=', ColorPairs.Blue),  ('=', ColorPairs.Blue),  False, False, move_multi=mult),
@@ -57,11 +58,11 @@ def get_level() -> Level:
         '*': Tile("dungeon",        ('*', ColorPairs.Brown), ('*', ColorPairs.Brown), True,  True,  move_multi=mult),
         '^': Tile("high mountains", ('^', ColorPairs.Brown), ('^', ColorPairs.Brown), False, False, move_multi=mult),
     }
-    custom_locations: dict[Letter, LevelLocation] = {
+    custom_locations: AssetLocationDict = {
         '*': OverWorldLocation.Dungeon,
         't': OverWorldLocation.Village,
     }
-    custom_creatures: dict[Letter, Creature] = {
+    custom_creatures: AssetCreatureDict = {
     }
     tiles, locations, creatures = construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures)
 

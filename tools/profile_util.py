@@ -1,15 +1,16 @@
+import cProfile
 import sys
 from pstats import Stats
 
 from pyrl.config.debug import Debug
 
-def write_results_log(profiler):
+def write_results_log(profiler: cProfile.Profile) -> None:
 
     with open(Debug.profiling_output_file, "w") as f:
         stats = Stats(profiler, stream=f)
         print_results(stats)
 
-def print_results(stats):
+def print_results(stats: Stats) -> None:
     stats.strip_dirs()
     stats.sort_stats('calls').print_stats(10)
     stats.sort_stats('time').print_stats(15)
@@ -19,7 +20,6 @@ def print_results(stats):
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         profile_data_file = sys.argv[1]
-        stats = Stats(profile_data_file)
-        print_results(stats)
+        print_results(Stats(profile_data_file))
     else:
         print("Profile data path required.")

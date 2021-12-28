@@ -53,9 +53,14 @@ Walk_Mode               = ["w"]
 Show_Vision             = ["H"]
 Skip_To_Last_Message    = ["Enter"]
 
-[EquipmentView]         #   Head Armor  RightHand LeftHand Feet
-Equipment_Select_Keys   = ["h", "b",   "r",      "l",     "f"]
+[EquipmentSelectKeys]
+Equipment_Select_Head   = ["h"]
+Equipment_Select_Body   = ["b"]
+Equipment_Select_Right  = ["r"]
+Equipment_Select_Left   = ["l"]
 Equipment_Select_Feet   = ["f"]
+
+[EquipmentView]
 Equipment_View_Backpack = ["v"]
 
 [BackpackView]

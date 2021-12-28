@@ -56,9 +56,9 @@ class Table(Generic[T], DimensionsMixin):
         y, x = coord
         return (0 <= y < self.rows) and (0 <= x < self.cols)
 
-    def clear(self) -> None:
+    def fill(self, fill_value: T) -> None:
         for i in range(self.dimensions.area):
-            self[self.get_coord(i)] = None
+            self[self.get_coord(i)] = fill_value
 
     def enumerate(self) -> Iterable[tuple[Coord, T]]:
         for i, item in enumerate(self):

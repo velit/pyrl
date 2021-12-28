@@ -90,13 +90,14 @@ def add_vector(vector_a: Coord, vector_b: Coord) -> Coord:
 def scalar_mult(scalar: int, vector: Coord) -> Coord:
     return scalar * vector[0], scalar * vector[1]
 
-def reverse_vector(vector: Coord) -> Coord:
+Vector = TypeVar('Vector', Coord, Direction)
+def reverse(vector: Vector) -> Vector:
     return -vector[0], -vector[1]
 
-def clockwise_90(vector: Coord) -> Coord:
+def clockwise_90(vector: Vector) -> Vector:
     return vector[1], -vector[0]
 
-def anticlockwise_90(vector: Coord) -> Coord:
+def anticlockwise_90(vector: Vector) -> Vector:
     return -vector[1], vector[0]
 
 def clockwise_45(direction: Direction) -> Direction:

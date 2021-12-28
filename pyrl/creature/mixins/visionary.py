@@ -10,12 +10,13 @@ if TYPE_CHECKING:
     from pyrl.world.level import Level
 
 class Visionary(Creature):
+
     """Creatures with this mixin class remember the level squares they've seen."""
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
         self.visited_locations: dict[Level, set[Coord]] = defaultdict(set)
-        self.vision: set[Coord] = set()
+        self._vision: set[Coord] = set()
 
     def get_visited_locations(self) -> set[Coord]:
         return self.visited_locations[self.level]
@@ -26,8 +27,8 @@ class Visionary(Creature):
 
     @vision.setter
     def vision(self, coordinates: set[Coord]) -> None:
-        self.visited_locations[self.level] |= coordinates
         self._vision = coordinates
+        self.visited_locations[self.level] |= coordinates
 
     @vision.deleter
     def vision(self) -> None:

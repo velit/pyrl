@@ -18,7 +18,11 @@ class DefaultLocation(LevelLocation):
     Passage_Down    = 2
     Random_Location = 3
 
-base_tiles: dict[Letter, Tile] = {
+AssetTileDict = dict[Letter, Tile]
+AssetCreatureDict = dict[Letter, Creature]
+AssetLocationDict = dict[Letter, LevelLocation]
+
+base_tiles: AssetTileDict = {
     '.': PyrlTiles.Floor,
     'w': PyrlTiles.Wall,
     '#': PyrlTiles.Dynamic_Wall,
@@ -29,16 +33,16 @@ base_tiles: dict[Letter, Tile] = {
     '<': PyrlTiles.Stairs_Up,
 }
 
-base_creatures: dict[Letter, Creature] = {
+base_creatures: AssetCreatureDict = {
 }
 
-base_locations: dict[Letter, LevelLocation] = {
+base_locations: AssetLocationDict = {
     '<': DefaultLocation.Passage_Up,
     '>': DefaultLocation.Passage_Down,
 }
 
-def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: dict[Letter, Tile],
-                   custom_locations: dict[Letter, LevelLocation], custom_creatures: dict[Letter, Creature]) \
+def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: AssetTileDict,
+                   custom_locations: AssetLocationDict, custom_creatures: AssetCreatureDict) \
                    -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
 
     _assert_dimensions(dimensions, table_data)
@@ -58,8 +62,8 @@ def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: dict[L
 def _assert_dimensions(dimensions: Dimensions, table_data: str) -> None:
     assert len(table_data) == dimensions.area, "Wrong dimensions for custom level definition."
 
-def _construct_data(unfinalized_tiles: Table, tiles_lookup: dict[Letter, Tile],
-                    locations_lookup: dict[Letter, LevelLocation], creatures_lookup: dict[Letter, Creature]) \
+def _construct_data(unfinalized_tiles: Table, tiles_lookup: AssetTileDict,
+                    locations_lookup: AssetLocationDict, creatures_lookup: AssetCreatureDict) \
                         -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
     tiles = unfinalized_tiles
     locations = {}

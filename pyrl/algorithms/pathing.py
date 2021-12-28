@@ -6,25 +6,25 @@ from heapq import heappush, heappop
 from pyrl.types.coord import Coord
 from pyrl.algorithms.coord_algorithms import chebyshev_distance
 
-NeighbourCall = Callable[[Coord], Iterable[tuple[Coord, int]]]
+NeighborCall = Callable[[Coord], Iterable[tuple[Coord, int]]]
 HeuristicCall = Callable[[Coord, Coord, Coord], float]
 
-def path(start: Coord, goal: Coord, neighbours: NeighbourCall, heuristic: HeuristicCall) -> Iterable[Coord]:
+def path(start: Coord, goal: Coord, neighbours: NeighborCall, heuristic: HeuristicCall) -> Iterable[Coord]:
     return _iterate_path(_a_star(start, goal, neighbours, heuristic), start, goal)
 
 def distance(coord_a: Coord, coord_b: Coord, default_movement_cost: int, diagonal_modifier: float) -> float:
     orthogonal_steps, diagonal_steps = chebyshev_distance(coord_a, coord_b)
     return default_movement_cost * (orthogonal_steps + diagonal_steps * diagonal_modifier)
 
-def _a_star(start: Coord, goal: Coord, neighbors: NeighbourCall, heuristic: HeuristicCall) -> dict[Coord, Coord]:
+def _a_star(start: Coord, goal: Coord, neighbors: NeighborCall, heuristic: HeuristicCall) -> dict[Coord, Coord]:
     start, goal = goal, start
     came_from: dict[Coord, Coord] = {}
     closedset = set()
     openmember = set()
     openmember.add(start)
 
-    g = {start: 0}
-    openprio: list[tuple[int, Coord]] = []
+    cheap = {start: 0}  # Current cheapest cost to coord
+    openprio: list[tuple[float, Coord]] = []
     heappush(openprio, (0, start))
 
     while openprio:
@@ -36,10 +36,11 @@ def _a_star(start: Coord, goal: Coord, neighbors: NeighbourCall, heuristic: Heur
             closedset.add(origin)
 
             for node, cost in neighbors(origin):
-                if node not in closedset and (node not in openmember or g[origin] + cost < g[node]):
+                if node not in closedset and (node not in openmember or cheap[origin] + cost < cheap[node]):
                     came_from[node] = origin
-                    g[node] = g[origin] + cost
-                    heappush(openprio, (g[node] + heuristic(node, goal, start), node))
+                    cheap[node] = cheap[origin] + cost
+                    estimate = cheap[node] + heuristic(node, goal, start)
+                    heappush(openprio, (estimate, node))
                     openmember.add(node)
     else:
         raise ValueError(f"No possible paths between {start=} and {goal=}")

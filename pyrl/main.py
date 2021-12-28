@@ -100,6 +100,7 @@ def load_game(game_name: str, cursor_lib: IoWrapper) -> Game:
     except FileNotFoundError:
         print(f"Save file '{game_name}' not found.", file=sys.stderr)
         sys.exit(1)
+    assert isinstance(game, Game), f"Loaded data isn't a savegame. Found an object of type {type(game)}"
     game.init_nonserialized_state(cursor_lib)
     game.redraw()
     return game

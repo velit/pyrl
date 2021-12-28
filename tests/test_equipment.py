@@ -8,7 +8,7 @@ from pyrl.creature.item import Weapon, Armor
 from pyrl.creature.stats import Stats
 from pyrl.structures.dice import Dice
 
-def test_creature_equipment():
+def test_creature_equipment() -> None:
     equipment = Inventory()
     items = {
         Slot.Right_Hand: Weapon("short sword +1", 0, Dice(1, 6, 1)),

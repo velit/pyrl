@@ -85,8 +85,7 @@ class Game:
         except KeyError:
             return False
 
-        creature.level.remove_creature(creature)
-        target_level.add_creature_to_location(creature, world_point.level_location)
+        target_level.move_creature_to_location(creature, world_point.level_location)
 
         if isinstance(creature, Visionary):
             creature.vision.clear()

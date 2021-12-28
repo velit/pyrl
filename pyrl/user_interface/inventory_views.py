@@ -8,7 +8,7 @@ from pyrl.types.equipment_slot import Slot
 from pyrl.game_actions import GameActions
 from pyrl.creature.actions import Action, NoValidTargetException
 from pyrl.creature.inventory import Inventory
-from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view
+from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view, a_lines_view
 from pyrl.types.line import Line
 
 def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:
@@ -30,7 +30,7 @@ def equipment_view(actions: GameActions) -> Literal[Action.No_Action, Action.Dro
         lines: Sequence[Line[Slot]] = tuple(Line(f"{slot.value:11}: {_get_equipment_item_str(inventory, slot)}", slot)
                                             for slot in Slot)
         key, slot = lines_view(actions.io.whole_window, lines,
-                               select_keys=Binds.Equipment_Select_Keys,
+                               select_keys=Binds.EquipmentSelectKeys,
                                return_keys=Binds.Equipment_View_Backpack + Binds.Cancel,
                                header="Equipment",
                                footer=footer)

@@ -8,11 +8,11 @@ from pyrl import main
 from pyrl.config.binds import Binds
 from pyrl.game import Game
 from pyrl.io_wrappers.io_wrapper import IoWrapper
-from tests.integration_tests import dummy_plug_system
-from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem
-
 # from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
 from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
+from pyrl.types.key_sequence import AnyKeys
+from tests.integration_tests import dummy_plug_system
+from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem
 
 # CONTINUE_AFTER_INTEGRATION_TEST = True
 CONTINUE_AFTER_INTEGRATION_TEST = False
@@ -68,18 +68,18 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     )
 
     # debug_actions enabled ones
-    message_system = (Binds.Debug_Commands, 'm', Binds.Skip_To_Last_Message)
-    whole_map = (Binds.Debug_Commands, 'v')
-    path_to_staircase = (Binds.Debug_Commands, 'o', Binds.Skip_To_Last_Message)
+    message_system: AnyKeys = [Binds.Debug_Commands, 'm', Binds.Skip_To_Last_Message]
+    whole_map: AnyKeys = [Binds.Debug_Commands, 'v']
+    path_to_staircase: AnyKeys = [Binds.Debug_Commands, 'o', Binds.Skip_To_Last_Message]
 
     inventory = (
         Binds.Equipment,
         Binds.Equipment_View_Backpack,
         Binds.Cancel,
-        Binds.Equipment_Select_Keys[1],
-        Binds.Equipment_Select_Keys[2],
-        Binds.Equipment_Select_Keys[3],
-        Binds.Equipment_Select_Keys[3],
+        Binds.Equipment_Select_Body,
+        Binds.Equipment_Select_Right,
+        Binds.Equipment_Select_Left,
+        Binds.Equipment_Select_Left,
         Binds.Backpack_Select_Keys[0],
         Binds.Cancel,
         Binds.Drop_Items,
@@ -98,9 +98,9 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
         Binds.Cancel,
     )
 
-    walk_mode = (Binds.Walk_Mode, Binds.East)
+    walk_mode = [Binds.Walk_Mode, Binds.East]
 
-    descend = (Binds.Descend, Binds.Descend)
+    descend = [Binds.Descend, Binds.Descend]
 
     coord = game.player.coord
 

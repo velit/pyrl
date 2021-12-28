@@ -4,7 +4,7 @@ from pyrl.creature.creature import Creature
 from pyrl.types.color import ColorPairs
 from decimal import Decimal
 
-def test_danger_level_spawn_mult():
+def test_danger_level_spawn_mult() -> None:
     c = Creature("test", ('t', ColorPairs.Cyan), danger_level=0)
 
     assert c.danger_level_spawn_mult(-6) == Decimal(0)

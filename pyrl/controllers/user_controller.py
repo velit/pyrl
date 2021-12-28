@@ -9,14 +9,14 @@ from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.creature.actions import Action, ActionException
 from pyrl.game_actions import GameActions
-from pyrl.structures.helper_mixins import GameActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
+from pyrl.structures.helper_mixins import GameActionsMixin
 from pyrl.types.color import Color, ColorPairs
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.keys import Keys, KeyTuple
 from pyrl.user_interface.help_view import help_view
 from pyrl.user_interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
-from pyrl.user_interface.lines_view import lines_view, build_lines
+from pyrl.user_interface.lines_view import build_lines, lines_view
 
 ActionCallable = Callable[[], Action]
 

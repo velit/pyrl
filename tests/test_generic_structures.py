@@ -6,7 +6,7 @@ import pytest
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
-from pyrl.structures.one_to_one_mapping import OneToOneMapping
+from pyrl.structures.one_to_one_mapping import OTOMap
 from pyrl.structures.table import Table
 
 def test_table() -> None:
@@ -26,32 +26,32 @@ def test_table() -> None:
     assert not table.is_legal((3, 2))
 
 def test_one_to_one_mapping() -> None:
-    mapping: OneToOneMapping[int, int] = OneToOneMapping()
-    mapping[0] = 0
-    mapping[1] = 1
-    mapping[2] = 2
-    mapping[3] = 3
-    mapping[4] = 4
+    mapping: OTOMap[str, int] = OTOMap()
+    mapping['0'] = 0
+    mapping['1'] = 1
+    mapping['2'] = 2
+    mapping['3'] = 3
+    mapping['4'] = 4
 
-    assert mapping[0] == 0
-    assert mapping[1] == 1
-    assert mapping[2] == 2
-    assert mapping[3] == 3
-    assert mapping[4] == 4
+    assert mapping['0'] == 0
+    assert mapping['1'] == 1
+    assert mapping['2'] == 2
+    assert mapping['3'] == 3
+    assert mapping['4'] == 4
 
-    mapping[0] = 5
-    assert mapping[0] == 5
-    assert mapping.getkey(5) == 0
+    mapping['0'] = 5
+    assert mapping['0'] == 5
+    assert mapping.getkey(5) == '0'
 
     with pytest.raises(ValueError):
-        mapping[1] = 5
+        mapping['1'] = 5
 
-    del mapping[4]
+    del mapping['4']
     with pytest.raises(KeyError):
         mapping.getkey(4)
 
     with pytest.raises(ValueError):
-        mapping.update(**{"a": 10, "b": 10})
+        mapping.update(a=10, b=10)
 
     with pytest.raises(ValueError):
         mapping.update({"a": 10, "b": 10})

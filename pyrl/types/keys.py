@@ -46,5 +46,7 @@ class Keys:
     WINDOW_RESIZE:  Final = "Window Resize"
     CLOSE_WINDOW:   Final = "Close Window"
 
-    # Do not use
+    # The IO system will never return this value
+    UNDEFINED:      Final = "Undefined"
+    # Do not bind. Returned by the IO system when something has to be returned and there is no input
     NO_INPUT:       Final = "No Input"

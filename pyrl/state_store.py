@@ -3,13 +3,14 @@ from __future__ import annotations
 import bz2
 import os
 import pickle
+from typing import Any
 
 from pyrl.config.config import Config
 from pyrl.game import Game
 
 _SAVE_FILETYPE = ".svg"
 
-def load(save_name: str) -> Game:
+def load(save_name: str) -> Any:
     save_path = os.path.join(Config.save_folder, save_name + _SAVE_FILETYPE)
     with open(save_path, "rb") as f:
         state_string = f.read()
