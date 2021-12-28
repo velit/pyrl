@@ -67,7 +67,7 @@ def a_lines_view(mode: Literal[Mode.Single, Mode.Multi], window: BaseWindow, lin
     orig_lines = tuple(lines)
     orig_select_keys = tuple(select_keys)
     scroll_offset = 0
-    selected: set[Line] = set()
+    selected: set[Line[T]] = set()
     filter_regex = ""
     while True:
         content_size, select_keys, all_keys = _get_vars(window, lines, multi_select,

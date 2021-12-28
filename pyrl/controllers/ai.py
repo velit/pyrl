@@ -18,7 +18,7 @@ class AI(GameActionsMixin):
     actions: GameActions
 
     def __init__(self) -> None:
-        self.ai_state: dict[Creature, tuple[Coord, Coord]] = {}
+        self.ai_state: dict[Creature, tuple[Coord | None, Coord | None]] = {}
 
     def act(self, game_actions: GameActions, alert_coord: Coord) -> Literal[Action.Move, Action.Swap, Action.Attack]:
         self.actions = game_actions
@@ -36,8 +36,9 @@ class AI(GameActionsMixin):
             chase_coord = alert_coord
 
             # actions
-            if self.actions.can_reach(alert_coord):
-                action = self.actions.attack(get_vector(self.coord, alert_coord))
+            direction = self.actions.can_reach(alert_coord)
+            if direction:
+                action = self.actions.attack(direction)
             else:
                 action = self._move_towards(alert_coord)
 
@@ -74,7 +75,7 @@ class AI(GameActionsMixin):
     def _move_towards(self, target_coord: Coord) -> Literal[Action.Move, Action.Swap]:
         best_action = Action.Move
         best_direction = Dir.Stay
-        best_cost = None
+        best_cost: int | None = None
         for direction in Dir.AllPlusStay:
             coord = add_vector(self.coord, direction)
             if self.level.is_passable(coord):

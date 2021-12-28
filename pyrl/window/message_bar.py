@@ -4,24 +4,24 @@ import logging
 import re
 import textwrap
 from collections.abc import Callable, Iterable
-from functools import wraps
 from typing import Any
 
 from pyrl.config.binds import Binds
+from pyrl.io_wrappers import mock
+from pyrl.io_wrappers.io_wrapper import IoWrapper
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.position import Position
 from pyrl.types.color import ColorPairs
 from pyrl.window.base_window import BaseWindow
-from pyrl.io_wrappers import mock
 
 MORE_STR = " More"
 MORE_STR_LEN = len(MORE_STR)
 
 class MessageBar(BaseWindow):
-
     """Handles the messaging bar system."""
 
-    @wraps(BaseWindow.__init__, assigned=())
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        BaseWindow.__init__(self, *args, **kwargs)
+    def __init__(self, io_wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
+        BaseWindow.__init__(self, io_wrapper, dimensions, screen_position)
 
         self.history: list[str] = []
         self.msgqueue: list[str] = []

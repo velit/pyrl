@@ -103,7 +103,7 @@ class Binds:
 
     @classmethod
     def set_directions(cls) -> None:
-        def set_every_to(every: Iterable[Key], to: Direction, at: MutableMapping) -> None:
+        def set_every_to(every: Iterable[Key], to: Direction, at: MutableMapping[Key, Direction]) -> None:
             for item in every:
                 at[item] = to
 

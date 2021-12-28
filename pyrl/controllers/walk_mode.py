@@ -1,37 +1,39 @@
 from __future__ import annotations
 
-from collections import namedtuple
-from typing import Literal
+from enum import Enum
+from typing import Literal, NamedTuple
 
+from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_45, \
+    anticlockwise_45
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Direction, Dir
 from pyrl.creature.actions import Action, IllegalContextException
 from pyrl.game_actions import GameActions
 from pyrl.structures.helper_mixins import GameActionsMixin
-from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_90, anticlockwise_90, clockwise_45, \
-    anticlockwise_45
+from pyrl.types.direction import Direction, Dir
 
-WalkType = namedtuple("WalkType", "left_passable, right_passable")
-WalkModeState = namedtuple("WalkModeState", "direction, walk_type, next_walk_time, show_msg_time")
+class Type(Enum):
+    Wait          = (None, None)
+    Corridor      = (False, False)
+    Left          = (True, False)
+    Right         = (False, True)
+    Open          = (True, True)
 
-WALK_IN_PLACE = WalkType(None,  None)
-CORRIDOR      = WalkType(False, False)
-LEFT          = WalkType(True,  False)
-RIGHT         = WalkType(False, True)
-OPEN          = WalkType(True,  True)
+class WalkModeState(NamedTuple):
+    direction: Direction
+    walk_type: Type
+    next_walk_time: float
+    show_msg_time: float
 
 INTERRUPT_MSG_TIME = 1
 
 class WalkMode(GameActionsMixin):
 
+    state: WalkModeState
+
     def __init__(self, game_actions: GameActions):
         self.actions = game_actions
-        self.state: WalkModeState = None
-
-    def is_walk_mode_active(self) -> bool:
-        return self.state is not None
+        self.active = False
 
     def init_walk_mode(self, direction: Direction | None = None) -> Literal[Action.Move, Action.No_Action]:
         if self._any_creatures_visible():
@@ -50,9 +52,10 @@ class WalkMode(GameActionsMixin):
         if not walk_type:
             return feedback
 
+        self.active = True
         self.state = WalkModeState(direction, walk_type,
-                                   self.io.get_future_time(Config.animation_period),
-                                   self.io.get_future_time(INTERRUPT_MSG_TIME))
+                                   next_walk_time=self.io.get_future_time(Config.animation_period),
+                                   show_msg_time=self.io.get_future_time(INTERRUPT_MSG_TIME))
         return feedback
 
     def continue_walk(self) -> Literal[Action.Move, Action.No_Action]:
@@ -64,7 +67,7 @@ class WalkMode(GameActionsMixin):
             self.state = WalkModeState(next_direction, self.state.walk_type, next_walk_time, self.state.show_msg_time)
             return feedback
 
-        self.state = None
+        self.active = False
         return Action.No_Action
 
     def _next_direction(self) -> Direction | None:
@@ -87,10 +90,10 @@ class WalkMode(GameActionsMixin):
 
         return next_direction
 
-    def _calculate_next_direction(self, old_direction: Direction, walk_type: WalkType) -> Direction | None:
-        if walk_type == WALK_IN_PLACE:
+    def _calculate_next_direction(self, old_direction: Direction, walk_type: Type) -> Direction | None:
+        if walk_type == Type.Wait:
             return old_direction
-        elif walk_type == CORRIDOR:
+        elif walk_type == Type.Corridor:
             forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(old_direction)
             if len(forward_dirs) == 1:
                 new_direction = forward_dirs.pop()
@@ -101,7 +104,7 @@ class WalkMode(GameActionsMixin):
                     return new_direction
         else:
             forward = self._passable(old_direction)
-            sides = self._get_side_passables(old_direction)
+            sides = self._get_type_from_sides(old_direction)
             if forward and sides == walk_type:
                 return old_direction
         return None
@@ -130,11 +133,11 @@ class WalkMode(GameActionsMixin):
         up_left    = self._passable(Dir.clockwise(direction, 7))
         return forward, up_left, up_right, left, right, down_left, down_right
 
-    def _get_initial_walk_type(self, direction: Direction) -> WalkType | None:
+    def _get_initial_walk_type(self, direction: Direction) -> Type | None:
         if direction == Dir.Stay:
-            return WALK_IN_PLACE
+            return Type.Wait
 
-        walk_type = self._get_side_passables(direction)
+        walk_type = self._get_type_from_sides(direction)
         forward, up_left, up_right, left, right, down_left, down_right = \
             self._get_neighbor_passables(direction)
         if (forward and left and not up_left and not down_left
@@ -143,19 +146,19 @@ class WalkMode(GameActionsMixin):
                 or not forward and right and down_right):
             return None
         if not forward:
-            walk_type = CORRIDOR
+            walk_type = Type.Corridor
         return walk_type
 
-    def _get_side_passables(self, direction: Direction) -> WalkType:
+    def _get_type_from_sides(self, direction: Direction) -> Type:
         if direction in Dir.Orthogonals:
             turns = 2
         elif direction in Dir.Diagonals:
             turns = 1
         else:
-            raise Exception(f"Not a valid {direction=}")
+            raise Exception(f"Not a valid {direction=} for side viewing")
         left = self._passable(Dir.counter_clockwise(direction, turns))
         right = self._passable(Dir.clockwise(direction, turns))
-        return WalkType(left, right)
+        return Type((left, right))
 
     def _any_creatures_visible(self) -> int:
         return len(self.actions.get_coords_of_creatures_in_vision())

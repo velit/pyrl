@@ -11,7 +11,7 @@ Entry = tuple[int, int, T]
 class Scheduler(Generic[T]):
     """Priority queue based scheduler. Behaves in LIFO fashion with equal time values."""
 
-    priority_queue: list[Entry] = field(default_factory=list, repr=False)
+    priority_queue: list[Entry[T]] = field(default_factory=list, repr=False)
     remove_set:          set[T] = field(default_factory=set, repr=False)
     time:                   int = 0
     count:                  int = 0  # count is used to resolve time collisions in the queue

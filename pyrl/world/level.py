@@ -252,7 +252,7 @@ class Level(DimensionsMixin):
 
     def spawn_creature(self, creature: Creature) -> None:
         coord = None
-        if creature.coord is not None:
+        if hasattr(creature, "coord"):
             assert self.is_passable(creature.coord), \
                 f"Attempting to spawn {creature.name} to already occupied square: {creature.coord}"
             coord = creature.coord

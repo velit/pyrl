@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from decimal import Decimal
-from typing import TypeVar, Type, Iterable
+from typing import TypeVar, Type, Iterable, TypeGuard
 
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
@@ -83,6 +83,9 @@ def resize_vector_to_len(vector: Coord, length: int) -> Coord:
 
 def get_vector(origin: Coord, target: Coord) -> Coord:
     return target[0] - origin[0], target[1] - origin[1]
+
+def vector_is_direction(vector: Coord) -> TypeGuard[Direction]:
+    return vector in Dir.AllPlusStay
 
 def add_vector(vector_a: Coord, vector_b: Coord) -> Coord:
     return vector_a[0] + vector_b[0], vector_a[1] + vector_b[1]

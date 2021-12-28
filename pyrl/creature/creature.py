@@ -60,19 +60,19 @@ class Creature:
         return round(1000 * self.danger_level_spawn_mult(external_danger_level) * self.spawn_weight_class)
 
     def danger_level_spawn_mult(self, external_danger_level: int) -> Decimal:
-        diff = Decimal(external_danger_level - self.danger_level)
-
+        diff = external_danger_level - self.danger_level
         speciation_range = range(-5, 1)
         extant_range = range(1, 10)
         extinction_range = range(10, 21)
+        diff_weight: Decimal
         if diff in speciation_range:
             # 0 0.008 0.064 0.216 0.512 1
-            diff_weight = pow(resize_range(diff, speciation_range), 3)
+            diff_weight = pow(resize_range(Decimal(diff), speciation_range), 3)
         elif diff in extant_range:
             diff_weight = Decimal(1)
         elif diff in extinction_range:
             # 1, 0.999, 0.992, 0.973, 0.936, 0.875, 0.784, 0.657, 0.488, 0.271, 0
-            diff_weight = Decimal(1 - pow(resize_range(diff, extinction_range), 3))
+            diff_weight = Decimal(1 - pow(resize_range(Decimal(diff), extinction_range), 3))
         else:
             diff_weight = Decimal(0)
         return diff_weight

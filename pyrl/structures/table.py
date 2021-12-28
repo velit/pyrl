@@ -47,10 +47,10 @@ class Table(Generic[T], DimensionsMixin):
         return False
 
     def get_coord(self, index: int) -> Coord:
-        return self.get_coord_from_index(index, self.dimensions.cols)
+        return self.dimensions.get_coord(index)
 
     def get_index(self, coord: Coord) -> int:
-        return self.get_index_from_coord(coord, self.dimensions.cols)
+        return self.dimensions.get_index(coord)
 
     def is_legal(self, coord: Coord) -> bool:
         y, x = coord
@@ -70,15 +70,3 @@ class Table(Generic[T], DimensionsMixin):
 
     def random_coord(self) -> Coord:
         return randrange(self.rows), randrange(self.cols)
-
-    @staticmethod
-    def get_index_from_coord(coord: Coord, second_dim_bound: int) -> int:
-        first_dim, second_dim = coord
-        if second_dim < second_dim_bound:
-            return first_dim * second_dim_bound + second_dim
-        else:
-            raise IndexError(f"Second dimension index out of range: {second_dim=} < {second_dim_bound=}")
-
-    @staticmethod
-    def get_coord_from_index(index: int, second_dim_bound: int) -> Coord:
-        return index // second_dim_bound, index % second_dim_bound

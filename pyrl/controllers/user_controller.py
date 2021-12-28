@@ -86,7 +86,7 @@ class UserController(GameActionsMixin):
 
     def _act(self) -> Action:
         action: Action
-        if self.walk_mode.is_walk_mode_active():
+        if self.walk_mode.active:
             action = self.walk_mode.continue_walk()
         else:
             key = self.io.get_key()

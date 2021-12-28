@@ -46,7 +46,7 @@ def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: AssetT
                    -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
 
     _assert_dimensions(dimensions, table_data)
-    unfinalized_tiles = Table(dimensions, table_data)
+    unfinalized_tiles: Table[Letter] = Table(dimensions, table_data)
 
     tiles_lookup = base_tiles.copy()
     tiles_lookup.update(custom_tiles)
@@ -57,37 +57,37 @@ def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: AssetT
     creatures_lookup = base_creatures.copy()
     creatures_lookup.update(custom_creatures)
 
-    return _construct_data(unfinalized_tiles, tiles_lookup, locations, creatures_lookup)
+    return _construct_data(dimensions, table_data, tiles_lookup, locations, creatures_lookup)
 
 def _assert_dimensions(dimensions: Dimensions, table_data: str) -> None:
     assert len(table_data) == dimensions.area, "Wrong dimensions for custom level definition."
 
-def _construct_data(unfinalized_tiles: Table, tiles_lookup: AssetTileDict,
+def _construct_data(dimensions: Dimensions, table_data: str, tiles_lookup: AssetTileDict,
                     locations_lookup: AssetLocationDict, creatures_lookup: AssetCreatureDict) \
                         -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
-    tiles = unfinalized_tiles
     locations = {}
     creatures = []
-    for coord, char in tiles.enumerate():
+    tile_list: list[Tile] = []
+    for index, letter in enumerate(table_data):
+        coord = dimensions.get_coord(index)
+        tile_list.append(tiles_lookup[letter])
 
-        tiles[coord] = tiles_lookup[char]
+        if letter in locations_lookup:
+            locations[coord] = locations_lookup[letter]
 
-        if char in locations_lookup:
-            locations[coord] = locations_lookup[char]
-
-        if char in creatures_lookup:
-            creature = creatures_lookup[char]
+        if letter in creatures_lookup:
+            creature = creatures_lookup[letter]
             creature.coord = coord
             creatures.append(creature)
-
-    _finalize_tiles(tiles)
+    tiles: Table[Tile] = _finalize_tiles(Table(dimensions, tile_list))
     return tiles, locations, creatures
 
-def _finalize_tiles(tiles: Table) -> None:
+def _finalize_tiles(tiles: Table[Tile]) -> Table[Tile]:
     for coord, tile in tiles.enumerate():
         tiles[coord] = _finalize_tile(coord, tile, tiles)
+    return tiles
 
-def _finalize_tile(coord: Coord, tile: Tile, tiles: Table) -> Tile:
+def _finalize_tile(coord: Coord, tile: Tile, tiles: Table[Tile]) -> Tile:
     if tile != PyrlTiles.Dynamic_Wall:
         return tile
 

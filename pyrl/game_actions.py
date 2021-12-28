@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING
 
 from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message
+from pyrl.algorithms.coord_algorithms import get_vector, add_vector, vector_is_direction
 from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetException
+from pyrl.creature.creature import Creature
 from pyrl.creature.item import Item
 from pyrl.creature.mixins.hoarder import Hoarder, has_inventory
 from pyrl.creature.mixins.visionary import Visionary
-from pyrl.algorithms.coord_algorithms import get_vector, add_vector
 from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
@@ -15,7 +16,6 @@ from pyrl.types.level_location import LevelLocation
 from pyrl.world.tile import Tile
 
 if TYPE_CHECKING:
-    from pyrl.creature.creature import Creature
     from pyrl.game import Game
 
 class GameActions(GameMixin, CreatureMixin):
@@ -117,6 +117,7 @@ class GameActions(GameMixin, CreatureMixin):
         self.assert_not_acted_yet()
 
         target_coord = add_vector(self.coord, direction)
+        target: Tile | Creature
         if target_coord in self.level.creatures:
             target = self.level.creatures[target_coord]
         else:
@@ -124,16 +125,17 @@ class GameActions(GameMixin, CreatureMixin):
 
         succeeds, damage = get_melee_attack_cr(self.creature, target)
         died = False
-        if damage:
-            target.receive_damage(damage)
-            died = target.is_dead()
-        if died:
-            self.game.creature_death(target)
+        if isinstance(target, Creature):
+            if damage:
+                target.receive_damage(damage)
+                died = target.is_dead()
+            if died:
+                self.game.creature_death(target)
         self._apply_action_cost(self.creature.action_cost(Action.Attack))
         self._attack_user_message(succeeds, damage, died, target)
         return Action.Attack
 
-    def _attack_user_message(self, succeeds: bool, damage: int, died: bool, target: Creature) -> None:
+    def _attack_user_message(self, succeeds: bool, damage: int, died: bool, target: Creature | Tile) -> None:
         player_attacker: bool = self.creature is self.player
         player_target: bool = target is self.player
         if player_attacker or player_target:
@@ -219,8 +221,12 @@ class GameActions(GameMixin, CreatureMixin):
         assert isinstance(self.creature, Hoarder), f"{self.creature} doesn't have an inventory."
         return self.creature.inventory.inspect_items()
 
-    def can_reach(self, target_coord: Coord) -> bool:
-        return self.coord == target_coord or get_vector(self.coord, target_coord) in Dir.All
+    def can_reach(self, target_coord: Coord) -> Direction | None:
+        vector = get_vector(self.coord, target_coord)
+        if vector_is_direction(vector):
+            return vector
+        else:
+            return None
 
     def can_move(self, direction: Direction) -> bool:
         if direction not in Dir.AllPlusStay:

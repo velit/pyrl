@@ -64,7 +64,7 @@ def Weapon(name: str,
            damage_dice: Dice,
            two_handed: bool = False,
            compatible_slots: Iterable[Slot] = (Slot.Right_Hand, Slot.Left_Hand),
-           stats: Stats = None,
+           stats: Stats | None = None,
            char: Glyph = ('(', ColorPairs.Normal)) -> Item:
     if stats is None:
         stats = Stats()
@@ -77,7 +77,7 @@ def Armor(name: str,
           defense: int,
           armor: int,
           compatible_slots: Iterable[Slot] = (),
-          stats: Stats = None,
+          stats: Stats | None = None,
           char: Glyph = (']', ColorPairs.Normal)) -> Item:
     if stats is None:
         stats = Stats()
