@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from functools import partial
-from typing import Literal, TYPE_CHECKING
+from typing import Literal
 
 from pyrl.algorithms.coord_algorithms import add_vector
 from pyrl.config.binds import Binds
@@ -32,9 +33,10 @@ class UserController(CreatureActionsMixin):
 
     def define_actions(self) -> dict[str, ActionCallable]:
         actions_funcs: dict[str, ActionCallable] = {
-            '+':               partial(self.debug_action.sight_change, 1),
-            '-':               partial(self.debug_action.sight_change, -1),
-            Keys.CLOSE_WINDOW: self.quit,
+            '+':                      partial(self.debug_action.sight_change, 1),
+            '-':                      partial(self.debug_action.sight_change, -1),
+            Keys.WINDOW_RESIZE:       self.redraw,
+            Keys.CLOSE_WINDOW:        self.quit,
         }
 
         unfinalized_actions: dict[KeyTuple, ActionCallable] = {
@@ -55,6 +57,8 @@ class UserController(CreatureActionsMixin):
             Binds.Ascend:             self.ascend,
             Binds.Descend:            self.descend,
             Binds.Toggle_Fullscreen:  self.toggle_fullscreen,
+            Binds.Next_Tileset:       self.next_tileset,
+            Binds.Previous_Tileset:   self.previous_tileset,
 
             Binds.North:              partial(self.act_to_dir, Dir.North),
             Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
@@ -236,3 +240,15 @@ class UserController(CreatureActionsMixin):
     def toggle_fullscreen(self) -> Literal[Action.No_Action]:
         self.io.cursor_lib.toggle_fullscreen()
         return Action.No_Action
+
+    def next_tileset(self) -> Literal[Action.Redraw]:
+        tileset_name = self.io.cursor_lib.next_tileset()
+        logging.debug(tileset_name)
+        self.io.msg(tileset_name)
+        return self.actions.redraw()
+
+    def previous_tileset(self) -> Literal[Action.Redraw]:
+        tileset_name = self.io.cursor_lib.previous_tileset()
+        logging.debug(tileset_name)
+        self.io.msg(tileset_name)
+        return self.actions.redraw()

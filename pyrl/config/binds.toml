@@ -94,3 +94,5 @@ Instant_NorthEast = []
 
 [Other]
 Toggle_Fullscreen = ["F11"]
+Next_Tileset      = ["F8"]
+Previous_Tileset  = ["F7"]

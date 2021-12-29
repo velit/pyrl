@@ -30,3 +30,9 @@ class IoWrapper(Protocol):
 
     def toggle_fullscreen(self) -> None:
         pass
+
+    def next_tileset(self) -> str:
+        return f"Not supported in {self.implementation}"
+
+    def previous_tileset(self) -> str:
+        return f"Not supported in {self.implementation}"

@@ -64,7 +64,7 @@ def init_cursor_lib(output: str) -> IoWrapper:
 
 def create_game(options: argparse.Namespace, cursor_lib: IoWrapper) -> Game:
     init_files_and_folders()
-    init_logger_system()
+    init_logger_system(options.output)
 
     if options.load:
         game = load_game(options.load, cursor_lib)
@@ -87,9 +87,13 @@ def init_files_and_folders() -> None:
     if not os.path.exists(Config.save_folder):
         os.makedirs(Config.save_folder)
 
-def init_logger_system() -> None:
-    logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
-    logging.debug("Starting new session")
+def init_logger_system(output: str) -> None:
+    if output == "sdl":
+        logging.basicConfig(level=Debug.log_level)
+        logging.debug("Starting new session")
+    else:
+        logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
+        logging.debug("Starting new session")
 
 def load_game(game_name: str, cursor_lib: IoWrapper) -> Game:
     try:
