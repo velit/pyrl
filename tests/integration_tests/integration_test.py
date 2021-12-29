@@ -35,7 +35,6 @@ def game(io_wrapper: IoWrapper) -> Game:
 def load_game(io_wrapper: IoWrapper) -> Game:
     return main.create_game(main.get_commandline_options(args=("-l", "test")), io_wrapper)
 
-@pytest.mark.skip(reason="Disabled until save system is fixed")
 def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy: DummyPlugSystem) -> None:
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]

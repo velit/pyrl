@@ -13,12 +13,11 @@ from pyrl.controllers.ai_controller import AIController, AiState
 from pyrl.controllers.user_controller import UserController
 from pyrl.creature.action import Action
 from pyrl.creature.creature import Creature
+from pyrl.creature.creature_actions import CreatureActions
 from pyrl.creature.mixins.visionary import Visionary
 from pyrl.creature.player import Player
-from pyrl.creature.creature_actions import CreatureActions
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.io_wrappers.io_wrapper import IoWrapper
-from pyrl.structures.helper_mixins import HasCreatureActions
 from pyrl.types.world_point import WorldPoint
 from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
@@ -166,7 +165,7 @@ class Game:
     def __getstate__(self) -> dict[str, Any]:
         exclude_state = (
             'ai_controller',
-            'creature_actions'
+            'creature_actions',
             'io',
             'user_controller',
         )

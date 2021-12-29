@@ -342,6 +342,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1609809005" done="1640875048">
+        Separate Equipment_Select_Keys to head, armor, righthand, lefthand and feet
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1609809787" done="1610160104">
         Refactor .format strings to f-strings
         <comment>
@@ -639,11 +645,11 @@
     <note priority="veryhigh" time="1475592380">
         Add item drops and progression through that
     </note>
-    <note priority="veryhigh" time="1609809005">
-        Separate Equipment_Select_Keys to head, armor, righthand, lefthand and feet
-    </note>
-    <note priority="veryhigh" time="1610212428">
+    <note priority="veryhigh" time="1610212428" done="1640875160">
         Fix tcod https://python-tcod.readthedocs.io/en/latest/installation.html
+        <comment>
+            done
+        </comment>
     </note>
     <note priority="veryhigh" time="1618067884">
         Add gunslinger with vests that hold four pistols and the rotation shoots all of them
