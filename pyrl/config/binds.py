@@ -85,6 +85,9 @@ class Binds:
     Instant_North           = unbound
     Instant_NorthEast       = unbound
 
+    Other                   = unbound
+    Toggle_Fullscreen       = unbound
+
     _direction_keys: dict[Key, Direction] = {}
 
     @classmethod

@@ -6,6 +6,8 @@ import logging
 from typing import Iterable, TYPE_CHECKING
 
 from pyrl.config.debug import Debug
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.position import Position
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.curses import IMPLEMENTATION, WideChar
 from pyrl.io_wrappers.curses.curses_dicts import Curses256ColorDict, CursesColorDict
@@ -70,14 +72,14 @@ class CursesWindow(IoWindow):
     def clear(self) -> None:
         self.win.erase()
 
-    def blit(self, size: tuple[int, int], screen_position: tuple[int, int]) -> None:
+    def blit(self, size: Dimensions, screen_position: Position) -> None:
         self._ensure_terminal_is_big_enough()
-        rows, cols = size
+        rows, cols = size.params
         y, x = screen_position
         self.win.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
 
-    def get_dimensions(self) -> tuple[int, int]:
-        return self.win.getmaxyx()
+    def get_dimensions(self) -> Dimensions:
+        return Dimensions(*self.win.getmaxyx())
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         y, x = coord
@@ -148,7 +150,7 @@ class CursesWindow(IoWindow):
         return key, alt
 
     def _ensure_terminal_is_big_enough(self) -> None:
-        rows, cols = self.root_win.get_dimensions()
+        rows, cols = self.root_win.get_dimensions().params
         min_rows, min_cols = WindowSystem.game_dimensions.params
         while rows < min_rows or cols < min_cols:
             message = (f"Game needs at least a screen size of {min_cols}x{min_rows} while the "
@@ -165,4 +167,4 @@ class CursesWindow(IoWindow):
                     exit()
             self.root_win.clear()
             self.root_win.win.refresh()
-            rows, cols = self.root_win.get_dimensions()
+            rows, cols = self.root_win.get_dimensions().params

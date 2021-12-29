@@ -4,11 +4,11 @@ try:
     import curses
 except ImportError:
     import sys
-    print("Couldn't import curses. Try running sdlpyrl.py")
+    print("Couldn't import curses. Try running with sdl output.")
     sys.exit(1)
 
-IMPLEMENTATION = "curses"
 WideChar = int | str
+IMPLEMENTATION = "curses"
 
 def clean_curses() -> None:
     """Resume normal shell state. Does nothing if curses wasn't initialized."""

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import curses
+from typing import Any
 
-from pyrl.io_wrappers.curses import IMPLEMENTATION
+from pyrl.io_wrappers.curses import IMPLEMENTATION, clean_curses
 from pyrl.io_wrappers.curses.curses_window import CursesWindow
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.io_wrapper import IoWrapper
@@ -30,6 +31,12 @@ class CursesWrapper(IoWrapper):
             pass
 
         self.root_win = CursesWindow(self.curses_root_window)
+
+    def __enter__(self) -> IoWrapper:
+        return self
+
+    def __exit__(self, *args: Any, **kwargs: Any) -> None:
+        clean_curses()
 
     def new_window(self, dimensions: Dimensions) -> IoWindow:
         """Create and return a curses window wrapper of dimensions = (rows, colums)."""

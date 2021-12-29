@@ -1,98 +1,96 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterator
+from typing import Iterable, Any
 
 import tcod
+from tcod import Console
+from tcod.event import Modifier
 
-from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.tcod import IMPLEMENTATION
-from pyrl.io_wrappers.tcod.tcod_colors import tcod_color_map
-from pyrl.io_wrappers.tcod.tcod_keys import tcod_key_map
+from pyrl.io_wrappers.tcod.tcod_colors import color_map
+from pyrl.io_wrappers.tcod.tcod_keys import key_map, ignore_keys
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.helper_mixins import DimensionsMixin
+from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import Color, ColorPair, ColorPairs
+from pyrl.types.color import Color, ColorPair
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
+from tests.integration_tests.dummy_plug_system import handle_dummy_input
 
-class TcodWindow(IoWindow):
+class TcodWindow(IoWindow, DimensionsMixin):
     implementation = IMPLEMENTATION
-    key_map = tcod_key_map
-    color_map = tcod_color_map
 
-    def __init__(self, libtcod_console: tcod.Console) -> None:
-        self.default_fg = self.color_map[Color.Normal]
-        self.default_bg = self.color_map[Color.Black]
-        self.console: tcod.Console = libtcod_console
-        tcod.console_set_default_foreground(self.console, self.default_fg)
-        tcod.console_set_default_background(self.console, self.default_bg)
+    def __init__(self, console: Console, root_console: Console) -> None:
+        self.console = console
+        self.root_console = root_console
+        self.default_fg = color_map[Color.Normal]
+        self.default_bg = color_map[Color.Black]
 
     @handle_dummy_input
     def get_key(self) -> Key:
-        while True:
-            key_event = tcod.Key()
-            mouse_event = tcod.Mouse()
-            tcod.sys_wait_for_event(tcod.EVENT_KEY_PRESS, key_event, mouse_event, False)
-            key = self._interpret_event(key_event)
-            if key != Keys.NO_INPUT:
-                return key
+        while (key := self._interpret_events(tcod.event.wait())) == Keys.NO_INPUT:
+            pass
+        return key
 
     def check_key(self) -> Key:
-        event = tcod.console_check_for_keypress(tcod.KEY_PRESSED)
-        return self._interpret_event(event)
+        return self._interpret_events(tcod.event.get())
 
-    def _interpret_event(self, event: tcod.Key) -> Key:
-        if tcod.console_is_window_closed():
-            return Keys.CLOSE_WINDOW
-        elif event.vk in self.key_map:
-            return self.key_map[event.vk]
-        elif event.vk == tcod.KEY_CHAR:
-            if event.c == ord('c') and event.lctrl or event.rctrl:
-                raise KeyboardInterrupt
-            ch = chr(event.c)
-            if event.shift:
-                ch = ch.upper()
-            if event.lctrl or event.rctrl:
-                ch = "^" + ch
-            if event.lalt or event.ralt:
-                ch = "!" + ch
-            return ch
-        else:
-            return Keys.NO_INPUT
+    def _interpret_events(self, events: Iterator[Any]) -> Key:
+        for event in events:
+            if isinstance(event, tcod.event.Quit):
+                raise SystemExit()
+            elif isinstance(event, tcod.event.KeyDown):
+                if event.sym in key_map:
+                    return key_map[event.sym]
+                if event.sym in ignore_keys:
+                    continue
+                key = event.sym.label
+                if event.mod & Modifier.SHIFT:
+                    key = key.upper()
+                else:
+                    key = key.lower()
+                if event.mod & Modifier.CTRL:
+                    key = "^" + key
+                if event.mod & Modifier.ALT:
+                    key = "!" + key
+                if key == "^c":
+                    raise KeyboardInterrupt
+                return key
+        return Keys.NO_INPUT
 
     def clear(self) -> None:
-        tcod.console_clear(self.console)
+        self.console.clear(fg=self.default_fg, bg=self.default_bg)
 
-    def blit(self, size: tuple[int, int], screen_position: tuple[int, int]) -> None:
-        rows, cols = size
+    def blit(self, size: Dimensions, screen_position: Position) -> None:
         y, x = screen_position
-        tcod.console_blit(self.console, 0, 0, cols, rows, 0, x, y, 1.0, 1.0)
+        self.console.blit(self.root_console, dest_y=y, dest_x=x)
 
-    def get_dimensions(self) -> tuple[int, int]:
-        return tcod.console_get_height(self.console), tcod.console_get_width(self.console)
+    def get_dimensions(self) -> Dimensions:
+        return Dimensions(self.console.height, self.console.width)
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         y, x = coord
         symbol, (fg, bg) = char
-        tcod.console_put_char_ex(self.console, x, y, symbol, self.color_map[fg], self.color_map[bg])
+        self.console.print(y=y, x=x, string=symbol, fg=color_map[fg], bg=color_map[bg])
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
         y, x = coord
         if color is None:
-            fg, bg = ColorPairs.Normal
+            fg, bg = self.default_fg, self.default_bg
         else:
-            fg, bg = color
-        tcod.console_set_color_control(tcod.COLCTRL_1, self.color_map[fg], self.color_map[bg])
-        string = chr(tcod.COLCTRL_1) + string + chr(tcod.COLCTRL_STOP)
-        tcod.console_print(self.console, x, y, string)
+            fg_colo, bg_colo = color
+            fg, bg = color_map[fg_colo], color_map[bg_colo]
+        self.console.print(y=y, x=x, string=string, fg=fg, bg=bg)
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        _draw = tcod.console_put_char_ex
-        local_color = self.color_map
+        _print = self.console.print
         for (y, x), (symbol, (fg, bg)) in glyph_info_iterable:
-            _draw(self.console, x, y, symbol, local_color[fg], local_color[bg])
+            _print(y=y, x=x, string=symbol, fg=color_map[fg], bg=color_map[bg])
 
     def draw_reverse(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        _draw = tcod.console_put_char_ex
-        local_color = self.color_map
+        _print = self.console.print
         for (y, x), (symbol, (fg, bg)) in glyph_info_iterable:
-            _draw(self.console, x, y, symbol, local_color[bg], local_color[fg])
+            _print(y=y, x=x, string=symbol, fg=color_map[bg], bg=color_map[fg])

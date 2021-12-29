@@ -91,3 +91,6 @@ Instant_East      = []
 Instant_NorthWest = []
 Instant_North     = []
 Instant_NorthEast = []
+
+[Other]
+Toggle_Fullscreen = ["F11"]

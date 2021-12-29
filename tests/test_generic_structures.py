@@ -58,14 +58,14 @@ def test_one_to_one_mapping() -> None:
 
 def test_observable_event() -> None:
     event = Event()
-    sub1 = None
-    sub2 = None
+    sub1: int | None = None
+    sub2: int | None = None
 
-    def sub_fun_1(x: Callable) -> None:
+    def sub_fun_1(x: int) -> None:
         nonlocal sub1
         sub1 = x
 
-    def sub_fun_2(x: Callable) -> None:
+    def sub_fun_2(x: int) -> None:
         nonlocal sub2
         sub2 = x
 

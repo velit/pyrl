@@ -11,10 +11,10 @@ Entry = tuple[int, int, T]
 class Scheduler(Generic[T]):
     """Priority queue based scheduler. Behaves in LIFO fashion with equal time values."""
 
-    priority_queue: list[Entry[T]] = field(default_factory=list, repr=False)
-    remove_set:          set[T] = field(default_factory=set, repr=False)
-    time:                   int = 0
-    count:                  int = 0  # count is used to resolve time collisions in the queue
+    priority_queue: list[tuple[int, int, T]] = field(default_factory=list, repr=False)
+    remove_set: set[T] = field(default_factory=set, repr=False)
+    time: int = 0
+    count: int = 0  # count is used to resolve time collisions in the queue
 
     def addpop(self, item: T, time_delta: int) -> tuple[T, int]:
         self.count -= 1

@@ -7,9 +7,9 @@ from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_45, 
     anticlockwise_45
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.creature.actions import Action, IllegalContextException
-from pyrl.game_actions import GameActions
-from pyrl.structures.helper_mixins import GameActionsMixin
+from pyrl.creature.action import Action, IllegalContextException
+from pyrl.creature.creature_actions import CreatureActions
+from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.direction import Direction, Dir
 
 class Type(Enum):
@@ -27,12 +27,12 @@ class WalkModeState(NamedTuple):
 
 INTERRUPT_MSG_TIME = 1
 
-class WalkMode(GameActionsMixin):
+class WalkMode(CreatureActionsMixin):
 
     state: WalkModeState
 
-    def __init__(self, game_actions: GameActions):
-        self.actions = game_actions
+    def __init__(self, actions: CreatureActions):
+        self.actions = actions
         self.active = False
 
     def init_walk_mode(self, direction: Direction | None = None) -> Literal[Action.Move, Action.No_Action]:

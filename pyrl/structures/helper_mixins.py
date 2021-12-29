@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from pyrl.creature.creature import Creature
     from pyrl.creature.player import Player
     from pyrl.game import Game
-    from pyrl.game_actions import GameActions
+    from pyrl.creature.creature_actions import CreatureActions
     from pyrl.structures.dimensions import Dimensions
     from pyrl.types.coord import Coord
     from pyrl.window.window_system import WindowSystem
@@ -62,33 +62,33 @@ class DimensionsMixin:
     def cols(self: HasDimensions) -> int:
         return self.dimensions.cols
 
-class HasGameActions(Protocol):
+class HasCreatureActions(Protocol):
     @property
-    def actions(self) -> GameActions:
+    def actions(self) -> CreatureActions:
         raise NotImplementedError
 
-class GameActionsMixin:
+class CreatureActionsMixin:
 
     @property
-    def creature(self: HasGameActions) -> Creature:
+    def creature(self: HasCreatureActions) -> Creature:
         return self.actions.creature
 
     @property
-    def coord(self: HasGameActions) -> Coord:
+    def coord(self: HasCreatureActions) -> Coord:
         return self.actions.creature.coord
 
     @property
-    def level(self: HasGameActions) -> Level:
+    def level(self: HasCreatureActions) -> Level:
         return self.actions.creature.level
 
     @property
-    def io(self: HasGameActions) -> WindowSystem:
+    def io(self: HasCreatureActions) -> WindowSystem:
         return self.actions.game.io
 
     @property
-    def world(self: HasGameActions) -> World:
+    def world(self: HasCreatureActions) -> World:
         return self.actions.game.world
 
     @property
-    def player(self: HasGameActions) -> Player:
+    def player(self: HasCreatureActions) -> Player:
         return self.actions.game.world.player

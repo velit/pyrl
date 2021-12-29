@@ -5,24 +5,21 @@ from typing import Literal, TYPE_CHECKING
 
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Dir
-from pyrl.creature.actions import Action
-from pyrl.game_actions import GameActions
-from pyrl.structures.helper_mixins import GameActionsMixin
+from pyrl.creature.action import Action
+from pyrl.creature.creature_actions import CreatureActions
+from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.algorithms.coord_algorithms import resize_vector_to_len, get_vector, add_vector
+from pyrl.creature.creature import Creature
 
-if TYPE_CHECKING:
-    from pyrl.creature.creature import Creature
+AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 
-class AI(GameActionsMixin):
+class AIController(CreatureActionsMixin):
 
-    actions: GameActions
+    def __init__(self, ai_state: AiState, actions: CreatureActions) -> None:
+        self.ai_state = ai_state
+        self.actions = actions
 
-    def __init__(self) -> None:
-        self.ai_state: dict[Creature, tuple[Coord | None, Coord | None]] = {}
-
-    def act(self, game_actions: GameActions, alert_coord: Coord) -> Literal[Action.Move, Action.Swap, Action.Attack]:
-        self.actions = game_actions
-
+    def act(self, alert_coord: Coord) -> Action:
         if self.creature in self.ai_state:
             chase_coord, chase_vector = self.ai_state[self.creature]
         else:

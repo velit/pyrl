@@ -5,10 +5,10 @@ from typing import Literal
 
 from pyrl.config.binds import Binds
 from pyrl.types.equipment_slot import Slot
-from pyrl.game_actions import GameActions
-from pyrl.creature.actions import Action, NoValidTargetException
+from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.action import Action, NoValidTargetException
 from pyrl.creature.inventory import Inventory
-from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view, a_lines_view
+from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view
 from pyrl.types.line import Line
 
 def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:
@@ -20,7 +20,7 @@ def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:
     else:
         return item.name
 
-def equipment_view(actions: GameActions) -> Literal[Action.No_Action, Action.Drop_Items]:
+def equipment_view(actions: CreatureActions) -> Literal[Action.No_Action, Action.Drop_Items]:
     footer = f"Press a slot key to (un)equip" \
              f"  {Binds.Equipment_View_Backpack.key} to view backpack" \
              f"  {Binds.Cancel.key} to close"
@@ -38,7 +38,9 @@ def equipment_view(actions: GameActions) -> Literal[Action.No_Action, Action.Dro
         if key in Binds.Cancel:
             return Action.No_Action
         elif key in Binds.Equipment_View_Backpack:
-            backpack_view(actions)
+            action = backpack_view(actions)
+            if action != Action.No_Action:
+                return action
         elif slot is not None and slot in Slot:
             if inventory.get_item(slot) is None:
                 backpack_equip_item_view(actions, slot)
@@ -47,7 +49,7 @@ def equipment_view(actions: GameActions) -> Literal[Action.No_Action, Action.Dro
         else:
             assert False, f"Got unhandled return values {key=} {slot=}"
 
-def backpack_equip_item_view(actions: GameActions, slot: Slot) -> None:
+def backpack_equip_item_view(actions: CreatureActions, slot: Slot) -> None:
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items())
                                        if item.fits_slot(slot))
     key, item = lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
@@ -57,7 +59,7 @@ def backpack_equip_item_view(actions: GameActions, slot: Slot) -> None:
     elif item is not None:
         actions.player.inventory.equip_from_bag(item, slot)
 
-def backpack_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
+def backpack_view(actions: CreatureActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = multi_select_lines_view(
         actions.io.whole_window,
@@ -72,7 +74,8 @@ def backpack_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_
         return action
     return Action.No_Action
 
-def pickup_items_view(actions: GameActions) -> Literal[Action.Pick_Items, Action.No_Action]:
+def pickup_items_view(actions: CreatureActions) -> Literal[Action.Pick_Items, Action.No_Action]:
+
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_floor_items()))
     if not lines:
         raise NoValidTargetException("Creature tried to pick up items in a place without any.",
@@ -94,7 +97,7 @@ def pickup_items_view(actions: GameActions) -> Literal[Action.Pick_Items, Action
         return action
     return Action.No_Action
 
-def drop_items_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
+def drop_items_view(actions: CreatureActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
     key, selections = multi_select_lines_view(
         actions.io.whole_window,

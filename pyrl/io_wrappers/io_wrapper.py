@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol
+from typing import Protocol, Any
 
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.structures.dimensions import Dimensions
@@ -9,18 +9,24 @@ from pyrl.structures.dimensions import Dimensions
 class IoWrapper(Protocol):
     implementation: str
 
+    def __enter__(self) -> IoWrapper:
+        return self
+
+    def __exit__(self, *args: Any, **kwargs: Any) -> None:
+        pass
+
     @abstractmethod
     def new_window(self, dimensions: Dimensions) -> IoWindow:
         raise NotImplementedError
 
-    @abstractmethod
     def flush(self) -> None:
-        raise NotImplementedError
+        pass
 
-    @abstractmethod
     def suspend(self) -> None:
-        raise NotImplementedError
+        pass
 
-    @abstractmethod
     def resume(self) -> None:
-        raise NotImplementedError
+        pass
+
+    def toggle_fullscreen(self) -> None:
+        pass

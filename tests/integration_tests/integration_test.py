@@ -19,14 +19,14 @@ CONTINUE_AFTER_INTEGRATION_TEST = False
 
 @pytest.fixture
 def dummy() -> Iterable[DummyPlugSystem]:
-    # dummy = dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.2)
-    dummy = dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)
-    yield dummy
-    dummy.reset_modes()
+    # with dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.1) as dummy_plug:
+    with dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Instant) as dummy_plug:
+        yield dummy_plug
 
 @pytest.fixture
-def io_wrapper() -> IoWrapper:
-    return TestWrapper()
+def io_wrapper() -> Iterable[IoWrapper]:
+    with TestWrapper() as io_wrapper:
+        yield io_wrapper
 
 @pytest.fixture
 def game(io_wrapper: IoWrapper) -> Game:
@@ -141,8 +141,10 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     assert game.turn_counter == 9
     assert game.player.level.level_key.idx == 2
 
-    # equip armor and run to end
-    game = dummy.add_input_and_run(['e', 'b', 'a', 'z', 'd', 'x'], game)
+    # equip armor
+    game = dummy.add_input_and_run(['e', 'b', 'a', 'z'], game)
+    # run to end
+    # game = dummy.add_input_and_run(['d', 'x'], game)
 
     if CONTINUE_AFTER_INTEGRATION_TEST:
         dummy.reset_modes()

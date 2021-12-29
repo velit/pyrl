@@ -6,7 +6,8 @@ from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TypeVar, Callable, TYPE_CHECKING
+from types import TracebackType
+from typing import TypeVar, Callable, TYPE_CHECKING, Type, Any
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.types.key_sequence import KeySequence, AnyKeys
 from pyrl.types.keys import Key
@@ -49,6 +50,12 @@ class DummyPlugSystem:
             _dps.speed_mode = speed_mode
         if delay:
             _dps.delay = delay
+
+    def __enter__(self) -> DummyPlugSystem:
+        return self
+
+    def __exit__(self, *args: Any, **kwargs: Any) -> None:
+        self.reset_modes()
 
     def reset_modes(self) -> None:
         self.__init__()  # type: ignore

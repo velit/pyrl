@@ -83,7 +83,7 @@ class BaseWindow(DimensionsMixin):
             return Keys.NO_INPUT
 
     def blit(self) -> None:
-        self.cursor_win.blit(self.dimensions.params, self.screen_position)
+        self.cursor_win.blit(self.dimensions, self.screen_position)
 
     def refresh(self) -> None:
         self.blit()

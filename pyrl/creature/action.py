@@ -4,7 +4,7 @@ from enum import Enum
 
 class Action(Enum):
     No_Action      = "Creature didn't do an action.",  0
-    Free_Action    = "Creature did a free action.",    0
+    Free_action    = "Creature didn't do an action.",  0
     Save           = "Player saved.",                  0
     Redraw         = "Player redrew the screen.",      0
     Generic        = "Creature did a generic action.", 1000

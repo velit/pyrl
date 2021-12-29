@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Protocol, Iterable
 
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
 from pyrl.types.color import ColorPair
 from pyrl.types.coord import Coord
@@ -23,11 +25,11 @@ class IoWindow(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def blit(self, size: tuple[int, int], screen_position: tuple[int, int]) -> None:
+    def blit(self, size: Dimensions, screen_position: Position) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def get_dimensions(self) -> tuple[int, int]:
+    def get_dimensions(self) -> Dimensions:
         raise NotImplementedError
 
     @abstractmethod

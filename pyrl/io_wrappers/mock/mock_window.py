@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Iterable
 
 from pyrl.game_data.levels.shared_assets import default_dims
+from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.position import Position
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.mock import IMPLEMENTATION
@@ -28,11 +30,11 @@ class MockWindow(IoWindow):
     def clear(self) -> None:
         pass
 
-    def blit(self, size: tuple[int, int], screen_position: tuple[int, int]) -> None:
+    def blit(self, size: Dimensions, screen_position: Position) -> None:
         pass
 
-    def get_dimensions(self) -> tuple[int, int]:
-        return default_dims.params
+    def get_dimensions(self) -> Dimensions:
+        return default_dims
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         pass

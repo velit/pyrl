@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from functools import partial
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
 from pyrl.algorithms.coord_algorithms import add_vector
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.creature.actions import Action, ActionException
-from pyrl.game_actions import GameActions
+from pyrl.creature.action import Action, ActionException
+from pyrl.creature.creature_actions import CreatureActions
 from pyrl.game_data.levels.shared_assets import DefaultLocation
-from pyrl.structures.helper_mixins import GameActionsMixin
+from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.color import Color, ColorPairs
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.keys import Keys, KeyTuple
@@ -20,17 +20,15 @@ from pyrl.user_interface.lines_view import build_lines, lines_view
 
 ActionCallable = Callable[[], Action]
 
-class UserController(GameActionsMixin):
+class UserController(CreatureActionsMixin):
 
-    def __init__(self, game_actions: GameActions):
-        self.actions = game_actions
-
+    def __init__(self, actions: CreatureActions) -> None:
         from pyrl.controllers.walk_mode import WalkMode
-        self.walk_mode = WalkMode(self.actions)
-
         from pyrl.controllers.debug_action import DebugAction
+        self.actions = actions
+        self.walk_mode = WalkMode(self.actions)
         self.debug_action = DebugAction(self.actions)
-        self.actions_funcs = self.define_actions()
+        self.action_lookup = self.define_actions()
 
     def define_actions(self) -> dict[str, ActionCallable]:
         actions_funcs: dict[str, ActionCallable] = {
@@ -56,6 +54,7 @@ class UserController(GameActionsMixin):
             Binds.Show_Vision:        self.show_vision,
             Binds.Ascend:             self.ascend,
             Binds.Descend:            self.descend,
+            Binds.Toggle_Fullscreen:  self.toggle_fullscreen,
 
             Binds.North:              partial(self.act_to_dir, Dir.North),
             Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
@@ -84,44 +83,41 @@ class UserController(GameActionsMixin):
 
         return actions_funcs
 
-    def _act(self) -> Action:
+    def act(self) -> Action:
+        try:
+            action = self._get_action()
+        except ActionException as exception:
+            self.io.msg(exception.player_message)
+            action = Action.No_Action
+
+        if action in (Action.Move, Action.Teleport, Action.Swap, Action.Spawn):
+            items = self.actions.inspect_floor_items()
+
+            if self.actions.get_passage():
+                self.io.msg(f"There is a {self.actions.get_tile().name} here.")
+
+            if len(items) == 1:
+                self.io.msg(f"A {items[0].name} is lying here.")
+            elif 1 < len(items) <= 10:
+                self.io.msg("There are several items lying here.")
+            elif 10 < len(items):
+                self.io.msg("There is a stack of items lying here.")
+
+        return action
+
+    def _get_action(self) -> Action:
         action: Action
         if self.walk_mode.active:
             action = self.walk_mode.continue_walk()
         else:
             key = self.io.get_key()
-            if key in self.actions_funcs:
-                action = self.actions_funcs[key]()
+            if key in self.action_lookup:
+                action = self.action_lookup[key]()
             else:
                 self.io.msg(f"Undefined key: {key}")
                 action = Action.No_Action
+
         return action
-
-    def act(self) -> None:
-        while True:
-            try:
-                action = self._act()
-                if action in (Action.No_Action, Action.Free_Action):
-                    continue
-            except ActionException as exception:
-                self.io.msg(exception.player_message)
-                continue
-
-            if action in (Action.Move, Action.Teleport, Action.Swap, Action.Spawn):
-                items = self.actions.inspect_floor_items()
-
-                if self.actions.get_passage():
-                    self.io.msg(f"There is a {self.actions.get_tile().name} here.")
-
-                if len(items) == 1:
-                    self.io.msg(f"A {items[0].name} is lying here.")
-                elif 1 < len(items) <= 10:
-                    self.io.msg("There are several items lying here.")
-                elif 10 < len(items):
-                    self.io.msg("There is a stack of items lying here.")
-
-            if self.actions.already_acted():
-                return
 
     def act_to_dir(self, direction: Direction) -> Literal[Action.Move] | Literal[Action.Attack]:
         return self.actions.act_to_dir(direction)
@@ -148,7 +144,7 @@ class UserController(GameActionsMixin):
                 self.io.draw_char(char, coord)
                 self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
             key = self.io.get_key()
-            self.actions.redraw()
+            self.actions.redraw_no_action()
             direction = Dir.Stay
             if key in Binds.Directions:
                 direction = Binds.get_direction(key)
@@ -236,3 +232,7 @@ class UserController(GameActionsMixin):
     def help_screen(self) -> Literal[Action.Redraw]:
         help_view(self.io)
         return self.actions.redraw()
+
+    def toggle_fullscreen(self) -> Literal[Action.No_Action]:
+        self.io.cursor_lib.toggle_fullscreen()
+        return Action.No_Action

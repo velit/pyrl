@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pyrl.types.color import Color
 
-tcod_color_map: dict[Color, tuple[int, int, int]] = {
+color_map: dict[Color, tuple[int, int, int]] = {
     Color.Red:           (175, 0, 0),
     Color.Green:         (0, 175, 0),
     Color.Blue:          (0, 0, 175),

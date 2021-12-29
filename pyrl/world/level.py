@@ -9,7 +9,7 @@ from pyrl.algorithms.coord_algorithms import bresenham, cross_product, add_vecto
 from pyrl.algorithms.dungeon_generator import generate_tiles_to
 from pyrl.algorithms.pathing import path, distance
 from pyrl.config.debug import Debug
-from pyrl.creature.actions import Action
+from pyrl.creature.action import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation

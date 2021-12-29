@@ -8,15 +8,15 @@ from pyrl.config.binds import Binds
 from pyrl.config.debug import Debug
 from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_location import LevelLocation
-from pyrl.creature.actions import Action, NoValidTargetException
-from pyrl.game_actions import GameActions
-from pyrl.structures.helper_mixins import GameActionsMixin
+from pyrl.creature.action import Action, NoValidTargetException
+from pyrl.creature.creature_actions import CreatureActions
+from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.world.level import Level
 
-class DebugAction(GameActionsMixin):
+class DebugAction(CreatureActionsMixin):
 
-    def __init__(self, game_actions: GameActions) -> None:
+    def __init__(self, game_actions: CreatureActions) -> None:
         self.actions = game_actions
 
         self.action_funcs: dict[str, Callable[[], Action | None]] = {
@@ -41,24 +41,25 @@ class DebugAction(GameActionsMixin):
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
         if c in self.action_funcs:
             action = self.action_funcs[c]()
-            return action if action is not None else Action.Debug
+            return action if action is not None else Action.No_Action
         self.io.msg(f"Undefined debug key: {c}")
         return Action.No_Action
 
     def print_user_input(self) -> None:
         self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
-    def add_monster(self) -> None:
+    def add_monster(self) -> Literal[Action.Debug] | None:
         if self.level.creature_spawning_enabled:
             self.level.spawn_creature(self.level.creature_spawner.random_creature())
-            self.actions.no_action()
+            return self.actions.debug_action()
         else:
             self.io.msg("No random spawning on this level. Can't add monster.")
+            return None
 
-    def show_map(self) -> None:
+    def show_map(self) -> Literal[Action.Redraw]:
         Debug.show_map = not Debug.show_map
-        self.actions.redraw()
         self.io.msg(f"Show map set to {Debug.show_map}")
+        return self.actions.redraw()
 
     def toggle_path_heuristic_cross(self) -> None:
         Debug.cross = not Debug.cross
@@ -89,24 +90,24 @@ class DebugAction(GameActionsMixin):
             Debug.path_step = False
             self.io.msg("Path debug unset")
 
-    def kill_creatures_in_level(self) -> None:
+    def kill_creatures_in_level(self) -> Literal[Action.Debug]:
         creature_list = list(self.level.creatures.values())
         creature_list.remove(self.creature)
         for i in creature_list:
             self.level.remove_creature(i)
-        self.actions.no_action()
         self.io.msg("Abracadabra.")
+        return self.actions.debug_action()
 
-    def draw_path_to_passage_down(self) -> None:
+    def draw_path_to_passage_down(self) -> Literal[Action.Redraw]:
         passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
-        self.actions.redraw()
+        return self.actions.redraw()
 
-    def draw_path_from_up_to_down(self) -> None:
+    def draw_path_from_up_to_down(self) -> Literal[Action.Redraw]:
         passage_up_coord = self.level.get_location_coord(DefaultLocation.Passage_Up)
         passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
-        self.actions.redraw()
+        return self.actions.redraw()
 
     def interactive_console(self) -> None:
         self.io.suspend()
@@ -128,9 +129,9 @@ class DebugAction(GameActionsMixin):
     def print_message_debug_string(self) -> None:
         self.io.msg(Debug.debug_string)
 
-    def sight_change(self, amount: int) -> Action:
+    def sight_change(self, amount: int) -> Literal[Action.Debug]:
         self.creature.base_perception += amount
-        return self.actions.no_action()
+        return self.actions.debug_action()
 
     def teleport_to_location(self, location: LevelLocation) -> Literal[Action.Teleport]:
         try:

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING
+from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING, TypeVar
 
 from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message
 from pyrl.algorithms.coord_algorithms import get_vector, add_vector, vector_is_direction
-from pyrl.creature.actions import Action, IllegalMoveException, NoValidTargetException
+from pyrl.creature.action import Action, IllegalMoveException, NoValidTargetException
 from pyrl.creature.creature import Creature
 from pyrl.creature.item import Item
-from pyrl.creature.mixins.hoarder import Hoarder, has_inventory
+from pyrl.creature.mixins.hoarder import Hoarder
 from pyrl.creature.mixins.visionary import Visionary
 from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
 from pyrl.types.coord import Coord
@@ -18,8 +18,7 @@ from pyrl.world.tile import Tile
 if TYPE_CHECKING:
     from pyrl.game import Game
 
-class GameActions(GameMixin, CreatureMixin):
-
+class CreatureActions(GameMixin, CreatureMixin):
     """
     GameActions is the interface between creature controllers (user_controller.py, ai.py) and the game.
 
@@ -29,17 +28,23 @@ class GameActions(GameMixin, CreatureMixin):
     info about the action.
     """
 
-    def __init__(self, game: Game, creature: Creature | None = None) -> None:
+    creature: Creature
+
+    def __init__(self, game: Game) -> None:
         self.game: Game = game
         self.action_cost: int | None = None
-        if creature:
-            self.creature = creature
 
-    def already_acted(self) -> bool:
-        return self.action_cost is not None
+    def associate_creature(self, creature: Creature) -> None:
+        self.creature = creature
+        self.action_cost = None
 
-    def assert_not_acted_yet(self) -> None:
-        assert not self.already_acted(), f"{self.creature} tried to act multiple times"
+    def verify_and_get_cost(self, action: Action) -> int:
+        """Verify action cost is defined and return it."""
+        assert self.action_cost is not None, \
+            f"{self.creature} did {action} but its cost wasn't registered into GameActions"
+        assert self.action_cost >= 0, \
+            f"A negative {self.action_cost=} is not allowed (yet at least)."
+        return self.action_cost
 
     def act_to_dir(self, direction: Direction) -> Literal[Action.Move] | Literal[Action.Attack]:
         target_coord = add_vector(self.coord, direction)
@@ -52,8 +57,6 @@ class GameActions(GameMixin, CreatureMixin):
                                        "You can't move there.")
 
     def enter_passage(self) -> Literal[Action.Enter_Passage]:
-        self.assert_not_acted_yet()
-
         if self.coord not in self.level.locations:
             raise NoValidTargetException("Creature tried to enter a passage in a place without one.",
                                          "This location doesn't have a passage.")
@@ -69,35 +72,26 @@ class GameActions(GameMixin, CreatureMixin):
             raise NoValidTargetException("Creature tried to enter a passage that leads nowhere.",
                                          "This passage doesn't seem to lead anywhere.")
 
-        self._apply_action_cost(self.creature.action_cost(Action.Move))
-        return Action.Enter_Passage
+        return self._act(Action.Enter_Passage)
 
     def move(self, direction: Direction) -> Literal[Action.Move]:
-        self.assert_not_acted_yet()
-
         if not self.can_move(direction):
             raise IllegalMoveException("Creature tried to move illegally.",
                                        "You can't move there.")
 
         self.level.move_creature_to_dir(self.creature, direction)
         move_multiplier = self.level.movement_multiplier(self.coord, direction)
-        self._apply_action_cost(self.creature.action_cost(Action.Move, move_multiplier))
-        return Action.Move
+        return self._act(Action.Move, move_multiplier)
 
     def teleport(self, target_coord: Coord) -> Literal[Action.Teleport]:
-        self.assert_not_acted_yet()
-
         if not self.level.is_passable(target_coord):
             raise IllegalMoveException("Creature tried to teleport to an illegal location.",
                                        "You can't teleport there.")
 
         self.level.move_creature(self.creature, target_coord)
-        self._apply_action_cost(self.creature.action_cost(Action.Move))
-        return Action.Teleport
+        return self._act(Action.Teleport)
 
     def swap(self, direction: Direction) -> Literal[Action.Swap]:
-        self.assert_not_acted_yet()
-
         target_coord = add_vector(self.coord, direction)
         if target_coord not in self.level.creatures:
             raise NoValidTargetException("Creature tried to swap with a target that doesn't exist.",
@@ -110,12 +104,9 @@ class GameActions(GameMixin, CreatureMixin):
 
         self.level.swap_creature(self.creature, target_creature)
         move_multiplier = self.level.movement_multiplier(self.coord, direction)
-        self._apply_action_cost(self.creature.action_cost(Action.Move, move_multiplier))
-        return Action.Swap
+        return self._act(Action.Swap, move_multiplier)
 
     def attack(self, direction: Direction) -> Literal[Action.Attack]:
-        self.assert_not_acted_yet()
-
         target_coord = add_vector(self.coord, direction)
         target: Tile | Creature
         if target_coord in self.level.creatures:
@@ -131,9 +122,8 @@ class GameActions(GameMixin, CreatureMixin):
                 died = target.is_dead()
             if died:
                 self.game.creature_death(target)
-        self._apply_action_cost(self.creature.action_cost(Action.Attack))
         self._attack_user_message(succeeds, damage, died, target)
-        return Action.Attack
+        return self._act(Action.Attack)
 
     def _attack_user_message(self, succeeds: bool, damage: int, died: bool, target: Creature | Tile) -> None:
         player_attacker: bool = self.creature is self.player
@@ -144,59 +134,56 @@ class GameActions(GameMixin, CreatureMixin):
             self.game.io.msg(msg)
 
     def drop_items(self, item_indexes: Iterable[int]) -> tuple[Literal[Action.Drop_Items], str]:
-        self.assert_not_acted_yet()
         assert isinstance(self.creature, Hoarder), f"{self.creature} doesn't have an inventory."
 
         items = self.creature.inventory.unbag_items(item_indexes)
         self.level.add_items(self.coord, items)
-        self._apply_action_cost(self.creature.action_cost(Action.Drop_Items))
         if len(items) == 1:
-            return Action.Drop_Items, f"a {items[0].name}"
+            message = f"a {items[0].name}"
         else:
-            return Action.Drop_Items, f"a collection of items"
+            message = f"a collection of items"
+        return self._act(Action.Drop_Items), message
 
     def pickup_items(self, item_indexes: Iterable[int]) -> tuple[Literal[Action.Pick_Items], str]:
-        self.assert_not_acted_yet()
         assert isinstance(self.creature, Hoarder), f"{self.creature} doesn't have an inventory."
 
         items = self.level.pop_items(self.coord, item_indexes)
         self.creature.inventory.bag_items(items)
-        self._apply_action_cost(self.creature.action_cost(Action.Pick_Items))
         if len(items) == 1:
-            return Action.Pick_Items, f"a {items[0].name}"
+            message = f"a {items[0].name}"
         else:
-            return Action.Pick_Items, f"a collection of items"
+            message = f"a collection of items"
+        return self._act(Action.Pick_Items), message
 
     def wait(self) -> Literal[Action.Wait]:
-        self.assert_not_acted_yet()
-        self._apply_action_cost(self.creature.action_cost(Action.Wait))
-        return Action.Wait
+        return self._act(Action.Wait)
 
     def willing_to_swap(self, target_creature: Creature) -> bool:
-        return self.creature is not self.player and target_creature not in self.game.ai.ai_state
+        return self.creature is not self.player and target_creature not in self.game.ai_state
 
-    def no_action(self) -> Literal[Action.No_Action]:
-        self._assert_player()
-        self._apply_action_cost(self.creature.action_cost(Action.No_Action))
-        return Action.No_Action
+    def debug_action(self) -> Literal[Action.Debug]:
+        return self._player_act(Action.Debug)
 
     # Player only actions
 
     def redraw(self) -> Literal[Action.Redraw]:
-        self._assert_player()
         self.game.redraw()
-        return Action.Redraw
+        return self._player_act(Action.Redraw)
+
+    def redraw_no_action(self) -> Literal[Action.No_Action]:
+        self.game.redraw()
+        return Action.No_Action
 
     def save(self) -> tuple[Literal[Action.Save], str]:
         self._assert_player()
         save_message = self.game.savegame()
-        return Action.Save, save_message
+        return self._player_act(Action.Save), save_message
 
     def quit(self) -> NoReturn:
         self._assert_player()
         self.game.endgame()
 
-    # Operations available for creatures
+    # (Free) operations available for creatures
 
     def get_tile(self) -> Tile:
         return self.level.tiles[self.creature.coord]
@@ -218,6 +205,7 @@ class GameActions(GameMixin, CreatureMixin):
         return self.level.inspect_items(self.coord)
 
     def inspect_character_items(self) -> tuple[Item, ...]:
+        CreatureActions._assert_inventory(self.creature)
         assert isinstance(self.creature, Hoarder), f"{self.creature} doesn't have an inventory."
         return self.creature.inventory.inspect_items()
 
@@ -246,21 +234,34 @@ class GameActions(GameMixin, CreatureMixin):
         return (self.target_within_sight_distance(target_coord) and
                 self.level.check_los(self.coord, target_coord))
 
-    def _has_inventory(self, creature: Creature) -> TypeGuard[Hoarder]:
-        assert has_inventory(creature), f"{creature} doesn't have an inventory."
+    @staticmethod
+    def has_inventory(creature: Creature) -> TypeGuard[Hoarder]:
+        return isinstance(creature, Hoarder)
+
+    @staticmethod
+    def _assert_inventory(creature: Creature) -> TypeGuard[Hoarder]:
+        assert CreatureActions.has_inventory(creature), f"{creature} doesn't have an inventory."
         return True
 
     def _assert_player(self) -> None:
         assert self.creature is self.game.player, f"{self.creature} tried to execute a player only action."
 
-    def _assert_inventory(self, creature: Creature) -> TypeGuard[Hoarder]:
-        assert isinstance(creature, Hoarder), f"{self.creature} doesn't have an inventory."
-        return True
+    def _assert_not_acted_yet(self) -> None:
+        assert self.action_cost is None, f"{self.creature} tried to act multiple times"
+
+    A = TypeVar('A', bound=Action)
+
+    def _act(self, action: A, action_multiplier: float = 1.0) -> A:
+        assert action != Action.No_Action, f"Idea behind the {action} is it's not marked into creature actions."
+        self._assert_not_acted_yet()
+        self.action_cost = self.creature.action_cost(action, action_multiplier)
+        return action
+
+    def _player_act(self, action: A) -> A:
+        self._assert_player()
+        return self._act(action)
 
     def _clear_action(self, and_associate_creature: Creature | None = None) -> None:
         self.action_cost = None
         if and_associate_creature:
             self.creature = and_associate_creature
-
-    def _apply_action_cost(self, cost: int) -> None:
-        self.action_cost = cost
