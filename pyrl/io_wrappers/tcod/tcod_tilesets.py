@@ -1,4 +1,6 @@
-import os.path
+from pathlib import Path
+
+import logging
 
 import tcod.tileset
 from tcod.tileset import CHARMAP_CP437, CHARMAP_TCOD, Tileset
@@ -53,7 +55,7 @@ tileset_params = dict((
 tileset_indexes = [filename for filename in tileset_params.keys()]
 
 def get_tileset(filename: str) -> Tileset:
-    path = os.path.join("resources", "fonts", filename)
+    path = Path("resources", "fonts", filename)
     return tcod.tileset.load_tilesheet(path, *tileset_params[filename])
 
 def get_index_and_tileset(filename: str) -> tuple[int, Tileset]:
@@ -63,3 +65,9 @@ def get_index_and_tileset(filename: str) -> tuple[int, Tileset]:
 def get_tileset_by_index(idx: int) -> tuple[str, Tileset]:
     tileset_name = tileset_indexes[idx % len(tileset_indexes)]
     return tileset_name, get_tileset(tileset_name)
+
+def get_bdf_tileset(idx: int) -> tuple[str, Tileset]:
+    bdfs = list(Path("resources", "fonts", "bdf").glob("*.bdf"))
+    bdf = bdfs[idx % len(bdfs)]
+    logging.debug(bdf.name)
+    return bdf.name, tcod.tileset.load_bdf(bdf)

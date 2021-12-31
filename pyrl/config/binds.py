@@ -89,6 +89,8 @@ class Binds:
     Toggle_Fullscreen       = unbound
     Next_Tileset            = unbound
     Previous_Tileset        = unbound
+    Next_Bdf                = unbound
+    Previous_Bdf            = unbound
 
     _direction_keys: dict[Key, Direction] = {}
 

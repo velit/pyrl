@@ -59,6 +59,8 @@ class UserController(CreatureActionsMixin):
             Binds.Toggle_Fullscreen:  self.toggle_fullscreen,
             Binds.Next_Tileset:       self.next_tileset,
             Binds.Previous_Tileset:   self.previous_tileset,
+            Binds.Next_Bdf:           self.next_bdf,
+            Binds.Previous_Bdf:       self.previous_bdf,
 
             Binds.North:              partial(self.act_to_dir, Dir.North),
             Binds.NorthEast:          partial(self.act_to_dir, Dir.NorthEast),
@@ -250,5 +252,17 @@ class UserController(CreatureActionsMixin):
     def previous_tileset(self) -> Literal[Action.Redraw]:
         tileset_name = self.io.cursor_lib.previous_tileset()
         logging.debug(tileset_name)
+        self.io.msg(tileset_name)
+        return self.actions.redraw()
+
+    def next_bdf(self) -> Literal[Action.Redraw]:
+        tileset_name = self.io.cursor_lib.next_bdf()
+        # logging.debug(tileset_name)
+        self.io.msg(tileset_name)
+        return self.actions.redraw()
+
+    def previous_bdf(self) -> Literal[Action.Redraw]:
+        tileset_name = self.io.cursor_lib.previous_bdf()
+        # logging.debug(tileset_name)
         self.io.msg(tileset_name)
         return self.actions.redraw()

@@ -36,3 +36,9 @@ class IoWrapper(Protocol):
 
     def previous_tileset(self) -> str:
         return f"Not supported in {self.implementation}"
+
+    def next_bdf(self) -> str:
+        return f"Not supported in {self.implementation}"
+
+    def previous_bdf(self) -> str:
+        return f"Not supported in {self.implementation}"
