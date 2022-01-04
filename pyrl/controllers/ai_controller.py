@@ -6,7 +6,7 @@ from typing import Literal, TYPE_CHECKING
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Dir
 from pyrl.creature.action import Action
-from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.game_actions import GameActions
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.algorithms.coord_algorithms import resize_vector_to_len, get_vector, add_vector
 from pyrl.creature.creature import Creature
@@ -15,7 +15,7 @@ AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 
 class AIController(CreatureActionsMixin):
 
-    def __init__(self, ai_state: AiState, actions: CreatureActions) -> None:
+    def __init__(self, ai_state: AiState, actions: GameActions) -> None:
         self.ai_state = ai_state
         self.actions = actions
 

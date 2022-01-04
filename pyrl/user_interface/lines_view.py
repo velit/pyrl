@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence, Iterable
-from enum import Enum
-from typing import TypeVar, overload, Literal
+from dataclasses import dataclass, field
+from typing import TypeVar, Generic, Final
 
 from pyrl.config.binds import Binds
 from pyrl.types.keys import Key, KeyTuple
@@ -13,151 +13,164 @@ from pyrl.window.base_window import BaseWindow
 def build_lines(iterable: Iterable[str]) -> tuple[Line[int], ...]:
     return tuple(Line(value, i) for i, value in enumerate(iterable))
 
-def define_footers() -> tuple[str, str]:
-    pages = f"{Binds.Next_Page.key}/{Binds.Previous_Page.key} scroll"
-    lines = f"{Binds.Next_Line.key}/{Binds.Previous_Line.key} next/previous line"
-    selects = f"{Binds.Deselect_All.key}/{Binds.Select_All.key} (de)select all"
-    filt = f"{Binds.Filter.key} filter"
-    close = f"{Binds.Cancel.key} close"
-
-    single_footer = f"{pages}  {lines}  {filt}  {close}"
-    multi_footer = f"{pages}  {lines}  {selects}  {filt}  {close}"
-    return single_footer, multi_footer
-
-single_select_footer, multi_select_footer = define_footers()
-
-class Mode(Enum):
-    Single = 1
-    Multi = 2
-
 T = TypeVar('T')
+def lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
+               return_keys: KeyTuple = Binds.Cancel, header: str = "",
+               footer: str | None = None) -> tuple[Key, T | None]:
+    return LinesView(window, lines, select_keys, return_keys, header, footer).single()
 
-def lines_view(window: BaseWindow, lines: Sequence[Line[T]], return_keys: KeyTuple = Binds.Cancel,
-               select_keys: KeyTuple = (), header: str = "", footer: str | None = None) -> tuple[Key, T]:
-    return a_lines_view(Mode.Single, window, lines, return_keys, select_keys, header, footer)
+def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
+                            return_keys: KeyTuple = Binds.Cancel, header: str = "",
+                            footer: str | None = None) -> tuple[Key, Sequence[T]]:
+    return LinesView(window, lines, select_keys, return_keys, header, footer).multi()
 
-def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]],
-                            return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (),
-                            header: str = "", footer: str | None = None) -> tuple[Key, Sequence[T]]:
-    return a_lines_view(Mode.Multi, window, lines, return_keys, select_keys, header, footer)
-
-@overload
-def a_lines_view(mode: Literal[Mode.Single], window: BaseWindow, lines: Sequence[Line[T]],
-                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
-                 footer: str | None = None) -> tuple[Key, T]: ...
-@overload
-def a_lines_view(mode: Literal[Mode.Multi], window: BaseWindow, lines: Sequence[Line[T]],
-                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
-                 footer: str | None = None) -> tuple[Key, Sequence[T]]: ...
-
-def a_lines_view(mode: Literal[Mode.Single, Mode.Multi], window: BaseWindow, lines: Sequence[Line[T]],
-                 return_keys: KeyTuple = Binds.Cancel, select_keys: KeyTuple = (), header: str = "",
-                 footer: str | None = None) -> tuple[Key, T | None] | tuple[Key, Sequence[T]]:
+@dataclass(eq=False)
+class LinesView(Generic[T]):
     """
-    Render a view based on parameter lines which is a sequence of Line namedtuples.
+    Render a Lines based view with given parameters.
 
-    In normal mode returns (return_key, possible_selected_item), item == None if returned
-    by return key.
-    In multi_select mode returns (return_key, selected_items)
+    lines The objects associated with Lines are returned if those lines are selected by the user
+    select_keys defines which keys are valid for selecting lines
+    return_keys will cause the view to return either selected lines or None in single mode
+    header is printed as is
+    footer is printed, if it's None a default footer that depends on the mode is printed
     """
-    multi_select = mode == Mode.Multi
-    if footer is None:
-        footer = multi_select_footer if multi_select else single_select_footer
+    window: Final[BaseWindow] = field(repr=False)
+    orig_lines: Sequence[Line[T]] = field(repr=False)
+    orig_select_keys: Final[KeyTuple] = field(default_factory=tuple, repr=False)
+    return_keys: Final[KeyTuple] = Binds.Cancel
+    header: Final[str] = ""
+    footer: str | None = None
 
-    orig_lines = tuple(lines)
-    orig_select_keys = tuple(select_keys)
-    scroll_offset = 0
-    selected: set[Line[T]] = set()
-    filter_regex = ""
-    while True:
-        content_size, select_keys, all_keys = _get_vars(window, lines, multi_select,
-                                                        orig_select_keys, return_keys)
-        print_lines = _get_print_lines(lines, scroll_offset, content_size,
-                                       selected, select_keys)
-        _print_view(window, print_lines, header + filter_regex, footer)
-        key = window.get_key(keys=all_keys, refresh=True)
+    selected: set[Line[T]] = field(default_factory=set, init=False)
+    scroll_offset: int = field(default=0, init=False)
+    filter_regex_visual: str = field(default="", init=False)
 
-        if key in Binds.Filter:
-            query = "Filter regex (empty to clear): "
-            filter_regex = window.get_str(query, (1, 0))
-            window.draw_str(" " * (len(query + filter_regex) + 1), (1, 0))
-            if filter_regex:
-                lines = tuple(line for line in orig_lines if re.search(filter_regex, line.display))
-                filter_regex = f" (Filter/{filter_regex})"
+    lines: Sequence[Line[T]] = field(init=False)
+    select_keys: KeyTuple = field(init=False)
+    all_keys: KeyTuple = field(init=False)
+    content_size: int = field(init=False)
+
+    single_footer: str = field(init=False, repr=False)
+    multi_footer: str = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        self.lines = self.orig_lines
+        self._init_footers()
+
+    def _init_footers(self) -> None:
+        pages = f"{Binds.Next_Page.key}/{Binds.Previous_Page.key} scroll"
+        lines = f"{Binds.Next_Line.key}/{Binds.Previous_Line.key} next/previous line"
+        selects = f"{Binds.Deselect_All.key}/{Binds.Select_All.key} (de)select all"
+        filt = f"{Binds.Filter.key} filter"
+        close = f"{Binds.Cancel.key} close"
+
+        self.single_footer = f"{pages}  {lines}  {filt}  {close}"
+        self.multi_footer = f"{pages}  {lines}  {selects}  {filt}  {close}"
+
+    def single(self) -> tuple[Key, T | None]:
+        if self.footer is None:
+            self.footer = self.single_footer
+
+        while True:
+            self._update_vars(multi_select=False)
+            self._print_view(self.header + self.filter_regex_visual, self.footer)
+            key = self.window.get_key(keys=self.all_keys, refresh=True)
+
+            if key in Binds.Filter:
+                self._handle_filter()
+            elif key in Binds.ScrollKeys:
+                self._handle_scrolling(key)
             else:
-                lines = orig_lines
-            scroll_offset = 0
-        elif key in Binds.ScrollKeys:
-            scroll_offset = _new_offset(scroll_offset, key, content_size, len(lines))
+                if key in self.select_keys:
+                    return key, self.lines[self.select_keys.index(key) + self.scroll_offset].return_value
+                elif key in self.return_keys:
+                    return key, None
+                else:
+                    assert False, f"Unhandled {key=}"
 
-        if mode == Mode.Single:
-            if key in select_keys:
-                return key, lines[select_keys.index(key) + scroll_offset].return_value
-            elif key in return_keys:
-                return key, None
+    def multi(self) -> tuple[Key, Sequence[T]]:
+        """
+        Render a view based on parameter lines which is a sequence of Line namedtuples.
+
+        In normal mode returns (return_key, possible_selected_item), item == None if returned
+        by return key.
+        In multi_select mode returns (return_key, selected_items)
+        """
+        if self.footer is None:
+            self.footer = self.multi_footer
+
+        while True:
+            self._update_vars(multi_select=True)
+            self._print_view(self.header + self.filter_regex_visual, self.footer)
+            key = self.window.get_key(keys=self.all_keys, refresh=True)
+
+            if key in Binds.Filter:
+                self._handle_filter()
+            elif key in Binds.ScrollKeys:
+                self._handle_scrolling(key)
             else:
-                assert False, f"Unhandled {key=}"
-        elif mode == Mode.Multi:
-            if key in select_keys:
-                selected ^= {lines[select_keys.index(key) + scroll_offset]}
-            elif key in return_keys:
-                return key, tuple(line.return_value for line in selected)
-            elif key in Binds.Select_All:
-                selected = set(lines)
-            elif key in Binds.Deselect_All:
-                selected.clear()
-            else:
-                assert False, f"Unhandled {key=}"
+                if key in self.select_keys:
+                    self.selected ^= {self.lines[self.select_keys.index(key) + self.scroll_offset]}
+                elif key in self.return_keys:
+                    return key, tuple(line.return_value for line in self.selected)
+                elif key in Binds.Select_All:
+                    self.selected = set(self.lines)
+                elif key in Binds.Deselect_All:
+                    self.selected.clear()
+                else:
+                    assert False, f"Unhandled {key=}"
 
-def _get_vars(window: BaseWindow, lines: Sequence[Line[T]], multi_select: bool,
-              select_keys: KeyTuple, return_keys: KeyTuple) -> tuple[int, KeyTuple, KeyTuple]:
-    if select_keys:
-        content_size = min(window.rows - 4, len(lines), len(select_keys))
-    else:
-        content_size = min(window.rows - 4, len(lines))
+    def _handle_filter(self) -> None:
+        query = "Filter regex (empty to clear): "
+        filter_regex = self.window.get_str(query, (1, 0))
+        self.window.draw_str(" " * (len(query + filter_regex) + 1), (1, 0))
+        if filter_regex:
+            self.lines = tuple(line for line in self.orig_lines if re.search(filter_regex, line.display))
+            self.filter_regex_visual = f" (Filter/{filter_regex})"
+        else:
+            self.lines = self.orig_lines
+        self.scroll_offset = 0
 
-    select_keys = select_keys[:content_size]
-    all_keys = tuple(Binds.ScrollKeys) + select_keys + return_keys
-    if multi_select:
-        all_keys += Binds.MultiSelectKeys
+    def _update_vars(self, multi_select: bool) -> None:
+        """Return the size left for content and update current select and all keys"""
+        if self.orig_select_keys:
+            self.content_size = min(self.window.rows - 4, len(self.lines), len(self.orig_select_keys))
+        else:
+            self.content_size = min(self.window.rows - 4, len(self.lines))
 
-    return content_size, select_keys, all_keys
+        self.select_keys = self.orig_select_keys[:self.content_size]
+        self.all_keys = tuple(Binds.ScrollKeys) + self.select_keys + self.return_keys
+        if multi_select:
+            self.all_keys += Binds.MultiSelectKeys
 
-def _get_print_lines(lines: Sequence[Line[T]], offset: int, content_size: int,
-                     selected: set[Line[T]], select_keys: KeyTuple) -> Sequence[str]:
-    sliced_lines = _slice_lines(lines, offset, offset + content_size)
-    if select_keys:
-        return tuple(f"{key} {'+' if line in selected else '-'} {line.display}"
-                     for key, line in zip(select_keys, sliced_lines))
-    else:
-        return tuple(line.display for line in sliced_lines)
+    def _get_print_lines(self) -> Sequence[str]:
+        """Return a sequence of printable lines from given parameters."""
+        sliced_lines = self.lines[self.scroll_offset: self.scroll_offset + self.content_size]
+        if self.select_keys:
+            return tuple(f"{key} {'+' if line in self.selected else '-'} {line.display}"
+                         for key, line in zip(self.select_keys, sliced_lines))
+        else:
+            return tuple(line.display for line in sliced_lines)
 
-def _slice_lines(seq: Sequence[T], start_index: int = 0, stop_index: int | None = None) -> Iterable[T]:
-    if stop_index is not None:
-        for i in range(start_index, stop_index):
-            yield seq[i]
-    else:
-        for i in range(start_index, len(seq)):
-            yield seq[i]
+    def _print_view(self, header: str, footer: str,
+                    main_view_pos: int = 2, header_pos: int = 0, footer_pos: int = -1) -> None:
+        self.window.clear()
+        if header is not None:
+            self.window.draw_banner(header, y_offset=header_pos)
+        self.window.draw_lines(self._get_print_lines(), y_offset=main_view_pos)
+        if footer is not None:
+            self.window.draw_banner(footer, y_offset=footer_pos)
 
-def _print_view(window: BaseWindow, print_lines: Iterable[str], header: str = "", footer: str = "",
-                main_view_pos: int = 2, header_pos: int = 0, footer_pos: int = -1) -> None:
-    window.clear()
-    if header is not None:
-        window.draw_banner(header, y_offset=header_pos)
-    window.draw_lines(print_lines, y_offset=main_view_pos)
-    if footer is not None:
-        window.draw_banner(footer, y_offset=footer_pos)
-
-def _new_offset(offset: int, key: Key, visible_amount: int, lines_amount: int) -> int:
-    if key in Binds.Next_Line:
-        offset += 1
-    elif key in Binds.Next_Page:
-        offset += visible_amount - 1
-    elif key in Binds.Previous_Line:
-        offset -= 1
-    elif key in Binds.Previous_Page:
-        offset -= visible_amount - 1
-    max_offset = max(0, lines_amount - visible_amount)
-    offset = min(max(0, offset), max_offset)
-    return offset
+    def _handle_scrolling(self, key: Key) -> None:
+        """Calculate the next offset from the given input key."""
+        if key in Binds.Next_Line:
+            self.scroll_offset += 1
+        elif key in Binds.Next_Page:
+            self.scroll_offset += self.content_size - 1
+        elif key in Binds.Previous_Line:
+            self.scroll_offset -= 1
+        elif key in Binds.Previous_Page:
+            self.scroll_offset -= self.content_size - 1
+        max_offset = max(0, len(self.lines) - self.content_size)
+        self.scroll_offset = min(max(0, self.scroll_offset), max_offset)

@@ -8,7 +8,7 @@ from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_45, 
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.creature.action import Action, IllegalContextException
-from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.game_actions import GameActions
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.direction import Direction, Dir
 
@@ -31,7 +31,7 @@ class WalkMode(CreatureActionsMixin):
 
     state: WalkModeState
 
-    def __init__(self, actions: CreatureActions):
+    def __init__(self, actions: GameActions):
         self.actions = actions
         self.active = False
 

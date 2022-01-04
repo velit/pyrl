@@ -9,7 +9,7 @@ from pyrl.algorithms.coord_algorithms import add_vector
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.creature.action import Action, ActionException
-from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.game_actions import GameActions
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.color import Color, ColorPairs
@@ -23,7 +23,7 @@ ActionCallable = Callable[[], Action]
 
 class UserController(CreatureActionsMixin):
 
-    def __init__(self, actions: CreatureActions) -> None:
+    def __init__(self, actions: GameActions) -> None:
         from pyrl.controllers.walk_mode import WalkMode
         from pyrl.controllers.debug_action import DebugAction
         self.actions = actions

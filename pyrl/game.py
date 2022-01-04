@@ -13,7 +13,7 @@ from pyrl.controllers.ai_controller import AIController, AiState
 from pyrl.controllers.user_controller import UserController
 from pyrl.creature.action import Action
 from pyrl.creature.creature import Creature
-from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.game_actions import GameActions
 from pyrl.creature.mixins.visionary import Visionary
 from pyrl.creature.player import Player
 from pyrl.game_data.pyrl_world import pyrl_world
@@ -37,10 +37,10 @@ class Game:
             self.ai_controller, \
             self.user_controller = self.post_init(cursor_lib)
 
-    def post_init(self, cursor_lib: IoWrapper) -> tuple[WindowSystem, CreatureActions, AIController, UserController]:
+    def post_init(self, cursor_lib: IoWrapper) -> tuple[WindowSystem, GameActions, AIController, UserController]:
         """Initialise non-serialized state. Used when loading the game."""
         self.io = WindowSystem(cursor_lib)
-        self.creature_actions = CreatureActions(self)
+        self.creature_actions = GameActions(self)
         self.ai_controller = AIController(self.ai_state, self.creature_actions)
         self.user_controller = UserController(self.creature_actions)
         register_status_texts(self.io, self, self.player)

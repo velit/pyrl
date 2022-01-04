@@ -9,14 +9,14 @@ from pyrl.config.debug import Debug
 from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_location import LevelLocation
 from pyrl.creature.action import Action, NoValidTargetException
-from pyrl.creature.creature_actions import CreatureActions
+from pyrl.creature.game_actions import GameActions
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.world.level import Level
 
 class DebugAction(CreatureActionsMixin):
 
-    def __init__(self, game_actions: CreatureActions) -> None:
+    def __init__(self, game_actions: GameActions) -> None:
         self.actions = game_actions
 
         self.action_funcs: dict[str, Callable[[], Action | None]] = {

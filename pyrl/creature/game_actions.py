@@ -18,7 +18,7 @@ from pyrl.world.tile import Tile
 if TYPE_CHECKING:
     from pyrl.game import Game
 
-class CreatureActions(GameMixin, CreatureMixin):
+class GameActions(GameMixin, CreatureMixin):
     """
     GameActions is the interface between creature controllers (user_controller.py, ai.py) and the game.
 
@@ -205,7 +205,7 @@ class CreatureActions(GameMixin, CreatureMixin):
         return self.level.inspect_items(self.coord)
 
     def inspect_character_items(self) -> tuple[Item, ...]:
-        CreatureActions._assert_inventory(self.creature)
+        GameActions._assert_inventory(self.creature)
         assert isinstance(self.creature, Hoarder), f"{self.creature} doesn't have an inventory."
         return self.creature.inventory.inspect_items()
 
@@ -240,7 +240,7 @@ class CreatureActions(GameMixin, CreatureMixin):
 
     @staticmethod
     def _assert_inventory(creature: Creature) -> TypeGuard[Hoarder]:
-        assert CreatureActions.has_inventory(creature), f"{creature} doesn't have an inventory."
+        assert GameActions.has_inventory(creature), f"{creature} doesn't have an inventory."
         return True
 
     def _assert_player(self) -> None:
