@@ -8,10 +8,12 @@ from pyrl.config.config import Config
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.io_wrappers.tcod import IMPLEMENTATION
-from pyrl.io_wrappers.tcod.tcod_tilesets import get_index_and_tileset, get_tileset_by_index, get_bdf_tileset
+from pyrl.io_wrappers.tcod.tcod_tilesets import get_tileset_by_index, get_bdf_index_and_tileset, \
+    get_bdf_tileset_by_index
 from pyrl.io_wrappers.tcod.tcod_window import TcodWindow
 from pyrl.structures.dimensions import Dimensions
 from pyrl.window.window_system import WindowSystem
+
 
 class TcodWrapper(IoWrapper):
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""
@@ -22,8 +24,8 @@ class TcodWrapper(IoWrapper):
         """Init the SDL surface and prepare for draw calls."""
         rows, cols = WindowSystem.game_dimensions.params
         # self.tileset_index, tileset = get_index_and_tileset("terminal10x18_gs_ro.png")
-        self.bdf_index = 80
-        _, tileset = get_bdf_tileset(self.bdf_index)
+        self.tileset_index = -1
+        self.bdf_index, tileset = get_bdf_index_and_tileset("spleen-32x64.bdf")
         self.context = tcod.context.new(rows=rows, columns=cols, tileset=tileset, title=Config.default_game_name)
         self.root_console = self.context.new_console(min_rows=rows, min_columns=cols)
 
@@ -75,14 +77,14 @@ class TcodWrapper(IoWrapper):
 
     def next_bdf(self) -> str:
         self.bdf_index += 1
-        tileset_name, tileset = get_bdf_tileset(self.bdf_index)
+        tileset_name, tileset = get_bdf_tileset_by_index(self.bdf_index)
         self.context.change_tileset(tileset)
         self.flush()
         return tileset_name
 
     def previous_bdf(self) -> str:
         self.bdf_index -= 1
-        tileset_name, tileset = get_bdf_tileset(self.bdf_index)
+        tileset_name, tileset = get_bdf_tileset_by_index(self.bdf_index)
         self.context.change_tileset(tileset)
         self.flush()
         return tileset_name

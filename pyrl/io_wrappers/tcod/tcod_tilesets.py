@@ -66,7 +66,12 @@ def get_tileset_by_index(idx: int) -> tuple[str, Tileset]:
     tileset_name = tileset_indexes[idx % len(tileset_indexes)]
     return tileset_name, get_tileset(tileset_name)
 
-def get_bdf_tileset(idx: int) -> tuple[str, Tileset]:
+def get_bdf_index_and_tileset(filename: str) -> tuple[int, Tileset]:
+    bdfs = list(Path("resources", "fonts", "bdf").glob("*.bdf"))
+    idx, bdf_path = next((idx, bdf_path) for idx, bdf_path in enumerate(bdfs) if bdf_path.name == filename)
+    return idx, tcod.tileset.load_bdf(bdf_path)
+
+def get_bdf_tileset_by_index(idx: int) -> tuple[str, Tileset]:
     bdfs = list(Path("resources", "fonts", "bdf").glob("*.bdf"))
     bdf = bdfs[idx % len(bdfs)]
     logging.debug(bdf.name)
