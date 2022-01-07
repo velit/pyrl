@@ -7,7 +7,6 @@ from pyrl.creature.creature import Creature
 
 if TYPE_CHECKING:
     from pyrl.types.coord import Coord
-    from pyrl.world.level import Level
 
 class Visionary(Creature):
 

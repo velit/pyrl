@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections import deque
 from collections.abc import Iterable, Sequence
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
 
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
@@ -19,21 +19,26 @@ from pyrl.window.level_window import LevelWindow
 from pyrl.window.message_bar import MessageBar
 from pyrl.window.status_bar import StatusBar
 
+@dataclass(eq=False, slots=True)
 class WindowSystem:
 
-    message_dimensions = Dimensions(Config.message_bar_height, default_dims.cols)
-    status_dimensions = Dimensions(Config.status_bar_height, default_dims.cols)
-    game_dimensions = Dimensions(message_dimensions.rows + status_dimensions.rows + default_dims.rows,
-                                 default_dims.cols)
+    message_dimensions: ClassVar[Dimensions] = Dimensions(Config.message_bar_height, default_dims.cols)
+    status_dimensions: ClassVar[Dimensions] = Dimensions(Config.status_bar_height, default_dims.cols)
+    game_dimensions: ClassVar[Dimensions] = Dimensions(message_dimensions.rows + status_dimensions.rows +
+                                                       default_dims.rows, default_dims.cols)
 
-    def __init__(self, cursor_lib: IoWrapper) -> None:
-        self.cursor_lib = cursor_lib
+    wrapper:      IoWrapper
+    whole_window: BaseWindow  = field(init=False)
+    message_bar:  MessageBar  = field(init=False)
+    level_window: LevelWindow = field(init=False)
+    status_bar:   StatusBar   = field(init=False)
 
-        self.whole_window = BaseWindow(cursor_lib, self.game_dimensions, Position(0, 0))
-        self.message_bar  = MessageBar(cursor_lib, self.message_dimensions, Position(0, 0))
-        self.level_window = LevelWindow(cursor_lib, default_dims,
+    def __post_init__(self) -> None:
+        self.whole_window = BaseWindow(self.wrapper, self.game_dimensions, Position(0, 0))
+        self.message_bar  = MessageBar(self.wrapper, self.message_dimensions, Position(0, 0))
+        self.level_window = LevelWindow(self.wrapper, default_dims,
                                         Position(self.message_bar.screen_position.y + self.message_bar.rows, 0))
-        self.status_bar   = StatusBar(cursor_lib, self.status_dimensions,
+        self.status_bar   = StatusBar(self.wrapper, self.status_dimensions,
                                       Position(self.level_window.screen_position.y + self.level_window.rows, 0))
 
     def get_key(self, message: str | None = None, keys: KeyTuple | None = None) -> Key:
@@ -55,7 +60,7 @@ class WindowSystem:
         self.message_bar.update()
         self.level_window.update()
         self.status_bar.update()
-        self.cursor_lib.flush()
+        self.wrapper.flush()
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]], reverse: bool = False) -> None:
         if not reverse:
@@ -81,10 +86,10 @@ class WindowSystem:
             self.level_window.get_key(refresh=True)
 
     def suspend(self) -> None:
-        self.cursor_lib.suspend()
+        self.wrapper.suspend()
 
     def resume(self) -> None:
-        self.cursor_lib.resume()
+        self.wrapper.resume()
 
     def get_str(self, ask_line: str = "", coord: Coord = (0, 0)) -> str:
         self.message_bar.clear()

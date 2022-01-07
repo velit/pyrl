@@ -5,4 +5,3 @@ from pyrl.creature.mixins.visionary import Visionary
 
 class Player(Hoarder, Visionary):
     pass
-

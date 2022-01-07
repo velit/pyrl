@@ -240,29 +240,29 @@ class UserController(CreatureActionsMixin):
         return self.actions.redraw()
 
     def toggle_fullscreen(self) -> Literal[Action.No_Action]:
-        self.io.cursor_lib.toggle_fullscreen()
+        self.io.wrapper.toggle_fullscreen()
         return Action.No_Action
 
     def next_tileset(self) -> Literal[Action.Redraw]:
-        tileset_name = self.io.cursor_lib.next_tileset()
+        tileset_name = self.io.wrapper.next_tileset()
         logging.debug(tileset_name)
         self.io.msg(tileset_name)
         return self.actions.redraw()
 
     def previous_tileset(self) -> Literal[Action.Redraw]:
-        tileset_name = self.io.cursor_lib.previous_tileset()
+        tileset_name = self.io.wrapper.previous_tileset()
         logging.debug(tileset_name)
         self.io.msg(tileset_name)
         return self.actions.redraw()
 
     def next_bdf(self) -> Literal[Action.Redraw]:
-        tileset_name = self.io.cursor_lib.next_bdf()
+        tileset_name = self.io.wrapper.next_bdf()
         # logging.debug(tileset_name)
         self.io.msg(tileset_name)
         return self.actions.redraw()
 
     def previous_bdf(self) -> Literal[Action.Redraw]:
-        tileset_name = self.io.cursor_lib.previous_bdf()
+        tileset_name = self.io.wrapper.previous_bdf()
         # logging.debug(tileset_name)
         self.io.msg(tileset_name)
         return self.actions.redraw()

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import textwrap
 from collections.abc import Callable
+from dataclasses import dataclass
+from textwrap import TextWrapper
 from typing import Any
 
 from pyrl.io_wrappers.io_wrapper import IoWrapper
@@ -11,14 +12,18 @@ from pyrl.window.base_window import BaseWindow
 
 Getter = Callable[[], Any]
 
+@dataclass(init=False, eq=False)
 class StatusBar(BaseWindow):
     """Handles the status bar system."""
 
-    def __init__(self, io_wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
-        BaseWindow.__init__(self, io_wrapper, dimensions, screen_position)
+    elements: list[tuple[str, Getter]]
+    text_wrapper: TextWrapper
 
-        self.elements: list[tuple[str, Getter]] = []
-        self.wrapper = textwrap.TextWrapper(width=self.cols)
+    def __init__(self, wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
+        super().__init__(wrapper, dimensions, screen_position)
+
+        self.elements = []
+        self.text_wrapper = TextWrapper(width=self.cols)
 
     def update(self) -> None:
         self.clear()
@@ -32,6 +37,6 @@ class StatusBar(BaseWindow):
         status_string = "  ".join(
             f"{string}:{getter()}" for string, getter in self.elements
         )
-        lines = self.wrapper.wrap(status_string)
+        lines = self.text_wrapper.wrap(status_string)
         for i, line in enumerate(lines):
             self.draw_str(line, (i, 0))

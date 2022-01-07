@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass, InitVar, field
 from itertools import zip_longest
 from random import randrange
 from typing import TypeVar, Generic, Iterator
@@ -10,6 +11,7 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.types.coord import Coord
 
 T = TypeVar('T')
+@dataclass(slots=True)
 class Table(Generic[T], DimensionsMixin):
     """
     Mutable non-dynamic array with two-dimensional get- and setitem methods.
@@ -20,11 +22,15 @@ class Table(Generic[T], DimensionsMixin):
     Underlying implementation is a one-dimensional dynamic list with dynamic methods
     disabled.
     """
-    def __init__(self, dimensions: Dimensions, init_values: Iterable[T] = (), fillvalue: T | None = None):
-        self.dimensions: Dimensions = dimensions
+    dimensions: Dimensions
+    init_values: InitVar[Iterable[T]] = ()
+    fillvalue: InitVar[T | None]      = None
+    _impl: list[T]                    = field(init=False)
+
+    def __post_init__(self, init_values: Iterable[T], fillvalue: T | None) -> None:
         self._impl: list[T] = list(value for _, value in zip_longest(range(self.dimensions.area), init_values,
                                                                      fillvalue=fillvalue))
-        assert len(self) <= dimensions.area, f"Given {len(self)=} exceed {self.dimensions.area=}."
+        assert len(self) <= self.dimensions.area, f"Given {len(self)=} exceed {self.dimensions.area=}."
 
     def __getitem__(self, coord: Coord) -> T:
         return self._impl[self.get_index(coord)]

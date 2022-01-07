@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING, TypeVar
 
 from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message

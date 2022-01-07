@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any, TypeGuard
 
 from pyrl.creature.creature import Creature
@@ -11,6 +12,7 @@ def has_inventory(creature: Creature) -> TypeGuard[Hoarder]:
 
 class Hoarder(Creature):
     """Creatures with this class have an inventory."""
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.inventory = Inventory()
         super().__init__(*args, **kwargs)

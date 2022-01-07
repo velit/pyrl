@@ -1,6 +1,7 @@
 """Bunch of property getter mixins to flatten the hierarchy of the game a bit in certain places"""
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Protocol, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -15,11 +16,14 @@ if TYPE_CHECKING:
     from pyrl.world.world import World
 
 class HasGame(Protocol):
+
     @property
     def game(self) -> Game:
         raise NotImplementedError
 
 class GameMixin:
+
+    __slots__ = ()
 
     @property
     def io(self: HasGame) -> WindowSystem:
@@ -34,11 +38,14 @@ class GameMixin:
         return self.game.world.player
 
 class HasCreature(Protocol):
+
     @property
     def creature(self) -> Creature:
         raise NotImplementedError
 
 class CreatureMixin:
+
+    __slots__ = ()
 
     @property
     def coord(self: HasCreature) -> Coord:
@@ -49,11 +56,15 @@ class CreatureMixin:
         return self.creature.level
 
 class HasDimensions(Protocol):
+
     @property
     def dimensions(self) -> Dimensions:
         raise NotImplementedError
 
 class DimensionsMixin:
+
+    __slots__ = ()
+
     @property
     def rows(self: HasDimensions) -> int:
         return self.dimensions.rows
@@ -68,6 +79,8 @@ class HasCreatureActions(Protocol):
         raise NotImplementedError
 
 class CreatureActionsMixin:
+
+    __slots__ = ()
 
     @property
     def creature(self: HasCreatureActions) -> Creature:

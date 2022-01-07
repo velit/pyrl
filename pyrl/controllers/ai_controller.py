@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import random
-from typing import Literal, TYPE_CHECKING
+from typing import Literal
 
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Dir
+from pyrl.algorithms.coord_algorithms import resize_vector_to_len, get_vector, add_vector
 from pyrl.creature.action import Action
+from pyrl.creature.creature import Creature
 from pyrl.creature.game_actions import GameActions
 from pyrl.structures.helper_mixins import CreatureActionsMixin
-from pyrl.algorithms.coord_algorithms import resize_vector_to_len, get_vector, add_vector
-from pyrl.creature.creature import Creature
+from pyrl.types.coord import Coord
+from pyrl.types.direction import Dir
 
 AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 

@@ -7,7 +7,7 @@ from typing import Generic, TypeVar
 T = TypeVar('T')
 Entry = tuple[int, int, T]
 
-@dataclass(eq=False, order=False)
+@dataclass(eq=False, order=False, slots=True)
 class Scheduler(Generic[T]):
     """Priority queue based scheduler. Behaves in LIFO fashion with equal time values."""
 

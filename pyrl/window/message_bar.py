@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import logging
 import re
-import textwrap
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
+from textwrap import TextWrapper
 from typing import Any
 
 from pyrl.config.binds import Binds
@@ -17,15 +18,20 @@ from pyrl.window.base_window import BaseWindow
 MORE_STR = " More"
 MORE_STR_LEN = len(MORE_STR)
 
+@dataclass(init=False, eq=False)
 class MessageBar(BaseWindow):
     """Handles the messaging bar system."""
 
-    def __init__(self, io_wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
-        BaseWindow.__init__(self, io_wrapper, dimensions, screen_position)
+    history: list[str]
+    msgqueue: list[str]
+    wrap: Callable[[str], list[str]]
 
-        self.history: list[str] = []
-        self.msgqueue: list[str] = []
-        self.wrap = textwrap.TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
+    def __init__(self, wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
+        super().__init__(wrapper, dimensions, screen_position)
+
+        self.history = []
+        self.msgqueue = []
+        self.wrap = TextWrapper(width=(self.cols - MORE_STR_LEN)).wrap
 
     def update(self) -> None:
         self.clear()
@@ -40,7 +46,7 @@ class MessageBar(BaseWindow):
 
     def queue_msg(self, *args: Any) -> None:
         output: Callable[[str], Any]
-        if self.cursor_win.implementation == mock.IMPLEMENTATION:
+        if self.io_win.implementation == mock.IMPLEMENTATION:
             output = self.debug_msg
         else:
             output = self.msgqueue.append

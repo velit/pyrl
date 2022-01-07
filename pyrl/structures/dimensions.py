@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from pyrl.types.coord import Coord
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Dimensions:
     rows: int
     cols: int

@@ -24,7 +24,7 @@ def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]], select
                             footer: str | None = None) -> tuple[Key, Sequence[T]]:
     return LinesView(window, lines, select_keys, return_keys, header, footer).multi()
 
-@dataclass(eq=False)
+@dataclass(eq=False, slots=True)
 class LinesView(Generic[T]):
     """
     Render a Lines based view with given parameters.

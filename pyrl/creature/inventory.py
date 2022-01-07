@@ -1,25 +1,25 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import field, dataclass
 
 from pyrl.creature.item import Item
 from pyrl.creature.stats import Stats
 from pyrl.structures.dice import Dice
 from pyrl.types.equipment_slot import Slot
 
+@dataclass(eq=False, slots=True)
 class Inventory:
 
-    def __init__(self) -> None:
-        self.stats = Stats()
-
-        self._equipment: dict[Slot, Item | None] = {
-            Slot.Head: None,
-            Slot.Body: None,
-            Slot.Right_Hand: None,
-            Slot.Left_Hand: None,
-            Slot.Feet: None,
-        }
-        self._bag: list[Item] = []
+    stats: Stats = field(init=False, default_factory=Stats)
+    _equipment: dict[Slot, Item | None] = field(init=False, default_factory=lambda: {
+        Slot.Head:       None,
+        Slot.Body:       None,
+        Slot.Right_Hand: None,
+        Slot.Left_Hand:  None,
+        Slot.Feet:       None,
+    })
+    _bag: list[Item] = field(init=False, default_factory=list)
 
     @property
     def damage_dice(self) -> Dice | None:

@@ -6,13 +6,11 @@ from typing import Literal
 
 from pyrl.config.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.types.level_gen import LevelGen
-from pyrl.types.level_location import LevelLocation
 from pyrl.creature.action import Action, NoValidTargetException
 from pyrl.creature.game_actions import GameActions
-from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
-from pyrl.world.level import Level
+from pyrl.structures.helper_mixins import CreatureActionsMixin
+from pyrl.types.level_location import LevelLocation
 
 class DebugAction(CreatureActionsMixin):
 

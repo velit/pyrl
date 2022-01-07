@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import time
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, field
+from typing import ClassVar
 
+from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
@@ -12,31 +15,34 @@ from pyrl.types.color import ColorPairs, ColorPair
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key, KeyTuple
 
+@dataclass(eq=False)
 class BaseWindow(DimensionsMixin):
 
     # Seconds to sleep until next user input check in half-block functions
-    half_block_input_responsiveness = 0.001
+    half_block_input_responsiveness: ClassVar[float] = 0.001
 
-    def __init__(self, io_wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
-        self.cursor_lib = io_wrapper
-        self.dimensions = dimensions
-        self.screen_position = screen_position
-        self.cursor_win = io_wrapper.new_window(dimensions)
+    wrapper: IoWrapper
+    dimensions: Dimensions
+    screen_position: Position
+    io_win: IoWindow = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.io_win = self.wrapper.new_window(self.dimensions)
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
-        self.cursor_win.draw_char(char, coord)
+        self.io_win.draw_char(char, coord)
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
-        self.cursor_win.draw_str(string, coord, color)
+        self.io_win.draw_str(string, coord, color)
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        self.cursor_win.draw(glyph_info_iterable)
+        self.io_win.draw(glyph_info_iterable)
 
     def draw_reverse(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        self.cursor_win.draw_reverse(glyph_info_iterable)
+        self.io_win.draw_reverse(glyph_info_iterable)
 
     def clear(self) -> None:
-        self.cursor_win.clear()
+        self.io_win.clear()
 
     @classmethod
     def get_time(cls) -> float:
@@ -54,7 +60,7 @@ class BaseWindow(DimensionsMixin):
             self.refresh()
 
         while True:
-            key = self.cursor_win.get_key()
+            key = self.io_win.get_key()
             if not keys or key in keys:
                 return key
 
@@ -71,7 +77,7 @@ class BaseWindow(DimensionsMixin):
             self.refresh()
 
         while True:
-            key = self.cursor_win.check_key()
+            key = self.io_win.check_key()
             if until is None or self.get_time() >= until \
                     or keys and key in keys:
                 break
@@ -83,11 +89,11 @@ class BaseWindow(DimensionsMixin):
             return Keys.NO_INPUT
 
     def blit(self) -> None:
-        self.cursor_win.blit(self.dimensions, self.screen_position)
+        self.io_win.blit(self.dimensions, self.screen_position)
 
     def refresh(self) -> None:
         self.blit()
-        self.cursor_lib.flush()
+        self.wrapper.flush()
 
     def menu(self, header: str, lines: Sequence[str], footer: str, keys: KeyTuple) -> Key:
         self.clear()
