@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from pyrl.creature.creature import Creature
-from pyrl.types.char import Letter
+from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
+    AssetTileDict
 from pyrl.types.color import ColorPairs
 from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_location import LevelLocation
-from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
-    AssetTileDict
-from pyrl.world.level import Level
+from pyrl.world.level_gen_params import LevelGenParams
 from pyrl.world.tile import Tile
 
 name = "overworld"
@@ -16,7 +14,7 @@ class OverWorldLocation(LevelLocation):
     Dungeon = 1
     Village = 2
 
-def get_level() -> Level:
+def get_level() -> LevelGenParams:
     dimensions = default_dims
     charstr = (
         '^^^^^^^^¨=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -66,11 +64,12 @@ def get_level() -> Level:
     }
     tiles, locations, creatures = construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures)
 
-    return Level(
+    return LevelGenParams(
         danger_level=1,
-        generation_type=LevelGen.NoGeneration,
         tiles=tiles,
         locations=locations,
         custom_creatures=creatures,
-        creature_spawning_enabled=False,
+        initial_creature_spawns=False,
+        ongoing_creature_spawns=False,
+        generation_type=LevelGen.NoGeneration,
     )

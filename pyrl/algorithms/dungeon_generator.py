@@ -19,10 +19,10 @@ from pyrl.types.level_location import LevelLocation
 from pyrl.world.tile import Tile
 
 if TYPE_CHECKING:
-    from pyrl.world.level import Level
+    from pyrl.world.level_gen_params import LevelGenParams
 
-def generate_tiles_to(level: Level) -> None:
-    DungeonGenerator(level).generate_tiles()
+def generate_tiles_to(level_params: LevelGenParams) -> None:
+    DungeonGenerator(level_params).generate_tiles()
 
 Floor = PyrlTiles.Floor
 Wall = PyrlTiles.Wall
@@ -30,8 +30,8 @@ Rock = PyrlTiles.Rock
 
 class DungeonGenerator(DimensionsMixin):
 
-    def __init__(self, level: Level) -> None:
-        self.level = level
+    def __init__(self, level: LevelGenParams) -> None:
+        self.level_params = level
 
         self.level_cycles          = 300
         self.room_y_range          = 5, 11
@@ -47,11 +47,11 @@ class DungeonGenerator(DimensionsMixin):
 
     @property
     def generation_type(self) -> LevelGen:
-        return self.level.generation_type
+        return self.level_params.generation_type
 
     @property
     def dimensions(self) -> Dimensions:
-        return self.level.tiles.dimensions
+        return self.level_params.tiles.dimensions
 
     def generate_tiles(self) -> None:
         if self.generation_type == LevelGen.Dungeon:
@@ -64,14 +64,14 @@ class DungeonGenerator(DimensionsMixin):
             self.make_room(Rectangle((0, 0), self.dimensions))
 
         if self.generation_type.value >= LevelGen.Dungeon.value:
-            if DefaultLocation.Passage_Up not in self.level.locations.values():
+            if DefaultLocation.Passage_Up not in self.level_params.locations.values():
                 self.add_location(PyrlTiles.Stairs_Up, DefaultLocation.Passage_Up)
-            if DefaultLocation.Passage_Down not in self.level.locations.values():
+            if DefaultLocation.Passage_Down not in self.level_params.locations.values():
                 self.add_location(PyrlTiles.Stairs_Down, DefaultLocation.Passage_Down)
 
     def init_tiles(self) -> None:
-        for coord, item in self.level.tiles.enumerate():
-            self.level.tiles[coord] = Rock
+        for coord, item in self.level_params.tiles.enumerate():
+            self.level_params.tiles[coord] = Rock
 
     def generator_loop(self) -> None:
         rand_room_height = partial(randrange, *self.room_y_range)
@@ -118,15 +118,15 @@ class DungeonGenerator(DimensionsMixin):
         for _ in range(Debug.max_loop_cycles):
             coord = self.free_coord()
             neighbors = self.get_up_down_left_right_neighbors(coord)
-            old_tile = self.level.tiles[coord]
+            old_tile = self.level_params.tiles[coord]
 
             if neighbors == (Floor, Floor, Floor, Floor) and old_tile == Floor:
                 break
         else:
             assert False, "Location add failed due to free coord get failed."
 
-        self.level.tiles[coord] = tile
-        self.level.locations[coord] = location
+        self.level_params.tiles[coord] = tile
+        self.level_params.locations[coord] = location
 
     def make_initial_room(self) -> None:
         while True:
@@ -146,7 +146,7 @@ class DungeonGenerator(DimensionsMixin):
                 break
 
         self.make_room(Rectangle((y, x), Dimensions(height, width)))
-        self.level.tiles[y + 2, x + 2] = PyrlTiles.Black_Floor
+        self.level_params.tiles[y + 2, x + 2] = PyrlTiles.Black_Floor
 
     def attempt_corridor(self, door_coord: Coord, direction: Direction, length: int) -> bool:
         y, x = door_coord
@@ -169,15 +169,15 @@ class DungeonGenerator(DimensionsMixin):
     def attempt_room(self, rectangle: Rectangle, door_coord: Coord) -> bool:
         if self.rectangle_consists_of_tiles(rectangle, (Wall, Rock)):
             self.make_room(rectangle)
-            self.level.tiles[door_coord] = Floor
+            self.level_params.tiles[door_coord] = Floor
             return True
         else:
             return False
 
     def free_coord(self) -> Coord:
         while True:
-            coord = self.level.tiles.random_coord()
-            if self.level.tiles[coord] == Floor:
+            coord = self.level_params.tiles.random_coord()
+            if self.level_params.tiles[coord] == Floor:
                 return coord
 
     def get_random_wall_coord(self) -> Coord:
@@ -221,7 +221,7 @@ class DungeonGenerator(DimensionsMixin):
             return None
 
     def get_up_down_left_right_neighbors(self, coord: Coord) -> tuple[Tile, Tile, Tile, Tile]:
-        tiles = self.level.tiles
+        tiles = self.level_params.tiles
         neighbors = (
             tiles[add_vector(coord, Dir.North)],
             tiles[add_vector(coord, Dir.South)],
@@ -233,26 +233,26 @@ class DungeonGenerator(DimensionsMixin):
     def make_room(self, rectangle: Rectangle) -> None:
         for (is_edge, coord) in rectangle.enumerate_with_edge():
             if is_edge:
-                self.level.tiles[coord] = Wall
+                self.level_params.tiles[coord] = Wall
                 self.mark_wall(coord)
             else:
-                self.level.tiles[coord] = Floor
+                self.level_params.tiles[coord] = Floor
 
     def rectangle_consists_of_tiles(self, rectangle: Rectangle, given_tiles: Sequence[Tile]) -> bool:
-        tiles = self.level.tiles
+        tiles = self.level_params.tiles
         return all(tiles.is_legal(coord) and tiles[coord] in given_tiles for coord in rectangle.iterate())
 
     def set_rectangle(self, rectangle: Rectangle, tile: Tile) -> None:
         """Set all the tiles in rectangle to given tile."""
         if tile == Wall:
             for coord in rectangle.iterate():
-                self.level.tiles[coord] = tile
+                self.level_params.tiles[coord] = tile
                 self.mark_wall(coord)
         else:
             for coord in rectangle.iterate():
-                self.level.tiles[coord] = tile
+                self.level_params.tiles[coord] = tile
 
     def turn_rock_to_wall(self) -> None:
-        for coord, tile in self.level.tiles.enumerate():
+        for coord, tile in self.level_params.tiles.enumerate():
             if tile == Rock:
-                self.level.tiles[coord] = Wall
+                self.level_params.tiles[coord] = Wall

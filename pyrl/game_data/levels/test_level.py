@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from pyrl.creature.player import Player
-from pyrl.types.color import ColorPairs
-from pyrl.types.level_gen import LevelGen
 from pyrl.creature.creature import Creature
+from pyrl.creature.player import Player
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, DefaultLocation, AssetTileDict, \
     AssetLocationDict, AssetCreatureDict
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.world.level import Level
+from pyrl.types.color import ColorPairs
+from pyrl.types.level_gen import LevelGen
+from pyrl.world.level_gen_params import LevelGenParams
 
-def get_level(player: Player) -> Level:
+def get_level(player: Player) -> LevelGenParams:
 
     dimensions = default_dims
     charstr = (
@@ -54,11 +54,12 @@ def get_level(player: Player) -> Level:
     level_data = custom_tiles, custom_locations, custom_creatures
     tiles, locations, creatures = construct_data(dimensions, charstr, *level_data)
 
-    return Level(
+    return LevelGenParams(
         danger_level=1,
-        generation_type=LevelGen.NoGeneration,
         tiles=tiles,
         locations=locations,
         custom_creatures=creatures,
-        creature_spawning_enabled=False,
+        initial_creature_spawns=False,
+        ongoing_creature_spawns=False,
+        generation_type=LevelGen.NoGeneration,
     )

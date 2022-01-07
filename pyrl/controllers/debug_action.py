@@ -26,7 +26,6 @@ class DebugAction(CreatureActionsMixin):
             'g': self.print_user_input,
             'i': self.interactive_console,
             'k': self.kill_creatures_in_level,
-            'l': self.cycle_level_type,
             'm': self.print_message_debug_string,
             'o': self.draw_path_to_passage_down,
             'p': self.draw_path_from_up_to_down,
@@ -49,11 +48,11 @@ class DebugAction(CreatureActionsMixin):
         self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
     def add_monster(self) -> Literal[Action.Debug] | None:
-        if self.level.creature_spawning_enabled:
-            self.level.spawn_creature(self.level.creature_spawner.random_creature())
+        if self.level.ongoing_creature_spawns:
+            self.level.spawn_creature(self.level.creature_picker.random_creature())
             return self.actions.debug_action()
         else:
-            self.io.msg("No random spawning on this level. Can't add monster.")
+            self.io.msg("No ongoing spawning on this level. Can't add monster.")
             return None
 
     def show_map(self) -> Literal[Action.Redraw]:
@@ -64,19 +63,6 @@ class DebugAction(CreatureActionsMixin):
     def toggle_path_heuristic_cross(self) -> None:
         Debug.cross = not Debug.cross
         self.io.msg(f"Path heuristic cross set to {Debug.cross}")
-
-    def cycle_level_type(self) -> None:
-        last_level_type: LevelGen | str = "All levels are already generated"
-        level: Level
-        for level in self.world.levels.values():
-            if level.is_finalized:
-                continue
-            if level.generation_type == LevelGen.Dungeon:
-                level.generation_type = LevelGen.Arena
-            elif level.generation_type == LevelGen.Arena:
-                level.generation_type = LevelGen.Dungeon
-            last_level_type = level.generation_type
-        self.io.msg(f"Level type set to {last_level_type}")
 
     def show_path_debug(self) -> None:
         if not Debug.path:

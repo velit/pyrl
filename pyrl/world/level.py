@@ -2,127 +2,71 @@ from __future__ import annotations
 
 import random
 from collections.abc import Iterable, Container
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from typing import TYPE_CHECKING
 
 from pyrl.algorithms.coord_algorithms import bresenham, cross_product, add_vector
-from pyrl.algorithms.dungeon_generator import generate_tiles_to
 from pyrl.algorithms.pathing import path, distance
 from pyrl.config.debug import Debug
 from pyrl.creature.action import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
-from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
+from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
 from pyrl.structures.helper_mixins import DimensionsMixin
-from pyrl.structures.one_to_one_mapping import OTOMap
+from pyrl.structures.uniq_dict import UniqDict
 from pyrl.structures.scheduler import Scheduler
 from pyrl.structures.table import Table
 from pyrl.types.char import Glyph
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
-from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_key import LevelKey
 from pyrl.types.level_location import LevelLocation
 from pyrl.types.world_point import WorldPoint
+from pyrl.world.creature_picker import CreaturePicker
 
 if TYPE_CHECKING:
     from pyrl.world.tile import Tile
     from pyrl.creature.creature import Creature
 
-class CreatureSpawner:
-    __slots__ = ('creatures', 'total_weight')
-
-    def __init__(self) -> None:
-        self.creatures: list[tuple[int, Creature]] = []
-        self.total_weight = 0
-
-    def set_creatures(self, creatures: Iterable[Creature], danger_level: int) -> None:
-        self.creatures = []
-        accumulator = 0
-        for creature in creatures:
-            weight = creature.spawn_weight(danger_level)
-            if weight == 0:
-                continue
-            accumulator += weight
-            self.creatures.append((accumulator, creature))
-        self.total_weight = accumulator
-
-    def random_creature(self) -> Creature:
-        assert self.creatures, "Trying to spawn a random creature with no creatures defined"
-        index = random.randrange(self.total_weight)
-        return next(creature for (slot, creature) in self.creatures if index < slot).copy()
-
+@dataclass(eq=False, slots=True)
 class Level(DimensionsMixin):
 
+    # __init__
     level_key: LevelKey
+    danger_level: int
+    tiles: Table[Tile]                            = field(repr=False)
+    locations: UniqDict[Coord, LevelLocation]     = field(default_factory=UniqDict)
+    custom_creatures: InitVar[Iterable[Creature]] = field(repr=False, default=())
+    initial_creature_spawns: InitVar[bool]        = True
+    ongoing_creature_spawns: bool                 = True
 
-    def __init__(self,
-                 danger_level: int = 0,
-                 generation_type: LevelGen = LevelGen.Dungeon,
-                 tiles: Table[Tile] | None = None,
-                 locations: dict[Coord, LevelLocation] | None = None,
-                 custom_creatures: list[Creature] | None = None,
-                 creature_spawning_enabled: bool = True):
-        # Generation
-        self.danger_level = danger_level
-        self.generation_type = generation_type
-        self.custom_creatures = list(custom_creatures) if custom_creatures else []
-        self.creature_spawn_count = 99
-        self.creature_spawning_enabled = creature_spawning_enabled
-        self.creature_spawner = CreatureSpawner()
+    # rest
+    creature_picker: CreaturePicker      = field(init=False, repr=False)
+    creatures: dict[Coord, Creature]     = field(init=False, repr=False, default_factory=dict)
+    items: dict[Coord, tuple[Item, ...]] = field(init=False, repr=False, default_factory=dict)
+    turn_scheduler: Scheduler[Creature]  = field(init=False, repr=False, default_factory=Scheduler)
+    visible_change: Event                = field(init=False, repr=False, default_factory=Event)
 
-        # Normal usage
-        self.tiles: Table[Tile]
-        if tiles is None:
-            self.tiles = Table(default_dims)
-        else:
-            self.tiles = tiles
+    def __post_init__(self, custom_creatures: Iterable[Creature], initial_creature_spawns: bool) -> None:
+        self.creature_picker = CreaturePicker(default_creatures, self.danger_level)
 
-        self.locations: OTOMap[Coord, LevelLocation] = OTOMap(locations) if locations else OTOMap()
-        self.visible_change = Event()
-        self.turn_scheduler: Scheduler[Creature] = Scheduler()
-        self.creatures: dict[Coord, Creature] = {}
-        self.items: dict[Coord, tuple[Item, ...]] = {}
-        self.is_finalized = False
+        for creature in custom_creatures:
+            self.spawn_creature(creature)
+
+        creature_spawn_count = 99
+        if initial_creature_spawns:
+            for _ in range(creature_spawn_count):
+                creature = self.creature_picker.random_creature()
+                self.spawn_creature(creature)
 
     @property
     def dimensions(self) -> Dimensions:
         return self.tiles.dimensions
 
-    def will_have_location(self, location: LevelLocation) -> bool:
-        if location == DefaultLocation.Random_Location:
-            return True
-
-        if location in self.locations.values():
-            return True
-
-        if self.generation_type != LevelGen.NoGeneration:
-            return location in DefaultLocation
-
-        return False
-
     def get_creature_spawn_list(self) -> list[Creature]:
         return list(default_creatures)
-
-    def finalize(self, level_key: LevelKey) -> None:
-        if self.generation_type.is_used():
-            generate_tiles_to(self)
-
-        self.level_key = level_key
-
-        for creature in self.custom_creatures:
-            self.spawn_creature(creature)
-
-        if self.creature_spawning_enabled:
-            self.creature_spawner.set_creatures(default_creatures, self.danger_level)
-
-            for _ in range(self.creature_spawn_count):
-                creature = self.creature_spawner.random_creature()
-                self.spawn_creature(creature)
-
-        self.is_finalized = True
 
     def get_location_coord(self, level_location: LevelLocation) -> Coord:
         if level_location == DefaultLocation.Random_Location:
@@ -260,12 +204,6 @@ class Level(DimensionsMixin):
         self.add_creature(creature, coord)
         self.turn_scheduler.add(creature, creature.action_cost(Action.Spawn))
 
-    def move_creature_to_location(self, creature: Creature, level_location: LevelLocation) -> None:
-        creature.level.remove_creature(creature)
-        coord = self.get_location_coord(level_location)
-        self.add_creature(creature, coord)
-        self.turn_scheduler.add(creature, 0)
-
     def add_creature(self, creature: Creature, coord: Coord | None = None) -> None:
         if coord is None:
             coord = self.free_coord()
@@ -276,6 +214,12 @@ class Level(DimensionsMixin):
         creature.coord = coord
         creature.level = self
         self.visible_change.trigger(coord)
+
+    def move_creature_to_location(self, creature: Creature, level_location: LevelLocation) -> None:
+        creature.level.remove_creature(creature)
+        coord = self.get_location_coord(level_location)
+        self.add_creature(creature, coord)
+        self.turn_scheduler.add(creature, 0)
 
     def remove_creature(self, creature: Creature) -> None:
         coord = creature.coord

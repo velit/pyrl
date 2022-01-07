@@ -6,7 +6,7 @@ import pytest
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
-from pyrl.structures.one_to_one_mapping import OTOMap
+from pyrl.structures.uniq_dict import UniqDict
 from pyrl.structures.table import Table
 
 def test_table() -> None:
@@ -26,7 +26,7 @@ def test_table() -> None:
     assert not table.is_legal((3, 2))
 
 def test_one_to_one_mapping() -> None:
-    mapping: OTOMap[str, int] = OTOMap()
+    mapping: UniqDict[str, int] = UniqDict()
     mapping['0'] = 0
     mapping['1'] = 1
     mapping['2'] = 2

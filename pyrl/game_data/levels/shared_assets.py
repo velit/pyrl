@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pyrl.structures.uniq_dict import UniqDict
 from pyrl.types.char import Letter
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Dir
@@ -43,7 +44,7 @@ base_locations: AssetLocationDict = {
 
 def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: AssetTileDict,
                    custom_locations: AssetLocationDict, custom_creatures: AssetCreatureDict) \
-                   -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
+                   -> tuple[Table[Tile], UniqDict[Coord, LevelLocation], list[Creature]]:
 
     _assert_dimensions(dimensions, table_data)
     unfinalized_tiles: Table[Letter] = Table(dimensions, table_data)
@@ -64,8 +65,8 @@ def _assert_dimensions(dimensions: Dimensions, table_data: str) -> None:
 
 def _construct_data(dimensions: Dimensions, table_data: str, tiles_lookup: AssetTileDict,
                     locations_lookup: AssetLocationDict, creatures_lookup: AssetCreatureDict) \
-                        -> tuple[Table[Tile], dict[Coord, LevelLocation], list[Creature]]:
-    locations = {}
+                        -> tuple[Table[Tile], UniqDict[Coord, LevelLocation], list[Creature]]:
+    locations: UniqDict[Coord, LevelLocation] = UniqDict()
     creatures = []
     tile_list: list[Tile] = []
     for index, letter in enumerate(table_data):

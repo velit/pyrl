@@ -6,8 +6,8 @@ from typing import TypeVar
 K = TypeVar("K")
 V = TypeVar("V")
 
-class OTOMap(UserDict[K, V]):
-    """One to one mapping. A dict-like object which guarantees uniqueness for values in addition to keys."""
+class UniqDict(UserDict[K, V]):
+    """One to one mapping. A dict which guarantees uniqueness for values in addition to keys."""
     def __setitem__(self, key: K, value: V) -> None:
         if value in self.values():
             raise ValueError(f"{value=} already exists in mapping.")
