@@ -5,8 +5,8 @@ from collections.abc import Iterable, Container
 from dataclasses import dataclass, field, InitVar
 from typing import TYPE_CHECKING
 
-from pyrl.algorithms.coord_algorithms import bresenham, cross_product, add_vector
-from pyrl.algorithms.pathing import path, distance
+from pyrl.functions.coord_algorithms import bresenham, cross_product, add_vector
+from pyrl.functions.pathing import path, distance
 from pyrl.config.debug import Debug
 from pyrl.creature.action import Action
 from pyrl.creature.item import Item
@@ -24,7 +24,7 @@ from pyrl.types.direction import Direction, Dir
 from pyrl.types.level_key import LevelKey
 from pyrl.types.level_location import LevelLocation
 from pyrl.types.world_point import WorldPoint
-from pyrl.world.creature_picker import CreaturePicker
+from pyrl.creature.creature_picker import CreaturePicker
 
 if TYPE_CHECKING:
     from pyrl.world.tile import Tile
@@ -35,7 +35,7 @@ class Level(DimensionsMixin):
 
     # __init__
     level_key: LevelKey
-    danger_level: int
+    area_level: int
     tiles: Table[Tile]                            = field(repr=False)
     locations: UniqDict[Coord, LevelLocation]     = field(default_factory=UniqDict)
     custom_creatures: InitVar[Iterable[Creature]] = field(repr=False, default=())
@@ -50,7 +50,7 @@ class Level(DimensionsMixin):
     visible_change: Event                = field(init=False, repr=False, default_factory=Event)
 
     def __post_init__(self, custom_creatures: Iterable[Creature], initial_creature_spawns: bool) -> None:
-        self.creature_picker = CreaturePicker(default_creatures, self.danger_level)
+        self.creature_picker = CreaturePicker(default_creatures, self.area_level)
 
         for creature in custom_creatures:
             self.spawn_creature(creature)

@@ -6,8 +6,8 @@ from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
-from types import TracebackType
-from typing import TypeVar, Callable, TYPE_CHECKING, Type, Any
+from typing import TypeVar, Callable, TYPE_CHECKING, Any
+
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.types.key_sequence import KeySequence, AnyKeys
 from pyrl.types.keys import Key
@@ -35,36 +35,28 @@ class DummySpeed(Enum):
     UseInput = 3
 
 @dataclass
+class DummyOptions:
+    mode:       DummyMode  = DummyMode.Hybrid
+    speed_mode: DummySpeed = DummySpeed.Instant
+    delay:      float      = 0 # seconds
+    log_debug:  bool       = False
+
+@dataclass(eq=False)
 class DummyPlugSystem:
     dummy_input: deque[Key] = field(init=False, default_factory=deque)
-    mode: DummyMode = DummyMode.Hybrid
-    speed_mode: DummySpeed = DummySpeed.Instant
-    delay: float = 1  # seconds
-
-    def change_modes(self, *, mode: DummyMode | None = None,
-                     speed_mode: DummySpeed | None = None,
-                     delay: float | None = None) -> None:
-        if mode:
-            _dps.mode = mode
-        if speed_mode:
-            _dps.speed_mode = speed_mode
-        if delay:
-            _dps.delay = delay
+    options: DummyOptions = field(default_factory=DummyOptions)
 
     def __enter__(self) -> DummyPlugSystem:
         return self
 
     def __exit__(self, *args: Any, **kwargs: Any) -> None:
-        self.reset_modes()
+        self.reset_options()
 
-    def reset_modes(self) -> None:
-        self.__init__()  # type: ignore
+    def change_options(self, options: DummyOptions) -> None:
+        self.options = options
 
-    def get_dummy_input(self) -> Key:
-        """Return a dummy input key or IndexError if empty"""
-        key = self.dummy_input.popleft()
-        logging.debug(f"Dummy input: {key}")
-        return key
+    def reset_options(self) -> None:
+        self.options = DummyOptions()
 
     def add_input(self, input_iterable: Iterable[Key]) -> None:
         self.dummy_input.extend(input_iterable)
@@ -77,12 +69,18 @@ class DummyPlugSystem:
         except StopSimulation:
             return game
 
+    def get_dummy_input(self) -> Key:
+        """Return a dummy input key or IndexError if empty"""
+        key = self.dummy_input.popleft()
+        if self.options.log_debug:
+            logging.debug(f"Dummy input: {key}")
+        return key
+
 _dps = DummyPlugSystem()
 
-def get(*, mode: DummyMode | None = None,
-        speed_mode: DummySpeed | None = None,
-        delay: float | None = None) -> DummyPlugSystem:
-    _dps.change_modes(mode=mode, speed_mode=speed_mode, delay=delay)
+def get(options: DummyOptions | None = None) -> DummyPlugSystem:
+    if options is not None:
+        _dps.change_options(options)
     return _dps
 
 IoWindowSubclass = TypeVar('IoWindowSubclass', bound=IoWindow)
@@ -90,14 +88,14 @@ def handle_dummy_input(get_key: Callable[[IoWindowSubclass], Key]) -> Callable[[
 
     def get_key_handle_dummy_input(self: IoWindowSubclass) -> Key:
         """Get a key and handle dummy input if any exist"""
-        if get().mode != DummyMode.Disabled:
+        if get().options.mode != DummyMode.Disabled:
             if get().dummy_input:
-                if get().speed_mode == DummySpeed.Delayed:
-                    time.sleep(get().delay)
-                elif get().speed_mode == DummySpeed.UseInput:
+                if get().options.speed_mode == DummySpeed.Delayed:
+                    time.sleep(get().options.delay)
+                elif get().options.speed_mode == DummySpeed.UseInput:
                     get_key(self)
                 return get().get_dummy_input()
-            elif get().mode == DummyMode.Full:
+            elif get().options.mode == DummyMode.Full:
                 raise StopSimulation()
         return get_key(self)
 

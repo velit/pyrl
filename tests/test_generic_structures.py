@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-
 import pytest
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.event import Event
-from pyrl.structures.uniq_dict import UniqDict
 from pyrl.structures.table import Table
+from pyrl.structures.uniq_dict import UniqDict
 
 def test_table() -> None:
     dims = Dimensions(2, 2)

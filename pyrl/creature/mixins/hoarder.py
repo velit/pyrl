@@ -1,21 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, TypeGuard
 
 from pyrl.creature.creature import Creature
 from pyrl.creature.inventory import Inventory
 from pyrl.structures.dice import Dice
 
-def has_inventory(creature: Creature) -> TypeGuard[Hoarder]:
-    return isinstance(creature, Hoarder)
-
+@dataclass(eq=False)
 class Hoarder(Creature):
     """Creatures with this class have an inventory."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.inventory = Inventory()
-        super().__init__(*args, **kwargs)
+    inventory: Inventory = field(init=False, default_factory=Inventory)
 
     @property
     def damage_dice(self) -> Dice:

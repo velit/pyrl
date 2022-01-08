@@ -8,7 +8,7 @@ import sys
 from cProfile import Profile
 from collections.abc import Sequence
 
-from pyrl import state_store
+from pyrl.functions import state_store
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
 from pyrl.game import Game

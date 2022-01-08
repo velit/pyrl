@@ -4,8 +4,6 @@ from __future__ import annotations
 import sys
 from typing import NoReturn, Any
 
-from pyrl import state_store
-from pyrl.algorithms.field_of_vision import ShadowCast
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
@@ -16,6 +14,8 @@ from pyrl.creature.creature import Creature
 from pyrl.creature.game_actions import GameActions
 from pyrl.creature.mixins.visionary import Visionary
 from pyrl.creature.player import Player
+from pyrl.functions import state_store
+from pyrl.functions.field_of_vision import ShadowCast
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.types.world_point import WorldPoint
@@ -38,7 +38,7 @@ class Game:
             self.user_controller = self.post_init(cursor_lib)
 
     def post_init(self, cursor_lib: IoWrapper) -> tuple[WindowSystem, GameActions, AIController, UserController]:
-        """Initialise non-serialized state. Used when loading the game."""
+        """Initialize non-serialised state. Used when loading the game."""
         self.io = WindowSystem(cursor_lib)
         self.creature_actions = GameActions(self)
         self.ai_controller = AIController(self.ai_state, self.creature_actions)
@@ -118,12 +118,9 @@ class Game:
 
     def savegame(self) -> str:
         try:
-            raw, compressed = state_store.save(self, self.game_name)
+            msg_str = state_store.save(self, self.game_name)
         except IOError as e:
             msg_str = str(e)
-        else:
-            msg_str = f"Saved game '{self.game_name}', file size: {raw:,} b," \
-                      f" {compressed:,} b compressed. Ratio: {raw / compressed:.2%}"
         return msg_str
 
     def update_view(self, creature: Visionary) -> None:

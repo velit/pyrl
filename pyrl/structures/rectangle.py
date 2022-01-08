@@ -7,7 +7,7 @@ from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.types.coord import Coord
 
-@dataclass(init=False, slots=True)
+@dataclass(init=False)
 class Rectangle(DimensionsMixin):
     row_range: range
     col_range: range

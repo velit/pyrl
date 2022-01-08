@@ -19,7 +19,7 @@ from pyrl.window.level_window import LevelWindow
 from pyrl.window.message_bar import MessageBar
 from pyrl.window.status_bar import StatusBar
 
-@dataclass(eq=False, slots=True)
+@dataclass(eq=False)
 class WindowSystem:
 
     message_dimensions: ClassVar[Dimensions] = Dimensions(Config.message_bar_height, default_dims.cols)

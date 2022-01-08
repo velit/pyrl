@@ -10,7 +10,7 @@ from pyrl.types.color import ColorPairs
 from pyrl.types.char import Glyph
 from pyrl.types.equipment_slot import Slot
 
-@dataclass(eq=False, slots=True)
+@dataclass(eq=False)
 class Item:
     name: str
     char: Glyph

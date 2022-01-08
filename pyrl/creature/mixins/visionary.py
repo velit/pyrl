@@ -1,24 +1,24 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, TYPE_CHECKING
+from dataclasses import field, dataclass
+from typing import TYPE_CHECKING
 
 from pyrl.creature.creature import Creature
+from pyrl.world.level import Level
 
 if TYPE_CHECKING:
     from pyrl.types.coord import Coord
 
+@dataclass(eq=False)
 class Visionary(Creature):
+    """Creatures with this mixin class see and remember squares they've seen."""
 
-    """Creatures with this mixin class remember the level squares they've seen."""
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-
-        self.visited_locations: dict[Level, set[Coord]] = defaultdict(set)
-        self._vision: set[Coord] = set()
+    seen_coords: dict[Level, set[Coord]] = field(init=False, default_factory=lambda: defaultdict(set))
+    _vision: set[Coord]                  = field(init=False, default_factory=set)
 
     def get_visited_locations(self) -> set[Coord]:
-        return self.visited_locations[self.level]
+        return self.seen_coords[self.level]
 
     @property
     def vision(self) -> set[Coord]:
@@ -27,7 +27,7 @@ class Visionary(Creature):
     @vision.setter
     def vision(self, coordinates: set[Coord]) -> None:
         self._vision = coordinates
-        self.visited_locations[self.level] |= coordinates
+        self.seen_coords[self.level] |= coordinates
 
     @vision.deleter
     def vision(self) -> None:

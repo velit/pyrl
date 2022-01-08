@@ -7,7 +7,7 @@ from pyrl.types.direction import Dir
 from pyrl.types.level_location import LevelLocation
 from pyrl.creature.creature import Creature
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.algorithms.coord_algorithms import add_vector
+from pyrl.functions.coord_algorithms import add_vector
 from pyrl.structures.table import Table
 from pyrl.structures.dimensions import Dimensions
 from pyrl.world.tile import Tile
@@ -45,9 +45,7 @@ base_locations: AssetLocationDict = {
 def construct_data(dimensions: Dimensions, table_data: str, custom_tiles: AssetTileDict,
                    custom_locations: AssetLocationDict, custom_creatures: AssetCreatureDict) \
                    -> tuple[Table[Tile], UniqDict[Coord, LevelLocation], list[Creature]]:
-
     _assert_dimensions(dimensions, table_data)
-    unfinalized_tiles: Table[Letter] = Table(dimensions, table_data)
 
     tiles_lookup = base_tiles.copy()
     tiles_lookup.update(custom_tiles)

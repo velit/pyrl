@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from pyrl.algorithms.dungeon_generator import generate_tiles_to
+from pyrl.functions.dungeon_generator import generate_tiles_to
 from pyrl.creature.creature import Creature
 from pyrl.game_data.levels.shared_assets import default_dims, DefaultLocation
 from pyrl.structures.uniq_dict import UniqDict
@@ -16,7 +16,7 @@ from pyrl.world.tile import Tile
 
 @dataclass
 class LevelGenParams:
-    danger_level: int                         = 0
+    area_level: int                         = 0
     tiles: Table[Tile]                        = field(default_factory=lambda: Table(default_dims))
     locations: UniqDict[Coord, LevelLocation] = field(default_factory=UniqDict)
     custom_creatures: list[Creature]          = field(default_factory=list)
@@ -41,7 +41,7 @@ class LevelGenParams:
             generate_tiles_to(self)
         return Level(
             level_key,
-            danger_level=self.danger_level,
+            area_level=self.area_level,
             tiles=self.tiles,
             locations=self.locations,
             custom_creatures=self.custom_creatures,

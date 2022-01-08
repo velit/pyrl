@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from random import randint
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Dice:
     dices: int
     faces: int

@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from pyrl.algorithms.dungeon_generator import DungeonGenerator
+from pyrl.functions.dungeon_generator import DungeonGenerator
 from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 from pyrl.structures.dimensions import Dimensions

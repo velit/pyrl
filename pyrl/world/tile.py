@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from pyrl.types.char import Glyph
 
-@dataclass(eq=False, frozen=True, slots=True)
+@dataclass(eq=False, frozen=True)
 class Tile:
     """Permanent portion of a square. E.g. walls or floor."""
     name: str

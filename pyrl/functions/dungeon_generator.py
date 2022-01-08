@@ -5,7 +5,7 @@ from functools import partial
 from random import randrange, random, choice
 from typing import TYPE_CHECKING
 
-from pyrl.algorithms.coord_algorithms import add_vector
+from pyrl.functions.coord_algorithms import add_vector
 from pyrl.config.debug import Debug
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin

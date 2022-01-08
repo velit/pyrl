@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Any
 
-@dataclass(eq=False, slots=True)
+@dataclass(eq=False)
 class Event:
 
     observers: list[Callable[..., None]] = field(default_factory=list)

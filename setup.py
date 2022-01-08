@@ -11,6 +11,7 @@ setup(
     license="Creative Commons Attribution-NonCommercial-Sharelike 3.0 Unported License",
     data_files=[
         ('resources', ['resources/terminal10x18_gs_ro.png']),
-        ('', ['docs/LIBTCOD-LICENSE.txt', 'docs/PYRL-LICENSE.txt', 'docs/README', 'docs/glossary', 'libtcod/libtcod.so', 'SDL.dll', 'libtcod/libtcod-mingw.dll', ]),
+        ('', ['docs/LIBTCOD-LICENSE.txt', 'docs/PYRL-LICENSE.txt', 'docs/README', 'docs/glossary',
+              'libtcod/libtcod.so', 'SDL.dll', 'libtcod/libtcod-mingw.dll', ]),
     ]
 )

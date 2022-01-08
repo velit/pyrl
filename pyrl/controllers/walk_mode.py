@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal, NamedTuple
 
-from pyrl.algorithms.coord_algorithms import get_vector, reverse, clockwise_45, \
+from pyrl.functions.coord_algorithms import get_vector, reverse, clockwise_45, \
     anticlockwise_45
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config

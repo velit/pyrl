@@ -11,7 +11,7 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.types.coord import Coord
 
 T = TypeVar('T')
-@dataclass(slots=True)
+@dataclass
 class Table(Generic[T], DimensionsMixin):
     """
     Mutable non-dynamic array with two-dimensional get- and setitem methods.

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from pyrl.types.color import Color, ColorPairs
-from pyrl.types.equipment_slot import Slot
 from pyrl.creature.item import Armor, Weapon
 from pyrl.creature.player import Player
 from pyrl.creature.stats import Stats
 from pyrl.structures.dice import Dice
+from pyrl.types.color import Color, ColorPairs
+from pyrl.types.equipment_slot import Slot
 
 def pyrl_player() -> Player:
-    player = Player(name="player", char=('@', (Color.Green, Color.Black)))
+    player = Player("player", ('@', (Color.Green, Color.Black)))
     aok = Armor("Armor of Kings", 10, 10, [Slot.Body], Stats(accuracy=10, speed=100), (']', ColorPairs.Yellow))
     player.inventory.equip(aok, Slot.Body)
 

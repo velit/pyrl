@@ -59,9 +59,11 @@ def backpack_equip_item_view(actions: GameActions, slot: Slot) -> None:
 
 def backpack_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
-    key, selections = multi_select_lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
+    header = f"Backpack (Press {Binds.Backpack_Drop_Items.key} to drop selected items)"
+    key, selections = multi_select_lines_view(actions.io.whole_window, lines,
+                                              select_keys=Binds.Backpack_Select_Keys,
                                               return_keys=Binds.Backpack_Drop_Items + Binds.Cancel,
-                                              header=f"Backpack ({Binds.Backpack_Drop_Items.key} to drop selected items)")
+                                              header=header)
     if key in Binds.Backpack_Drop_Items:
         action, item_description = actions.drop_items(selections)
         actions.io.msg(f"Dropped {item_description}")
@@ -79,7 +81,8 @@ def pickup_items_view(actions: GameActions) -> Literal[Action.Pick_Items, Action
         actions.io.msg(f"Picked up {item_description}")
         return action
 
-    key, selections = multi_select_lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
+    key, selections = multi_select_lines_view(actions.io.whole_window, lines,
+                                              select_keys=Binds.Backpack_Select_Keys,
                                               header="Select items to pick up")
     if key in Binds.Cancel and selections:
         action, item_description = actions.pickup_items(selections)
@@ -89,7 +92,8 @@ def pickup_items_view(actions: GameActions) -> Literal[Action.Pick_Items, Action
 
 def drop_items_view(actions: GameActions) -> Literal[Action.Drop_Items, Action.No_Action]:
     lines: Sequence[Line[int]] = tuple(Line(str(item), i) for i, item in enumerate(actions.inspect_character_items()))
-    key, selections = multi_select_lines_view(actions.io.whole_window, lines, select_keys=Binds.Backpack_Select_Keys,
+    key, selections = multi_select_lines_view(actions.io.whole_window, lines,
+                                              select_keys=Binds.Backpack_Select_Keys,
                                               header="Select items to drop")
     if key in Binds.Cancel and selections:
         action, item_description = actions.drop_items(selections)

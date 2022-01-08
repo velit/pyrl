@@ -65,7 +65,7 @@ def get_level() -> LevelGenParams:
     tiles, locations, creatures = construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures)
 
     return LevelGenParams(
-        danger_level=1,
+        area_level=0,
         tiles=tiles,
         locations=locations,
         custom_creatures=creatures,

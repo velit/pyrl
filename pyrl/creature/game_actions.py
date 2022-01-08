@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import NoReturn, Iterable, TypeGuard, Literal, TYPE_CHECKING, TypeVar
 
-from pyrl.algorithms.combat import get_melee_attack_cr, get_combat_message
-from pyrl.algorithms.coord_algorithms import get_vector, add_vector, vector_is_direction
 from pyrl.creature.action import Action, IllegalMoveException, NoValidTargetException
 from pyrl.creature.creature import Creature
 from pyrl.creature.item import Item
 from pyrl.creature.mixins.hoarder import Hoarder
 from pyrl.creature.mixins.visionary import Visionary
+from pyrl.functions.combat import get_melee_attack_cr, get_combat_message
+from pyrl.functions.coord_algorithms import get_vector, add_vector, vector_is_direction
 from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir

@@ -12,7 +12,7 @@ from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
 from pyrl.types.key_sequence import AnyKeys
 from tests.integration_tests import dummy_plug_system
-from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem
+from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions
 
 # CONTINUE_AFTER_INTEGRATION_TEST = True
 CONTINUE_AFTER_INTEGRATION_TEST = False
@@ -20,7 +20,7 @@ CONTINUE_AFTER_INTEGRATION_TEST = False
 @pytest.fixture
 def dummy() -> Iterable[DummyPlugSystem]:
     # with dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.1) as dummy_plug:
-    with dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Instant) as dummy_plug:
+    with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)) as dummy_plug:
         yield dummy_plug
 
 @pytest.fixture
@@ -146,9 +146,9 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     # game = dummy.add_input_and_run(['d', 'x'], game)
 
     if CONTINUE_AFTER_INTEGRATION_TEST:
-        dummy.reset_modes()
-        with pytest.raises(SystemExit) as e:
+        dummy.reset_options()
+        with pytest.raises(SystemExit) as _:
             game.game_loop()
-    elif dummy.speed_mode != DummySpeed.Instant:
-        dummy.mode = DummyMode.Hybrid
+    elif dummy.options.speed_mode != DummySpeed.Instant:
+        dummy.options.mode = DummyMode.Hybrid
         game.io.get_key()

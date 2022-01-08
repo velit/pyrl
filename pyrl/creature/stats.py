@@ -19,7 +19,7 @@ class Stat(Enum):
     sight          = "Sight"
     speed          = "Speed"
 
-@dataclass(kw_only=True, slots=True)
+@dataclass(kw_only=True)
 class Stats:
     strength:            int = 0
     dexterity:           int = 0
