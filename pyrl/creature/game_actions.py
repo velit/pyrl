@@ -121,7 +121,7 @@ class GameActions(GameMixin, CreatureMixin):
                 target.receive_damage(damage)
                 died = target.is_dead()
             if died:
-                self.game.creature_death(target)
+                self.game.creature_death(self.creature, target)
         self._attack_user_message(succeeds, damage, died, target)
         return self._act(Action.Attack)
 

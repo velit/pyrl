@@ -33,8 +33,8 @@ class CreaturePicker:
     def speciation_mult(self, creature_level: int, area_level: int) -> Decimal:
         """Applies a multiplier based on the difference of creature level to area level."""
         diff = area_level - creature_level
-        speciation_range = range(-5, 1)
-        extant_range = range(1, 10)
+        speciation_range = range(-5, 1) # [-5, 0]
+        extant_range     = range(1, 10)
         extinction_range = range(10, 21)
         diff_weight: Decimal
         if diff in speciation_range:

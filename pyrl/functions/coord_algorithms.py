@@ -10,6 +10,10 @@ from pyrl.types.direction import Direction, Dir
 N = TypeVar('N', int, float, Decimal)
 
 def resize_range(number: N, old_range: range, new_range: range = range(2)) -> N:
+    """Resize given number from the old_range to the new_range.
+
+    If the input number is a float or decimal then the return value will also be and might include fractions
+    For example resize_range(1.0, range(3)) == 0.5 because 1 is in the middle of range(3)"""
     n_t: Type[N] = type(number)
     assert number in old_range, f"Value '{number}' is not inside {old_range}"
     assert len(old_range) > 1, f"Number {old_range.start} is not a range"

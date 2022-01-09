@@ -27,6 +27,8 @@ class TcodWrapper(IoWrapper):
         self.tileset_index = -1
         self.bdf_index, tileset = get_bdf_index_and_tileset("spleen-16x32.bdf")
         self.context = tcod.context.new(width=1536, height=960, tileset=tileset, title=Config.default_game_name)
+                                        # sdl_window_flags=(tcod.context.SDL_WINDOW_MAXIMIZED |
+                                        #                   tcod.context.SDL_WINDOW_RESIZABLE))
         self.root_console = self.context.new_console(min_rows=rows, min_columns=cols)
 
     def __enter__(self) -> IoWrapper:

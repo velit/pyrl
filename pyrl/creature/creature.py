@@ -42,6 +42,9 @@ class Creature:
         if amount > 0:
             self.hp -= amount
 
+    def kill(self, target: Creature) -> None:
+        pass
+
     def is_dead(self) -> bool:
         return self.hp <= 0
 

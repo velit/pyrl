@@ -106,11 +106,13 @@ class Game:
 
         return True
 
-    def creature_death(self, creature: Creature) -> None:
-        self.ai_controller.remove_creature_state(creature)
+    def creature_death(self, killer: Creature, creature: Creature) -> None:
         if creature is self.player:
             self.io.get_key("You die...", keys=Binds.Cancel)
             self.endgame()
+
+        killer.kill(creature)
+        self.ai_controller.remove_creature_state(creature)
         creature.level.remove_creature(creature)
 
     def endgame(self) -> NoReturn:
