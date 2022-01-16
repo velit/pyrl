@@ -50,7 +50,9 @@ ignore_keys: set[KeySym] = {
     KeySym.LALT,
     KeySym.LCTRL,
     KeySym.LSHIFT,
+    KeySym.LGUI,
     KeySym.RALT,
     KeySym.RCTRL,
     KeySym.RSHIFT,
+    KeySym.RGUI,
 }

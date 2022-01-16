@@ -71,10 +71,7 @@ class DummyPlugSystem:
 
     def get_dummy_input(self) -> Key:
         """Return a dummy input key or IndexError if empty"""
-        key = self.dummy_input.popleft()
-        if self.options.log_debug:
-            logging.debug(f"Dummy input: {key}")
-        return key
+        return self.dummy_input.popleft()
 
 _dps = DummyPlugSystem()
 
@@ -88,15 +85,22 @@ def handle_dummy_input(get_key: Callable[[IoWindowSubclass], Key]) -> Callable[[
 
     def get_key_handle_dummy_input(self: IoWindowSubclass) -> Key:
         """Get a key and handle dummy input if any exist"""
-        if get().options.mode != DummyMode.Disabled:
-            if get().dummy_input:
-                if get().options.speed_mode == DummySpeed.Delayed:
-                    time.sleep(get().options.delay)
-                elif get().options.speed_mode == DummySpeed.UseInput:
+        dps = get()
+        if dps.options.mode != DummyMode.Disabled:
+            if dps.dummy_input:
+                if dps.options.speed_mode == DummySpeed.Delayed:
+                    time.sleep(dps.options.delay)
+                elif dps.options.speed_mode == DummySpeed.UseInput:
                     get_key(self)
-                return get().get_dummy_input()
-            elif get().options.mode == DummyMode.Full:
+                key = dps.get_dummy_input()
+                if dps.options.log_debug:
+                    logging.debug(f"Dummy input: {key}")
+                return key
+            elif dps.options.mode == DummyMode.Full:
                 raise StopSimulation()
-        return get_key(self)
+        key = get_key(self)
+        if dps.options.log_debug:
+            logging.debug(f"User input: {key}")
+        return key
 
     return get_key_handle_dummy_input

@@ -42,8 +42,8 @@ class TcodWindow(IoWindow, DimensionsMixin):
         for event in events:
             if isinstance(event, tcod.event.Quit):
                 raise SystemExit()
-            elif isinstance(event, tcod.event.WindowResized):
-                return Keys.WINDOW_RESIZE
+            # elif isinstance(event, tcod.event.WindowResized):
+            #     return Keys.WINDOW_RESIZE
             elif isinstance(event, tcod.event.KeyDown):
                 if event.sym in key_map:
                     return key_map[event.sym]
@@ -54,6 +54,8 @@ class TcodWindow(IoWindow, DimensionsMixin):
                     key = key.upper()
                 else:
                     key = key.lower()
+                if event.mod & Modifier.LGUI or event.mod & Modifier.RGUI:
+                    key = "◆" + key
                 if event.mod & Modifier.CTRL:
                     key = "^" + key
                 if event.mod & Modifier.ALT:

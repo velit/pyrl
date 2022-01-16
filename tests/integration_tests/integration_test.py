@@ -19,7 +19,7 @@ CONTINUE_AFTER_INTEGRATION_TEST = False
 
 @pytest.fixture
 def dummy() -> Iterable[DummyPlugSystem]:
-    # with dummy_plug_system.get(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.1) as dummy_plug:
+    # with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.1)) as dummy_plug:
     with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)) as dummy_plug:
         yield dummy_plug
 
@@ -49,6 +49,12 @@ def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy: DummyPlugS
     assert game.player.level.level_key.idx == 5
 
 def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
+
+    if game.io.wrapper.implementation != "mock" and CONTINUE_AFTER_INTEGRATION_TEST:
+        old_mode = dummy.options.mode
+        dummy.options.mode = DummyMode.Disabled
+        game.io.get_key()
+        dummy.options.mode = old_mode
 
     help_system = (Binds.Help, Binds.Cancel)
 
