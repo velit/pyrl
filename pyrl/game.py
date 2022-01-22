@@ -111,7 +111,7 @@ class Game:
             self.io.get_key("You die...", keys=Binds.Cancel)
             self.endgame()
 
-        killer.kill(creature)
+        killer.gain_kill_xp(creature)
         self.ai_controller.remove_creature_state(creature)
         creature.level.remove_creature(creature)
 

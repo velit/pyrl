@@ -18,11 +18,15 @@ class Learner(Creature):
     experience:     int        = field(init=False, default=0)
     levelups:       deque[int] = field(init=False, default_factory=lambda: deque(range(2, 101)))
 
-    base_kill_xp:   Final[int] = field(init=False, default=50)
-    base_level_xp:  Final[int] = field(init=False, default=1000)
+    kill_xp_unit:   Final[int] = field(init=False, default=50)
+    level_xp_unit:  Final[int] = field(init=False, default=1000)
 
-    def kill(self, target: Creature) -> None:
-        creature_xp = self.base_kill_xp * target.creature_level
+    @property
+    def experience_level(self) -> int:
+        return self.calc_experience_level(self.experience, self.level_xp_unit)
+
+    def gain_kill_xp(self, target: Creature) -> None:
+        creature_xp = self.kill_xp_unit * target.creature_level
         levels_above = self.creature_level - target.creature_level
 
         still_xp = range(7) # Actually being 6 above won't give exp, 5 is max
@@ -41,13 +45,20 @@ class Learner(Creature):
         while self.experience_level >= self.levelups[0]:
             self.level_up(self.levelups.popleft())
 
-    def xp_limit(self, level: int) -> int:
-        """Return the xp limit for the given level."""
-        return (level ** 2) / 2 - level + 1
+    @classmethod
+    def calc_experience_level(cls, experience: int, base_level_xp: int) -> int:
+        level_units = experience / base_level_xp
+        inner_sqrt = 2 * level_units - 1
+        if inner_sqrt < 0:
+            return 1
+        else:
+            return int(sqrt(inner_sqrt) + 1) + 1
 
-    @property
-    def experience_level(self) -> int:
-        return int(sqrt(2 * self.experience / self.base_level_xp - 1) + 1)
+    @classmethod
+    def calc_experience_limit(cls, level: int, level_unit_xp: int) -> int:
+        """Return the xp limit for the given level."""
+        level_units = level ** 2 / 2 - level + 1
+        return int(level_units * level_unit_xp)
 
     def level_up(self, level: int) -> None:
         logging.debug(f"You gain enough experience to attain level {level}!")
