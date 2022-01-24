@@ -17,25 +17,48 @@ class Creature:
     name:              str
     char:            Glyph
     creature_level:    int = 0
-    spawn_class:       int = 1
+    spawn_class:       int = field(repr=False, default=1)
 
-    base_strength:     int = field(init=False, repr=False, default=10)
-    base_dexterity:    int = field(init=False, repr=False, default=10)
-    base_endurance:    int = field(init=False, repr=False, default=10)
-    base_intelligence: int = field(init=False, repr=False, default=10)
-    base_perception:   int = field(init=False, repr=False, default=10)
+    base_strength:     int = field(init=False, repr=False)
+    base_dexterity:    int = field(init=False, repr=False)
+    base_endurance:    int = field(init=False, repr=False)
+    base_intelligence: int = field(init=False, repr=False)
+    base_perception:   int = field(init=False, repr=False)
+
+    turns:             int = field(init=False, repr=False, default=0)
+    time:              int = field(init=False, repr=True, default=0)
 
     hp:                int = field(init=False, repr=True)
     coord:           Coord = field(init=False, repr=True)
     level:           Level = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        self.base_strength     = 10 + self.creature_level
+        self.base_dexterity    = 10 + self.creature_level
+        self.base_endurance    = 10 + self.creature_level
+        self.base_intelligence = 10 + self.creature_level
+        self.base_perception   = 10 + self.creature_level
+
         self.hp = self.max_hp
+
+    def advance_time(self, new_time: int) -> None:
+        """Accrue all the passive changes that happen to this creature when time advances."""
+        time_delta = new_time - self.time
+        if time_delta > 0:
+            self.apply_regen(time_delta)
+            self.turns += 1
+        self.time = new_time
+
+    def apply_regen(self, time_delta: int) -> None:
+        ticks_per_hp = 4000 / self.regen
+        previous_time = self.time % ticks_per_hp
+        self.hp += int((previous_time + time_delta) / ticks_per_hp)
+        self.hp = min(self.hp, self.max_hp)
 
     @property
     def damage_dice(self) -> Dice:
-        base_attack_dices = self.strength // 20 + 1
-        base_attack_faces = self.strength // 3 + self.dexterity // 6
+        base_attack_dices = self.strength // 3 + self.dexterity // 6
+        base_attack_faces = self.strength // 20 + 1
         return Dice(base_attack_dices, base_attack_faces, self.damage)
 
     def receive_damage(self, amount: int) -> None:
@@ -100,6 +123,11 @@ class Creature:
     @property
     def sight(self) -> int:
         return min(self.perception // 2, int((self.perception * 5) ** 0.5))
+
+    @property
+    def regen(self) -> float:
+        """HP per 4000 time units."""
+        return 0.5 + 1 * self.endurance / 20
 
     @property
     def speed(self) -> int:

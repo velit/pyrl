@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 class Visionary(Creature):
     """Creatures with this mixin class see and remember squares they've seen."""
 
-    seen_coords: dict[Level, set[Coord]] = field(init=False, default_factory=lambda: defaultdict(set))
-    _vision: set[Coord]                  = field(init=False, default_factory=set)
+    seen_coords: dict[Level, set[Coord]] = field(init=False, repr=False, default_factory=lambda: defaultdict(set))
+    _vision: set[Coord]                  = field(init=False, repr=False, default_factory=set)
 
     def get_visited_locations(self) -> set[Coord]:
         return self.seen_coords[self.level]

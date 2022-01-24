@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import dataclass, field
 
 from pyrl.types.level_key import LevelKey
 from pyrl.game_data.levels.shared_assets import DefaultLocation
@@ -9,15 +10,14 @@ from pyrl.types.world_point import WorldPoint
 from pyrl.world.level import Level
 from pyrl.world.level_gen_params import LevelGenParams
 
+@dataclass
 class World:
-
-    def __init__(self, player: Player) -> None:
-        self.levels: dict[LevelKey, Level] = {}
-        self.level_params: dict[LevelKey, LevelGenParams] = {}
-        self.level_connections: dict[WorldPoint, WorldPoint] = {}
-        self.dungeon_lengths: Counter[str] = Counter()
-        self.player: Player = player
-        self.start_level_key = None
+    player: Player
+    time: int                                       = field(init=False, default=0)
+    levels: dict[LevelKey, Level]                   = field(init=False, default_factory=dict)
+    level_params: dict[LevelKey, LevelGenParams]    = field(init=False, default_factory=dict)
+    level_connections: dict[WorldPoint, WorldPoint] = field(init=False, default_factory=dict)
+    dungeon_lengths: Counter[str]                   = field(init=False, default_factory=Counter)
 
     def add_level(self, dungeon_key: str, level_params: LevelGenParams | None = None) -> None:
         self.dungeon_lengths[dungeon_key] += 1

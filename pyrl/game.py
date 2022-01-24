@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+from dataclasses import field, InitVar, dataclass
 from typing import NoReturn, Any
 
 from pyrl.config.binds import Binds
@@ -22,29 +23,28 @@ from pyrl.types.world_point import WorldPoint
 from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.level import Level
+from pyrl.world.world import World
 
+@dataclass
 class Game:
+    game_name:        str
+    cursor_lib:       InitVar[IoWrapper] = field(repr=False)
 
-    def __init__(self, game_name: str, cursor_lib: IoWrapper) -> None:
-        self.game_name = game_name
-        self.ai_state: AiState = {}
-        self.turn_counter = 0
-        self.time = 0
+    ai_state:         AiState            = field(init=False, repr=False, default_factory=dict)
+    world:            World              = field(init=False, repr=False, default_factory=pyrl_world)
 
-        self.world = pyrl_world()
-        self.io, \
-            self.creature_actions, \
-            self.ai_controller, \
-            self.user_controller = self.post_init(cursor_lib)
+    io:               WindowSystem       = field(init=False, repr=False)
+    creature_actions: GameActions        = field(init=False, repr=False)
+    ai_controller:    AIController       = field(init=False, repr=False)
+    user_controller:  UserController     = field(init=False, repr=False)
 
-    def post_init(self, cursor_lib: IoWrapper) -> tuple[WindowSystem, GameActions, AIController, UserController]:
+    def __post_init__(self, cursor_lib: IoWrapper) -> None:
         """Initialize non-serialised state. Used when loading the game."""
         self.io = WindowSystem(cursor_lib)
         self.creature_actions = GameActions(self)
         self.ai_controller = AIController(self.ai_state, self.creature_actions)
         self.user_controller = UserController(self.creature_actions)
         register_status_texts(self.io, self, self.player)
-        return self.io, self.creature_actions, self.ai_controller, self.user_controller
 
     @property
     def player(self) -> Player:
@@ -61,34 +61,39 @@ class Game:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
 
         while True:
-            creature, time_delta = self.active_level.turn_scheduler.advance_time()
-            self.time += time_delta
+            creature, time_delta = self.active_level.turn_scheduler.pop()
+            cost = 0
+            try:
+                action, cost = self.creature_act(creature, time_delta)
+            finally:
+                creature.level.turn_scheduler.add(creature, cost)
 
-            self.creature_actions.associate_creature(creature)
-            if creature is self.player:
-                assert isinstance(creature, Visionary)
-                self.update_view(creature)
-                action_cost = self.player_act()
-                if action_cost > 0:
-                    self.turn_counter += 1
-            else:
-                action_cost = self.ai_act()
+            if action == Action.Save:
+                self.io.msg(self.savegame())
 
-            creature_check, time_delta = self.active_level.turn_scheduler.addpop(creature, action_cost)
-            assert creature is creature_check
-            assert time_delta == 0
+    def creature_act(self, creature: Creature, time_delta: int) -> tuple[Action, int]:
+        self.world.time += time_delta
+        creature.advance_time(self.world.time)
 
-    def player_act(self) -> int:
+        self.creature_actions.associate_creature(creature)
+        if creature is self.player:
+            assert isinstance(creature, Visionary)
+            self.update_view(creature)
+            return self.get_player_action()
+        else:
+            return self.get_ai_action()
+
+    def get_player_action(self) -> tuple[Action, int]:
         """Returns the action cost"""
         while (action := self.user_controller.act()) == Action.No_Action:
             pass
-        return self.creature_actions.verify_and_get_cost(action)
+        return action, self.creature_actions.verify_and_get_cost(action)
 
-    def ai_act(self) -> int:
+    def get_ai_action(self) -> tuple[Action, int]:
         """Returns the action cost"""
         action = self.ai_controller.act(self.player.coord)
         assert action != Action.No_Action, "AI chose {action=}"
-        return self.creature_actions.verify_and_get_cost(action)
+        return action, self.creature_actions.verify_and_get_cost(action)
 
     def move_creature_to_level(self, creature: Creature, world_point: WorldPoint) -> bool:
         try:
@@ -163,9 +168,9 @@ class Game:
 
     def __getstate__(self) -> dict[str, Any]:
         exclude_state = (
-            'ai_controller',
-            'creature_actions',
             'io',
+            'creature_actions',
+            'ai_controller',
             'user_controller',
         )
         state = vars(self).copy()

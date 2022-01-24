@@ -174,10 +174,8 @@ class GameActions(GameMixin, CreatureMixin):
         self.game.redraw()
         return Action.No_Action
 
-    def save(self) -> tuple[Literal[Action.Save], str]:
-        self._assert_player()
-        save_message = self.game.savegame()
-        return self._player_act(Action.Save), save_message
+    def save(self) -> Literal[Action.Save]:
+        return self._player_act(Action.Save)
 
     def quit(self) -> NoReturn:
         self._assert_player()

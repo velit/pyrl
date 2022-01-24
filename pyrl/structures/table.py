@@ -25,7 +25,7 @@ class Table(Generic[T], DimensionsMixin):
     dimensions: Dimensions
     init_values: InitVar[Iterable[T]] = ()
     fillvalue: InitVar[T | None]      = None
-    _impl: list[T]                    = field(init=False)
+    _impl: list[T]                    = field(init=False, repr=False)
 
     def __post_init__(self, init_values: Iterable[T], fillvalue: T | None) -> None:
         self._impl: list[T] = list(value for _, value in zip_longest(range(self.dimensions.area), init_values,

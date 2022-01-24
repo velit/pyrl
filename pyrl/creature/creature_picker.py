@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Iterable
 
@@ -11,7 +11,7 @@ from pyrl.functions.coord_algorithms import resize_range
 @dataclass(init=False, eq=False)
 class CreaturePicker:
     total_weight: int
-    weighted_creatures: list[tuple[int, Creature]]
+    weighted_creatures: list[tuple[int, Creature]] = field(repr=False)
 
     def __init__(self, creatures: Iterable[Creature] = (), danger_level: int = 0):
         self.set_creatures(creatures, danger_level)

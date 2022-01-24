@@ -102,6 +102,6 @@ def load_game(game_name: str, cursor_lib: IoWrapper) -> Game:
         print(f"Save file '{game_name}' not found.", file=sys.stderr)
         sys.exit(1)
     assert isinstance(game, Game), f"Loaded data isn't a savegame. Found an object of type {type(game)}"
-    game.post_init(cursor_lib)
+    game.__post_init__(cursor_lib)
     game.redraw()
     return game

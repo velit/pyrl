@@ -19,7 +19,7 @@ CONTINUE_AFTER_INTEGRATION_TEST = False
 
 @pytest.fixture
 def dummy() -> Iterable[DummyPlugSystem]:
-    # with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.1)) as dummy_plug:
+    # with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.5)) as dummy_plug:
     with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)) as dummy_plug:
         yield dummy_plug
 
@@ -39,13 +39,13 @@ def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy: DummyPlugS
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
     game = dummy.add_input_and_run(input_seq, game)
-    assert game.turn_counter == 4
+    assert game.player.turns == 5
     assert game.player.level.level_key.idx == 3
 
     game = load_game(io_wrapper)
     input_seq = [Binds.Descend] * 4
     game = dummy.add_input_and_run(input_seq, game)
-    assert game.turn_counter == 8
+    assert game.player.turns == 9
     assert game.player.level.level_key.idx == 5
 
 def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
@@ -110,40 +110,40 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     coord = game.player.coord
 
     game = dummy.add_input_and_run(help_system, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     game = dummy.add_input_and_run(help_system, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     game = dummy.add_input_and_run(movement_and_look_system, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     game = dummy.add_input_and_run(message_system, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     game = dummy.add_input_and_run(whole_map, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     game = dummy.add_input_and_run(path_to_staircase, game)
-    assert game.turn_counter == 0
+    assert game.player.turns == 1
     assert coord == game.player.coord
 
     previous_bag_count = len(game.player.inventory._bag)
     game = dummy.add_input_and_run(inventory, game)
-    assert game.turn_counter == 3
+    assert game.player.turns == 4
     assert coord == game.player.coord
     assert len(game.player.inventory._bag) == previous_bag_count + 2
 
     game = dummy.add_input_and_run(walk_mode, game)
-    assert game.turn_counter == 7
+    assert game.player.turns == 8
 
     game = dummy.add_input_and_run(descend, game)
-    assert game.turn_counter == 9
+    assert game.player.turns == 10
     assert game.player.level.level_key.idx == 2
 
     # equip armor

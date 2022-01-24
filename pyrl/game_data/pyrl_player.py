@@ -9,7 +9,7 @@ from pyrl.types.equipment_slot import Slot
 
 def pyrl_player() -> Player:
     player = Player("player", ('@', (Color.Green, Color.Black)))
-    aok = Armor("Armor of Kings", 10, 10, [Slot.Body], Stats(accuracy=10, speed=100), (']', ColorPairs.Yellow))
+    aok = Armor("Armor of Kings", 1000, 1000, [Slot.Body], Stats(accuracy=10, speed=100), (']', ColorPairs.Yellow))
     player.inventory.equip(aok, Slot.Body)
 
     # weapon = Weapon("Black Spike", 15, Dice(8, 8, 10), two_handed=True, char=('(', ColorPairs.Darkest))
@@ -31,7 +31,7 @@ def pyrl_player() -> Player:
         Weapon("Short Sword", 0, Dice(1, 6, 3)),
         Weapon("Short Sword", 0, Dice(1, 6, 0)),
         Weapon("Long Sword", 0, Dice(1, 8, 2)),
-        Weapon("Lance of Longinus", 0, Dice(4, 8, 8), stats=Stats(endurance=8), char=('(', ColorPairs.Red)),
+        Weapon("Lance of Longinus", 100, Dice(4, 8, 8), stats=Stats(endurance=8), char=('(', ColorPairs.Red)),
     )
     items2 = tuple(Weapon("Short Sword", i, Dice(1, 6, i)) for i in range(60))
     for itam in (items + items2):

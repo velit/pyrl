@@ -219,7 +219,6 @@ class Level(DimensionsMixin):
         creature.level.remove_creature(creature)
         coord = self.get_location_coord(level_location)
         self.add_creature(creature, coord)
-        self.turn_scheduler.add(creature, 0)
 
     def remove_creature(self, creature: Creature) -> None:
         coord = creature.coord

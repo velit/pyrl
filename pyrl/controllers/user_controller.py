@@ -178,10 +178,7 @@ class UserController(CreatureActionsMixin):
         query = f"Do you wish to save the game? [{Binds.Yes}]"
         if dont_ask or self.io.get_key(query) in Binds.Yes:
             self.io.msg("Saving...")
-            self.io.refresh()
-            action, save_message = self.actions.save()
-            self.io.msg(save_message)
-            return action
+            return self.actions.save()
         return Action.No_Action
 
     def attack(self) -> Literal[Action.Attack, Action.No_Action]:

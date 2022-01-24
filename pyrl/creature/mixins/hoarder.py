@@ -10,7 +10,7 @@ from pyrl.structures.dice import Dice
 class Hoarder(Creature):
     """Creatures with this class have an inventory."""
 
-    inventory: Inventory = field(init=False, default_factory=Inventory)
+    inventory: Inventory = field(init=False, repr=False, default_factory=Inventory)
 
     @property
     def damage_dice(self) -> Dice:

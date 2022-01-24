@@ -14,7 +14,7 @@ class Action(Enum):
     Enter_Passage  = "Creature entered a passage.",    1000
     Move           = "Creature moved.",                1000
     Pick_Items     = "Creature picked up items.",      1000
-    Spawn          = "Creature spawned.",              500
+    Spawn          = "Creature spawned.",              1000
     Swap           = "Creature swapped.",              1000
     Teleport       = "Creature teleported.",           1000
     Wait           = "Creature waited.",               1000

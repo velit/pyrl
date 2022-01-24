@@ -16,6 +16,7 @@ class Stat(Enum):
     damage         = "Dmg"
     defense        = "Def"
     max_hp         = "HP"
+    regen          = "Regen"
     sight          = "Sight"
     speed          = "Speed"
 
@@ -31,6 +32,7 @@ class Stats:
     damage:              int = 0
     defense:             int = 0
     max_hp:              int = 0
+    regen:               int = 0
     sight:               int = 0
     speed:               int = 0
 

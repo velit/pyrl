@@ -16,10 +16,10 @@ class Learner(Creature):
     """Creatures with this mixin class learn new things and gain levels."""
 
     experience:     int        = field(init=False, default=0)
-    levelups:       deque[int] = field(init=False, default_factory=lambda: deque(range(2, 101)))
+    levelups:       deque[int] = field(init=False, repr=False, default_factory=lambda: deque(range(2, 101)))
 
-    kill_xp_unit:   Final[int] = field(init=False, default=50)
-    level_xp_unit:  Final[int] = field(init=False, default=1000)
+    kill_xp_unit:   Final[int] = field(init=False, repr=False, default=50)
+    level_xp_unit:  Final[int] = field(init=False, repr=False, default=1000)
 
     @property
     def experience_level(self) -> int:
