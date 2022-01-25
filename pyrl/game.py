@@ -19,6 +19,7 @@ from pyrl.functions import state_store
 from pyrl.functions.field_of_vision import ShadowCast
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.io_wrappers.io_wrapper import IoWrapper
+from pyrl.types.color import ColorPairs
 from pyrl.types.world_point import WorldPoint
 from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
@@ -55,7 +56,7 @@ class Game:
         return self.world.player.level
 
     def game_loop(self) -> NoReturn:
-        self.io.msg(f"{Binds.Help.key} for help menu.")
+        self.io.msg(f"{Binds.Help.key} for help menu.", color=ColorPairs.Yellow)
         undefined_keys = Binds.undefined_keys()
         if undefined_keys:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")

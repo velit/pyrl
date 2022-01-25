@@ -17,7 +17,7 @@ from pyrl.types.direction import Direction, Dir
 from pyrl.types.keys import Keys, KeyTuple
 from pyrl.user_interface.help_view import help_view
 from pyrl.user_interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
-from pyrl.user_interface.lines_view import build_lines, lines_view
+from pyrl.user_interface.lines_view import build_lines, lines_view, build_color_lines
 
 ActionCallable = Callable[[], Action]
 
@@ -214,7 +214,7 @@ class UserController(CreatureActionsMixin):
 
     def print_history(self) -> Literal[Action.No_Action]:
         header = "History"
-        lines_view(self.io.whole_window, build_lines(reversed(self.io.message_bar.history)), header=header)
+        lines_view(self.io.whole_window, build_color_lines(reversed(self.io.message_bar.history)), header=header)
         return Action.No_Action
 
     def manage_equipment(self) -> Literal[Action.No_Action, Action.Drop_Items]:

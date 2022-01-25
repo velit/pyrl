@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, ClassVar
 
 import tcod
+from tcod import Console
+from tcod.context import Context
 
 from pyrl.config.config import Config
 from pyrl.io_wrappers.io_window import IoWindow
@@ -12,24 +15,30 @@ from pyrl.io_wrappers.tcod.tcod_tilesets import get_tileset_by_index, get_bdf_in
     get_bdf_tileset_by_index
 from pyrl.io_wrappers.tcod.tcod_window import TcodWindow
 from pyrl.structures.dimensions import Dimensions
+from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.window.window_system import WindowSystem
 
-
-class TcodWrapper(IoWrapper):
+@dataclass
+class TcodWrapper(IoWrapper, DimensionsMixin):
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""
 
-    implementation = IMPLEMENTATION
+    implementation: ClassVar[str] = IMPLEMENTATION
 
-    def __init__(self) -> None:
+    dimensions:    Dimensions = WindowSystem.game_dimensions
+    tileset_index: int        = field(init=False)
+    bdf_index:     int        = field(init=False)
+    context:       Context    = field(init=False, repr=False)
+    root_console:  Console    = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
         """Init the SDL surface and prepare for draw calls."""
-        rows, cols = WindowSystem.game_dimensions.params
         # self.tileset_index, tileset = get_index_and_tileset("terminal10x18_gs_ro.png")
-        self.tileset_index = -1
+        self.tileset_index = 0
         self.bdf_index, tileset = get_bdf_index_and_tileset("spleen-16x32.bdf")
         self.context = tcod.context.new(width=1536, height=960, tileset=tileset, title=Config.default_game_name)
                                         # sdl_window_flags=(tcod.context.SDL_WINDOW_MAXIMIZED |
                                         #                   tcod.context.SDL_WINDOW_RESIZABLE))
-        self.root_console = self.context.new_console(min_rows=rows, min_columns=cols)
+        self.root_console = self.context.new_console(min_rows=self.rows, min_columns=self.cols)
 
     def __enter__(self) -> IoWrapper:
         return self

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Iterable
+from typing import Protocol, Iterable, ClassVar
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
@@ -10,7 +10,7 @@ from pyrl.types.color import ColorPair
 from pyrl.types.coord import Coord
 
 class IoWindow(Protocol):
-    implementation: str
+    implementation: ClassVar[str]
 
     @abstractmethod
     def get_key(self) -> str:
@@ -29,7 +29,7 @@ class IoWindow(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def get_dimensions(self) -> Dimensions:
+    def dimensions(self) -> Dimensions:
         raise NotImplementedError
 
     @abstractmethod
@@ -37,7 +37,7 @@ class IoWindow(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair) -> None:
         raise NotImplementedError
 
     @abstractmethod

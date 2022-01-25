@@ -11,9 +11,11 @@ from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPairs
+from pyrl.types.color import ColorPairs, ColorPair
+from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Key, KeyTuple
+from pyrl.types.line import Line
 from pyrl.window.base_window import BaseWindow
 from pyrl.window.level_window import LevelWindow
 from pyrl.window.message_bar import MessageBar
@@ -41,7 +43,7 @@ class WindowSystem:
         self.status_bar   = StatusBar(self.wrapper, self.status_dimensions,
                                       Position(self.level_window.screen_position.y + self.level_window.rows, 0))
 
-    def get_key(self, message: str | None = None, keys: KeyTuple | None = None) -> Key:
+    def get_key(self, message: str | None = None, keys: KeyTuple = ()) -> Key:
         if message:
             self.msg(message)
         self.refresh()
@@ -53,8 +55,8 @@ class WindowSystem:
         self.refresh()
         return self.whole_window.check_key(keys=keys, until=until)
 
-    def msg(self, *messages: Any) -> None:
-        self.message_bar.queue_msg(*messages)
+    def msg(self, *messages: Any, color: ColorPair = ColorPairs.Normal) -> None:
+        self.message_bar.queue_msg(*messages, color=color)
 
     def refresh(self) -> None:
         self.message_bar.update()
@@ -68,7 +70,7 @@ class WindowSystem:
         else:
             self.level_window.draw_reverse(glyph_info_iterable)
 
-    def menu(self, header: str, lines: Sequence[str], footer: str, keys: KeyTuple) -> Key:
+    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> Key:
         return self.whole_window.menu(header, lines, footer, keys)
 
     def draw_char(self, char: Glyph, coord: Coord, reverse: bool = False) -> None:

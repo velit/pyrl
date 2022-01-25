@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from textwrap import TextWrapper
 from typing import Any
 
@@ -12,17 +12,15 @@ from pyrl.window.base_window import BaseWindow
 
 Getter = Callable[[], Any]
 
-@dataclass(init=False, eq=False)
+@dataclass(eq=False)
 class StatusBar(BaseWindow):
     """Handles the status bar system."""
 
-    elements: list[tuple[str, Getter]]
-    text_wrapper: TextWrapper
+    elements: list[tuple[str, Getter]] = field(repr=False, default_factory=list)
+    text_wrapper: TextWrapper          = field(init=False, repr=False)
 
-    def __init__(self, wrapper: IoWrapper, dimensions: Dimensions, screen_position: Position) -> None:
-        super().__init__(wrapper, dimensions, screen_position)
-
-        self.elements = []
+    def __post_init__(self) -> None:
+        super().__post_init__()
         self.text_wrapper = TextWrapper(width=self.cols)
 
     def update(self) -> None:

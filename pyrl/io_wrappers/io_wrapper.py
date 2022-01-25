@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Any
+from typing import Protocol, Any, ClassVar
 
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.structures.dimensions import Dimensions
 
 class IoWrapper(Protocol):
-    implementation: str
+    implementation: ClassVar[str]
 
     def __enter__(self) -> IoWrapper:
         return self

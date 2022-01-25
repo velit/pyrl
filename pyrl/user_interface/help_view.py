@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from pyrl.config.binds import Binds
+from pyrl.types import color_str
+from pyrl.types.color import ColorPairs
+from pyrl.types.line import Line
 from pyrl.window.window_system import WindowSystem
 
 def help_view(io: WindowSystem) -> None:
     header = "Help Screen, ^ means ctrl, ! means alt"
-    help_lines = (
+    help_lines = color_str.from_seq((
         f"Help            {Binds.Help!s:16.16}"      f"Walk Mode       {Binds.Walk_Mode!s:16.16}",
         f"Cancel          {Binds.Cancel!s:16.16}"    f"Look Mode       {Binds.Look_Mode!s:16.16}",
         f"Save            {Binds.Save!s:16.16}"      f"Show vision     {Binds.Show_Vision!s:16.16}",
@@ -26,6 +29,6 @@ def help_view(io: WindowSystem) -> None:
         f"Print debug string  dm        Set cross heuristic in path  dr",
         f"",
         f"Colors available     dc (only on ncurses ie. pyrl.py)",
-    )
+    ), color=ColorPairs.Normal)
     footer = f"{Binds.Cancel.key} to close"
     io.menu(header, help_lines, footer, Binds.Cancel)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import curses
 import curses.ascii
 import logging
-from typing import Iterable, TYPE_CHECKING
+from typing import Iterable, TYPE_CHECKING, ClassVar
 
 from pyrl.config.debug import Debug
 from pyrl.structures.dimensions import Dimensions
@@ -14,7 +14,7 @@ from pyrl.io_wrappers.curses.curses_dicts import Curses256ColorDict, CursesColor
 from pyrl.io_wrappers.curses.curses_keys import curses_key_map
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPair
+from pyrl.types.color import ColorPair, ColorPairs
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
 from pyrl.window.window_system import WindowSystem
@@ -24,9 +24,12 @@ if TYPE_CHECKING:
 
 class CursesWindow(IoWindow):
 
-    implementation = IMPLEMENTATION
-    color_map: dict[ColorPair, int]
-    key_map: dict[WideChar, str] = curses_key_map
+    implementation: ClassVar[str] = IMPLEMENTATION
+    color_map: ClassVar[dict[ColorPair, int]]
+    key_map: ClassVar[dict[WideChar, str]] = curses_key_map
+
+    win: _CursesWindow
+    root_win: CursesWindow
 
     def __init__(self, curses_window: _CursesWindow, root_window: CursesWindow | None = None) -> None:
         self.win = curses_window
@@ -42,6 +45,10 @@ class CursesWindow(IoWindow):
         self.win.keypad(True)
         self.win.immedok(False)
         self.win.scrollok(False)
+
+    @property
+    def dimensions(self) -> Dimensions:
+        return Dimensions(*self.win.getmaxyx())
 
     @handle_dummy_input
     def get_key(self) -> Key:
@@ -78,20 +85,14 @@ class CursesWindow(IoWindow):
         y, x = screen_position
         self.win.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
 
-    def get_dimensions(self) -> Dimensions:
-        return Dimensions(*self.win.getmaxyx())
-
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         y, x = coord
         symbol, color = char
         self.win.addstr(y, x, symbol, self.color_map[color])
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
         y, x = coord
-        if color is None:
-            self.win.addstr(y, x, string)
-        else:
-            self.win.addstr(y, x, string, self.color_map[color])
+        self.win.addstr(y, x, string, self.color_map[color])
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
         local_addch = self.win.addstr
@@ -150,7 +151,7 @@ class CursesWindow(IoWindow):
         return key, alt
 
     def _ensure_terminal_is_big_enough(self) -> None:
-        rows, cols = self.root_win.get_dimensions().params
+        rows, cols = self.root_win.dimensions.params
         min_rows, min_cols = WindowSystem.game_dimensions.params
         while rows < min_rows or cols < min_cols:
             message = (f"Game needs at least a screen size of {min_cols}x{min_rows} while the "
@@ -167,4 +168,4 @@ class CursesWindow(IoWindow):
                     exit()
             self.root_win.clear()
             self.root_win.win.refresh()
-            rows, cols = self.root_win.get_dimensions().params
+            rows, cols = self.root_win.dimensions.params

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Iterable, Any
+from dataclasses import dataclass, field
+from typing import Iterable, Any, ClassVar
 
 import tcod
 from tcod import Console
@@ -15,19 +16,21 @@ from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import Color, ColorPair
+from pyrl.types.color import Color, ColorPair, ColorPairs
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 
+@dataclass
 class TcodWindow(IoWindow, DimensionsMixin):
-    implementation = IMPLEMENTATION
+    implementation: ClassVar[str] = IMPLEMENTATION
 
-    def __init__(self, console: Console, root_console: Console) -> None:
-        self.console = console
-        self.root_console = root_console
-        self.default_fg = color_map[Color.Normal]
-        self.default_bg = color_map[Color.Black]
+    console: Console = field(repr=False)
+    root_console: Console = field(repr=False)
+
+    @property
+    def dimensions(self) -> Dimensions:
+        return Dimensions(self.console.height, self.console.width)
 
     @handle_dummy_input
     def get_key(self) -> Key:
@@ -66,27 +69,21 @@ class TcodWindow(IoWindow, DimensionsMixin):
         return Keys.NO_INPUT
 
     def clear(self) -> None:
-        self.console.clear(fg=self.default_fg, bg=self.default_bg)
+        self.console.clear(fg=color_map[Color.Normal], bg=color_map[Color.Black])
 
     def blit(self, size: Dimensions, screen_position: Position) -> None:
         y, x = screen_position
-        self.console.blit(self.root_console, dest_y=y, dest_x=x)
-
-    def get_dimensions(self) -> Dimensions:
-        return Dimensions(self.console.height, self.console.width)
+        self.console.blit(self.root_console, dest_y=y, dest_x=x, width=size.cols, height=size.rows)
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         y, x = coord
         symbol, (fg, bg) = char
         self.console.print(y=y, x=x, string=symbol, fg=color_map[fg], bg=color_map[bg])
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
         y, x = coord
-        if color is None:
-            fg, bg = self.default_fg, self.default_bg
-        else:
-            fg_colo, bg_colo = color
-            fg, bg = color_map[fg_colo], color_map[bg_colo]
+        fg_colo, bg_colo = color
+        fg, bg = color_map[fg_colo], color_map[bg_colo]
         self.console.print(y=y, x=x, string=string, fg=fg, bg=bg)
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:

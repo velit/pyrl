@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import ClassVar
 
@@ -12,6 +12,7 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
 from pyrl.types.color import ColorPairs, ColorPair
+from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key, KeyTuple
 
@@ -21,10 +22,10 @@ class BaseWindow(DimensionsMixin):
     # Seconds to sleep until next user input check in half-block functions
     half_block_input_responsiveness: ClassVar[float] = 0.001
 
-    wrapper: IoWrapper
-    dimensions: Dimensions
+    wrapper:         IoWrapper = field(repr=False)
+    dimensions:      Dimensions
     screen_position: Position
-    io_win: IoWindow = field(init=False)
+    io_win:          IoWindow = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         self.io_win = self.wrapper.new_window(self.dimensions)
@@ -32,7 +33,7 @@ class BaseWindow(DimensionsMixin):
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         self.io_win.draw_char(char, coord)
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
         self.io_win.draw_str(string, coord, color)
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
@@ -49,7 +50,7 @@ class BaseWindow(DimensionsMixin):
         """Get a time in fractional seconds that is compatible with self.check_key(until=timestamp)."""
         return time.perf_counter()
 
-    def get_key(self, keys: KeyTuple | None = None, refresh: bool = False) -> Key:
+    def get_key(self, keys: KeyTuple = (), refresh: bool = False) -> Key:
         """
         Return key from user.
 
@@ -95,16 +96,16 @@ class BaseWindow(DimensionsMixin):
         self.blit()
         self.wrapper.flush()
 
-    def menu(self, header: str, lines: Sequence[str], footer: str, keys: KeyTuple) -> Key:
+    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> Key:
         self.clear()
         self.draw_banner(header)
         self.draw_lines(lines, y_offset=2)
         self.draw_banner(footer, y_offset=-1)
         return self.get_key(keys=keys, refresh=True)
 
-    def draw_lines(self, lines: Iterable[str], y_offset: int = 0, x_offset: int = 0) -> None:
-        for i, line in enumerate(lines):
-            self.draw_str(line, (i + y_offset, x_offset))
+    def draw_lines(self, color_lines: Iterable[ColorStr], y_offset: int = 0, x_offset: int = 0) -> None:
+        for i, (line, color) in enumerate(color_lines):
+            self.draw_str(line, (i + y_offset, x_offset), color)
 
     def draw_banner(self, banner_content: str, y_offset: int = 0, color: ColorPair = ColorPairs.Brown) -> None:
         space_padded = f"  {banner_content}  "

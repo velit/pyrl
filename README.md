@@ -25,13 +25,13 @@ Requirements
 
 ### SDL version, all platforms (pyrl.py)
 
-* Python 3.6 interpreter
+* Python 3.10 interpreter
 
-* The dorien library https://github.com/HexDecimal/python-tdl#installation
+* Tcod library https://github.com/libtcod/python-tcod#installation
 
 ### Terminal version, \*nixes/OSX (terminal_pyrl.sh)
 
-* Python 3.6 interpreter
+* Python 3.10 interpreter
 
 * Most any terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
 

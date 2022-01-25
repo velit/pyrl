@@ -9,7 +9,7 @@ from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.mock import IMPLEMENTATION
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPair
+from pyrl.types.color import ColorPair, ColorPairs
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
 
@@ -19,6 +19,10 @@ class MockWindow(IoWindow):
 
     def __init__(self) -> None:
         pass
+
+    @property
+    def dimensions(self) -> Dimensions:
+        return default_dims
 
     @handle_dummy_input
     def get_key(self) -> Key:
@@ -33,13 +37,10 @@ class MockWindow(IoWindow):
     def blit(self, size: Dimensions, screen_position: Position) -> None:
         pass
 
-    def get_dimensions(self) -> Dimensions:
-        return default_dims
-
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         pass
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair | None = None) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
         pass
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:

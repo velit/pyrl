@@ -6,12 +6,17 @@ from dataclasses import dataclass, field
 from typing import TypeVar, Generic, Final
 
 from pyrl.config.binds import Binds
+from pyrl.types.color import ColorPair
+from pyrl.types.color_str import ColorStr
 from pyrl.types.keys import Key, KeyTuple
 from pyrl.types.line import Line
 from pyrl.window.base_window import BaseWindow
 
 def build_lines(iterable: Iterable[str]) -> tuple[Line[int], ...]:
     return tuple(Line(value, i) for i, value in enumerate(iterable))
+
+def build_color_lines(iterable: Iterable[tuple[str, ColorPair]]) -> tuple[Line[int], ...]:
+    return tuple(Line(value, i, color) for i, (value, color) in enumerate(iterable))
 
 T = TypeVar('T')
 def lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
@@ -144,14 +149,14 @@ class LinesView(Generic[T]):
         if multi_select:
             self.all_keys += Binds.MultiSelectKeys
 
-    def _get_print_lines(self) -> Sequence[str]:
+    def _get_print_lines(self) -> Sequence[ColorStr]:
         """Return a sequence of printable lines from given parameters."""
         sliced_lines = self.lines[self.scroll_offset: self.scroll_offset + self.content_size]
         if self.select_keys:
-            return tuple(f"{key} {'+' if line in self.selected else '-'} {line.display}"
+            return tuple((f"{key} {'+' if line in self.selected else '-'} {line.display}", line.color)
                          for key, line in zip(self.select_keys, sliced_lines))
         else:
-            return tuple(line.display for line in sliced_lines)
+            return tuple((line.display, line.color) for line in sliced_lines)
 
     def _print_view(self, header: str, footer: str,
                     main_view_pos: int = 2, header_pos: int = 0, footer_pos: int = -1) -> None:
