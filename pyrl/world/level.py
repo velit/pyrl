@@ -5,10 +5,10 @@ from collections.abc import Iterable, Container
 from dataclasses import dataclass, field, InitVar
 from typing import TYPE_CHECKING
 
-from pyrl.functions.coord_algorithms import bresenham, cross_product, add_vector
+from pyrl.functions.coord_algorithms import bresenham, cross_product, add_vector, vector_within_distance
 from pyrl.functions.pathing import path, distance
 from pyrl.config.debug import Debug
-from pyrl.creature.action import Action
+from pyrl.engine.actions.action import Action
 from pyrl.creature.item import Item
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import DefaultLocation
@@ -144,8 +144,8 @@ class Level(DimensionsMixin):
         return self.tiles[coord].is_see_through
 
     def check_los(self, coord_a: Coord, coord_b: Coord) -> bool:
-        return not (any(not self.is_see_through(coord) for coord in bresenham(coord_a, coord_b)) and
-                    any(not self.is_see_through(coord) for coord in bresenham(coord_b, coord_a)))
+        return (all(self.is_see_through(coord) for coord in bresenham(coord_a, coord_b))
+                or all(self.is_see_through(coord) for coord in bresenham(coord_b, coord_a)))
 
     def distance(self, coord_a: Coord, coord_b: Coord) -> int:
         return round(distance(coord_a, coord_b, Action.Move.base_cost, Dir.DiagonalMoveMult))

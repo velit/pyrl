@@ -9,7 +9,7 @@ from typing import Any
 
 from pyrl.config.binds import Binds
 from pyrl.io_wrappers import mock
-from pyrl.types.color import ColorPairs, ColorPair
+from pyrl.types.color import Colors, ColorPair
 from pyrl.window.base_window import BaseWindow
 
 MORE_STR = " More"
@@ -38,7 +38,7 @@ class MessageBar(BaseWindow):
     def debug_msg(self, obj: Any) -> None:
         logging.debug(f"io.msg: {obj}")
 
-    def queue_msg(self, *args: Any, color: ColorPair = ColorPairs.Normal) -> None:
+    def queue_msg(self, *args: Any, color: ColorPair = Colors.Normal) -> None:
         output: Callable[[str], Any]
         for obj in args:
             if self.io_win.implementation == mock.IMPLEMENTATION:
@@ -70,12 +70,13 @@ class MessageBar(BaseWindow):
         skip = False
         for message, color in events:
             for chunk in self._chunkify(message):
-                if len(chunk) > self.cols - i:
+                padding = MORE_STR_LEN if line == self.rows - 1 else 1
+                if len(chunk) > self.cols - i - padding:
                     i = 0
                     line += 1
                 if line >= self.rows:
                     if not skip:
-                        self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), ColorPairs.Green)
+                        self.draw_str(MORE_STR, (self.rows - 1, self.cols - MORE_STR_LEN), Colors.Green)
                         key = self.get_key(keys=Binds.Skip_To_Last_Message + Binds.Cancel, refresh=True)
                         if key in Binds.Skip_To_Last_Message:
                             skip = True

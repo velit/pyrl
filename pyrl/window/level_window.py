@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPairs
+from pyrl.types.color import Colors
 from pyrl.functions.coord_algorithms import bresenham
 from pyrl.types.coord import Coord
 from pyrl.window.base_window import BaseWindow
@@ -21,7 +21,7 @@ class LevelWindow(BaseWindow):
             char = symbol, (bg, fg)
         super().draw_char(char, coord)
 
-    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', ColorPairs.Yellow), draw_first: bool = False) -> None:
+    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', Colors.Yellow), draw_first: bool = False) -> None:
         if draw_first:
             for coord in bresenham(a, b):
                 self.draw_char(char, coord)

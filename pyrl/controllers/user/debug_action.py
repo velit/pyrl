@@ -2,22 +2,23 @@ from __future__ import annotations
 
 import code
 from collections.abc import Callable
-from typing import Literal
 
 from pyrl.config.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.creature.action import Action, NoValidTargetException
-from pyrl.creature.game_actions import GameActions
+from pyrl.engine.actions.action import Action
+from pyrl.engine.actions.action_exceptions import NoValidTargetException
+from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
+from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.level_location import LevelLocation
 
 class DebugAction(CreatureActionsMixin):
 
-    def __init__(self, game_actions: GameActions) -> None:
-        self.actions = game_actions
+    def __init__(self, actions: ActionInterface) -> None:
+        self.actions = actions
 
-        self.action_funcs: dict[str, Callable[[], Action | None]] = {
+        self.action_funcs: dict[str, Callable[[], ActionFeedback | None]] = {
             'a': self.add_monster,
             'c': self.display_curses_color_info,
             'd': self.show_path_debug,
@@ -34,18 +35,18 @@ class DebugAction(CreatureActionsMixin):
             'X': self.ascend_to_surface,
         }
 
-    def ask_action(self) -> Action:
+    def ask_action(self) -> ActionFeedback:
         c = self.io.get_key("Avail cmds: " + "".join(sorted(self.action_funcs.keys())))
         if c in self.action_funcs:
-            action = self.action_funcs[c]()
-            return action if action is not None else Action.No_Action
+            feedback = self.action_funcs[c]()
+            return feedback if feedback is not None else NoActionFeedback
         self.io.msg(f"Undefined debug key: {c}")
-        return Action.No_Action
+        return NoActionFeedback
 
     def print_user_input(self) -> None:
         self.io.msg(self.io.get_str("Tulostetaas tää: "))
 
-    def add_monster(self) -> Literal[Action.Debug] | None:
+    def add_monster(self) -> ActionFeedback | None:
         if self.level.ongoing_creature_spawns:
             self.level.spawn_creature(self.level.creature_picker.random_creature())
             return self.actions.debug_action()
@@ -53,10 +54,10 @@ class DebugAction(CreatureActionsMixin):
             self.io.msg("No ongoing spawning on this level. Can't add monster.")
             return None
 
-    def show_map(self) -> Literal[Action.Redraw]:
+    def show_map(self) -> ActionFeedback:
         Debug.show_map = not Debug.show_map
         self.io.msg(f"Show map set to {Debug.show_map}")
-        return self.actions.redraw()
+        return self.actions.redraw_action()
 
     def toggle_path_heuristic_cross(self) -> None:
         Debug.cross = not Debug.cross
@@ -74,7 +75,7 @@ class DebugAction(CreatureActionsMixin):
             Debug.path_step = False
             self.io.msg("Path debug unset")
 
-    def kill_creatures_in_level(self) -> Literal[Action.Debug]:
+    def kill_creatures_in_level(self) -> ActionFeedback:
         creature_list = list(self.level.creatures.values())
         creature_list.remove(self.creature)
         for i in creature_list:
@@ -82,16 +83,16 @@ class DebugAction(CreatureActionsMixin):
         self.io.msg("Abracadabra.")
         return self.actions.debug_action()
 
-    def draw_path_to_passage_down(self) -> Literal[Action.Redraw]:
+    def draw_path_to_passage_down(self) -> ActionFeedback:
         passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(self.creature.coord, passage_down_coord))
-        return self.actions.redraw()
+        return self.actions.redraw_action()
 
-    def draw_path_from_up_to_down(self) -> Literal[Action.Redraw]:
+    def draw_path_from_up_to_down(self) -> ActionFeedback:
         passage_up_coord = self.level.get_location_coord(DefaultLocation.Passage_Up)
         passage_down_coord = self.level.get_location_coord(DefaultLocation.Passage_Down)
         self.io.draw_path(self.level.path(passage_up_coord, passage_down_coord))
-        return self.actions.redraw()
+        return self.actions.redraw_action()
 
     def interactive_console(self) -> None:
         self.io.suspend()
@@ -108,16 +109,16 @@ class DebugAction(CreatureActionsMixin):
 
     def display_curses_color_info(self) -> None:
         import curses
-        self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")
+        self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")  # type: ignore
 
     def print_message_debug_string(self) -> None:
         self.io.msg(Debug.debug_string)
 
-    def sight_change(self, amount: int) -> Literal[Action.Debug]:
+    def sight_change(self, amount: int) -> ActionFeedback:
         self.creature.base_perception += amount
         return self.actions.debug_action()
 
-    def teleport_to_location(self, location: LevelLocation) -> Literal[Action.Teleport]:
+    def teleport_to_location(self, location: LevelLocation) -> ActionFeedback:
         try:
             new_coord = self.level.get_location_coord(location)
         except KeyError:

@@ -16,7 +16,7 @@ from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import Color, ColorPair, ColorPairs
+from pyrl.types.color import Color, ColorPair, Colors
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
@@ -80,7 +80,7 @@ class TcodWindow(IoWindow, DimensionsMixin):
         symbol, (fg, bg) = char
         self.console.print(y=y, x=x, string=symbol, fg=color_map[fg], bg=color_map[bg])
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:
         y, x = coord
         fg_colo, bg_colo = color
         fg, bg = color_map[fg_colo], color_map[bg_colo]

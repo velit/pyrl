@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import deque
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal
 from math import sqrt
@@ -9,7 +10,6 @@ from typing import Final
 
 from pyrl.creature.creature import Creature
 from pyrl.functions.coord_algorithms import resize_range
-
 
 @dataclass(eq=False)
 class Learner(Creature):
@@ -25,7 +25,7 @@ class Learner(Creature):
     def experience_level(self) -> int:
         return self.calc_experience_level(self.experience, self.level_xp_unit)
 
-    def gain_kill_xp(self, target: Creature) -> None:
+    def gain_kill_xp(self, target: Creature) -> tuple[int, Sequence[int]]:
         creature_xp = self.kill_xp_unit * target.creature_level
         levels_above = self.creature_level - target.creature_level
 
@@ -37,13 +37,18 @@ class Learner(Creature):
         else:
             xp_multi = Decimal(0)
         kill_xp = round(creature_xp * xp_multi)
-        self.gain_xp(kill_xp)
+        levelups = self.gain_xp(kill_xp)
+        return kill_xp, levelups
 
-    def gain_xp(self, amount: int) -> None:
+    def gain_xp(self, amount: int) -> Sequence[int]:
         self.experience += amount
         logging.debug(f"+{amount} xp")
+        levels = []
         while self.experience_level >= self.levelups[0]:
-            self.level_up(self.levelups.popleft())
+            level = self.levelups.popleft()
+            levels.append(level)
+            self.level_up(level)
+        return levels
 
     @classmethod
     def calc_experience_level(cls, experience: int, base_level_xp: int) -> int:

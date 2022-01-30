@@ -6,8 +6,8 @@ from typing import Protocol, TYPE_CHECKING
 if TYPE_CHECKING:
     from pyrl.creature.creature import Creature
     from pyrl.creature.player import Player
-    from pyrl.game import Game
-    from pyrl.creature.game_actions import GameActions
+    from pyrl.engine.game import Game
+    from pyrl.engine.actions.action_interface import ActionInterface
     from pyrl.structures.dimensions import Dimensions
     from pyrl.types.coord import Coord
     from pyrl.window.window_system import WindowSystem
@@ -68,7 +68,7 @@ class DimensionsMixin:
 
 class HasCreatureActions(Protocol):
     @property
-    def actions(self) -> GameActions:
+    def actions(self) -> ActionInterface:
         raise NotImplementedError
 
 class CreatureActionsMixin:

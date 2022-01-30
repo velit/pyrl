@@ -38,7 +38,7 @@ class Color(Enum):
 
 ColorPair = tuple[Color, Color]
 
-class ColorPairs:
+class Colors:
     Red:          ColorPair = (Color.Red,          Color.Black)
     Green:        ColorPair = (Color.Green,        Color.Black)
     Blue:         ColorPair = (Color.Blue,         Color.Black)

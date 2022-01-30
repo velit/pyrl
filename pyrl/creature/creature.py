@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from pyrl.creature.action import Action
+from pyrl.engine.actions.action import Action
+from pyrl.functions.combat import Attackeable
+from pyrl.functions.coord_algorithms import vector_within_distance
 from pyrl.structures.dice import Dice
 from pyrl.types.char import Glyph
 from pyrl.types.coord import Coord
@@ -13,7 +16,7 @@ if TYPE_CHECKING:
     from pyrl.world.level import Level
 
 @dataclass(eq=False)
-class Creature:
+class Creature(Attackeable):
     name:              str
     char:            Glyph
     creature_level:    int = 0
@@ -65,14 +68,18 @@ class Creature:
         if amount > 0:
             self.hp -= amount
 
-    def gain_kill_xp(self, target: Creature) -> None:
-        pass
+    def gain_kill_xp(self, target: Creature) -> tuple[int, Sequence[int]]:
+        return 0, []
 
     def is_dead(self) -> bool:
         return self.hp <= 0
 
     def action_cost(self, action: Action, multiplier: float = 1.0) -> int:
         return round(action.base_cost * multiplier * self.speed_multiplier)
+
+    def can_see(self, target_coord: Coord) -> bool:
+        return (vector_within_distance(self.coord, target_coord, self.sight) and
+                self.level.check_los(self.coord, target_coord))
 
     def __repr__(self) -> str:
         return f"Creature(name={self.name})"

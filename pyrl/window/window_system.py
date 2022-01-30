@@ -11,7 +11,7 @@ from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPairs, ColorPair
+from pyrl.types.color import Colors, ColorPair
 from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Key, KeyTuple
@@ -55,7 +55,7 @@ class WindowSystem:
         self.refresh()
         return self.whole_window.check_key(keys=keys, until=until)
 
-    def msg(self, *messages: Any, color: ColorPair = ColorPairs.Normal) -> None:
+    def msg(self, *messages: Any, color: ColorPair = Colors.Normal) -> None:
         self.message_bar.queue_msg(*messages, color=color)
 
     def refresh(self) -> None:
@@ -76,12 +76,12 @@ class WindowSystem:
     def draw_char(self, char: Glyph, coord: Coord, reverse: bool = False) -> None:
         self.level_window.draw_char(char, coord, reverse)
 
-    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', ColorPairs.Yellow), draw_first: bool = False) -> None:
+    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', Colors.Yellow), draw_first: bool = False) -> None:
         self.level_window.draw_line(a, b, char, draw_first)
 
     def draw_path(self, path: Iterable[Coord]) -> None:
         for coord in path:
-            self.draw_char((" ", ColorPairs.Green), coord, reverse=True)
+            self.draw_char((" ", Colors.Green), coord, reverse=True)
             if Debug.path_step:
                 self.level_window.get_key(refresh=True)
         if not Debug.path_step:

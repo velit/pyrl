@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
     AssetTileDict
-from pyrl.types.color import ColorPairs
+from pyrl.types.color import Colors
 from pyrl.types.level_gen import LevelGen
 from pyrl.types.level_location import LevelLocation
 from pyrl.world.level_gen_params import LevelGenParams
@@ -48,13 +48,13 @@ def get_level() -> LevelGenParams:
     # Overworld movement multiplier
     mult = default_dims.min
     custom_tiles: AssetTileDict = {
-        '"': Tile("grassland",      ('"', ColorPairs.Green), ('"', ColorPairs.Green), True,  True,  move_multi=mult),
-        '¨': Tile("mountains",      ('^', ColorPairs.White), ('^', ColorPairs.White), False, True,  move_multi=mult),
-        '=': Tile("river",          ('=', ColorPairs.Blue),  ('=', ColorPairs.Blue),  False, False, move_multi=mult),
-        'T': Tile("forest",         ('T', ColorPairs.Green), ('T', ColorPairs.Green), True,  True,  move_multi=mult),
-        't': Tile("town",           ('*', ColorPairs.Green), ('*', ColorPairs.Green), True,  True,  move_multi=mult),
-        '*': Tile("dungeon",        ('*', ColorPairs.Brown), ('*', ColorPairs.Brown), True,  True,  move_multi=mult),
-        '^': Tile("high mountains", ('^', ColorPairs.Brown), ('^', ColorPairs.Brown), False, False, move_multi=mult),
+        '"': Tile("grassland",      ('"', Colors.Green), ('"', Colors.Green), True,  True,  move_multi=mult),
+        '¨': Tile("mountains",      ('^', Colors.White), ('^', Colors.White), False, True,  move_multi=mult),
+        '=': Tile("river",          ('=', Colors.Blue),  ('=', Colors.Blue),  False, False, move_multi=mult),
+        'T': Tile("forest",         ('T', Colors.Green), ('T', Colors.Green), True,  True,  move_multi=mult),
+        't': Tile("town",           ('*', Colors.Green), ('*', Colors.Green), True,  True,  move_multi=mult),
+        '*': Tile("dungeon",        ('*', Colors.Brown), ('*', Colors.Brown), True,  True,  move_multi=mult),
+        '^': Tile("high mountains", ('^', Colors.Brown), ('^', Colors.Brown), False, False, move_multi=mult),
     }
     custom_locations: AssetLocationDict = {
         '*': OverWorldLocation.Dungeon,

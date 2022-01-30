@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from pyrl.functions.combat import Attackeable
 from pyrl.types.char import Glyph
 
 @dataclass(eq=False, frozen=True)
-class Tile:
+class Tile(Attackeable):
     """Permanent portion of a square. E.g. walls or floor."""
     name: str
     visible_char: Glyph

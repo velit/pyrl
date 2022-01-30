@@ -6,7 +6,7 @@ import pickle
 from typing import Any
 
 from pyrl.config.config import Config
-from pyrl.game import Game
+from pyrl.engine.game import Game
 
 _SAVE_FILETYPE = ".save"
 

@@ -14,7 +14,7 @@ from pyrl.io_wrappers.curses.curses_dicts import Curses256ColorDict, CursesColor
 from pyrl.io_wrappers.curses.curses_keys import curses_key_map
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPair, ColorPairs
+from pyrl.types.color import ColorPair, Colors
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
 from pyrl.window.window_system import WindowSystem
@@ -90,7 +90,7 @@ class CursesWindow(IoWindow):
         symbol, color = char
         self.win.addstr(y, x, symbol, self.color_map[color])
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:
         y, x = coord
         self.win.addstr(y, x, string, self.color_map[color])
 

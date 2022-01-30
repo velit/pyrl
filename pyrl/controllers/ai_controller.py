@@ -3,10 +3,11 @@ from __future__ import annotations
 import random
 from typing import Literal
 
+from pyrl.engine.actions.action_feedback import ActionFeedback
 from pyrl.functions.coord_algorithms import resize_vector_to_len, get_vector, add_vector
-from pyrl.creature.action import Action
+from pyrl.engine.actions.action import Action
 from pyrl.creature.creature import Creature
-from pyrl.creature.game_actions import GameActions
+from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Dir
@@ -15,7 +16,7 @@ AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 
 class AIController(CreatureActionsMixin):
 
-    def __init__(self, ai_state: AiState, actions: GameActions) -> None:
+    def __init__(self, ai_state: AiState, actions: ActionInterface) -> None:
         self.ai_state = ai_state
         self.actions = actions
 
@@ -25,7 +26,6 @@ class AIController(CreatureActionsMixin):
         else:
             chase_coord, chase_vector = None, None
 
-        action: Action
         if self.actions.target_in_sight(alert_coord):
             # passive actions
             if chase_coord is not None and chase_coord != alert_coord:
@@ -35,10 +35,9 @@ class AIController(CreatureActionsMixin):
             # actions
             direction = self.actions.can_reach(alert_coord)
             if direction:
-                action = self.actions.attack(direction)
+                feedback = self.actions.attack(direction)
             else:
-                action = self._move_towards(alert_coord)
-
+                feedback = self._move_towards(alert_coord)
         else:
             # chasing and already at the target square and has a chase vector to pursue
             if chase_coord == self.coord:
@@ -58,18 +57,18 @@ class AIController(CreatureActionsMixin):
 
             # actions
             if chase_coord is not None:
-                action = self._move_towards(chase_coord)
+                feedback = self._move_towards(chase_coord)
             else:
-                action = self._move_random()
+                feedback = self._move_random()
 
         if chase_coord is not None or chase_vector is not None:
             self.ai_state[self.creature] = chase_coord, chase_vector
         else:
             self.remove_creature_state(self.creature)
 
-        return action
+        return feedback.action
 
-    def _move_towards(self, target_coord: Coord) -> Literal[Action.Move, Action.Swap]:
+    def _move_towards(self, target_coord: Coord) -> ActionFeedback:
         best_action = Action.Move
         best_direction = Dir.Stay
         best_cost: int | None = None
@@ -95,7 +94,7 @@ class AIController(CreatureActionsMixin):
         else:
             assert False, f"AI state bug. Best action was: {best_action}"
 
-    def _move_random(self) -> Literal[Action.Move]:
+    def _move_random(self) -> ActionFeedback:
         valid_dirs = [direction for direction in Dir.All if self.actions.can_move(direction)]
         if random.random() < 0.8 and len(valid_dirs) > 0:
             return self.actions.move(random.choice(valid_dirs))

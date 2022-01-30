@@ -13,7 +13,7 @@ from pyrl.types.key_sequence import KeySequence, AnyKeys
 from pyrl.types.keys import Key
 
 if TYPE_CHECKING:
-    from pyrl.game import Game
+    from pyrl.engine.game import Game
 
 class StopSimulation(Exception):
     pass

@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from pyrl.functions import state_store
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
-from pyrl.game import Game
+from pyrl.engine.game import Game
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from tools import profile_util
 

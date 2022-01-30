@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Sequence
 from dataclasses import field, InitVar, dataclass
 from typing import NoReturn, Any
 
@@ -9,17 +10,19 @@ from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
 from pyrl.controllers.ai_controller import AIController, AiState
-from pyrl.controllers.user_controller import UserController
-from pyrl.creature.action import Action
+from pyrl.controllers.user.user_controller import UserController
 from pyrl.creature.creature import Creature
-from pyrl.creature.game_actions import GameActions
 from pyrl.creature.mixins.visionary import Visionary
 from pyrl.creature.player import Player
+from pyrl.engine.actions.action import Action
+from pyrl.engine.actions.action_feedback import AttackFeedback
+from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.functions import state_store
+from pyrl.functions.combat import Attackeable, calc_melee_attack
 from pyrl.functions.field_of_vision import ShadowCast
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.io_wrappers.io_wrapper import IoWrapper
-from pyrl.types.color import ColorPairs
+from pyrl.types.color import Colors
 from pyrl.types.world_point import WorldPoint
 from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
@@ -35,16 +38,16 @@ class Game:
     world:            World              = field(init=False, repr=False, default_factory=pyrl_world)
 
     io:               WindowSystem       = field(init=False, repr=False)
-    creature_actions: GameActions        = field(init=False, repr=False)
+    action_interface: ActionInterface    = field(init=False, repr=False)
     ai_controller:    AIController       = field(init=False, repr=False)
     user_controller:  UserController     = field(init=False, repr=False)
 
     def __post_init__(self, cursor_lib: IoWrapper) -> None:
         """Initialize non-serialised state. Used when loading the game."""
         self.io = WindowSystem(cursor_lib)
-        self.creature_actions = GameActions(self)
-        self.ai_controller = AIController(self.ai_state, self.creature_actions)
-        self.user_controller = UserController(self.creature_actions)
+        self.action_interface = ActionInterface(self)
+        self.ai_controller = AIController(self.ai_state, self.action_interface)
+        self.user_controller = UserController(self.action_interface)
         register_status_texts(self.io, self, self.player)
 
     @property
@@ -56,27 +59,26 @@ class Game:
         return self.world.player.level
 
     def game_loop(self) -> NoReturn:
-        self.io.msg(f"{Binds.Help.key} for help menu.", color=ColorPairs.Yellow)
+        self.io.msg(f"{Binds.Help.key} for help menu.", color=Colors.Yellow)
         undefined_keys = Binds.undefined_keys()
         if undefined_keys:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
 
         while True:
             creature, time_delta = self.active_level.turn_scheduler.pop()
+            self.world.time += time_delta
             cost = 0
             try:
-                action, cost = self.creature_act(creature, time_delta)
+                action, cost = self.creature_act(creature)
             finally:
                 creature.level.turn_scheduler.add(creature, cost)
 
             if action == Action.Save:
                 self.io.msg(self.savegame())
 
-    def creature_act(self, creature: Creature, time_delta: int) -> tuple[Action, int]:
-        self.world.time += time_delta
+    def creature_act(self, creature: Creature) -> tuple[Action, int]:
         creature.advance_time(self.world.time)
-
-        self.creature_actions.associate_creature(creature)
+        self.action_interface.associate_creature(creature)
         if creature is self.player:
             assert isinstance(creature, Visionary)
             self.update_view(creature)
@@ -88,13 +90,13 @@ class Game:
         """Returns the action cost"""
         while (action := self.user_controller.act()) == Action.No_Action:
             pass
-        return action, self.creature_actions.verify_and_get_cost(action)
+        return action, self.action_interface.verify_and_get_cost(action)
 
     def get_ai_action(self) -> tuple[Action, int]:
         """Returns the action cost"""
         action = self.ai_controller.act(self.player.coord)
         assert action != Action.No_Action, "AI chose {action=}"
-        return action, self.creature_actions.verify_and_get_cost(action)
+        return action, self.action_interface.verify_and_get_cost(action)
 
     def move_creature_to_level(self, creature: Creature, world_point: WorldPoint) -> bool:
         try:
@@ -112,14 +114,27 @@ class Game:
 
         return True
 
-    def creature_death(self, killer: Creature, creature: Creature) -> None:
-        if creature is self.player:
-            self.io.get_key("You die...", keys=Binds.Cancel)
-            self.endgame()
+    def creature_attack(self, attacker: Creature, target: Attackeable) -> tuple[bool, bool, int, int, Sequence[int]]:
+        succeeds, damage = calc_melee_attack(attacker, target)
+        died = False
+        experience = 0
+        levelups: Sequence[int] = []
+        if isinstance(target, Creature):
+            if damage:
+                target.receive_damage(damage)
+                if died := target.is_dead():
+                    if target is self.player:
+                        self.user_controller.process_feedback(AttackFeedback(attacker, target, succeeds, died, damage,
+                                                                             0, ()))
+                        self.endgame()
+                    experience, levelups = self.creature_death(attacker, target)
+        return succeeds, died, damage, experience, levelups
 
-        killer.gain_kill_xp(creature)
-        self.ai_controller.remove_creature_state(creature)
-        creature.level.remove_creature(creature)
+    def creature_death(self, attacker: Creature, target: Creature) -> tuple[int, Sequence[int]]:
+
+        self.ai_controller.remove_creature_state(target)
+        target.level.remove_creature(target)
+        return attacker.gain_kill_xp(target)
 
     def endgame(self) -> NoReturn:
         sys.exit(0)
@@ -170,7 +185,7 @@ class Game:
     def __getstate__(self) -> dict[str, Any]:
         exclude_state = (
             'io',
-            'creature_actions',
+            'action_interface',
             'ai_controller',
             'user_controller',
         )

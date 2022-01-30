@@ -11,7 +11,7 @@ from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
 from pyrl.types.char import Glyph
-from pyrl.types.color import ColorPairs, ColorPair
+from pyrl.types.color import Colors, ColorPair
 from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key, KeyTuple
@@ -33,7 +33,7 @@ class BaseWindow(DimensionsMixin):
     def draw_char(self, char: Glyph, coord: Coord) -> None:
         self.io_win.draw_char(char, coord)
 
-    def draw_str(self, string: str, coord: Coord, color: ColorPair = ColorPairs.Normal) -> None:
+    def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:
         self.io_win.draw_str(string, coord, color)
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
@@ -107,7 +107,7 @@ class BaseWindow(DimensionsMixin):
         for i, (line, color) in enumerate(color_lines):
             self.draw_str(line, (i + y_offset, x_offset), color)
 
-    def draw_banner(self, banner_content: str, y_offset: int = 0, color: ColorPair = ColorPairs.Brown) -> None:
+    def draw_banner(self, banner_content: str, y_offset: int = 0, color: ColorPair = Colors.Brown) -> None:
         space_padded = f"  {banner_content}  "
         full_banner = f"{space_padded:+^{self.cols}}"
         if y_offset < 0:
@@ -130,14 +130,14 @@ class BaseWindow(DimensionsMixin):
 
             # Update vars
             cursor_coord = input_y, input_x + cursor_index
-            cursor_char = ((user_input + " ")[cursor_index], ColorPairs.Cursor)
+            cursor_char = ((user_input + " ")[cursor_index], Colors.Cursor)
 
             # Print
             self.draw_str(user_input, input_coord)
             self.draw_char(cursor_char, cursor_coord)
             key = self.get_key(refresh=True)
             self.draw_str(" " * (len(user_input)), input_coord)
-            self.draw_char((" ", ColorPairs.Normal), cursor_coord)
+            self.draw_char((" ", Colors.Normal), cursor_coord)
 
             if key == Keys.SPACE:
                 key = " "

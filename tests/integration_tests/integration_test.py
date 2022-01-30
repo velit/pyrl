@@ -6,7 +6,7 @@ import pytest
 
 from pyrl import main
 from pyrl.config.binds import Binds
-from pyrl.game import Game
+from pyrl.engine.game import Game
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 # from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
 from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
@@ -101,6 +101,10 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
         Binds.Backpack_Select_Keys[2],
         Binds.Backpack_Select_Keys[3],
         Binds.Cancel,
+        Binds.Equipment,
+        Binds.Equipment_Select_Body,
+        Binds.Backpack_Select_Keys[0],
+        Binds.Cancel,
     )
 
     walk_mode = [Binds.Walk_Mode, Binds.East]
@@ -108,10 +112,6 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     descend = [Binds.Descend, Binds.Descend]
 
     coord = game.player.coord
-
-    game = dummy.add_input_and_run(help_system, game)
-    assert game.player.turns == 1
-    assert coord == game.player.coord
 
     game = dummy.add_input_and_run(help_system, game)
     assert game.player.turns == 1
@@ -137,7 +137,7 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     game = dummy.add_input_and_run(inventory, game)
     assert game.player.turns == 4
     assert coord == game.player.coord
-    assert len(game.player.inventory._bag) == previous_bag_count + 2
+    assert len(game.player.inventory._bag) == previous_bag_count + 1
 
     game = dummy.add_input_and_run(walk_mode, game)
     assert game.player.turns == 8
@@ -146,8 +146,6 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     assert game.player.turns == 10
     assert game.player.level.level_key.idx == 2
 
-    # equip armor
-    game = dummy.add_input_and_run(['e', 'b', 'a', 'z'], game)
     # run to end
     # game = dummy.add_input_and_run(['d', 'x'], game)
 

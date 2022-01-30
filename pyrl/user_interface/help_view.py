@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from pyrl.config.binds import Binds
 from pyrl.types import color_str
-from pyrl.types.color import ColorPairs
-from pyrl.types.line import Line
+from pyrl.types.color import Colors
 from pyrl.window.window_system import WindowSystem
 
 def help_view(io: WindowSystem) -> None:
@@ -29,6 +28,6 @@ def help_view(io: WindowSystem) -> None:
         f"Print debug string  dm        Set cross heuristic in path  dr",
         f"",
         f"Colors available     dc (only on ncurses ie. pyrl.py)",
-    ), color=ColorPairs.Normal)
+    ), color=Colors.Normal)
     footer = f"{Binds.Cancel.key} to close"
     io.menu(header, help_lines, footer, Binds.Cancel)

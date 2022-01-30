@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal, NamedTuple
+from typing import NamedTuple
 
-from pyrl.functions.coord_algorithms import get_vector, reverse, clockwise_45, \
-    anticlockwise_45
 from pyrl.config.binds import Binds
 from pyrl.config.config import Config
-from pyrl.creature.action import Action, IllegalContextException
-from pyrl.creature.game_actions import GameActions
+from pyrl.engine.actions.action_exceptions import IllegalContextException
+from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
+from pyrl.engine.actions.action_interface import ActionInterface
+from pyrl.functions.coord_algorithms import get_vector, reverse, clockwise_45, \
+    anticlockwise_45
 from pyrl.structures.helper_mixins import CreatureActionsMixin
 from pyrl.types.direction import Direction, Dir
 
@@ -31,11 +32,11 @@ class WalkMode(CreatureActionsMixin):
 
     state: WalkModeState
 
-    def __init__(self, actions: GameActions):
+    def __init__(self, actions: ActionInterface):
         self.actions = actions
         self.active = False
 
-    def init_walk_mode(self, direction: Direction | None = None) -> Literal[Action.Move, Action.No_Action]:
+    def init_walk_mode(self, direction: Direction | None = None) -> ActionFeedback:
         if self._any_creatures_visible():
             raise IllegalContextException("Not while there are creatures in the vicinity.")
 
@@ -44,7 +45,7 @@ class WalkMode(CreatureActionsMixin):
             key_seq = Binds.Directions + Binds.Cancel
             key = self.io.get_key(query, keys=key_seq)
             if key in Binds.Cancel:
-                return Action.No_Action
+                return NoActionFeedback
             direction = Binds.get_direction(key)
 
         feedback = self.actions.move(direction)
@@ -58,7 +59,7 @@ class WalkMode(CreatureActionsMixin):
                                    show_msg_time=self.io.get_future_time(INTERRUPT_MSG_TIME))
         return feedback
 
-    def continue_walk(self) -> Literal[Action.Move, Action.No_Action]:
+    def continue_walk(self) -> ActionFeedback:
         next_direction = self._next_direction()
 
         if next_direction is not None:
@@ -68,7 +69,7 @@ class WalkMode(CreatureActionsMixin):
             return feedback
 
         self.active = False
-        return Action.No_Action
+        return NoActionFeedback
 
     def _next_direction(self) -> Direction | None:
         if self._any_creatures_visible():

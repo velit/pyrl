@@ -8,7 +8,7 @@ from pyrl.creature.stats import Stat
 
 if TYPE_CHECKING:
     from pyrl.window.window_system import WindowSystem
-    from pyrl.game import Game
+    from pyrl.engine.game import Game
 
 def register_status_texts(io: WindowSystem, game: Game, creature: Creature) -> None:
     io.status_bar.elements.clear()

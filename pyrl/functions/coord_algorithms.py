@@ -91,6 +91,11 @@ def get_vector(origin: Coord, target: Coord) -> Coord:
 def vector_is_direction(vector: Coord) -> TypeGuard[Direction]:
     return vector in Dir.AllPlusStay
 
+def vector_within_distance(origin: Coord, target: Coord, distance: int) -> bool:
+    cy, cx = origin
+    ty, tx = target
+    return (cy - ty) ** 2 + (cx - tx) ** 2 <= distance ** 2
+
 def add_vector(vector_a: Coord, vector_b: Coord) -> Coord:
     return vector_a[0] + vector_b[0], vector_a[1] + vector_b[1]
 
