@@ -51,8 +51,12 @@ def get_commandline_options(args: Sequence[str] | None = None) -> argparse.Names
 
 def init_cursor_lib(output: str) -> IoWrapper:
     if output == "terminal":
-        from pyrl.io_wrappers.curses.curses_wrapper import CursesWrapper
-        return CursesWrapper()
+        if sys.platform != "win32":
+            from pyrl.io_wrappers.curses.curses_wrapper import CursesWrapper
+            return CursesWrapper()
+        else:
+            print("Terminal mode is not supported on Windows", file=sys.stderr)
+            sys.exit(1)
     elif output == "sdl":
         from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper
         return TcodWrapper()

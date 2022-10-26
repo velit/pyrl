@@ -6,8 +6,8 @@ from typing import Any
 
 import pytest
 
-from pyrl.functions.dungeon_generator import DungeonGenerator
-from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation
+from pyrl.functions.dungeon_gen import DungeonGen
+from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation, default_dims
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.rectangle import Rectangle
@@ -24,12 +24,14 @@ def pp_tm(tile_matrix: Iterable[Any], cols: int) -> None:
 @pytest.mark.slow
 def test_many_rdg_generation() -> None:
     for idx in range(100):
-        level = LevelGenParams(generation_type=LevelGen.Dungeon).create_level(LevelKey("test", idx))
+        level = LevelGenParams(dimensions=default_dims, generation_type=LevelGen.Dungeon) \
+            .create_level(LevelKey("test", idx))
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
 
 def test_rdg_generation() -> None:
-    level = LevelGenParams(generation_type=LevelGen.Dungeon).create_level(LevelKey("test", 0))
+    level = LevelGenParams(dimensions=default_dims, generation_type=LevelGen.Dungeon) \
+        .create_level(LevelKey("test", 0))
     assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
     assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
 
@@ -54,13 +56,12 @@ def test_rectangle(rectangles: Rectangles) -> None:
 TEST_DIMENSIONS = Dimensions(10, 10)
 
 @pytest.fixture
-def generator() -> DungeonGenerator:
-    level_params = LevelGenParams(tiles=Table(TEST_DIMENSIONS))
-    generator = DungeonGenerator(level_params)
-    generator.init_tiles()
+def generator() -> DungeonGen:
+    level_params = LevelGenParams(dimensions=TEST_DIMENSIONS)
+    generator = DungeonGen(level_params)
     return generator
 
-def test_dungeon_generation(rectangles: Rectangles, generator: DungeonGenerator) -> None:
+def test_dungeon_generation(rectangles: Rectangles, generator: DungeonGen) -> None:
     rect = rectangles[0]
 
     generator.attempt_room(rect, (0, 1))
@@ -78,7 +79,7 @@ def test_dungeon_generation(rectangles: Rectangles, generator: DungeonGenerator)
         "wwwwwrrrrr",
         {}, {}, {},
     )
-    assert generator.level_params.tiles == room
+    assert generator.tiles == room
 
     generator.attempt_corridor((4, 4), (0, 1), 6)
     room, _, _ = construct_data(
@@ -95,4 +96,4 @@ def test_dungeon_generation(rectangles: Rectangles, generator: DungeonGenerator)
         "wwwwwrrrrr",
         {}, {}, {},
     )
-    assert generator.level_params.tiles == room
+    assert generator.tiles == room

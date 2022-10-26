@@ -28,8 +28,8 @@ class StatusBar(BaseWindow):
         self.print_elements()
         self.blit()
 
-    def add_element(self, string: str, getter: Getter) -> None:
-        self.elements.append((string, getter))
+    def add_element(self, element: Any, getter: Getter) -> None:
+        self.elements.append((element, getter))
 
     def print_elements(self) -> None:
         status_string = "  ".join(

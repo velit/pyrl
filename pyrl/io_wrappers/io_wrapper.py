@@ -13,23 +13,23 @@ class IoWrapper(Protocol):
         return self
 
     def __exit__(self, *args: Any, **kwargs: Any) -> None:
-        pass
+        return
 
     @abstractmethod
     def new_window(self, dimensions: Dimensions) -> IoWindow:
         raise NotImplementedError
 
     def flush(self) -> None:
-        pass
+        return
 
     def suspend(self) -> None:
-        pass
+        return
 
     def resume(self) -> None:
-        pass
+        return
 
     def toggle_fullscreen(self) -> None:
-        pass
+        return
 
     def next_tileset(self) -> str:
         return f"Not supported in {self.implementation}"

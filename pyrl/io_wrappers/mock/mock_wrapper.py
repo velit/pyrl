@@ -7,17 +7,9 @@ from pyrl.io_wrappers.mock.mock_window import MockWindow
 from pyrl.structures.dimensions import Dimensions
 
 class MockWrapper(IoWrapper):
+    __test__ = False
 
     implementation = IMPLEMENTATION
 
     def new_window(self, dimensions: Dimensions) -> IoWindow:
         return MockWindow()
-
-    def flush(self) -> None:
-        pass
-
-    def suspend(self) -> None:
-        pass
-
-    def resume(self) -> None:
-        pass

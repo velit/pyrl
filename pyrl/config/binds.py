@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import MutableMapping, Iterable
-from importlib import resources
+from importlib.resources import files
 from itertools import chain
 
-import toml
+import tomllib
 
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.key_sequence import KeySequence
@@ -97,8 +97,10 @@ class Binds:
     @classmethod
     def load_binds(cls) -> None:
         """Load binds from config and fill the to_direction dict direction lookup"""
-        with resources.open_text("pyrl.config", "binds.toml") as f:
-            hotkeys = toml.load(f)
+        import pyrl.config
+
+        with files(pyrl.config).joinpath("binds.toml").open("rb") as binds_toml:
+            hotkeys = tomllib.load(binds_toml)
 
         # Set all hotkeys and their categories to Binds namespace
         for category_name, category in hotkeys.items():

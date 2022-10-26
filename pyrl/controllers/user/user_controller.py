@@ -114,6 +114,18 @@ class UserController(CreatureActionsMixin):
     def process_feedback(self, feedback: ActionFeedback) -> None:
         match feedback:
 
+            case DisplacementFeedback(action, coord, items):
+                if self.actions.get_passage():
+                    self.io.msg(f"There is {article(self.actions.get_tile().name)} here.")
+                if items:
+                    self.io.msg(f"There {item_description(items, use_verb=True)} here.")
+
+            case DropItemsFeedback(items):
+                self.io.msg(f"Dropped {item_description(items)}")
+
+            case PickItemsFeedback(items):
+                self.io.msg(f"Picked up {item_description(items)}")
+
             case AttackFeedback(attacker, target, succeeds, target_died, damage, experience, levelups):
                 combat_msg = combat_message(attacker, target, self.player, succeeds, target_died, damage)
                 color = Colors.Normal
@@ -132,18 +144,6 @@ class UserController(CreatureActionsMixin):
                 if levelups:
                     self.io.msg(f"Congratulations! you've gained enough experience to attain level {levelups[-1]}!",
                                 color=Colors.Yellow)
-
-            case DisplacementFeedback(action, coord, items):
-                if self.actions.get_passage():
-                    self.io.msg(f"There is {article(self.actions.get_tile().name)} here.")
-                if items:
-                    self.io.msg(f"There {item_description(items, use_verb=True)} here.")
-
-            case DropItemsFeedback(items):
-                self.io.msg(f"Dropped {item_description(items)}")
-
-            case PickItemsFeedback(items):
-                self.io.msg(f"Picked up {item_description(items)}")
 
     def _get_and_execute_action(self) -> ActionFeedback:
         if self.walk_mode.active:

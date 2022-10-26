@@ -4,7 +4,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from pyrl.types.level_key import LevelKey
-from pyrl.game_data.levels.shared_assets import DefaultLocation
+from pyrl.game_data.levels.shared_assets import DefaultLocation, default_dims
 from pyrl.creature.player import Player
 from pyrl.types.world_point import WorldPoint
 from pyrl.world.level import Level
@@ -26,7 +26,7 @@ class World:
         prev_level_key = LevelKey(dungeon_key, level_i - 1)
 
         if level_params is None:
-            level_params = LevelGenParams(level_i)
+            level_params = LevelGenParams(default_dims, level_i)
 
         self.level_params[curr_level_key] = level_params
         if level_i != 1:

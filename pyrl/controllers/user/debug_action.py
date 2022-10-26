@@ -5,7 +5,6 @@ from collections.abc import Callable
 
 from pyrl.config.binds import Binds
 from pyrl.config.debug import Debug
-from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import NoValidTargetException
 from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface

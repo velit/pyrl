@@ -42,7 +42,6 @@ class Learner(Creature):
 
     def gain_xp(self, amount: int) -> Sequence[int]:
         self.experience += amount
-        logging.debug(f"+{amount} xp")
         levels = []
         while self.experience_level >= self.levelups[0]:
             level = self.levelups.popleft()
@@ -66,7 +65,6 @@ class Learner(Creature):
         return int(level_units * level_unit_xp)
 
     def level_up(self, level: int) -> None:
-        logging.debug(f"You gain enough experience to attain level {level}!")
         self.base_strength += 2
         self.base_dexterity += 2
         self.base_endurance += 2

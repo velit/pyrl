@@ -12,6 +12,10 @@ from pyrl.types.coord import Coord
 class IoWindow(Protocol):
     implementation: ClassVar[str]
 
+    @property
+    def dimensions(self) -> Dimensions:
+        raise NotImplementedError
+
     @abstractmethod
     def get_key(self) -> str:
         raise NotImplementedError
@@ -26,10 +30,6 @@ class IoWindow(Protocol):
 
     @abstractmethod
     def blit(self, size: Dimensions, screen_position: Position) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def dimensions(self) -> Dimensions:
         raise NotImplementedError
 
     @abstractmethod

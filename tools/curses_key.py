@@ -1,60 +1,66 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import curses
-from curses import ascii
-from curses import wrapper
-from typing import TYPE_CHECKING
+import sys
 
-if TYPE_CHECKING:
-    from _curses import _CursesWindow
+if sys.platform != "win32":
+    import curses
+    from curses import ascii
+    from curses import wrapper
+    from typing import TYPE_CHECKING
 
-_MSG = "Press key to test, Q to quit."
+    if TYPE_CHECKING:
+        from _curses import _CursesWindow
 
-def main(w: _CursesWindow) -> None:
-    curses.raw()
-    curses.meta(True)
-    w.keypad(True)
+    _MSG = "Press key to test, Q to quit."
 
-    key = None
-    w.addstr(_MSG)
-    while key != 'Q':
-        key, alt = get_key(w)
-        w.clear()
-        print_key(w, key, alt)
+    def main(w: _CursesWindow) -> None:
+        curses.raw()
+        curses.meta(True)
+        w.keypad(True)
 
-    curses.endwin()
+        key = None
+        w.addstr(_MSG)
+        while key != 'Q':
+            key, alt = get_key(w)
+            w.clear()
+            print_key(w, key, alt)
 
-def print_key(w: _CursesWindow, key: str | int, alt: bool) -> None:
-    if isinstance(key, str):
-        nr = ord(key)
-        w.addstr(0, 0, _MSG)
+        curses.endwin()
 
-        if nr < 128:
-            w.addstr(1, 0, str((nr, alt * "!" + curses.keyname(ord(key)).decode(), alt)))
-            w.addstr(2, 0, str((nr, alt * "!" + ascii.unctrl(key), alt)))
+    def print_key(w: _CursesWindow, key: str | int, alt: bool) -> None:
+        if isinstance(key, str):
+            nr = ord(key)
+            w.addstr(0, 0, _MSG)
+
+            if nr < 128:
+                w.addstr(1, 0, str((nr, alt * "!" + curses.keyname(ord(key)).decode(), alt)))
+                w.addstr(2, 0, str((nr, alt * "!" + ascii.unctrl(key), alt)))
+            else:
+                w.addstr(1, 0, str((nr, alt * "!" + key, alt)))
         else:
-            w.addstr(1, 0, str((nr, alt * "!" + key, alt)))
-    else:
-        w.addstr(0, 0, _MSG)
-        w.addstr(1, 0, str((key, alt * "!" + curses.keyname(key).decode(), alt)))
+            w.addstr(0, 0, _MSG)
+            w.addstr(1, 0, str((key, alt * "!" + curses.keyname(key).decode(), alt)))
 
-def get_key(w: _CursesWindow) -> tuple[str | int, bool]:
-    alt = False
-    key = w.get_wch()
-    if key == chr(ascii.ESC):
-        w.nodelay(True)
-        try:
-            second_key = w.get_wch()
-        except curses.error:
-            pass
-        else:
-            key = second_key
-            alt = True
-        finally:
-            w.nodelay(False)
+    def get_key(w: _CursesWindow) -> tuple[str | int, bool]:
+        alt = False
+        key = w.get_wch()
+        if key == chr(ascii.ESC):
+            w.nodelay(True)
+            try:
+                second_key = w.get_wch()
+            except curses.error:
+                pass
+            else:
+                key = second_key
+                alt = True
+            finally:
+                w.nodelay(False)
 
-    return key, alt
+        return key, alt
 
-if __name__ == '__main__':
-    wrapper(main)
+    if __name__ == '__main__':
+        wrapper(main)
+else:
+    "Curses not supported on Windows"
+    sys.exit(1)

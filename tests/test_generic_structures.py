@@ -9,13 +9,13 @@ from pyrl.structures.uniq_dict import UniqDict
 
 def test_table() -> None:
     dims = Dimensions(2, 2)
-    table = Table(dims, (0, 1, 2))
+    table = Table(dims, (0, 1, 2, 4))
     assert table.dimensions == dims
 
     assert table[table.get_coord(0)] == 0
     assert table[table.get_coord(1)] == 1
     assert table[table.get_coord(2)] == 2
-    assert table[table.get_coord(3)] is None
+    assert table[table.get_coord(3)] == 4
 
     assert table.is_legal((0, 0))
     assert table.is_legal((1, 1))

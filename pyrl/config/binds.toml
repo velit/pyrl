@@ -71,7 +71,7 @@ Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
 
 [Directions]
 SouthWest               = ["1", "m",      "Numpad 1", "End"]
-South                   = ["2", "\u002C", "Numpad 2", "Down"]
+South                   = ["2", ",",      "Numpad 2", "Down"]
 SouthEast               = ["3", ".",      "Numpad 3", "Page Down"]
 West                    = ["4", "j",      "Numpad 4", "Left"]
 East                    = ["6", "l",      "Numpad 6", "Right"]

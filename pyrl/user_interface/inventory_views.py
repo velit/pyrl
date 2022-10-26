@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Literal
 
 from pyrl.config.binds import Binds
-from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
-from pyrl.types.equipment_slot import Slot
-from pyrl.engine.actions.action_interface import ActionInterface
+from pyrl.creature.inventory import Inventory
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import NoValidTargetException
-from pyrl.creature.inventory import Inventory
-from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view
+from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
+from pyrl.engine.actions.action_interface import ActionInterface
+from pyrl.types.equipment_slot import Slot
 from pyrl.types.line import Line
+from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view
 
 def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:
     item = inventory.get_item(slot)

@@ -54,14 +54,6 @@ class TcodWrapper(IoWrapper, DimensionsMixin):
     def flush(self) -> None:
         self.context.present(self.root_console)
 
-    def suspend(self) -> None:
-        """SDL version doesn't require suspend."""
-        pass
-
-    def resume(self) -> None:
-        """SDL version doesn't require resume."""
-        pass
-
     def toggle_fullscreen(self) -> None:
         """Toggle a context window between fullscreen and windowed modes."""
         if not self.context.sdl_window_p:

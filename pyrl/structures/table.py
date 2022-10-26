@@ -11,6 +11,7 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.types.coord import Coord
 
 T = TypeVar('T')
+
 @dataclass
 class Table(Generic[T], DimensionsMixin):
     """
@@ -28,9 +29,15 @@ class Table(Generic[T], DimensionsMixin):
     _impl: list[T]                    = field(init=False, repr=False)
 
     def __post_init__(self, init_values: Iterable[T], fillvalue: T | None) -> None:
-        self._impl: list[T] = list(value for _, value in zip_longest(range(self.dimensions.area), init_values,
-                                                                     fillvalue=fillvalue))
-        assert len(self) <= self.dimensions.area, f"Given {len(self)=} exceed {self.dimensions.area=}."
+        if fillvalue is not None:
+            self._impl: list[T] = list(value for _, value in zip_longest(range(self.dimensions.area), init_values,
+                                                                         fillvalue=fillvalue))
+            if len(self) > self.dimensions.area:
+                raise ValueError(f"Given {len(self)=} exceed {self.dimensions.area=}.")
+        else:
+            self._impl = list(init_values)
+            if len(self) != self.dimensions.area:
+                raise ValueError(f"Given {len(self)=} differs from {self.dimensions.area=} with no fillvalue")
 
     def __getitem__(self, coord: Coord) -> T:
         return self._impl[self.get_index(coord)]

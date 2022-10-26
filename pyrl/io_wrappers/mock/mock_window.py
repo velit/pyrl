@@ -18,7 +18,7 @@ class MockWindow(IoWindow):
     implementation = IMPLEMENTATION
 
     def __init__(self) -> None:
-        pass
+        return
 
     @property
     def dimensions(self) -> Dimensions:
@@ -32,19 +32,19 @@ class MockWindow(IoWindow):
         return Keys.NO_INPUT
 
     def clear(self) -> None:
-        pass
+        return
 
     def blit(self, size: Dimensions, screen_position: Position) -> None:
-        pass
+        return
 
     def draw_char(self, char: Glyph, coord: Coord) -> None:
-        pass
+        return
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:
-        pass
+        return
 
     def draw(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        pass
+        return
 
     def draw_reverse(self, glyph_info_iterable: Iterable[tuple[Coord, Glyph]]) -> None:
-        pass
+        return

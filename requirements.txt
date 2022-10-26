@@ -1,4 +1,2 @@
 tcod
 pytest
-toml
-types-toml
