@@ -4,7 +4,7 @@ from pyrl.creature.creature import Creature
 from pyrl.types.color import Colors
 
 default_creatures = (
-    #        name                   char          creature_level   spawn_weight_class
+    #        name                   glyph         creature_level   spawn_weight_class
     Creature("bat",                ('b', Colors.Brown),        0,  10),
     Creature("giant bat",          ('B', Colors.Brown),        1,  1000),
     Creature("giant worm",         ('w', Colors.Brown),        1,  1000),

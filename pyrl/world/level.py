@@ -18,7 +18,7 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.uniq_dict import UniqDict
 from pyrl.structures.scheduler import Scheduler
 from pyrl.structures.table import Table
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Direction, Dir
 from pyrl.types.level_key import LevelKey
@@ -86,27 +86,27 @@ class Level(DimensionsMixin):
         else:
             assert False, "Free coord search failed."
 
-    def visible_char(self, coord: Coord) -> Glyph:
+    def visible_glyph(self, coord: Coord) -> Glyph:
         if coord in self.creatures:
-            return self.creatures[coord].char
+            return self.creatures[coord].glyph
         elif coord in self.items:
-            return self.items[coord][0].char
+            return self.items[coord][0].glyph
         else:
-            return self.tiles[coord].visible_char
+            return self.tiles[coord].visible_glyph
 
-    def memory_char(self, coord: Coord) -> Glyph:
-        return self.tiles[coord].memory_char
+    def memory_glyph(self, coord: Coord) -> Glyph:
+        return self.tiles[coord].memory_glyph
 
     def get_vision_information(self, coords: Iterable[Coord], visible_coords: Container[Coord],
                                always_show_creatures: bool = False) -> Iterable[tuple[Coord, Glyph]]:
         for coord in coords:
             if coord in visible_coords:
-                yield coord, self.visible_char(coord)
+                yield coord, self.visible_glyph(coord)
             else:
                 if always_show_creatures and coord in self.creatures:
-                    yield coord, self.creatures[coord].char
+                    yield coord, self.creatures[coord].glyph
                 else:
-                    yield coord, self.memory_char(coord)
+                    yield coord, self.memory_glyph(coord)
 
     def get_last_pathable_coord(self, coord_start: Coord, coord_end: Coord) -> Coord | None:
         last = None

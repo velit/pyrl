@@ -16,7 +16,7 @@ class OverWorldLocation(LevelLocation):
 
 def get_level() -> LevelGenParams:
     dimensions = default_dims
-    charstr = (
+    table_data = (
         '^^^^^^^^¨=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^^¨¨=¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
         '^^^^^^^¨¨t=¨¨^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^'
@@ -62,7 +62,7 @@ def get_level() -> LevelGenParams:
     }
     custom_creatures: AssetCreatureDict = {
     }
-    tiles, locations, creatures = construct_data(dimensions, charstr, custom_tiles, custom_locations, custom_creatures)
+    tiles, locations, creatures = construct_data(dimensions, table_data, custom_tiles, custom_locations, custom_creatures)
 
     return LevelGenParams(
         dimensions=dimensions,

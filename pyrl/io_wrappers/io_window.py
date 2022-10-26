@@ -5,7 +5,7 @@ from typing import Protocol, Iterable, ClassVar
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import ColorPair
 from pyrl.types.coord import Coord
 
@@ -33,7 +33,7 @@ class IoWindow(Protocol):
         raise NotImplementedError
 
     @abstractmethod
-    def draw_char(self, char: Glyph, coord: Coord) -> None:
+    def draw_glyph(self, glyph: Glyph, coord: Coord) -> None:
         raise NotImplementedError
 
     @abstractmethod

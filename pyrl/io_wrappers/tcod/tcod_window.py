@@ -15,7 +15,7 @@ from pyrl.io_wrappers.tcod.tcod_keys import key_map, ignore_keys
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import Color, ColorPair, Colors
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
@@ -75,9 +75,9 @@ class TcodWindow(IoWindow, DimensionsMixin):
         y, x = screen_position
         self.console.blit(self.root_console, dest_y=y, dest_x=x, width=size.cols, height=size.rows)
 
-    def draw_char(self, char: Glyph, coord: Coord) -> None:
+    def draw_glyph(self, glyph: Glyph, coord: Coord) -> None:
         y, x = coord
-        symbol, (fg, bg) = char
+        symbol, (fg, bg) = glyph
         self.console.print(y=y, x=x, string=symbol, fg=color_map[fg], bg=color_map[bg])
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:

@@ -175,10 +175,10 @@ class UserController(CreatureActionsMixin):
                 self.io.draw_line(coord, self.coord, ("*", Colors.Yellow))
                 self.io.msg(f"LoS: {self.actions.level.check_los(self.coord, coord)}")
             if coord != self.coord:
-                symbol, (foreground, background) = self.actions.level.visible_char(coord)
-                char = symbol, (foreground, Color.Green)
-                self.io.draw_char(char, coord)
-                self.io.draw_char(self.actions.level.visible_char(self.coord), self.coord, reverse=True)
+                symbol, (foreground, background) = self.actions.level.visible_glyph(coord)
+                glyph = symbol, (foreground, Color.Green)
+                self.io.draw_glyph(glyph, coord)
+                self.io.draw_glyph(self.actions.level.visible_glyph(self.coord), self.coord, reverse=True)
             key = self.io.get_key()
             self.actions.redraw()
             direction = Dir.Stay

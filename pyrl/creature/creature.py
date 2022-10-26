@@ -9,7 +9,7 @@ from pyrl.engine.actions.action import Action
 from pyrl.functions.combat import Attackeable
 from pyrl.functions.coord_algorithms import vector_within_distance
 from pyrl.structures.dice import Dice
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.coord import Coord
 
 if TYPE_CHECKING:
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 @dataclass(eq=False)
 class Creature(Attackeable):
     name:              str
-    char:            Glyph
+    glyph:             Glyph
     creature_level:    int = 0
     spawn_class:       int = field(repr=False, default=1)
 

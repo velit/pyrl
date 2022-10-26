@@ -10,7 +10,7 @@ from pyrl.game_data.levels.shared_assets import default_dims
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import Colors, ColorPair
 from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
@@ -73,15 +73,15 @@ class WindowSystem:
     def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> Key:
         return self.whole_window.menu(header, lines, footer, keys)
 
-    def draw_char(self, char: Glyph, coord: Coord, reverse: bool = False) -> None:
-        self.level_window.draw_char(char, coord, reverse)
+    def draw_glyph(self, glyph: Glyph, coord: Coord, reverse: bool = False) -> None:
+        self.level_window.draw_glyph(glyph, coord, reverse)
 
-    def draw_line(self, a: Coord, b: Coord, char: Glyph = ('*', Colors.Yellow), draw_first: bool = False) -> None:
-        self.level_window.draw_line(a, b, char, draw_first)
+    def draw_line(self, a: Coord, b: Coord, glyph: Glyph = ('*', Colors.Yellow), draw_first: bool = False) -> None:
+        self.level_window.draw_line(a, b, glyph, draw_first)
 
     def draw_path(self, path: Iterable[Coord]) -> None:
         for coord in path:
-            self.draw_char((" ", Colors.Green), coord, reverse=True)
+            self.draw_glyph((" ", Colors.Green), coord, reverse=True)
             if Debug.path_step:
                 self.level_window.get_key(refresh=True)
         if not Debug.path_step:

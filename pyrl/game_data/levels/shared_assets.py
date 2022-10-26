@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pyrl.structures.uniq_dict import UniqDict
-from pyrl.types.char import Letter
+from pyrl.types.glyph import Letter
 from pyrl.types.coord import Coord
 from pyrl.types.direction import Dir
 from pyrl.types.level_location import LevelLocation

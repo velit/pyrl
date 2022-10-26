@@ -9,7 +9,7 @@ from pyrl.io_wrappers.curses import IMPLEMENTATION, WideChar
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import ColorPair, Colors
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
@@ -90,9 +90,9 @@ if sys.platform != "win32":
             y, x = screen_position
             self.win.noutrefresh(0, 0, y, x, y + rows - 1, x + cols - 1)
 
-        def draw_char(self, char: Glyph, coord: Coord) -> None:
+        def draw_glyph(self, glyph: Glyph, coord: Coord) -> None:
             y, x = coord
-            symbol, color = char
+            symbol, color = glyph
             self.win.addstr(y, x, symbol, self.color_map[color])
 
         def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:

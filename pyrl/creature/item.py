@@ -7,13 +7,13 @@ from typing import Any
 from pyrl.creature.stats import Stats, Stat
 from pyrl.structures.dice import Dice
 from pyrl.types.color import Colors
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.equipment_slot import Slot
 
 @dataclass(eq=False)
 class Item:
     name: str
-    char: Glyph
+    glyph: Glyph
     stats: Stats                       = field(repr=False)
     compatible_slots: tuple[Slot, ...] = field(repr=False)
     uses_all_slots: bool               = False
@@ -56,7 +56,7 @@ class Item:
         return str(self) < str(other)
 
     def __repr__(self) -> str:
-        return f"Item({self.name=}, {self.char=}, {self.compatible_slots=}, {self.stats=})"
+        return f"Item({self.name=}, {self.glyph=}, {self.compatible_slots=}, {self.stats=})"
 
 # noinspection PyPep8Naming
 def Weapon(name: str,
@@ -65,11 +65,11 @@ def Weapon(name: str,
            two_handed: bool = False,
            compatible_slots: Iterable[Slot] = (Slot.Right_Hand, Slot.Left_Hand),
            stats: Stats | None = None,
-           char: Glyph = ('(', Colors.Normal)) -> Item:
+           glyph: Glyph = ('(', Colors.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.accuracy = accuracy
-    return Item(name=name, char=char, stats=stats, compatible_slots=tuple(compatible_slots),
+    return Item(name=name, glyph=glyph, stats=stats, compatible_slots=tuple(compatible_slots),
                 uses_all_slots=two_handed, damage_dice=damage_dice)
 
 # noinspection PyPep8Naming
@@ -78,9 +78,9 @@ def Armor(name: str,
           armor: int,
           compatible_slots: Iterable[Slot] = (),
           stats: Stats | None = None,
-          char: Glyph = (']', Colors.Normal)) -> Item:
+          glyph: Glyph = (']', Colors.Normal)) -> Item:
     if stats is None:
         stats = Stats()
     stats.defense = defense
     stats.armor = armor
-    return Item(name=name, char=char, stats=stats, compatible_slots=tuple(compatible_slots))
+    return Item(name=name, glyph=glyph, stats=stats, compatible_slots=tuple(compatible_slots))

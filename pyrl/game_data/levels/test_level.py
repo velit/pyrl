@@ -12,7 +12,7 @@ from pyrl.world.level_gen_params import LevelGenParams
 def get_level(player: Player) -> LevelGenParams:
 
     dimensions = default_dims
-    charstr = (
+    table_data = (
         '################################################################################################'
         '#######################..##################.#.#.#######.....#################################.##'
         '######...##############.#.################.#.#.#.#####.####.###......#######################.@.#'
@@ -52,7 +52,7 @@ def get_level(player: Player) -> LevelGenParams:
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures
-    tiles, locations, creatures = construct_data(dimensions, charstr, *level_data)
+    tiles, locations, creatures = construct_data(dimensions, table_data, *level_data)
 
     return LevelGenParams(
         dimensions=dimensions,

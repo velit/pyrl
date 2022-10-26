@@ -8,7 +8,7 @@ from pyrl.structures.position import Position
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.mock import IMPLEMENTATION
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import ColorPair, Colors
 from pyrl.types.coord import Coord
 from pyrl.types.keys import Keys, Key
@@ -37,7 +37,7 @@ class MockWindow(IoWindow):
     def blit(self, size: Dimensions, screen_position: Position) -> None:
         return
 
-    def draw_char(self, char: Glyph, coord: Coord) -> None:
+    def draw_glyph(self, glyph: Glyph, coord: Coord) -> None:
         return
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:

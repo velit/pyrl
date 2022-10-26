@@ -4,7 +4,7 @@ from pyrl.types.color import Colors
 from pyrl.world.tile import Tile
 
 class PyrlTiles:
-    # Name         Description                      Visible char          Memory char         Pathable Transparency
+    # Name         Description                      Visible glyph         Memory glyph        Pathable Transparency
     Unknown      = Tile("nothing",                 (' ', Colors.Normal), (' ', Colors.Normal),  False, False)
     Floor        = Tile("dungeon floor",           ('.', Colors.Light),  ('.', Colors.Gray),    True,  True)
     Black_Floor  = Tile("obisidian dungeon floor", ('.', Colors.Red),    ('.', Colors.Red),     True,  True)

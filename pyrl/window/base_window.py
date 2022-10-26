@@ -10,7 +10,7 @@ from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
-from pyrl.types.char import Glyph
+from pyrl.types.glyph import Glyph
 from pyrl.types.color import Colors, ColorPair
 from pyrl.types.color_str import ColorStr
 from pyrl.types.coord import Coord
@@ -30,8 +30,8 @@ class BaseWindow(DimensionsMixin):
     def __post_init__(self) -> None:
         self.io_win = self.wrapper.new_window(self.dimensions)
 
-    def draw_char(self, char: Glyph, coord: Coord) -> None:
-        self.io_win.draw_char(char, coord)
+    def draw_glyph(self, glyph: Glyph, coord: Coord) -> None:
+        self.io_win.draw_glyph(glyph, coord)
 
     def draw_str(self, string: str, coord: Coord, color: ColorPair = Colors.Normal) -> None:
         self.io_win.draw_str(string, coord, color)
@@ -130,14 +130,14 @@ class BaseWindow(DimensionsMixin):
 
             # Update vars
             cursor_coord = input_y, input_x + cursor_index
-            cursor_char = ((user_input + " ")[cursor_index], Colors.Cursor)
+            cursor_glyph = ((user_input + " ")[cursor_index], Colors.Cursor)
 
             # Print
             self.draw_str(user_input, input_coord)
-            self.draw_char(cursor_char, cursor_coord)
+            self.draw_glyph(cursor_glyph, cursor_coord)
             key = self.get_key(refresh=True)
             self.draw_str(" " * (len(user_input)), input_coord)
-            self.draw_char((" ", Colors.Normal), cursor_coord)
+            self.draw_glyph((" ", Colors.Normal), cursor_coord)
 
             if key == Keys.SPACE:
                 key = " "
