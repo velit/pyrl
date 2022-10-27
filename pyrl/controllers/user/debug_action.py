@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import code
+import sys
 from collections.abc import Callable
 
 from pyrl.config.binds import Binds
@@ -107,8 +108,11 @@ class DebugAction(CreatureActionsMixin):
         self.io.msg(f"Input code debug set to {Debug.show_keycodes}")
 
     def display_curses_color_info(self) -> None:
-        import curses
-        self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")  # type: ignore
+        if sys.platform != "win32":
+            import curses
+            self.io.msg(f"{curses.COLORS=} {curses.COLOR_PAIRS=} {curses.can_change_color()=}")
+        else:
+            self.io.msg("Not running curses")
 
     def print_message_debug_string(self) -> None:
         self.io.msg(Debug.debug_string)

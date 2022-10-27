@@ -9,7 +9,7 @@ KeyTuple = tuple[AnyKey, ...]
 
 class KeySequence(tuple[AnyKey, ...]):
 
-    def __new__(cls, key_or_iterable: AnyKey | Iterable[AnyKey] = (), /) -> Self:
+    def __new__(cls, key_or_iterable: AnyKey | Iterable[AnyKey] = (), /) -> Self:  # type: ignore
         if isinstance(key_or_iterable, AnyKey):
             return super().__new__(cls, (key_or_iterable,))  # type: ignore
         else:

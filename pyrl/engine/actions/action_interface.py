@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import NoReturn, Iterable, TYPE_CHECKING, TypeVar, Callable, Any
+from typing import NoReturn, Iterable, TYPE_CHECKING, ParamSpec, Callable, Concatenate, Any
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import IllegalMoveException, NoValidTargetException
@@ -20,9 +20,10 @@ from pyrl.engine.world.world_types import LevelLocation
 if TYPE_CHECKING:
     from pyrl.engine.game import Game
 
-F = TypeVar('F', bound=Callable[..., ActionFeedback])
-def creature_action(action_method: F) -> F:
-    def action_wrapper(self: ActionInterface, *args: Any, **kwargs: Any) -> ActionFeedback:
+P = ParamSpec("P")
+def creature_action(action_method: Callable[Concatenate[ActionInterface, P], ActionFeedback]) \
+        -> Callable[Concatenate[ActionInterface, P], ActionFeedback]:
+    def creature_wrapper(self: ActionInterface, /, *args: P.args, **kwargs: P.kwargs) -> ActionFeedback:
         self._assert_not_acted_yet()
         feedback: ActionFeedback = action_method(self, *args, **kwargs)
         if isinstance(feedback, MoveFeedback):
@@ -30,16 +31,17 @@ def creature_action(action_method: F) -> F:
         else:
             self._act(feedback.action, 1.0)
         return feedback
-    return action_wrapper # type: ignore
+    return creature_wrapper
 
-def player_action(action_method: F) -> F:
-    def action_wrapper(self: ActionInterface, *args: Any, **kwargs: Any) -> ActionFeedback:
+def player_action(action_method: Callable[Concatenate[ActionInterface, P], ActionFeedback]) \
+        -> Callable[Concatenate[ActionInterface, P], ActionFeedback]:
+    def player_wrapper(self: ActionInterface, /, *args: Any, **kwargs: Any) -> ActionFeedback:
         self._assert_player()
         self._assert_not_acted_yet()
         feedback: ActionFeedback = action_method(self, *args, **kwargs)
         self._act(feedback.action, 1.0)
         return feedback
-    return action_wrapper # type: ignore
+    return player_wrapper
 
 @dataclass
 class ActionInterface(GameMixin, CreatureMixin):
