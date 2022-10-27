@@ -7,10 +7,10 @@ import pytest
 from pyrl import main
 from pyrl.config.binds import Binds
 from pyrl.engine.game import Game
-from pyrl.io_wrappers.io_wrapper import IoWrapper
 # from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
-from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
-from pyrl.types.keys import KeyOrSequence
+from pyrl.engine.types.keys import KeyOrSequence
+from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper as TestWrapper
+from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from tests.integration_tests import dummy_plug_system
 from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions
 

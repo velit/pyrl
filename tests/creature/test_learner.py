@@ -1,6 +1,6 @@
 from typing import Callable
 
-from pyrl.creature.mixins.learner import Learner
+from pyrl.engine.creature.mixins.learner import Learner
 from tests.creature import creature_test_init_params
 
 def test_learner() -> None:

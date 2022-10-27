@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from pyrl.structures.uniq_dict import UniqDict
-from pyrl.types.glyphs import Letter
-from pyrl.types.directions import Dir, Coord
-from pyrl.world.world_types import LevelLocation
-from pyrl.creature.creature import Creature
+from pyrl.engine.behaviour.coordinates import add_vector
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.structures.dimensions import Dimensions
+from pyrl.engine.structures.table import Table
+from pyrl.engine.structures.uniq_dict import UniqDict
+from pyrl.engine.types.directions import Dir, Coord
+from pyrl.engine.types.glyphs import Letter
+from pyrl.engine.world.tile import Tile
+from pyrl.engine.world.world_types import LevelLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.functions.coord_algorithms import add_vector
-from pyrl.structures.table import Table
-from pyrl.structures.dimensions import Dimensions
-from pyrl.world.tile import Tile
 
 default_dims = Dimensions(26, 96)
 

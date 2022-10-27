@@ -6,13 +6,13 @@ from typing import Any
 
 import pytest
 
-from pyrl.functions.dungeon_gen import DungeonGen
+from pyrl.engine.behaviour.dungeon_gen import DungeonGen
+from pyrl.engine.structures.dimensions import Dimensions
+from pyrl.engine.structures.rectangle import Rectangle
+from pyrl.engine.world.level_gen_params import LevelGenParams
+from pyrl.engine.world.world_types import LevelGen, LevelKey
 from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation, default_dims
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.structures.dimensions import Dimensions
-from pyrl.structures.rectangle import Rectangle
-from pyrl.world.world_types import LevelGen, LevelKey
-from pyrl.world.level_gen_params import LevelGenParams
 
 def pp_tm(tile_matrix: Iterable[Any], cols: int) -> None:
     """Pretty print tiles."""

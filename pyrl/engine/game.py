@@ -11,23 +11,23 @@ from pyrl.config.config import Config
 from pyrl.config.debug import Debug
 from pyrl.controllers.ai_controller import AIController, AiState
 from pyrl.controllers.user.user_controller import UserController
-from pyrl.creature.creature import Creature
-from pyrl.creature.mixins.visionary import Visionary
-from pyrl.creature.player import Player
+from pyrl.engine import state_store
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_feedback import AttackFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
-from pyrl.functions import state_store
-from pyrl.functions.combat import Attackeable, calc_melee_attack
-from pyrl.functions.field_of_vision import ShadowCast
+from pyrl.engine.behaviour.combat import Attackeable, calc_melee_attack
+from pyrl.engine.behaviour.field_of_vision import ShadowCast
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.mixins.visionary import Visionary
+from pyrl.engine.creature.player import Player
+from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.world.level import Level
+from pyrl.engine.world.world import World
+from pyrl.engine.world.world_types import WorldPoint
 from pyrl.game_data.pyrl_world import pyrl_world
-from pyrl.io_wrappers.io_wrapper import IoWrapper
-from pyrl.types.glyphs import Colors
-from pyrl.world.world_types import WorldPoint
-from pyrl.user_interface.status_texts import register_status_texts
-from pyrl.window.window_system import WindowSystem
-from pyrl.world.level import Level
-from pyrl.world.world import World
+from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
+from pyrl.ui.views.status_texts import register_status_texts
+from pyrl.ui.window.window_system import WindowSystem
 
 @dataclass
 class Game:

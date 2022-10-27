@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from pyrl.creature.creature_picker import CreaturePicker
+from pyrl.engine.creature.creature_picker import CreaturePicker
 
 def test_speciation_mult() -> None:
     picker = CreaturePicker()

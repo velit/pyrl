@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pyrl.creature.item import Armor, Weapon
-from pyrl.creature.player import Player
-from pyrl.creature.stats import Stats
-from pyrl.structures.dice import Dice
-from pyrl.types.glyphs import Color, Colors
-from pyrl.creature.equipment_slot import Slot
+from pyrl.engine.creature.item import Armor, Weapon, Slot
+from pyrl.engine.creature.player import Player
+from pyrl.engine.creature.stats import Stats
+from pyrl.engine.structures.dice import Dice
+from pyrl.engine.types.glyphs import Color, Colors
 
 def pyrl_player() -> Player:
     player = Player("player", ('@', (Color.Green, Color.Black)))

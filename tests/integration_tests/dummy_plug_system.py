@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
-from pyrl.io_wrappers.io_window import IoWindow
-from pyrl.types.keys import AnyKey, KeySequence, KeyOrSequence
+from pyrl.engine.types.keys import AnyKey, KeySequence, KeyOrSequence
+from pyrl.ui.io_lib.protocol.io_window import IoWindow
 
 if TYPE_CHECKING:
     from pyrl.engine.game import Game

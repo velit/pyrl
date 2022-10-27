@@ -8,13 +8,12 @@ import sys
 from cProfile import Profile
 from collections.abc import Sequence
 
-from pyrl.functions import state_store
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
+from pyrl.engine import state_store
 from pyrl.engine.game import Game
-from pyrl.io_wrappers.io_wrapper import IoWrapper
+from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from tools import profile_util
-
 
 def run() -> None:
     options = get_commandline_options()
@@ -52,16 +51,16 @@ def get_commandline_options(args: Sequence[str] | None = None) -> argparse.Names
 def init_cursor_lib(output: str) -> IoWrapper:
     if output == "terminal":
         if sys.platform != "win32":
-            from pyrl.io_wrappers.curses.curses_wrapper import CursesWrapper
+            from pyrl.ui.io_lib.curses.curses_wrapper import CursesWrapper
             return CursesWrapper()
         else:
             print("Terminal mode is not supported on Windows", file=sys.stderr)
             sys.exit(1)
     elif output == "sdl":
-        from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper
+        from pyrl.ui.io_lib.tcod.tcod_wrapper import TcodWrapper
         return TcodWrapper()
     elif output == "test":
-        from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper
+        from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper
         return MockWrapper()
     else:
         assert False, f"Unknown output parameter '{output}'"

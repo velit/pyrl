@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from pyrl.creature.creature import Creature
-from pyrl.creature.player import Player
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.player import Player
+from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.world.level_gen_params import LevelGenParams
+from pyrl.engine.world.world_types import LevelGen
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, DefaultLocation, AssetTileDict, \
     AssetLocationDict, AssetCreatureDict
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.types.glyphs import Colors
-from pyrl.world.world_types import LevelGen
-from pyrl.world.level_gen_params import LevelGenParams
 
 def get_level(player: Player) -> LevelGenParams:
 

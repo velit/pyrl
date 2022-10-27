@@ -3,19 +3,19 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import NoReturn, Iterable, TYPE_CHECKING, TypeVar, Callable, Any
 
-from pyrl.creature.creature import Creature
-from pyrl.creature.item import Item
-from pyrl.creature.mixins.hoarder import Hoarder
-from pyrl.creature.mixins.visionary import Visionary
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import IllegalMoveException, NoValidTargetException
 from pyrl.engine.actions.action_feedback import AttackFeedback, ActionFeedback, MoveFeedback, DropItemsFeedback, \
     PickItemsFeedback, DisplacementFeedback, SwapFeedback
-from pyrl.functions.coord_algorithms import get_vector, add_vector, vector_is_direction
-from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
-from pyrl.types.directions import Direction, Dir, Coord
-from pyrl.world.world_types import LevelLocation
-from pyrl.world.tile import Tile
+from pyrl.engine.behaviour.coordinates import get_vector, vector_is_direction, add_vector
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.item import Item
+from pyrl.engine.creature.mixins.hoarder import Hoarder
+from pyrl.engine.creature.mixins.visionary import Visionary
+from pyrl.engine.structures.helper_mixins import GameMixin, CreatureMixin
+from pyrl.engine.types.directions import Direction, Dir, Coord
+from pyrl.engine.world.tile import Tile
+from pyrl.engine.world.world_types import LevelLocation
 
 if TYPE_CHECKING:
     from pyrl.engine.game import Game

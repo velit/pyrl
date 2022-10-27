@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from pyrl.creature.creature import Creature
-from pyrl.creature.player import Player
-from pyrl.functions.combat import Attackeable
+from pyrl.engine.behaviour.combat import Attackeable
+from pyrl.engine.creature.creature import Creature
 
 def experience_message(amount: int) -> str:
     return f"+[{amount}]"

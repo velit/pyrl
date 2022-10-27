@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from cProfile import Profile
 
+from pyrl.engine.world.level_gen_params import LevelGenParams
+from pyrl.engine.world.world_types import LevelGen, LevelKey
 from pyrl.game_data.levels.shared_assets import default_dims
-from pyrl.world.world_types import LevelGen, LevelKey
-from pyrl.world.level_gen_params import LevelGenParams
 from tools import profile_util
 
 def test_profile_rdg_generation() -> None:

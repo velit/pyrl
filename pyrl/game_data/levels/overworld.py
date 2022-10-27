@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.world.level_gen_params import LevelGenParams
+from pyrl.engine.world.tile import Tile
+from pyrl.engine.world.world_types import LevelLocation, LevelGen
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
     AssetTileDict
-from pyrl.types.glyphs import Colors
-from pyrl.world.world_types import LevelLocation, LevelGen
-from pyrl.world.level_gen_params import LevelGenParams
-from pyrl.world.tile import Tile
 
 name = "overworld"
 

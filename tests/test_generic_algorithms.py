@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.functions.coord_algorithms import resize_range
+from pyrl.engine.behaviour.coordinates import resize_range
 
 def test_resize_in_range() -> None:
     assert resize_range(5, range(5, 9)) == 0

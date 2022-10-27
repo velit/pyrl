@@ -17,15 +17,15 @@ from pyrl.engine.actions.action_exceptions import ActionException
 from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback, AttackFeedback, DropItemsFeedback, \
     PickItemsFeedback, DisplacementFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
-from pyrl.functions.coord_algorithms import add_vector
+from pyrl.engine.behaviour.coordinates import add_vector, bresenham
+from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
+from pyrl.engine.types.directions import Direction, Dir
+from pyrl.engine.types.glyphs import Color, Colors
+from pyrl.engine.types.keys import Key, KeyTuple, AnyKey
 from pyrl.game_data.levels.shared_assets import DefaultLocation
-from pyrl.structures.helper_mixins import CreatureActionsMixin
-from pyrl.types.glyphs import Color, Colors
-from pyrl.types.directions import Direction, Dir
-from pyrl.types.keys import Key, KeyTuple, AnyKey
-from pyrl.user_interface.help_view import help_view
-from pyrl.user_interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
-from pyrl.user_interface.lines_view import lines_view, build_color_lines
+from pyrl.ui.views.help_view import help_view
+from pyrl.ui.views.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
+from pyrl.ui.views.lines_view import build_color_lines, lines_view
 
 ActionCallable = Callable[[], ActionFeedback]
 ActionLookup = dict[AnyKey, ActionCallable]
@@ -187,12 +187,11 @@ class UserController(CreatureActionsMixin):
             elif key == 'd':
                 drawline_flag = not drawline_flag
             elif key == 'b':
-                from pyrl.functions.coord_algorithms import bresenham
                 for coord in bresenham(self.coord, coord):
                     self.io.msg(coord)
             elif key == 's':
                 if coord in self.actions.level.creatures:
-                    from pyrl.user_interface.status_texts import register_status_texts
+                    from pyrl.ui.views.status_texts import register_status_texts
                     register_status_texts(self.io, self.actions.game, self.actions.level.creatures[coord])
             elif key in Binds.Cancel or key in Binds.Look_Mode:
                 break

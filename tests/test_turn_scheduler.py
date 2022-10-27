@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.structures.scheduler import Scheduler
+from pyrl.engine.structures.scheduler import Scheduler
 
 def test_turn_scheduler() -> None:
     ts: Scheduler[str] = Scheduler()

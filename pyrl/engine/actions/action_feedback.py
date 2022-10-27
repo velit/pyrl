@@ -3,11 +3,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
-from pyrl.creature.creature import Creature
-from pyrl.creature.item import Item
 from pyrl.engine.actions.action import Action
-from pyrl.types.directions import Direction, Coord
-from pyrl.world.tile import Tile
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.item import Item
+from pyrl.engine.types.directions import Direction, Coord
+from pyrl.engine.world.tile import Tile
 
 @dataclass
 class ActionFeedback:
