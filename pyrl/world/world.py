@@ -3,10 +3,9 @@ from __future__ import annotations
 from collections import Counter
 from dataclasses import dataclass, field
 
-from pyrl.types.level_key import LevelKey
 from pyrl.game_data.levels.shared_assets import DefaultLocation, default_dims
 from pyrl.creature.player import Player
-from pyrl.types.world_point import WorldPoint
+from pyrl.world.world_types import WorldPoint, LevelKey
 from pyrl.world.level import Level
 from pyrl.world.level_gen_params import LevelGenParams
 

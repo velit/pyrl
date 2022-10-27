@@ -10,7 +10,7 @@ from pyrl.engine.game import Game
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 # from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
 from pyrl.io_wrappers.mock.mock_wrapper import MockWrapper as TestWrapper
-from pyrl.types.key_sequence import AnyKeys
+from pyrl.types.keys import KeyOrSequence
 from tests.integration_tests import dummy_plug_system
 from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions
 
@@ -73,9 +73,9 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
     )
 
     # debug_actions enabled ones
-    message_system: AnyKeys = [Binds.Debug_Commands, 'm', Binds.Skip_To_Last_Message]
-    whole_map: AnyKeys = [Binds.Debug_Commands, 'v']
-    path_to_staircase: AnyKeys = [Binds.Debug_Commands, 'o', Binds.Skip_To_Last_Message]
+    message_system: Iterable[KeyOrSequence] = [Binds.Debug_Commands, 'm', Binds.Skip_To_Last_Message]
+    whole_map: Iterable[KeyOrSequence] = [Binds.Debug_Commands, 'v']
+    path_to_staircase: Iterable[KeyOrSequence] = [Binds.Debug_Commands, 'o', Binds.Skip_To_Last_Message]
 
     inventory = (
         Binds.Equipment,

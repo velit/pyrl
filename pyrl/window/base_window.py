@@ -10,11 +10,9 @@ from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import Colors, ColorPair
-from pyrl.types.color_str import ColorStr
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys, Key, KeyTuple
+from pyrl.types.glyphs import Colors, ColorPair, ColorStr, Glyph
+from pyrl.types.directions import Coord
+from pyrl.types.keys import Key, AnyKey, KeyTuple
 
 @dataclass(eq=False)
 class BaseWindow(DimensionsMixin):
@@ -50,7 +48,7 @@ class BaseWindow(DimensionsMixin):
         """Get a time in fractional seconds that is compatible with self.check_key(until=timestamp)."""
         return time.perf_counter()
 
-    def get_key(self, keys: KeyTuple = (), refresh: bool = False) -> Key:
+    def get_key(self, keys: KeyTuple = (), refresh: bool = False) -> AnyKey:
         """
         Return key from user.
 
@@ -65,7 +63,7 @@ class BaseWindow(DimensionsMixin):
             if not keys or key in keys:
                 return key
 
-    def check_key(self, keys: KeyTuple | None = None, until: float | None = None, refresh: bool = False) -> Key:
+    def check_key(self, keys: KeyTuple | None = None, until: float | None = None, refresh: bool = False) -> AnyKey:
         """
         Return key if user has given one, otherwise return Key.NO_INPUT.
 
@@ -87,7 +85,7 @@ class BaseWindow(DimensionsMixin):
         if not keys or key in keys:
             return key
         else:
-            return Keys.NO_INPUT
+            return Key.NO_INPUT
 
     def blit(self) -> None:
         self.io_win.blit(self.dimensions, self.screen_position)
@@ -96,7 +94,7 @@ class BaseWindow(DimensionsMixin):
         self.blit()
         self.wrapper.flush()
 
-    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> Key:
+    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> AnyKey:
         self.clear()
         self.draw_banner(header)
         self.draw_lines(lines, y_offset=2)
@@ -139,10 +137,10 @@ class BaseWindow(DimensionsMixin):
             self.draw_str(" " * (len(user_input)), input_coord)
             self.draw_glyph((" ", Colors.Normal), cursor_coord)
 
-            if key == Keys.SPACE:
+            if key == Key.SPACE:
                 key = " "
 
-            if key in (Keys.ENTER, "^m", "^j", "^d"):
+            if key in (Key.ENTER, "^m", "^j", "^d"):
                 return user_input
             elif key == "^w":
                 state_whitespace = True
@@ -158,18 +156,18 @@ class BaseWindow(DimensionsMixin):
             elif key == "^u":
                 user_input = user_input[cursor_index:]
                 cursor_index = 0
-            elif key in (Keys.END, "^e"):
+            elif key in (Key.END, "^e"):
                 cursor_index = len(user_input)
-            elif key in (Keys.HOME, "^a"):
+            elif key in (Key.HOME, "^a"):
                 cursor_index = 0
-            elif key in (Keys.BACKSPACE, "^h"):
+            elif key in (Key.BACKSPACE, "^h"):
                 user_input = user_input[:max(cursor_index - 1, 0)] + user_input[cursor_index:]
                 cursor_index -= 1
-            elif key == Keys.DELETE:
+            elif key == Key.DELETE:
                 user_input = user_input[:cursor_index] + user_input[cursor_index + 1:]
-            elif key == Keys.LEFT:
+            elif key == Key.LEFT:
                 cursor_index -= 1
-            elif key == Keys.RIGHT:
+            elif key == Key.RIGHT:
                 cursor_index += 1
             else:
                 user_input = user_input[:cursor_index] + key + user_input[cursor_index:]

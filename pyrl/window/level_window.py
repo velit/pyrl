@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import Colors
+from pyrl.types.glyphs import Colors, Glyph
 from pyrl.functions.coord_algorithms import bresenham
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 from pyrl.window.base_window import BaseWindow
 
 @dataclass(eq=False)

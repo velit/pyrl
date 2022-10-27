@@ -6,11 +6,10 @@ from itertools import chain
 
 import tomllib
 
-from pyrl.types.direction import Direction, Dir
-from pyrl.types.key_sequence import KeySequence
-from pyrl.types.keys import Key, Keys
+from pyrl.types.directions import Direction, Dir
+from pyrl.types.keys import AnyKey, Key, KeySequence
 
-unbound = KeySequence([Keys.UNDEFINED] * 25)
+unbound = KeySequence([Key.UNDEFINED] * 25)
 
 class Binds:
 
@@ -92,7 +91,7 @@ class Binds:
     Next_Bdf                = unbound
     Previous_Bdf            = unbound
 
-    _direction_keys: dict[Key, Direction] = {}
+    _direction_keys: dict[AnyKey, Direction] = {}
 
     @classmethod
     def load_binds(cls) -> None:
@@ -112,7 +111,7 @@ class Binds:
 
     @classmethod
     def set_directions(cls) -> None:
-        def set_every_to(every: Iterable[Key], to: Direction, at: MutableMapping[Key, Direction]) -> None:
+        def set_every_to(every: Iterable[AnyKey], to: Direction, at: MutableMapping[AnyKey, Direction]) -> None:
             for item in every:
                 at[item] = to
 
@@ -128,11 +127,11 @@ class Binds:
         set_every_to(cls.NorthEast + cls.Instant_NorthEast, to=Dir.NorthEast, at=cls._direction_keys)
 
     @classmethod
-    def undefined_keys(cls) -> Iterable[Key]:
+    def undefined_keys(cls) -> Iterable[AnyKey]:
         return [key for key, value in vars(cls).items() if value is unbound]
 
     @classmethod
-    def get_direction(cls, bind: Key) -> Direction:
+    def get_direction(cls, bind: AnyKey) -> Direction:
         return cls._direction_keys[bind]
 
 Binds.load_binds()

@@ -1,52 +1,75 @@
 from __future__ import annotations
 
-from typing import Final
+from collections.abc import Iterable
+from enum import StrEnum
+from typing import Self
 
-Key = str
-KeyTuple = tuple[Key, ...]
-class Keys:
-    LEFT:           Final = "Left"
-    RIGHT:          Final = "Right"
-    UP:             Final = "Up"
-    DOWN:           Final = "Down"
-    F1:             Final = "F1"
-    F2:             Final = "F2"
-    F3:             Final = "F3"
-    F4:             Final = "F4"
-    F5:             Final = "F5"
-    F6:             Final = "F6"
-    F7:             Final = "F7"
-    F8:             Final = "F8"
-    F9:             Final = "F9"
-    F10:            Final = "F10"
-    F11:            Final = "F11"
-    F12:            Final = "F12"
-    ESC:            Final = "Esc"
-    TAB:            Final = "Tab"
-    SHIFT_TAB:      Final = "Shift+Tab"
-    BACKSPACE:      Final = "Backspace"
-    SPACE:          Final = "Space"
-    ENTER:          Final = "Enter"
-    INSERT:         Final = "Insert"
-    DELETE:         Final = "Delete"
-    HOME:           Final = "Home"
-    END:            Final = "End"
-    PAGE_UP:        Final = "Page Up"
-    PAGE_DOWN:      Final = "Page Down"
-    NUMPAD_0:       Final = "Numpad 0"
-    NUMPAD_1:       Final = "Numpad 1"
-    NUMPAD_2:       Final = "Numpad 2"
-    NUMPAD_3:       Final = "Numpad 3"
-    NUMPAD_4:       Final = "Numpad 4"
-    NUMPAD_5:       Final = "Numpad 5"
-    NUMPAD_6:       Final = "Numpad 6"
-    NUMPAD_7:       Final = "Numpad 7"
-    NUMPAD_8:       Final = "Numpad 8"
-    NUMPAD_9:       Final = "Numpad 9"
-    WINDOW_RESIZE:  Final = "Window Resize"
-    CLOSE_WINDOW:   Final = "Close Window"
+AnyKey = str
+KeyTuple = tuple[AnyKey, ...]
+
+class KeySequence(tuple[AnyKey, ...]):
+
+    def __new__(cls, key_or_iterable: AnyKey | Iterable[AnyKey] = (), /) -> Self:
+        if isinstance(key_or_iterable, AnyKey):
+            return super().__new__(cls, (key_or_iterable,))
+        else:
+            return super().__new__(cls, key_or_iterable)
+
+    @property
+    def key(self) -> AnyKey:
+        if len(self):
+            return self[0]
+        else:
+            return "Unbound"
+
+    def __str__(self) -> str:
+        return "/".join(f"{key}" for key in self)
+
+class Key(StrEnum):
+    LEFT           = "Left"
+    RIGHT          = "Right"
+    UP             = "Up"
+    DOWN           = "Down"
+    F1             = "F1"
+    F2             = "F2"
+    F3             = "F3"
+    F4             = "F4"
+    F5             = "F5"
+    F6             = "F6"
+    F7             = "F7"
+    F8             = "F8"
+    F9             = "F9"
+    F10            = "F10"
+    F11            = "F11"
+    F12            = "F12"
+    ESC            = "Esc"
+    TAB            = "Tab"
+    SHIFT_TAB      = "Shift+Tab"
+    BACKSPACE      = "Backspace"
+    SPACE          = "Space"
+    ENTER          = "Enter"
+    INSERT         = "Insert"
+    DELETE         = "Delete"
+    HOME           = "Home"
+    END            = "End"
+    PAGE_UP        = "Page Up"
+    PAGE_DOWN      = "Page Down"
+    NUMPAD_0       = "Numpad 0"
+    NUMPAD_1       = "Numpad 1"
+    NUMPAD_2       = "Numpad 2"
+    NUMPAD_3       = "Numpad 3"
+    NUMPAD_4       = "Numpad 4"
+    NUMPAD_5       = "Numpad 5"
+    NUMPAD_6       = "Numpad 6"
+    NUMPAD_7       = "Numpad 7"
+    NUMPAD_8       = "Numpad 8"
+    NUMPAD_9       = "Numpad 9"
+    WINDOW_RESIZE  = "Window Resize"
+    CLOSE_WINDOW   = "Close Window"
 
     # The IO system will never return this value
-    UNDEFINED:      Final = "Undefined"
+    UNDEFINED      = "Undefined"
     # Do not bind. Returned by the IO system when something has to be returned and there is no input
-    NO_INPUT:       Final = "No Input"
+    NO_INPUT       = "No Input"
+
+KeyOrSequence = AnyKey | KeySequence

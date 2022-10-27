@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 
 @dataclass(frozen=True)
 class Dimensions:

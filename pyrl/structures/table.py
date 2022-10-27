@@ -8,7 +8,7 @@ from typing import TypeVar, Generic, Iterator
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 
 T = TypeVar('T')
 

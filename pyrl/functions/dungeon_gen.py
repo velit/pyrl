@@ -13,10 +13,8 @@ from pyrl.structures.rectangle import Rectangle
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 from pyrl.structures.table import Table
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Dir, Direction
-from pyrl.types.level_gen import LevelGen
-from pyrl.types.level_location import LevelLocation
+from pyrl.types.directions import Dir, Direction, Coord
+from pyrl.world.world_types import LevelLocation, LevelGen
 from pyrl.world.tile import Tile
 
 if TYPE_CHECKING:

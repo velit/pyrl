@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from pyrl.config.binds import Binds
-from pyrl.types import color_str
-from pyrl.types.color import Colors
+from pyrl.types.glyphs import Colors, ColorPair, ColorStr
 from pyrl.window.window_system import WindowSystem
+
+def from_seq(display_strings: Iterable[str], color: ColorPair = Colors.Normal) -> list[ColorStr]:
+    return [(display, color) for display in display_strings]
 
 def help_view(io: WindowSystem) -> None:
     header = "Help Screen, ^ means ctrl, ! means alt"
-    help_lines = color_str.from_seq((
+    help_lines = from_seq((
         f"Help            {Binds.Help!s:16.16}"      f"Walk Mode       {Binds.Walk_Mode!s:16.16}",
         f"Cancel          {Binds.Cancel!s:16.16}"    f"Look Mode       {Binds.Look_Mode!s:16.16}",
         f"Save            {Binds.Save!s:16.16}"      f"Show vision     {Binds.Show_Vision!s:16.16}",

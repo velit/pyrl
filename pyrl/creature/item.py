@@ -6,9 +6,8 @@ from typing import Any
 
 from pyrl.creature.stats import Stats, Stat
 from pyrl.structures.dice import Dice
-from pyrl.types.color import Colors
-from pyrl.types.glyph import Glyph
-from pyrl.types.equipment_slot import Slot
+from pyrl.types.glyphs import Colors, Glyph
+from pyrl.creature.equipment_slot import Slot
 
 @dataclass(eq=False)
 class Item:

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 
 @dataclass(init=False)
 class Rectangle(DimensionsMixin):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 
-from pyrl.types.color import Color, ColorPair
+from pyrl.types.glyphs import Color, ColorPair
 
 if sys.platform != "win32":
 

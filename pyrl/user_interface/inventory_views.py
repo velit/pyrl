@@ -8,8 +8,8 @@ from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import NoValidTargetException
 from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
-from pyrl.types.equipment_slot import Slot
-from pyrl.types.line import Line
+from pyrl.creature.equipment_slot import Slot
+from pyrl.user_interface.line import Line
 from pyrl.user_interface.lines_view import lines_view, multi_select_lines_view
 
 def _get_equipment_item_str(inventory: Inventory, slot: Slot) -> str:

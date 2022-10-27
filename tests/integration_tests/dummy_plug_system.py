@@ -9,8 +9,7 @@ from enum import Enum
 from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
 from pyrl.io_wrappers.io_window import IoWindow
-from pyrl.types.key_sequence import KeySequence, AnyKeys
-from pyrl.types.keys import Key
+from pyrl.types.keys import AnyKey, KeySequence, KeyOrSequence
 
 if TYPE_CHECKING:
     from pyrl.engine.game import Game
@@ -43,7 +42,7 @@ class DummyOptions:
 
 @dataclass(eq=False)
 class DummyPlugSystem:
-    dummy_input: deque[Key] = field(init=False, default_factory=deque)
+    dummy_input: deque[AnyKey] = field(init=False, default_factory=deque)
     options: DummyOptions = field(default_factory=DummyOptions)
 
     def __enter__(self) -> DummyPlugSystem:
@@ -58,10 +57,10 @@ class DummyPlugSystem:
     def reset_options(self) -> None:
         self.options = DummyOptions()
 
-    def add_input(self, input_iterable: Iterable[Key]) -> None:
+    def add_input(self, input_iterable: Iterable[AnyKey]) -> None:
         self.dummy_input.extend(input_iterable)
 
-    def add_input_and_run(self, sequence_iterable: AnyKeys, game: Game) -> Game:
+    def add_input_and_run(self, sequence_iterable: Iterable[KeyOrSequence], game: Game) -> Game:
         key_iterable = tuple(seq.key if isinstance(seq, KeySequence) else seq for seq in sequence_iterable)
         self.add_input(key_iterable)
         try:
@@ -69,7 +68,7 @@ class DummyPlugSystem:
         except StopSimulation:
             return game
 
-    def get_dummy_input(self) -> Key:
+    def get_dummy_input(self) -> AnyKey:
         """Return a dummy input key or IndexError if empty"""
         return self.dummy_input.popleft()
 
@@ -81,9 +80,9 @@ def get(options: DummyOptions | None = None) -> DummyPlugSystem:
     return _dps
 
 IoWindowSubclass = TypeVar('IoWindowSubclass', bound=IoWindow)
-def handle_dummy_input(get_key: Callable[[IoWindowSubclass], Key]) -> Callable[[IoWindowSubclass], Key]:
+def handle_dummy_input(get_key: Callable[[IoWindowSubclass], AnyKey]) -> Callable[[IoWindowSubclass], AnyKey]:
 
-    def get_key_handle_dummy_input(self: IoWindowSubclass) -> Key:
+    def get_key_handle_dummy_input(self: IoWindowSubclass) -> AnyKey:
         """Get a key and handle dummy input if any exist"""
         dps = get()
         if dps.options.mode != DummyMode.Disabled:

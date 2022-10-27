@@ -13,9 +13,8 @@ from pyrl.engine.actions.action_feedback import AttackFeedback, ActionFeedback, 
     PickItemsFeedback, DisplacementFeedback, SwapFeedback
 from pyrl.functions.coord_algorithms import get_vector, add_vector, vector_is_direction
 from pyrl.structures.helper_mixins import GameMixin, CreatureMixin
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Direction, Dir
-from pyrl.types.level_location import LevelLocation
+from pyrl.types.directions import Direction, Dir, Coord
+from pyrl.world.world_types import LevelLocation
 from pyrl.world.tile import Tile
 
 if TYPE_CHECKING:

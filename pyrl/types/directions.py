@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Literal, Final
 
+Coord = tuple[int, int]
 DirectionUnit = Literal[-1, 0, 1]
 Direction     = tuple[DirectionUnit, DirectionUnit]
 Directions    = tuple[Direction, ...]

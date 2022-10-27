@@ -5,7 +5,7 @@ from collections.abc import Iterable, Container
 from dataclasses import dataclass, field, InitVar
 from typing import TYPE_CHECKING
 
-from pyrl.functions.coord_algorithms import bresenham, cross_product, add_vector, vector_within_distance
+from pyrl.functions.coord_algorithms import bresenham, cross_product, add_vector
 from pyrl.functions.pathing import path, distance
 from pyrl.config.debug import Debug
 from pyrl.engine.actions.action import Action
@@ -18,12 +18,9 @@ from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.uniq_dict import UniqDict
 from pyrl.structures.scheduler import Scheduler
 from pyrl.structures.table import Table
-from pyrl.types.glyph import Glyph
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Direction, Dir
-from pyrl.types.level_key import LevelKey
-from pyrl.types.level_location import LevelLocation
-from pyrl.types.world_point import WorldPoint
+from pyrl.types.glyphs import Glyph
+from pyrl.types.directions import Direction, Dir, Coord
+from pyrl.world.world_types import LevelLocation, WorldPoint, LevelKey
 from pyrl.creature.creature_picker import CreaturePicker
 
 if TYPE_CHECKING:

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, AssetLocationDict, AssetCreatureDict, \
     AssetTileDict
-from pyrl.types.color import Colors
-from pyrl.types.level_gen import LevelGen
-from pyrl.types.level_location import LevelLocation
+from pyrl.types.glyphs import Colors
+from pyrl.world.world_types import LevelLocation, LevelGen
 from pyrl.world.level_gen_params import LevelGenParams
 from pyrl.world.tile import Tile
 

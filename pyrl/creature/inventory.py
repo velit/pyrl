@@ -6,7 +6,7 @@ from dataclasses import field, dataclass
 from pyrl.creature.item import Item
 from pyrl.creature.stats import Stats
 from pyrl.structures.dice import Dice
-from pyrl.types.equipment_slot import Slot
+from pyrl.creature.equipment_slot import Slot
 
 @dataclass(eq=False)
 class Inventory:

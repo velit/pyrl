@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from pyrl.structures.uniq_dict import UniqDict
-from pyrl.types.glyph import Letter
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Dir
-from pyrl.types.level_location import LevelLocation
+from pyrl.types.glyphs import Letter
+from pyrl.types.directions import Dir, Coord
+from pyrl.world.world_types import LevelLocation
 from pyrl.creature.creature import Creature
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 from pyrl.functions.coord_algorithms import add_vector

@@ -10,7 +10,7 @@ from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.helper_mixins import CreatureActionsMixin
-from pyrl.types.level_location import LevelLocation
+from pyrl.world.world_types import LevelLocation
 
 class DebugAction(CreatureActionsMixin):
 

@@ -5,8 +5,8 @@ from pyrl.creature.player import Player
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, DefaultLocation, AssetTileDict, \
     AssetLocationDict, AssetCreatureDict
 from pyrl.game_data.pyrl_tiles import PyrlTiles
-from pyrl.types.color import Colors
-from pyrl.types.level_gen import LevelGen
+from pyrl.types.glyphs import Colors
+from pyrl.world.world_types import LevelGen
 from pyrl.world.level_gen_params import LevelGenParams
 
 def get_level(player: Player) -> LevelGenParams:

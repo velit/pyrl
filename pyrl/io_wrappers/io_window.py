@@ -5,9 +5,8 @@ from typing import Protocol, Iterable, ClassVar
 
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import ColorPair
-from pyrl.types.coord import Coord
+from pyrl.types.glyphs import ColorPair, Glyph
+from pyrl.types.directions import Coord
 
 class IoWindow(Protocol):
     implementation: ClassVar[str]

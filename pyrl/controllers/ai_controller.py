@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-from typing import Literal
 
 from pyrl.engine.actions.action_feedback import ActionFeedback
 from pyrl.functions.coord_algorithms import resize_vector_to_len, get_vector, add_vector
@@ -9,8 +8,7 @@ from pyrl.engine.actions.action import Action
 from pyrl.creature.creature import Creature
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.structures.helper_mixins import CreatureActionsMixin
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Dir
+from pyrl.types.directions import Dir, Coord
 
 AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 

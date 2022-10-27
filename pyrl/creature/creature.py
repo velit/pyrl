@@ -9,8 +9,8 @@ from pyrl.engine.actions.action import Action
 from pyrl.functions.combat import Attackeable
 from pyrl.functions.coord_algorithms import vector_within_distance
 from pyrl.structures.dice import Dice
-from pyrl.types.glyph import Glyph
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
+from pyrl.types.glyphs import Glyph
 
 if TYPE_CHECKING:
     from pyrl.world.level import Level

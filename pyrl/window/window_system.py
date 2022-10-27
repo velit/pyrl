@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
@@ -10,12 +10,9 @@ from pyrl.game_data.levels.shared_assets import default_dims
 from pyrl.io_wrappers.io_wrapper import IoWrapper
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import Colors, ColorPair
-from pyrl.types.color_str import ColorStr
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Key, KeyTuple
-from pyrl.types.line import Line
+from pyrl.types.glyphs import Colors, ColorPair, ColorStr, Glyph
+from pyrl.types.keys import AnyKey, KeyTuple
+from pyrl.types.directions import Coord
 from pyrl.window.base_window import BaseWindow
 from pyrl.window.level_window import LevelWindow
 from pyrl.window.message_bar import MessageBar
@@ -43,13 +40,13 @@ class WindowSystem:
         self.status_bar   = StatusBar(self.wrapper, self.status_dimensions,
                                       Position(self.level_window.screen_position.y + self.level_window.rows, 0))
 
-    def get_key(self, message: str | None = None, keys: KeyTuple = ()) -> Key:
+    def get_key(self, message: str | None = None, keys: KeyTuple = ()) -> AnyKey:
         if message:
             self.msg(message)
         self.refresh()
         return self.whole_window.get_key(keys=keys)
 
-    def check_key(self, message: str | None = None, keys: KeyTuple | None = None, until: float | None = None) -> Key:
+    def check_key(self, message: str | None = None, keys: KeyTuple | None = None, until: float | None = None) -> AnyKey:
         if message:
             self.msg(message)
         self.refresh()
@@ -70,7 +67,7 @@ class WindowSystem:
         else:
             self.level_window.draw_reverse(glyph_info_iterable)
 
-    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> Key:
+    def menu(self, header: str, lines: Iterable[ColorStr], footer: str, keys: KeyTuple) -> AnyKey:
         return self.whole_window.menu(header, lines, footer, keys)
 
     def draw_glyph(self, glyph: Glyph, coord: Coord, reverse: bool = False) -> None:

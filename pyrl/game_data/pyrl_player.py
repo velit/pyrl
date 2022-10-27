@@ -4,8 +4,8 @@ from pyrl.creature.item import Armor, Weapon
 from pyrl.creature.player import Player
 from pyrl.creature.stats import Stats
 from pyrl.structures.dice import Dice
-from pyrl.types.color import Color, Colors
-from pyrl.types.equipment_slot import Slot
+from pyrl.types.glyphs import Color, Colors
+from pyrl.creature.equipment_slot import Slot
 
 def pyrl_player() -> Player:
     player = Player("player", ('@', (Color.Green, Color.Black)))

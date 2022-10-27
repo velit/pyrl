@@ -8,10 +8,9 @@ from pyrl.structures.position import Position
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.io_wrappers.mock import IMPLEMENTATION
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import ColorPair, Colors
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys, Key
+from pyrl.types.glyphs import ColorPair, Colors, Glyph
+from pyrl.types.directions import Coord
+from pyrl.types.keys import Key, AnyKey
 
 class MockWindow(IoWindow):
 
@@ -25,11 +24,11 @@ class MockWindow(IoWindow):
         return default_dims
 
     @handle_dummy_input
-    def get_key(self) -> Key:
-        return Keys.NO_INPUT
+    def get_key(self) -> AnyKey:
+        return Key.NO_INPUT
 
-    def check_key(self) -> Key:
-        return Keys.NO_INPUT
+    def check_key(self) -> AnyKey:
+        return Key.NO_INPUT
 
     def clear(self) -> None:
         return

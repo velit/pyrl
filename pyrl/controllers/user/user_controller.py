@@ -20,15 +20,15 @@ from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.functions.coord_algorithms import add_vector
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.helper_mixins import CreatureActionsMixin
-from pyrl.types.color import Color, Colors
-from pyrl.types.direction import Direction, Dir
-from pyrl.types.keys import Keys, KeyTuple, Key
+from pyrl.types.glyphs import Color, Colors
+from pyrl.types.directions import Direction, Dir
+from pyrl.types.keys import Key, KeyTuple, AnyKey
 from pyrl.user_interface.help_view import help_view
 from pyrl.user_interface.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
 from pyrl.user_interface.lines_view import lines_view, build_color_lines
 
 ActionCallable = Callable[[], ActionFeedback]
-ActionLookup = dict[Key, ActionCallable]
+ActionLookup = dict[AnyKey, ActionCallable]
 
 @dataclass
 class UserController(CreatureActionsMixin):
@@ -45,10 +45,10 @@ class UserController(CreatureActionsMixin):
 
     def define_actions(self) -> dict[str, ActionCallable]:
         action_lookup: ActionLookup = {
-            '+':                partial(self.debug_action.sight_change, 1),
-            '-':                partial(self.debug_action.sight_change, -1),
-            Keys.WINDOW_RESIZE: self.redraw,
-            Keys.CLOSE_WINDOW:  self.quit,
+            '+':               partial(self.debug_action.sight_change, 1),
+            '-':               partial(self.debug_action.sight_change, -1),
+            Key.WINDOW_RESIZE: self.redraw,
+            Key.CLOSE_WINDOW:  self.quit,
         }
 
         unfinalized_actions: dict[KeyTuple, ActionCallable] = {

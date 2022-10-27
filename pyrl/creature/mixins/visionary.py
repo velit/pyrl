@@ -8,7 +8,7 @@ from pyrl.creature.creature import Creature
 from pyrl.world.level import Level
 
 if TYPE_CHECKING:
-    from pyrl.types.coord import Coord
+    from pyrl.types.directions import Coord
 
 @dataclass(eq=False)
 class Visionary(Creature):

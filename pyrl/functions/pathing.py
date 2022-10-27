@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Callable
 from heapq import heappush, heappop
 
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 from pyrl.functions.coord_algorithms import chebyshev_distance
 
 NeighborCall = Callable[[Coord], Iterable[tuple[Coord, int]]]

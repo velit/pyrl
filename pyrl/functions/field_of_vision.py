@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from pyrl.functions.coord_algorithms import bresenham
-from pyrl.types.coord import Coord
+from pyrl.types.directions import Coord
 
 IsVisible = Callable[[Coord], bool]
 

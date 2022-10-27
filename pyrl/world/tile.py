@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pyrl.functions.combat import Attackeable
-from pyrl.types.glyph import Glyph
+from pyrl.types.glyphs import Glyph
 
 @dataclass(eq=False, frozen=True)
 class Tile(Attackeable):

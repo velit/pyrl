@@ -9,10 +9,9 @@ from pyrl.io_wrappers.curses import IMPLEMENTATION, WideChar
 from pyrl.io_wrappers.io_window import IoWindow
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.position import Position
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import ColorPair, Colors
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys, Key
+from pyrl.types.glyphs import ColorPair, Colors, Glyph
+from pyrl.types.directions import Coord
+from pyrl.types.keys import Key, AnyKey
 from pyrl.window.window_system import WindowSystem
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 
@@ -55,7 +54,7 @@ if sys.platform != "win32":
             return Dimensions(*self.win.getmaxyx())
 
         @handle_dummy_input
-        def get_key(self) -> Key:
+        def get_key(self) -> AnyKey:
             ch = ""
             while True:
                 try:
@@ -68,14 +67,14 @@ if sys.platform != "win32":
                         raise
             return self._interpret_ch(*self._handle_alt(ch))
 
-        def check_key(self) -> Key:
+        def check_key(self) -> AnyKey:
             """Non-blocking version of get_key."""
             self.win.nodelay(True)
             try:
                 return self._get_key_unguarded()
             except curses.error as err:
                 if err.args == ("no input", ):
-                    return Keys.NO_INPUT
+                    return Key.NO_INPUT
                 else:
                     raise
             finally:
@@ -136,7 +135,7 @@ if sys.platform != "win32":
                 else:
                     key = alt * "!" + raw
 
-            if Debug.show_keycodes and raw != Keys.NO_INPUT:
+            if Debug.show_keycodes and raw != Key.NO_INPUT:
                 logging.debug(f"User input: raw: {raw} interp: {key}{' alt:yes' * alt}")
 
             return key
@@ -145,7 +144,7 @@ if sys.platform != "win32":
             alt = False
             if key == chr(curses.ascii.ESC):
                 second_key = self.check_key()
-                if second_key != Keys.NO_INPUT:
+                if second_key != Key.NO_INPUT:
                     key = second_key
                     alt = True
             return key, alt

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TypeVar, Generic
 
-from pyrl.types.color import ColorPair, Colors
+from pyrl.types.glyphs import ColorPair, Colors
 
 T = TypeVar('T', covariant=True)
 @dataclass(order=True, frozen=True)

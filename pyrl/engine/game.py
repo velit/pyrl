@@ -22,8 +22,8 @@ from pyrl.functions.combat import Attackeable, calc_melee_attack
 from pyrl.functions.field_of_vision import ShadowCast
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.io_wrappers.io_wrapper import IoWrapper
-from pyrl.types.color import Colors
-from pyrl.types.world_point import WorldPoint
+from pyrl.types.glyphs import Colors
+from pyrl.world.world_types import WorldPoint
 from pyrl.user_interface.status_texts import register_status_texts
 from pyrl.window.window_system import WindowSystem
 from pyrl.world.level import Level

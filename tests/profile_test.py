@@ -3,8 +3,7 @@ from __future__ import annotations
 from cProfile import Profile
 
 from pyrl.game_data.levels.shared_assets import default_dims
-from pyrl.types.level_gen import LevelGen
-from pyrl.types.level_key import LevelKey
+from pyrl.world.world_types import LevelGen, LevelKey
 from pyrl.world.level_gen_params import LevelGenParams
 from tools import profile_util
 

@@ -6,8 +6,7 @@ from dataclasses import dataclass, field
 from pyrl.creature.creature import Creature
 from pyrl.creature.item import Item
 from pyrl.engine.actions.action import Action
-from pyrl.types.coord import Coord
-from pyrl.types.direction import Direction
+from pyrl.types.directions import Direction, Coord
 from pyrl.world.tile import Tile
 
 @dataclass

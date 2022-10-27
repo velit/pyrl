@@ -6,10 +6,9 @@ from dataclasses import dataclass, field
 from typing import TypeVar, Generic, Final
 
 from pyrl.config.binds import Binds
-from pyrl.types.color import ColorPair
-from pyrl.types.color_str import ColorStr
-from pyrl.types.keys import Key, KeyTuple
-from pyrl.types.line import Line
+from pyrl.types.glyphs import ColorPair, ColorStr
+from pyrl.types.keys import AnyKey, KeyTuple
+from pyrl.user_interface.line import Line
 from pyrl.window.base_window import BaseWindow
 
 def build_lines(iterable: Iterable[str]) -> tuple[Line[int], ...]:
@@ -21,12 +20,12 @@ def build_color_lines(iterable: Iterable[tuple[str, ColorPair]]) -> tuple[Line[i
 T = TypeVar('T')
 def lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
                return_keys: KeyTuple = Binds.Cancel, header: str = "",
-               footer: str | None = None) -> tuple[Key, T | None]:
+               footer: str | None = None) -> tuple[AnyKey, T | None]:
     return LinesView(window, lines, select_keys, return_keys, header, footer).single()
 
 def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
                             return_keys: KeyTuple = Binds.Cancel, header: str = "",
-                            footer: str | None = None) -> tuple[Key, Sequence[T]]:
+                            footer: str | None = None) -> tuple[AnyKey, Sequence[T]]:
     return LinesView(window, lines, select_keys, return_keys, header, footer).multi()
 
 @dataclass(eq=False)
@@ -73,7 +72,7 @@ class LinesView(Generic[T]):
         self.single_footer = f"{pages}  {lines}  {filt}  {close}"
         self.multi_footer = f"{pages}  {lines}  {selects}  {filt}  {close}"
 
-    def single(self) -> tuple[Key, T | None]:
+    def single(self) -> tuple[AnyKey, T | None]:
         if self.footer is None:
             self.footer = self.single_footer
 
@@ -94,7 +93,7 @@ class LinesView(Generic[T]):
                 else:
                     assert False, f"Unhandled {key=}"
 
-    def multi(self) -> tuple[Key, Sequence[T]]:
+    def multi(self) -> tuple[AnyKey, Sequence[T]]:
         """
         Render a view based on parameter lines which is a sequence of Line namedtuples.
 
@@ -167,7 +166,7 @@ class LinesView(Generic[T]):
         if footer is not None:
             self.window.draw_banner(footer, y_offset=footer_pos)
 
-    def _handle_scrolling(self, key: Key) -> None:
+    def _handle_scrolling(self, key: AnyKey) -> None:
         """Calculate the next offset from the given input key."""
         if key in Binds.Next_Line:
             self.scroll_offset += 1

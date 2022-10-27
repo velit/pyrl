@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from pyrl.engine.game import Game
     from pyrl.engine.actions.action_interface import ActionInterface
     from pyrl.structures.dimensions import Dimensions
-    from pyrl.types.coord import Coord
+    from pyrl.types.directions import Coord
     from pyrl.window.window_system import WindowSystem
     from pyrl.world.level import Level
     from pyrl.world.world import World

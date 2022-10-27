@@ -15,10 +15,9 @@ from pyrl.io_wrappers.tcod.tcod_keys import key_map, ignore_keys
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.helper_mixins import DimensionsMixin
 from pyrl.structures.position import Position
-from pyrl.types.glyph import Glyph
-from pyrl.types.color import Color, ColorPair, Colors
-from pyrl.types.coord import Coord
-from pyrl.types.keys import Keys, Key
+from pyrl.types.glyphs import Color, ColorPair, Colors, Glyph
+from pyrl.types.directions import Coord
+from pyrl.types.keys import Key, AnyKey
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 
 @dataclass
@@ -33,15 +32,15 @@ class TcodWindow(IoWindow, DimensionsMixin):
         return Dimensions(self.console.height, self.console.width)
 
     @handle_dummy_input
-    def get_key(self) -> Key:
-        while (key := self._interpret_events(tcod.event.wait())) == Keys.NO_INPUT:
+    def get_key(self) -> AnyKey:
+        while (key := self._interpret_events(tcod.event.wait())) == Key.NO_INPUT:
             pass
         return key
 
-    def check_key(self) -> Key:
+    def check_key(self) -> AnyKey:
         return self._interpret_events(tcod.event.get())
 
-    def _interpret_events(self, events: Iterator[Any]) -> Key:
+    def _interpret_events(self, events: Iterator[Any]) -> AnyKey:
         for event in events:
             if isinstance(event, tcod.event.Quit):
                 raise SystemExit()
@@ -66,7 +65,7 @@ class TcodWindow(IoWindow, DimensionsMixin):
                 if key == "^c":
                     raise KeyboardInterrupt
                 return key
-        return Keys.NO_INPUT
+        return Key.NO_INPUT
 
     def clear(self) -> None:
         self.console.clear(fg=color_map[Color.Normal], bg=color_map[Color.Black])

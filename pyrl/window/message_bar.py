@@ -9,7 +9,7 @@ from typing import Any
 
 from pyrl.config.binds import Binds
 from pyrl.io_wrappers import mock
-from pyrl.types.color import Colors, ColorPair
+from pyrl.types.glyphs import Colors, ColorPair
 from pyrl.window.base_window import BaseWindow
 
 MORE_STR = " More"

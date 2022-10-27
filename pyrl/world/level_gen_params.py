@@ -8,10 +8,8 @@ from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.structures.dimensions import Dimensions
 from pyrl.structures.table import Table
 from pyrl.structures.uniq_dict import UniqDict
-from pyrl.types.coord import Coord
-from pyrl.types.level_gen import LevelGen
-from pyrl.types.level_key import LevelKey
-from pyrl.types.level_location import LevelLocation
+from pyrl.types.directions import Coord
+from pyrl.world.world_types import LevelLocation, LevelGen, LevelKey
 from pyrl.world.level import Level
 from pyrl.world.tile import Tile
 

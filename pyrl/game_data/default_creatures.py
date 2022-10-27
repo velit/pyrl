@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pyrl.creature.creature import Creature
-from pyrl.types.color import Colors
+from pyrl.types.glyphs import Colors
 
 default_creatures = (
     #        name                   glyph         creature_level   spawn_weight_class

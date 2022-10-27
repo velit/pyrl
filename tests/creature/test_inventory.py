@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 
-from pyrl.types.equipment_slot import Slot
+from pyrl.creature.equipment_slot import Slot
 from pyrl.creature.inventory import Inventory
 from pyrl.creature.item import Weapon, Armor
 from pyrl.creature.stats import Stats
