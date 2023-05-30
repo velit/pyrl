@@ -8,7 +8,7 @@ from itertools import chain
 from pyrl.engine.types.directions import Direction, Dir
 from pyrl.engine.types.keys import AnyKey, Key, KeySequence
 
-unbound = KeySequence([Key.UNDEFINED] * 25)
+unbound = KeySequence([Key.UNDEFINED] * 4)
 
 class Binds:
 
@@ -95,9 +95,7 @@ class Binds:
     @classmethod
     def load_binds(cls) -> None:
         """Load binds from config and fill the to_direction dict direction lookup"""
-        import pyrl.config
-
-        with files(pyrl).joinpath("hotkeys.toml").open("rb") as binds_toml:
+        with files("pyrl").joinpath("hotkeys.toml").open("rb") as binds_toml:
             hotkeys = tomllib.load(binds_toml)
 
         # Set all hotkeys and their categories to Binds namespace

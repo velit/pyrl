@@ -378,6 +378,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1666746558" done="1666819251">
+        types.char.Glyph is being used as variables with the names char, rename them to glyph
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="high" time="1315155829" done="1328980645">
         fix sight checking
         <comment>
@@ -540,6 +546,12 @@
             done
         </comment>
     </note>
+    <note priority="high" time="1610159918" done="1666991015">
+        https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="medium" time="1315155877" done="1330287444">
         redo WorldFile.get_level_monster_list
         <comment>
@@ -687,20 +699,11 @@
     <note priority="veryhigh" time="1641730948">
         Fix Creature picker to work better with the assumption that monsters start at level 1
     </note>
-    <note priority="veryhigh" time="1666746558" done="1666819251">
-        types.char.Glyph is being used as variables with the names char, rename them to glyph
-        <comment>
-            done
-        </comment>
-    </note>
     <note priority="high" time="1475592380">
         Add item drops and progression through that
     </note>
     <note priority="high" time="1475950694">
         Modify integration test to have a separate initialization setup (player items etc.) for testing.
-    </note>
-    <note priority="high" time="1610159918">
-        https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
     </note>
     <note priority="high" time="1618067884">
         Add gunslinger with vests that hold four pistols and the rotation shoots all of them
@@ -726,8 +729,11 @@
     <note priority="verylow" time="1388282755">
         add a way to calm monsters by talking
     </note>
-    <note priority="verylow" time="1427329682">
+    <note priority="verylow" time="1427329682" done="1685487996">
         Make message queue stop time when the message window gets full. Make pressing enter advance time.
+        <comment>
+            Fuck that
+        </comment>
     </note>
     <note priority="verylow" time="1475677338">
         Add item degradation and repairing through whetstones and armor repair kits.

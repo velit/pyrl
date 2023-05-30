@@ -1,60 +1,102 @@
 from __future__ import annotations
 
+import platform
 from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import Type
 
 import pytest
 
 from pyrl import main
 from pyrl.config.binds import Binds
 from pyrl.engine.game import Game
-# from pyrl.io_wrappers.tcod.tcod_wrapper import TcodWrapper as TestWrapper
 from pyrl.engine.types.keys import KeyOrSequence
-from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper as TestWrapper
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from tests.integration_tests import dummy_plug_system
 from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions
 
-# CONTINUE_AFTER_INTEGRATION_TEST = True
-CONTINUE_AFTER_INTEGRATION_TEST = False
+@dataclass
+class IntegrConfig:
+    io_wrapper_type: Type[IoWrapper]
+    continue_after_test: bool
+    dummy_options: DummyOptions
 
 @pytest.fixture
-def dummy() -> Iterable[DummyPlugSystem]:
-    # with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Delayed, delay=0.5)) as dummy_plug:
-    with dummy_plug_system.get(DummyOptions(mode=DummyMode.Full, speed_mode=DummySpeed.Instant)) as dummy_plug:
+def live_config(delay: float) -> IntegrConfig:
+    from pyrl.ui.io_lib.tcod.tcod_wrapper import TcodWrapper
+    dummy_options = DummyOptions(mode=DummyMode.Override,
+                                 speed_mode=DummySpeed.Delayed,
+                                 delay=delay,
+                                 log_debug=False)
+    return IntegrConfig(io_wrapper_type=TcodWrapper,
+                        continue_after_test=True,
+                        dummy_options=dummy_options)
+
+@pytest.fixture
+def background_config() -> IntegrConfig:
+    from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper
+    dummy_options = DummyOptions(mode=DummyMode.Override,
+                                 speed_mode=DummySpeed.Instant,
+                                 delay=0,
+                                 log_debug=False)
+    return IntegrConfig(io_wrapper_type=MockWrapper,
+                        continue_after_test=False,
+                        dummy_options=dummy_options)
+
+@pytest.fixture
+def integr_config(live: bool, live_config: IntegrConfig, background_config: IntegrConfig) -> IntegrConfig:
+    if live:
+        return live_config
+    return background_config
+
+@pytest.fixture
+def dummy_system(integr_config: IntegrConfig) -> Iterable[DummyPlugSystem]:
+    with dummy_plug_system.get(integr_config.dummy_options) as dummy_plug:
         yield dummy_plug
 
 @pytest.fixture
-def io_wrapper() -> Iterable[IoWrapper]:
-    with TestWrapper() as io_wrapper:
+def io_wrapper(integr_config: IntegrConfig) -> Iterable[IoWrapper]:
+    with integr_config.io_wrapper_type() as io_wrapper:
         yield io_wrapper
 
 @pytest.fixture
-def game(io_wrapper: IoWrapper) -> Game:
-    return main.create_game(main.get_commandline_options(args=("-g", "test")), io_wrapper)
+def game(io_wrapper: IoWrapper, dummy_system: DummyPlugSystem, integr_config: IntegrConfig) -> Iterable[Game]:
+    game = main.create_game(main.get_commandline_options(args=("-g", "test")), io_wrapper)
+    if platform.system() == "Darwin" and game.io.wrapper.implementation != "mock" and integr_config.continue_after_test:
+        old_mode = dummy_system.options.mode
+        dummy_system.options.mode = DummyMode.Disabled
+        # Macos for some reason needs the window to be in a waiting state for it to render before the end of the tests
+        game.io.get_key("Press any key to start the test.")
+        dummy_system.options.mode = old_mode
+
+    yield game
+
+    if integr_config.continue_after_test:
+        dummy_system.reset_options()
+        with pytest.raises(SystemExit) as _:
+            game.io.msg("Test successful.")
+            game.game_loop()
+    elif dummy_system.options.speed_mode != DummySpeed.Instant:
+        dummy_system.options.mode = DummyMode.Hybrid
+        game.io.get_key()
 
 def load_game(io_wrapper: IoWrapper) -> Game:
     return main.create_game(main.get_commandline_options(args=("-l", "test")), io_wrapper)
 
-def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy: DummyPlugSystem) -> None:
+def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy_system: DummyPlugSystem) -> None:
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
-    game = dummy.add_input_and_run(input_seq, game)
+    game = dummy_system.add_input_and_run(input_seq, game)
     assert game.player.turns == 5
     assert game.player.level.level_key.idx == 3
 
     game = load_game(io_wrapper)
     input_seq = [Binds.Descend] * 4
-    game = dummy.add_input_and_run(input_seq, game)
+    game = dummy_system.add_input_and_run(input_seq, game)
     assert game.player.turns == 9
     assert game.player.level.level_key.idx == 5
 
-def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
-
-    if game.io.wrapper.implementation != "mock" and CONTINUE_AFTER_INTEGRATION_TEST:
-        old_mode = dummy.options.mode
-        dummy.options.mode = DummyMode.Disabled
-        game.io.get_key()
-        dummy.options.mode = old_mode
+def test_subsystems(integr_config: IntegrConfig, game: Game, dummy_system: DummyPlugSystem) -> None:
 
     help_system = (Binds.Help, Binds.Cancel)
 
@@ -113,46 +155,38 @@ def test_subsystems(game: Game, dummy: DummyPlugSystem) -> None:
 
     coord = game.player.coord
 
-    game = dummy.add_input_and_run(help_system, game)
+    game = dummy_system.add_input_and_run(help_system, game)
     assert game.player.turns == 1
     assert coord == game.player.coord
 
-    game = dummy.add_input_and_run(movement_and_look_system, game)
+    game = dummy_system.add_input_and_run(movement_and_look_system, game)
     assert game.player.turns == 1
     assert coord == game.player.coord
 
-    game = dummy.add_input_and_run(message_system, game)
+    game = dummy_system.add_input_and_run(message_system, game)
     assert game.player.turns == 1
     assert coord == game.player.coord
 
-    game = dummy.add_input_and_run(whole_map, game)
+    game = dummy_system.add_input_and_run(whole_map, game)
     assert game.player.turns == 1
     assert coord == game.player.coord
 
-    game = dummy.add_input_and_run(path_to_staircase, game)
+    game = dummy_system.add_input_and_run(path_to_staircase, game)
     assert game.player.turns == 1
     assert coord == game.player.coord
 
     previous_bag_count = len(game.player.inventory._bag)
-    game = dummy.add_input_and_run(inventory, game)
+    game = dummy_system.add_input_and_run(inventory, game)
     assert game.player.turns == 4
     assert coord == game.player.coord
     assert len(game.player.inventory._bag) == previous_bag_count + 1
 
-    game = dummy.add_input_and_run(walk_mode, game)
+    game = dummy_system.add_input_and_run(walk_mode, game)
     assert game.player.turns == 8
 
-    game = dummy.add_input_and_run(descend, game)
+    game = dummy_system.add_input_and_run(descend, game)
     assert game.player.turns == 10
     assert game.player.level.level_key.idx == 2
 
     # run to end
     # game = dummy.add_input_and_run(['d', 'x'], game)
-
-    if CONTINUE_AFTER_INTEGRATION_TEST:
-        dummy.reset_options()
-        with pytest.raises(SystemExit) as _:
-            game.game_loop()
-    elif dummy.options.speed_mode != DummySpeed.Instant:
-        dummy.options.mode = DummyMode.Hybrid
-        game.io.get_key()

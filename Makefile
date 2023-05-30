@@ -10,6 +10,9 @@ test:
 all-tests:
 	$(TEST)
 
+live-test:
+	$(TEST) --live
+
 debug:
 	$(PYTHON) -m pdb -c continue pyrl.py -o terminal
 

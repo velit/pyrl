@@ -1,19 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from enum import StrEnum
-from typing import Self
 
 AnyKey = str
 KeyTuple = tuple[AnyKey, ...]
 
 class KeySequence(tuple[AnyKey, ...]):
-
-    def __new__(cls, key_or_iterable: AnyKey | Iterable[AnyKey] = (), /) -> Self:  # type: ignore
-        if isinstance(key_or_iterable, AnyKey):
-            return super().__new__(cls, (key_or_iterable,))  # type: ignore
-        else:
-            return super().__new__(cls, key_or_iterable)  # type: ignore
 
     @property
     def key(self) -> AnyKey:

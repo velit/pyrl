@@ -6,6 +6,7 @@ from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
+from functools import partial
 from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
 from pyrl.engine.types.keys import AnyKey, KeySequence, KeyOrSequence
@@ -23,7 +24,7 @@ class DummyMode(Enum):
     # Use prepared input when given, otherwise fall back to regular input
     Hybrid = 1
     # Use only prepared input and halt the simulation when input ends
-    Full = 2
+    Override = 2
 
 class DummySpeed(Enum):
     # Prepared input is instant
@@ -49,10 +50,14 @@ class DummyPlugSystem:
         return self
 
     def __exit__(self, *args: Any, **kwargs: Any) -> None:
-        self.reset_options()
+        self.reset()
 
     def change_options(self, options: DummyOptions) -> None:
         self.options = options
+
+    def reset(self) -> None:
+        self.dummy_input = deque()
+        self.reset_options()
 
     def reset_options(self) -> None:
         self.options = DummyOptions()
@@ -72,34 +77,38 @@ class DummyPlugSystem:
         """Return a dummy input key or IndexError if empty"""
         return self.dummy_input.popleft()
 
-_dps = DummyPlugSystem()
+_rei = DummyPlugSystem()
 
 def get(options: DummyOptions | None = None) -> DummyPlugSystem:
     if options is not None:
-        _dps.change_options(options)
-    return _dps
+        _rei.change_options(options)
+    return _rei
 
 IoWindowSubclass = TypeVar('IoWindowSubclass', bound=IoWindow)
-def handle_dummy_input(get_key: Callable[[IoWindowSubclass], AnyKey]) -> Callable[[IoWindowSubclass], AnyKey]:
+GetKeyMethod = Callable[[IoWindowSubclass], AnyKey]
+def handle_dummy_input(get_key: GetKeyMethod[IoWindowSubclass]) -> GetKeyMethod[IoWindowSubclass]:
 
     def get_key_handle_dummy_input(self: IoWindowSubclass) -> AnyKey:
         """Get a key and handle dummy input if any exist"""
         dps = get()
-        if dps.options.mode != DummyMode.Disabled:
-            if dps.dummy_input:
-                if dps.options.speed_mode == DummySpeed.Delayed:
-                    time.sleep(dps.options.delay)
-                elif dps.options.speed_mode == DummySpeed.UseInput:
-                    get_key(self)
-                key = dps.get_dummy_input()
-                if dps.options.log_debug:
-                    logging.debug(f"Dummy input: {key}")
-                return key
-            elif dps.options.mode == DummyMode.Full:
-                raise StopSimulation()
-        key = get_key(self)
-        if dps.options.log_debug:
-            logging.debug(f"User input: {key}")
-        return key
+        bound_get_key = get_key.__get__(self, self.__class__)
+
+        def _get_key(key_getter: Callable[[], AnyKey], input_mode: str) -> AnyKey:
+            key = key_getter()
+            if dps.options.log_debug:
+                logging.debug(f"{input_mode} input: {key}")
+            return key
+
+        if dps.options.mode != DummyMode.Disabled and dps.dummy_input:
+            if dps.options.speed_mode == DummySpeed.Delayed:
+                time.sleep(dps.options.delay)
+            elif dps.options.speed_mode == DummySpeed.UseInput:
+                bound_get_key()
+            return _get_key(dps.get_dummy_input, "Dummy")
+
+        elif dps.options.mode == DummyMode.Override:
+            raise StopSimulation()
+
+        return _get_key(bound_get_key, "User")
 
     return get_key_handle_dummy_input

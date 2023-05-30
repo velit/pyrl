@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import NoReturn, Iterable, TYPE_CHECKING, ParamSpec, Callable, Concatenate, Any
+from typing import NoReturn, Iterable, TYPE_CHECKING, ParamSpec, Callable, Concatenate
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import IllegalMoveException, NoValidTargetException
@@ -21,8 +21,7 @@ if TYPE_CHECKING:
     from pyrl.engine.game import Game
 
 P = ParamSpec("P")
-def creature_action(action_method: Callable[Concatenate[ActionInterface, P], ActionFeedback]) \
-        -> Callable[Concatenate[ActionInterface, P], ActionFeedback]:
+def creature_action(action_method: ActionInterfaceMethod[P]) -> ActionInterfaceMethod[P]:
     def creature_wrapper(self: ActionInterface, /, *args: P.args, **kwargs: P.kwargs) -> ActionFeedback:
         self._assert_not_acted_yet()
         feedback: ActionFeedback = action_method(self, *args, **kwargs)
@@ -33,9 +32,8 @@ def creature_action(action_method: Callable[Concatenate[ActionInterface, P], Act
         return feedback
     return creature_wrapper
 
-def player_action(action_method: Callable[Concatenate[ActionInterface, P], ActionFeedback]) \
-        -> Callable[Concatenate[ActionInterface, P], ActionFeedback]:
-    def player_wrapper(self: ActionInterface, /, *args: Any, **kwargs: Any) -> ActionFeedback:
+def player_action(action_method: ActionInterfaceMethod[P]) -> ActionInterfaceMethod[P]:
+    def player_wrapper(self: ActionInterface, /, *args: P.args, **kwargs: P.kwargs) -> ActionFeedback:
         self._assert_player()
         self._assert_not_acted_yet()
         feedback: ActionFeedback = action_method(self, *args, **kwargs)
@@ -235,3 +233,5 @@ class ActionInterface(GameMixin, CreatureMixin):
 
     def _assert_not_acted_yet(self) -> None:
         assert self.action_cost is None, f"{self.creature} tried to act multiple times"
+
+ActionInterfaceMethod = Callable[Concatenate[ActionInterface, P], ActionFeedback]
