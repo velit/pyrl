@@ -54,7 +54,7 @@ class CursesWindow(IoWindow):
 
     @handle_dummy_input
     def get_key(self) -> AnyKey:
-        ch = ""
+        ch: WideChar = ""
         while True:
             try:
                 ch = self.win.get_wch()

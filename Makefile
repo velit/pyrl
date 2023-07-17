@@ -1,5 +1,8 @@
-PYTHON = python3.11
+PYTHON = ./venv/bin/python3.11
 TEST = $(PYTHON) -m pytest
+
+run:
+	$(PYTHON) -m pyrl
 
 test-porcelain-output:
 	$(TEST) -q -k 'not slow' --tb=line
@@ -30,9 +33,6 @@ log:
 
 profile-log:
 	less save_data/profiling_results
-
-tags:
-	ctags -R .
 
 clean:
 	find . -name '*.pyc' -delete

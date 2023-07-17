@@ -1,2 +1,3 @@
 tcod
 pytest
+mypy

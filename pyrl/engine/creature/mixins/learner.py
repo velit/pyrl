@@ -48,6 +48,13 @@ class Learner(Creature):
             self.level_up(level)
         return levels
 
+    def level_up(self, level: int) -> None:
+        self.base_strength     += 2 * level
+        self.base_dexterity    += 2 * level
+        self.base_endurance    += 2 * level
+        self.base_intelligence += 2 * level
+        self.base_perception   += 2 * level
+
     @classmethod
     def calc_experience_level(cls, experience: int, base_level_xp: int) -> int:
         level_units = experience / base_level_xp
@@ -62,10 +69,3 @@ class Learner(Creature):
         """Return the xp limit for the given level."""
         level_units = level ** 2 / 2 - level + 1
         return int(level_units * level_unit_xp)
-
-    def level_up(self, level: int) -> None:
-        self.base_strength     += 2 * level
-        self.base_dexterity    += 2 * level
-        self.base_endurance    += 2 * level
-        self.base_intelligence += 2 * level
-        self.base_perception   += 2 * level
