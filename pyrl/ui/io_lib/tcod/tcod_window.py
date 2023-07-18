@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Iterable, Any, ClassVar
 
 import tcod
-from tcod import Console
+from tcod.console import Console
 from tcod.event import Modifier
 
 from pyrl.engine.structures.dimensions import Dimensions

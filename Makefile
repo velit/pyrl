@@ -1,4 +1,4 @@
-PYTHON = ./venv/bin/python3.11
+PYTHON = python3
 TEST = $(PYTHON) -m pytest
 
 run:

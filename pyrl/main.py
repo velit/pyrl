@@ -80,7 +80,7 @@ def create_game(options: argparse.Namespace, cursor_lib: IoWrapper) -> Game:
 
         def write_profile() -> None:
             profiler.disable()
-            profile_util.write_results_log(profiler)
+            profile_util.write_results_log(profiler, "game_profile.log")
 
         atexit.register(write_profile)
 

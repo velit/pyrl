@@ -9,7 +9,6 @@ class Debug:
 
     log_level = logging.DEBUG
     log_file = join(Config.save_folder, "pyrl.log")
-    profiling_output_file = join(Config.save_folder, "profiling_results")
     path = True
     path_step = False
     cross = True

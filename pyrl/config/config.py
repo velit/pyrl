@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+
 class Config:
     """Configure variables above the data section to suit your needs."""
 
@@ -11,9 +14,4 @@ class Config:
     animation_period = 0.005
     default_game_name = "pyrl"
     clearly_show_vision = False
-
-    ##################################
-    ### Data section, don't modify ###
-    ##################################
-
-    save_folder = "save_data"
+    save_folder = Path("save_data")

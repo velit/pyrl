@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
 import tcod
-from tcod import Console
+from tcod.console import Console
 from tcod.context import Context
 
 from pyrl.config.config import Config

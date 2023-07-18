@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from cProfile import Profile
 from collections.abc import Iterable
 from dataclasses import astuple
 from typing import Any
@@ -13,11 +14,30 @@ from pyrl.engine.world.level_gen_params import LevelGenParams
 from pyrl.engine.world.world_types import LevelGen, LevelKey
 from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation, default_dims
 from pyrl.game_data.pyrl_tiles import PyrlTiles
+from tools import profile_util
+
 
 def pp_tm(tile_matrix: Iterable[Any], cols: int) -> None:
     """Pretty print tiles."""
     for i, char in enumerate(tile_matrix):
         print(char, end=('' if i % cols != cols - 1 else '\n'))
+
+def test_rdg_generation() -> None:
+    level = LevelGenParams(dimensions=default_dims, generation_type=LevelGen.Dungeon) \
+        .create_level(LevelKey("test", 0))
+    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
+    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
+
+def test_and_profile_rdg_generation() -> None:
+    profiler = Profile()
+    profiler.enable()
+
+    for i in range(5):
+        LevelGenParams(dimensions=default_dims, generation_type=LevelGen.Dungeon) \
+            .create_level(LevelKey("test", i))
+
+    profiler.disable()
+    profile_util.write_results_log(profiler, "rdg_gen_profile.log")
 
 @pytest.mark.slow
 def test_many_rdg_generation() -> None:
@@ -26,12 +46,6 @@ def test_many_rdg_generation() -> None:
             .create_level(LevelKey("test", idx))
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
         assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
-
-def test_rdg_generation() -> None:
-    level = LevelGenParams(dimensions=default_dims, generation_type=LevelGen.Dungeon) \
-        .create_level(LevelKey("test", 0))
-    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Down)] == PyrlTiles.Stairs_Down
-    assert level.tiles[level.locations.getkey(DefaultLocation.Passage_Up)] == PyrlTiles.Stairs_Up
 
 
 Rectangles = tuple[Rectangle, Rectangle, Rectangle, Rectangle]
