@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Sequence
-from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from pyrl.engine.actions.action import Action
-from pyrl.engine.behaviour.combat import Attackeable
 from pyrl.engine.behaviour.coordinates import vector_within_distance
+from pyrl.engine.creature.stats import Stat, Stats, StatsProvider, calculate_stats
 from pyrl.engine.structures.dice import Dice
 from pyrl.engine.types.directions import Coord
 from pyrl.engine.types.glyphs import Glyph
@@ -16,53 +16,53 @@ if TYPE_CHECKING:
     from pyrl.engine.world.level import Level
 
 @dataclass(eq=False)
-class Creature(Attackeable):
+class Creature:
     name:              str
     glyph:             Glyph
-    creature_level:    int = 0
-    spawn_class:       int = field(repr=False, default=1)
+    _creature_level:   int
 
-    base_strength:     int = field(init=False, repr=False)
-    base_dexterity:    int = field(init=False, repr=False)
-    base_endurance:    int = field(init=False, repr=False)
-    base_intelligence: int = field(init=False, repr=False)
-    base_perception:   int = field(init=False, repr=False)
-
-    turns:             int = field(init=False, repr=False, default=0)
-    time:              int = field(init=False, repr=True, default=0)
-
-    hp:                int = field(init=False, repr=True)
-    coord:           Coord = field(init=False, repr=True)
-    level:           Level = field(init=False, repr=False)
+    ticks:             int   = field(init=False, repr=True, default=0)
+    hp:                int   = field(init=False, repr=False, default=0)
+    coord:             Coord = field(init=False, repr=False)
+    level:             Level = field(init=False, repr=False)
+    stats:             Stats = field(init=False, repr=False, default_factory=Counter[Stat])
+    stats_providers:   list[StatsProvider] | None = field(init=False, repr=False, default=None)
 
     def __post_init__(self) -> None:
-        self.base_strength     = 10 + self.creature_level
-        self.base_dexterity    = 10 + self.creature_level
-        self.base_endurance    = 10 + self.creature_level
-        self.base_intelligence = 10 + self.creature_level
-        self.base_perception   = 10 + self.creature_level
+        self.update_stats()
 
-        self.hp = self.max_hp
+    def __getitem__(self, stat: Stat) -> int:
+        return self.stats[stat]
 
-    def advance_time(self, new_time: int) -> None:
-        """Accrue all the passive changes that happen to this creature when time advances."""
-        time_delta = new_time - self.time
-        if time_delta > 0:
-            self.apply_regen(time_delta)
-            self.turns += 1
-        self.time = new_time
-
-    def apply_regen(self, time_delta: int) -> None:
-        ticks_per_hp = 4000 / self.regen
-        previous_time = self.time % ticks_per_hp
-        self.hp += int((previous_time + time_delta) / ticks_per_hp)
-        self.hp = min(self.hp, self.max_hp)
+    @property
+    def creature_level(self) -> int:
+        return self._creature_level
 
     @property
     def damage_dice(self) -> Dice:
-        base_attack_dices = self.strength // 3 + self.dexterity // 6
-        base_attack_faces = self.strength // 20 + 1
-        return Dice(base_attack_dices, base_attack_faces, self.damage)
+        base_attack_dices = self[Stat.STR] // 3 + self[Stat.DEX] // 6
+        base_attack_faces = self[Stat.STR] // 20 + 1
+        return Dice(base_attack_dices, base_attack_faces, self[Stat.DMG])
+
+    @property
+    def speed_multiplier(self) -> float:
+        return 100 / self[Stat.SPEED]
+
+    def advance_time(self, new_time: int) -> None:
+        """Accrue all the passive changes that happen to this creature when time advances."""
+        tick_delta = new_time - self.ticks
+        if tick_delta > 0:
+            self.apply_turn_effects(tick_delta)
+        self.ticks = new_time
+
+    def apply_turn_effects(self, tick_delta: int) -> None:
+        self._apply_regen(tick_delta)
+
+    def _apply_regen(self, time_delta: int) -> None:
+        ticks_per_hp = 10000 / self[Stat.REGEN]
+        previous_time = self.ticks % ticks_per_hp
+        self.hp += int((previous_time + time_delta) / ticks_per_hp)
+        self.hp = min(self.hp, self[Stat.MAX_HP])
 
     def receive_damage(self, amount: int) -> None:
         if amount > 0:
@@ -78,68 +78,17 @@ class Creature(Attackeable):
         return round(action.base_cost * multiplier * self.speed_multiplier)
 
     def can_see(self, target_coord: Coord) -> bool:
-        return (vector_within_distance(self.coord, target_coord, self.sight) and
+        return (vector_within_distance(self.coord, target_coord, self[Stat.SIGHT]) and
                 self.level.check_los(self.coord, target_coord))
 
-    def __repr__(self) -> str:
-        return f"Creature(name={self.name})"
+    def register_stat_source(self, stats_provider: StatsProvider) -> None:
+        if self.stats_providers is None:
+            self.stats_providers = []
+        self.stats_providers.append(stats_provider)
 
-    def copy(self) -> Creature:
-        return deepcopy(self)
-
-    @property
-    def strength(self) -> int:
-        return self.base_strength
-
-    @property
-    def dexterity(self) -> int:
-        return self.base_dexterity
-
-    @property
-    def intelligence(self) -> int:
-        return self.base_intelligence
-
-    @property
-    def endurance(self) -> int:
-        return self.base_endurance
-
-    @property
-    def perception(self) -> int:
-        return self.base_perception
-
-    @property
-    def accuracy(self) -> int:
-        return self.dexterity + self.perception // 2
-
-    @property
-    def armor(self) -> int:
-        return self.endurance // 10
-
-    @property
-    def damage(self) -> int:
-        return self.strength // 5 + self.dexterity // 10
-
-    @property
-    def defense(self) -> int:
-        return self.dexterity + self.intelligence // 2
-
-    @property
-    def max_hp(self) -> int:
-        return self.endurance + self.strength // 2
-
-    @property
-    def sight(self) -> int:
-        return min(self.perception // 2, int((self.perception * 5) ** 0.5))
-
-    @property
-    def regen(self) -> float:
-        """HP per 4000 time units."""
-        return 0.5 + 1 * self.endurance / 20
-
-    @property
-    def speed(self) -> int:
-        return 93 + self.dexterity // 2 + self.strength // 5
-
-    @property
-    def speed_multiplier(self) -> float:
-        return 100 / self.speed
+    def update_stats(self) -> None:
+        at_max_hp = self.hp == self[Stat.MAX_HP]
+        self.stats = calculate_stats(self.creature_level, self.stats_providers if self.stats_providers else [])
+        if at_max_hp:
+            self.hp = self[Stat.MAX_HP]
+        self.hp = min(self.hp, self[Stat.MAX_HP])

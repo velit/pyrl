@@ -1,27 +1,22 @@
 from __future__ import annotations
 
 from random import randint
-from typing import TYPE_CHECKING, Protocol
 
+from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.dice import Dice
+from pyrl.engine.world.tile import Tile
 
-if TYPE_CHECKING:
-    from pyrl.engine.creature.creature import Creature
 
-class Attackeable(Protocol):
-    name: str
-
-    @property
-    def defense(self) -> int:
-        raise NotImplementedError
-
-    @property
-    def armor(self) -> int:
-        raise NotImplementedError
-
-def calc_melee_attack(creature: Creature, target: Attackeable) -> tuple[bool, int]:
+def calc_melee_attack(creature: Creature, target: Creature | Tile) -> tuple[bool, int]:
     """Get the result of a melee attack. Returns success and damage."""
-    return _calc_melee_attack(creature.damage_dice, creature.accuracy, target.defense, target.armor)
+    match target:
+        case Creature() as target_creature:
+            return _calc_melee_attack(creature.damage_dice, creature[Stat.ACC],
+                                      target_creature[Stat.DEF], target_creature[Stat.ARMOR])
+        case Tile() as tile:
+            return _calc_melee_attack(creature.damage_dice, creature[Stat.ACC],
+                                      1, 100 if tile.is_passable else 40)
 
 def _calc_melee_attack(damage_dice: Dice, accuracy: int, defense: int, armor: int) -> tuple[bool, int]:
     roll = randint(1, 100) + accuracy - defense

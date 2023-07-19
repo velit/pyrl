@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+from collections import Counter
+
 from pyrl.engine.creature.item import Armor, Weapon, Slot
 from pyrl.engine.creature.player import Player
-from pyrl.engine.creature.stats import Stats
+from pyrl.engine.creature.skills import Skills, Skill
+from pyrl.engine.creature.stats import Stats, Stat
 from pyrl.engine.structures.dice import Dice
 from pyrl.engine.types.glyphs import Color, Colors
 
 def pyrl_player() -> Player:
-    player = Player("player", ('@', (Color.Green, Color.Black)))
-    aok = Armor("Armor of Kings", 1000, 1000, [Slot.Body], Stats(accuracy=10, speed=100), (']', Colors.Yellow))
+    skills = Skills(Counter({
+        Skill.HEALING: 20
+    }))
+    player = Player("player", ('@', (Color.Green, Color.Black)), 0, skills)
+    aok = Armor("Armor of Kings", 1000, 1000, [Slot.Body], Stats({Stat.ACC: 10, Stat.SPEED: 100}), (']', Colors.Yellow))
     player.inventory.equip(aok, Slot.Body)
 
     # weapon = Weapon("Black Spike", 15, Dice(8, 8, 10), two_handed=True, glyph=('(', ColorPairs.Darkest))
@@ -17,7 +23,7 @@ def pyrl_player() -> Player:
     sting = Weapon("Sting", 0, Dice(1, 8, 20), glyph=('(', Colors.Green))
     player.inventory.equip(sting, Slot.Right_Hand)
 
-    aok = Armor("Protector", 12, 20, [Slot.Right_Hand, Slot.Left_Hand], Stats(endurance=2))
+    aok = Armor("Protector", 12, 20, [Slot.Right_Hand, Slot.Left_Hand], Stats({Stat.END: 2}))
     player.inventory.equip(aok, Slot.Left_Hand)
 
     items = (
@@ -30,9 +36,9 @@ def pyrl_player() -> Player:
         Weapon("Short Sword", 0, Dice(1, 6, 3)),
         Weapon("Short Sword", 0, Dice(1, 6, 0)),
         Weapon("Long Sword", 0, Dice(1, 8, 2)),
-        Weapon("Lance of Longinus", 100, Dice(4, 8, 8), stats=Stats(endurance=8), glyph=('(', Colors.Red)),
+        Weapon("Lance of Longinus", 100, Dice(4, 8, 8), stats=Stats({Stat.END: 8}), glyph=('(', Colors.Red)),
     )
     items2 = tuple(Weapon("Short Sword", i, Dice(1, 6, i)) for i in range(60))
-    for itam in (items + items2):
-        player.inventory.bag_item(itam)
+    for item in (items + items2):
+        player.inventory.bag_item(item)
     return player

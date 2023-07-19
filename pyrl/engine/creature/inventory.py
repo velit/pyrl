@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from dataclasses import field, dataclass
 
 from pyrl.engine.creature.item import Item, Slot
-from pyrl.engine.creature.stats import Stats
+from pyrl.engine.creature.stats import Stats, StatsProvider
 from pyrl.engine.structures.dice import Dice
 
-@dataclass(eq=False)
-class Inventory:
 
-    stats: Stats = field(init=False, default_factory=Stats)
+@dataclass(eq=False)
+class Inventory(StatsProvider):
+
+    stats_changed_event: Callable[[], None]
     _equipment: dict[Slot, Item | None] = field(init=False, default_factory=lambda: {
         Slot.Head:       None,
         Slot.Body:       None,
@@ -51,7 +52,7 @@ class Inventory:
             if self._equipment[slot] is not None:
                 self.unequip(slot)
             self._equipment[slot] = item
-        self._update_combined_stats()
+        self.stats_changed_event()
 
     def unequip(self, select_slot: Slot) -> None:
         item = self._equipment[select_slot]
@@ -66,7 +67,7 @@ class Inventory:
             self._equipment[slot] = None
 
         self.bag_item(item)
-        self._update_combined_stats()
+        self.stats_changed_event()
 
     def bag_item(self, item: Item) -> None:
         self._bag.append(item)
@@ -86,8 +87,7 @@ class Inventory:
     def inspect_items(self) -> tuple[Item, ...]:
         return tuple(self._bag)
 
-    def _update_combined_stats(self) -> None:
-        self.stats = Stats.combine(*(item.stats for item in self._equipment.values() if item))
-
-    def __repr__(self) -> str:
-        return str(self._equipment)
+    def stats_sources(self) -> Iterable[Stats]:
+        for item in self._equipment.values():
+            if item:
+                yield item.stats

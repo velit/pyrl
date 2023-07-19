@@ -48,7 +48,7 @@ def get_level(player: Player) -> LevelGenParams:
         'P': DefaultLocation.Passage_Up,
     }
     custom_creatures: AssetCreatureDict = {
-        '@': Creature("The Crone", ('@', Colors.Purple)),
+        '@': Creature("The Crone", ('@', Colors.Purple), 0),
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures

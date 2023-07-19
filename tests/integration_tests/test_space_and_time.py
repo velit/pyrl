@@ -25,7 +25,7 @@ def test_space_and_time() -> None:
     creature_picker = CreaturePicker(default_creatures, danger_level=10)
 
     creature_start = time.time()
-    creatures = [creature_picker.random_creature() for _ in range(n)]
+    creatures = [creature_picker.spawn_random_creature() for _ in range(n)]
     creature_end = time.time()
     creature_seconds = creature_end - creature_start
 

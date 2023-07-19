@@ -1,25 +1,28 @@
 from __future__ import annotations
 
 import random
+from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Iterable
 
 from pyrl.engine.behaviour.coordinates import resize_range
 from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.creature_template import CreatureTemplate
+
 
 @dataclass(init=False, eq=False)
 class CreaturePicker:
     total_weight: int
-    weighted_creatures: list[tuple[int, Creature]] = field(repr=False)
+    weighted_creatures: list[tuple[int, CreatureTemplate]] = field(repr=False)
 
-    def __init__(self, creatures: Iterable[Creature] = (), danger_level: int = 0):
-        self.set_creatures(creatures, danger_level)
+    def __init__(self, creature_templates: Iterable[CreatureTemplate] = (), danger_level: int = 0):
+        self.set_creatures(creature_templates, danger_level)
 
-    def set_creatures(self, creatures: Iterable[Creature], danger_level: int) -> None:
+    def set_creatures(self, creature_templates: Iterable[CreatureTemplate], danger_level: int) -> None:
         self.weighted_creatures = []
         accumulator = 0
-        for creature in creatures:
+        for creature in creature_templates:
             weight = self.picking_weight(creature, danger_level)
             if weight == 0:
                 continue
@@ -27,13 +30,21 @@ class CreaturePicker:
             self.weighted_creatures.append((accumulator, creature))
         self.total_weight = accumulator
 
-    def picking_weight(self, creature: Creature, area_level: int) -> int:
-        return round(1000 * self.speciation_mult(area_level, creature.creature_level) * creature.spawn_class)
+    def picking_weight(self, creature_template: CreatureTemplate, area_level: int) -> int:
+        speciation_multiplier = self._speciation_mult(area_level, creature_template.creature_level)
+        return round(1000 * speciation_multiplier * creature_template.spawn_weight_class)
 
-    def speciation_mult(self, creature_level: int, area_level: int) -> Decimal:
+    def spawn_random_creature(self) -> Creature:
+        if not self.weighted_creatures:
+            raise IndexError("Trying to spawn a random creature with no creatures defined")
+        index = random.randrange(self.total_weight)
+        return next(creature_template.create() for (slot, creature_template) in self.weighted_creatures if index < slot)
+
+    @staticmethod
+    def _speciation_mult(creature_level: int, area_level: int) -> Decimal:
         """Applies a multiplier based on the difference of creature level to area level."""
         diff = area_level - creature_level
-        speciation_range = range(-5, 1) # [-5, 0]
+        speciation_range = range(-5, 1)  # [-5, 0]
         extant_range     = range(1, 10)
         extinction_range = range(10, 21)
         diff_weight: Decimal
@@ -48,9 +59,3 @@ class CreaturePicker:
         else:
             diff_weight = Decimal(0)
         return diff_weight
-
-    def random_creature(self) -> Creature:
-        if not self.weighted_creatures:
-            raise IndexError("Trying to spawn a random creature with no creatures defined")
-        index = random.randrange(self.total_weight)
-        return next(creature for (slot, creature) in self.weighted_creatures if index < slot).copy()

@@ -17,6 +17,9 @@ class Visionary(Creature):
     seen_coords: dict[Level, set[Coord]] = field(init=False, repr=False, default_factory=lambda: defaultdict(set))
     _vision: set[Coord]                  = field(init=False, repr=False, default_factory=set)
 
+    def __post_init__(self) -> None:
+        super().__post_init__()
+
     def get_visited_locations(self) -> set[Coord]:
         return self.seen_coords[self.level]
 

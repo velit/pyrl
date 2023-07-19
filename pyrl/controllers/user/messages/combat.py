@@ -1,12 +1,19 @@
 from __future__ import annotations
 
-from pyrl.engine.behaviour.combat import Attackeable
+from typing import Protocol
+
 from pyrl.engine.creature.creature import Creature
 
 def experience_message(amount: int) -> str:
     return f"+[{amount}]"
 
-def combat_message(attacker: Creature, target: Attackeable, player: Creature,
+class HasName(Protocol):
+
+    @property
+    def name(self) -> str:
+        raise NotImplementedError
+
+def combat_message(attacker: Creature, target: HasName, player: Creature,
                    succeeds: bool, dies: bool, damage: int) -> str:
     player_attacker = attacker is player
     player_target = target is player

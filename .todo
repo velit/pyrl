@@ -378,8 +378,20 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1641730920" done="1689799181">
+        Bring back some system for better feedback (eg. levelling up)
+        <comment>
+            done?
+        </comment>
+    </note>
     <note priority="veryhigh" time="1666746558" done="1666819251">
         types.char.Glyph is being used as variables with the names char, rename them to glyph
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1689672897" done="1689758488">
+        Implement automatic test/benchmark for time and space requirements for generating like 10k items and monsters
         <comment>
             done
         </comment>
@@ -684,20 +696,32 @@
             Not gonna do, gonna do something else
         </comment>
     </note>
+    <note priority="verylow" time="1427329682" done="1685487996">
+        Make message queue stop time when the message window gets full. Make pressing enter advance time.
+        <comment>
+            Fuck that
+        </comment>
+    </note>
     <note priority="verylow" time="1453792942" done="1642996811">
         Remove level reference from creature.
         <comment>
             not gunna
         </comment>
     </note>
-    <note priority="veryhigh" time="1641730920">
-        Bring back some system for better feedback (eg. levelling up)
-    </note>
-    <note priority="veryhigh" time="1641730929">
+    <note priority="veryhigh" time="1641730929" done="1689799193">
         User messaging when levelling up / gaining xp
+        <comment>
+            done?
+        </comment>
     </note>
     <note priority="veryhigh" time="1641730948">
         Fix Creature picker to work better with the assumption that monsters start at level 1
+    </note>
+    <note priority="veryhigh" time="1689758539">
+        Add category system for creatures, stuff like Swift, Strong that adds multipliers to various stats
+    </note>
+    <note priority="veryhigh" time="1689785444">
+        Fix learner levels to be 0-based, maybe unify experience_level and creature_level
     </note>
     <note priority="high" time="1475592380">
         Add item drops and progression through that
@@ -728,12 +752,6 @@
     </note>
     <note priority="verylow" time="1388282755">
         add a way to calm monsters by talking
-    </note>
-    <note priority="verylow" time="1427329682" done="1685487996">
-        Make message queue stop time when the message window gets full. Make pressing enter advance time.
-        <comment>
-            Fuck that
-        </comment>
     </note>
     <note priority="verylow" time="1475677338">
         Add item degradation and repairing through whetstones and armor repair kits.

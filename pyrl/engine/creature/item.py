@@ -30,25 +30,21 @@ class Item:
 
     def weapon_str(self) -> str:
         if self.damage_dice is not None:
-            return f" ({self.stats.accuracy:+}, {self.damage_dice})"
-        elif self.stats.accuracy:
-            return f" ({self.stats.accuracy:+})"
+            return f" ({self.stats[Stat.ACC]:+}, {self.damage_dice})"
+        elif self.stats[Stat.ACC]:
+            return f" ({self.stats[Stat.ACC]:+})"
         else:
             return ""
 
     def armor_str(self) -> str:
-        if self.stats.defense or self.stats.armor:
-            return f" [{self.stats.defense:+}, {self.stats.armor:+}]"
+        if self.stats[Stat.DEF] or self.stats[Stat.ARMOR]:
+            return f" [{self.stats[Stat.DEF]:+}, {self.stats[Stat.ARMOR]:+}]"
         else:
             return ""
 
     def stats_str(self) -> str:
-        skip_stats = ("weapon_dice", "accuracy", "defense", "armor")
-        stats_dict: dict[str, int] = asdict(self.stats)
-        stat: str
-        value: int
-        stats = ", ".join(f"{Stat[stat]}:{value:+}"
-                          for stat, value in stats_dict.items()
+        skip_stats = Stat.ACC, Stat.DEF, Stat.ARMOR
+        stats = ", ".join(f"{stat.short_name}:{value:+}" for stat, value in self.stats.items()
                           if value and stat not in skip_stats)
         if stats:
             return f" {stats}"
@@ -61,9 +57,6 @@ class Item:
     def __lt__(self, other: Any) -> bool:
         return str(self) < str(other)
 
-    def __repr__(self) -> str:
-        return f"Item({self.name=}, {self.glyph=}, {self.compatible_slots=}, {self.stats=})"
-
 # noinspection PyPep8Naming
 def Weapon(name: str,
            accuracy: int,
@@ -74,7 +67,7 @@ def Weapon(name: str,
            glyph: Glyph = ('(', Colors.Normal)) -> Item:
     if stats is None:
         stats = Stats()
-    stats.accuracy = accuracy
+    stats[Stat.ACC] = accuracy
     return Item(name=name, glyph=glyph, stats=stats, compatible_slots=tuple(compatible_slots),
                 uses_all_slots=two_handed, damage_dice=damage_dice)
 
@@ -87,6 +80,6 @@ def Armor(name: str,
           glyph: Glyph = (']', Colors.Normal)) -> Item:
     if stats is None:
         stats = Stats()
-    stats.defense = defense
-    stats.armor = armor
+    stats[Stat.DEF] = defense
+    stats[Stat.ARMOR] = armor
     return Item(name=name, glyph=glyph, stats=stats, compatible_slots=tuple(compatible_slots))

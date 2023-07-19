@@ -7,6 +7,7 @@ from pyrl.engine.actions.action_feedback import ActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import resize_vector_to_len, add_vector, get_vector
 from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.engine.types.directions import Dir, Coord
 
@@ -41,7 +42,7 @@ class AIController(CreatureActionsMixin):
             if chase_coord == self.coord:
                 if chase_vector is not None:
                     # resize the chase vector to the creatures sight so the self.creature can just go there
-                    chase_vector = resize_vector_to_len(chase_vector, self.creature.sight)
+                    chase_vector = resize_vector_to_len(chase_vector, self.creature[Stat.SIGHT])
 
                     # calculate a new target square
                     overarching_target = add_vector(self.coord, chase_vector)

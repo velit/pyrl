@@ -11,6 +11,7 @@ from pyrl.engine.behaviour.coordinates import bresenham, cross_product, add_vect
 from pyrl.engine.behaviour.pathing import path, distance
 from pyrl.engine.creature.creature_picker import CreaturePicker
 from pyrl.engine.creature.item import Item
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.event import Event
 from pyrl.engine.structures.helper_mixins import DimensionsMixin
@@ -55,15 +56,12 @@ class Level(DimensionsMixin):
         creature_spawn_count = 99
         if initial_creature_spawns:
             for _ in range(creature_spawn_count):
-                creature = self.creature_picker.random_creature()
+                creature = self.creature_picker.spawn_random_creature()
                 self.spawn_creature(creature)
 
     @property
     def dimensions(self) -> Dimensions:
         return self.tiles.dimensions
-
-    def get_creature_spawn_list(self) -> list[Creature]:
-        return list(default_creatures)
 
     def get_location_coord(self, level_location: LevelLocation) -> Coord:
         if level_location == DefaultLocation.Random_Location:
@@ -180,8 +178,7 @@ class Level(DimensionsMixin):
         if coord in self.creatures:
             c: Creature = self.creatures[coord]
             damage = c.damage_dice
-            information += f"{c.name} hp:{c.hp}/{c.max_hp} sight:{c.sight} armor:{c.armor} dr:{c.defense} " \
-                           f"ar:{c.accuracy} attack:{damage.dices}D{damage.faces}+{damage.addition}"
+            information += f"{c.name} hp:{c.hp}/{c[Stat.MAX_HP]} sight:{c[Stat.SIGHT]} armor:{c[Stat.ARMOR]} dr:{c[Stat.DEF]} ar:{c[Stat.ACC]} attack:{damage.dices}D{damage.faces}+{damage.addition}"
         else:
             information += self.tiles[coord].name
         return information

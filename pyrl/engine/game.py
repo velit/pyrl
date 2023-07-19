@@ -15,19 +15,22 @@ from pyrl.engine import state_store
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_feedback import AttackFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
-from pyrl.engine.behaviour.combat import Attackeable, calc_melee_attack
+from pyrl.engine.behaviour.combat import calc_melee_attack
 from pyrl.engine.behaviour.field_of_vision import ShadowCast
 from pyrl.engine.creature.creature import Creature
 from pyrl.engine.creature.mixins.visionary import Visionary
 from pyrl.engine.creature.player import Player
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.types.glyphs import Colors
 from pyrl.engine.world.level import Level
+from pyrl.engine.world.tile import Tile
 from pyrl.engine.world.world import World
 from pyrl.engine.world.world_types import WorldPoint
 from pyrl.game_data.pyrl_world import pyrl_world
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from pyrl.ui.views.status_texts import register_status_texts
 from pyrl.ui.window.window_system import WindowSystem
+
 
 @dataclass
 class Game:
@@ -65,8 +68,8 @@ class Game:
             self.io.msg(f"Following actions are missing from bind config: {', '.join(undefined_keys)}")
 
         while True:
-            creature, time_delta = self.active_level.turn_scheduler.pop()
-            self.world.time += time_delta
+            creature, ticks_delta = self.active_level.turn_scheduler.pop()
+            self.world.ticks += ticks_delta
             cost = 0
             try:
                 action, cost = self.creature_act(creature)
@@ -77,7 +80,7 @@ class Game:
                 self.io.msg(self.savegame())
 
     def creature_act(self, creature: Creature) -> tuple[Action, int]:
-        creature.advance_time(self.world.time)
+        creature.advance_time(self.world.ticks)
         self.action_interface.associate_creature(creature)
         if creature is self.player:
             assert isinstance(creature, Visionary)
@@ -114,7 +117,7 @@ class Game:
 
         return True
 
-    def creature_attack(self, attacker: Creature, target: Attackeable) -> tuple[bool, bool, int, int, Sequence[int]]:
+    def creature_attack(self, attacker: Creature, target: Creature | Tile) -> tuple[bool, bool, int, int, Sequence[int]]:
         succeeds, damage = calc_melee_attack(attacker, target)
         died = False
         experience = 0
@@ -151,7 +154,8 @@ class Game:
         Update the vision set of the Visionary.
         """
         lvl = creature.level
-        new_vision = ShadowCast.get_light_set(lvl.is_see_through, creature.coord, creature.sight, lvl.rows, lvl.cols)
+        new_vision = ShadowCast.get_light_set(lvl.is_see_through, creature.coord, creature[Stat.SIGHT],
+                                              lvl.rows, lvl.cols)
         creature.vision, old_vision = new_vision, creature.vision
         potentially_modified_vision = new_vision | old_vision
 

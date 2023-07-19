@@ -48,7 +48,7 @@ class DebugAction(CreatureActionsMixin):
 
     def add_monster(self) -> ActionFeedback | None:
         if self.level.ongoing_creature_spawns:
-            self.level.spawn_creature(self.level.creature_picker.random_creature())
+            self.level.spawn_creature(self.level.creature_picker.spawn_random_creature())
             return self.actions.debug_action()
         else:
             self.io.msg("No ongoing spawning on this level. Can't add monster.")
@@ -118,8 +118,7 @@ class DebugAction(CreatureActionsMixin):
         self.io.msg(Debug.debug_string)
 
     def sight_change(self, amount: int) -> ActionFeedback:
-        self.creature.base_perception += amount
-        return self.actions.debug_action()
+        raise NotImplementedError
 
     def teleport_to_location(self, location: LevelLocation) -> ActionFeedback:
         try:

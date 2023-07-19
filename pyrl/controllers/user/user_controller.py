@@ -18,6 +18,7 @@ from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
     PickItemsFeedback, DisplacementFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import add_vector, bresenham
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.engine.types.directions import Direction, Dir
 from pyrl.engine.types.glyphs import Color, Colors
@@ -130,7 +131,7 @@ class UserController(CreatureActionsMixin):
                 combat_msg = combat_message(attacker, target, self.player, succeeds, target_died, damage)
                 color = Colors.Normal
                 if target is self.player and damage:
-                    if damage / self.player.max_hp >= 0.25 or self.player.hp / self.player.max_hp < 0.3:
+                    if damage / self.player[Stat.MAX_HP] >= 0.25 or self.player.hp / self.player[Stat.MAX_HP] < 0.3:
                         color = Colors.Red
                     else:
                         color = Colors.Light_Red

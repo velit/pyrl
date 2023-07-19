@@ -21,14 +21,14 @@ class Learner(Creature):
     level_xp_unit:  Final[int] = field(init=False, repr=False, default=1000)
 
     @property
-    def experience_level(self) -> int:
+    def creature_level(self) -> int:
         return self.calc_experience_level(self.experience, self.level_xp_unit)
 
     def gain_kill_xp(self, target: Creature) -> tuple[int, Sequence[int]]:
         creature_xp = self.kill_xp_unit * target.creature_level
         levels_above = self.creature_level - target.creature_level
 
-        still_xp = range(7) # Actually being 6 above won't give exp, 5 is max
+        still_xp = range(7)  # Actually being 6 above won't give exp, 5 is max
         if levels_above in still_xp:
             xp_multi = Decimal(1 - pow(resize_range(Decimal(levels_above), still_xp), 3))
         elif levels_above < 0:
@@ -42,21 +42,21 @@ class Learner(Creature):
     def gain_xp(self, amount: int) -> Sequence[int]:
         self.experience += amount
         levels = []
-        while self.experience_level >= self.levelups[0]:
-            level = self.levelups.popleft()
-            levels.append(level)
-            self.level_up(level)
+        if self.creature_level >= self.levelups[0]:
+            while self.creature_level >= self.levelups[0]:
+                level = self.levelups.popleft()
+                levels.append(level)
+                self.level_up(level)
+            self.update_stats()
+
         return levels
 
     def level_up(self, level: int) -> None:
-        self.base_strength     += 2 * level
-        self.base_dexterity    += 2 * level
-        self.base_endurance    += 2 * level
-        self.base_intelligence += 2 * level
-        self.base_perception   += 2 * level
+        # No effect yet
+        pass
 
-    @classmethod
-    def calc_experience_level(cls, experience: int, base_level_xp: int) -> int:
+    @staticmethod
+    def calc_experience_level(experience: int, base_level_xp: int) -> int:
         level_units = experience / base_level_xp
         inner_sqrt = 2 * level_units - 1
         if inner_sqrt < 0:
@@ -64,8 +64,8 @@ class Learner(Creature):
         else:
             return int(sqrt(inner_sqrt) + 1) + 1
 
-    @classmethod
-    def calc_experience_limit(cls, level: int, level_unit_xp: int) -> int:
+    @staticmethod
+    def calc_experience_limit(level: int, level_unit_xp: int) -> int:
         """Return the xp limit for the given level."""
         level_units = level ** 2 / 2 - level + 1
         return int(level_units * level_unit_xp)

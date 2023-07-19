@@ -12,7 +12,7 @@ from pyrl.game_data.levels.shared_assets import DefaultLocation, default_dims
 @dataclass
 class World:
     player: Player
-    time: int                                       = field(init=False, default=0)
+    ticks: int                                      = field(init=False, default=0)
     levels: dict[LevelKey, Level]                   = field(init=False, default_factory=dict)
     level_params: dict[LevelKey, LevelGenParams]    = field(init=False, default_factory=dict)
     level_connections: dict[WorldPoint, WorldPoint] = field(init=False, default_factory=dict)
