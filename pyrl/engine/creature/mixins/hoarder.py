@@ -1,14 +1,15 @@
 from __future__ import annotations
 
+from abc import ABC
 from dataclasses import dataclass, field
 
-from pyrl.engine.creature.creature import Creature
 from pyrl.engine.creature.inventory import Inventory
+from pyrl.engine.creature.mixins.stats_mutator import StatsMutator
 from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.dice import Dice
 
 @dataclass(eq=False)
-class Hoarder(Creature):
+class Hoarder(StatsMutator, ABC):
     """Creatures with this class have an inventory."""
 
     inventory: Inventory = field(init=False, repr=False)

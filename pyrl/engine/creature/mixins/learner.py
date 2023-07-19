@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -9,9 +10,10 @@ from typing import Final
 
 from pyrl.engine.behaviour.coordinates import resize_range
 from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.mixins.stats_mutator import StatsMutator
 
 @dataclass(eq=False)
-class Learner(Creature):
+class Learner(StatsMutator, ABC):
     """Creatures with this mixin class learn new things and gain levels."""
 
     experience:     int        = field(init=False, default=0)

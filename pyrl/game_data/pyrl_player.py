@@ -13,7 +13,7 @@ def pyrl_player() -> Player:
     skills = Skills(Counter({
         Skill.HEALING: 20
     }))
-    player = Player("player", ('@', (Color.Green, Color.Black)), 0, skills)
+    player = Player(skills, "player")
     aok = Armor("Armor of Kings", 1000, 1000, [Slot.Body], {Stat.ACC: 10, Stat.SPEED: 100}, (']', Colors.Yellow))
     player.inventory.equip(aok, Slot.Body)
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.basic_creature import BasicCreature
 from pyrl.engine.creature.player import Player
 from pyrl.engine.types.glyphs import Colors
 from pyrl.engine.world.level_gen_params import LevelGenParams
@@ -48,7 +48,7 @@ def get_level(player: Player) -> LevelGenParams:
         'P': DefaultLocation.Passage_Up,
     }
     custom_creatures: AssetCreatureDict = {
-        '@': Creature("The Crone", ('@', Colors.Purple), 0),
+        '@': BasicCreature.create("The Crone", ('@', Colors.Purple), 0),
         'P': player,
     }
     level_data = custom_tiles, custom_locations, custom_creatures

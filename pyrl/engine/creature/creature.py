@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.behaviour.coordinates import vector_within_distance
-from pyrl.engine.creature.stats import Stat, Stats, StatsProvider, calculate_stats
+from pyrl.engine.creature.stats import Stat
 from pyrl.engine.structures.dice import Dice
 from pyrl.engine.types.directions import Coord
 from pyrl.engine.types.glyphs import Glyph
@@ -15,28 +14,31 @@ from pyrl.engine.types.glyphs import Glyph
 if TYPE_CHECKING:
     from pyrl.engine.world.level import Level
 
+@runtime_checkable
 @dataclass(eq=False)
-class Creature:
-    name:              str
-    glyph:             Glyph
-    _creature_level:   int
-
+class Creature(Protocol):
     ticks:             int   = field(init=False, repr=True, default=0)
     hp:                int   = field(init=False, repr=False, default=0)
     coord:             Coord = field(init=False, repr=False)
     level:             Level = field(init=False, repr=False)
-    stats:             Stats = field(init=False, repr=False, default_factory=Counter[Stat])
-    stats_providers:   list[StatsProvider] | None = field(init=False, repr=False, default=None)
 
     def __post_init__(self) -> None:
-        self.update_stats()
+        return
 
     def __getitem__(self, stat: Stat) -> int:
-        return self.stats[stat]
+        raise NotImplementedError
+
+    @property
+    def name(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def glyph(self) -> Glyph:
+        raise NotImplementedError
 
     @property
     def creature_level(self) -> int:
-        return self._creature_level
+        return 0
 
     @property
     def damage_dice(self) -> Dice:
@@ -80,15 +82,3 @@ class Creature:
     def can_see(self, target_coord: Coord) -> bool:
         return (vector_within_distance(self.coord, target_coord, self[Stat.SIGHT]) and
                 self.level.check_los(self.coord, target_coord))
-
-    def register_stat_source(self, stats_provider: StatsProvider) -> None:
-        if self.stats_providers is None:
-            self.stats_providers = []
-        self.stats_providers.append(stats_provider)
-
-    def update_stats(self) -> None:
-        at_max_hp = self.hp == self[Stat.MAX_HP]
-        self.stats = calculate_stats(self.creature_level, self.stats_providers if self.stats_providers else [])
-        if at_max_hp:
-            self.hp = self[Stat.MAX_HP]
-        self.hp = min(self.hp, self[Stat.MAX_HP])

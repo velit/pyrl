@@ -8,7 +8,6 @@ from pyrl.engine.structures.dice import Dice
 from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.pyrl_player import pyrl_player
 
-
 def test_space_and_time() -> None:
 
     n = 10000

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.engine.creature.creature_template import CreatureTemplate
+from pyrl.engine.creature.basic_creature import CreatureTemplate
 from pyrl.engine.types.glyphs import Colors
 
 default_creatures = (

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+from abc import ABC
 from dataclasses import dataclass
 
-from pyrl.engine.creature.creature import Creature
+from pyrl.engine.creature.mixins.stats_mutator import StatsMutator
 from pyrl.engine.creature.skills import Skills
 
-
 @dataclass(eq=False)
-class Skiller(Creature):
+class Skiller(StatsMutator, ABC):
     """Creatures with this mixin class have skills that impact them."""
 
     skills: Skills

@@ -172,7 +172,7 @@ class ActionInterface(GameMixin, CreatureMixin):
 
     def quit(self) -> NoReturn:
         self._assert_player()
-        self.game.endgame()
+        self.game.end_game()
 
     # (Free) operations available for creatures
 

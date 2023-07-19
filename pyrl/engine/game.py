@@ -77,7 +77,7 @@ class Game:
                 creature.level.turn_scheduler.add(creature, cost)
 
             if action == Action.Save:
-                self.io.msg(self.savegame())
+                self.io.msg(self.save_game())
 
     def creature_act(self, creature: Creature) -> tuple[Action, int]:
         creature.advance_time(self.world.ticks)
@@ -129,7 +129,7 @@ class Game:
                     if target is self.player:
                         self.user_controller.process_feedback(AttackFeedback(attacker, target, succeeds, died, damage,
                                                                              0, ()))
-                        self.endgame()
+                        self.end_game()
                     experience, levelups = self.creature_death(attacker, target)
         return succeeds, died, damage, experience, levelups
 
@@ -139,10 +139,10 @@ class Game:
         target.level.remove_creature(target)
         return attacker.gain_kill_xp(target)
 
-    def endgame(self) -> NoReturn:
+    def end_game(self) -> NoReturn:
         sys.exit(0)
 
-    def savegame(self) -> str:
+    def save_game(self) -> str:
         try:
             msg_str = state_store.save(self, self.game_name)
         except IOError as e:

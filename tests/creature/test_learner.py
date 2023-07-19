@@ -1,7 +1,17 @@
 from typing import Callable
 
 from pyrl.engine.creature.mixins.learner import Learner
-from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.types.glyphs import Glyph, GreenAt
+
+class ConcreteLearner(Learner):
+
+    @property
+    def name(self) -> str:
+        return "Learner"
+
+    @property
+    def glyph(self) -> Glyph:
+        return GreenAt
 
 def test_learner() -> None:
     level_xp_unit = 1000
@@ -28,7 +38,7 @@ def test_learner() -> None:
         assert xp_limit(level) == limit
         assert level + 1 == xp_level(limit)
 
-    learner = Learner("test", ("t", Colors.Green), 0)
+    learner = ConcreteLearner()
     learner.gain_xp(limits[97])
     assert learner.creature_level == 98
     learner.gain_xp(limits[98] - limits[97])

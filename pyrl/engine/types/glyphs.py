@@ -65,3 +65,7 @@ class Colors:
 ColorStr = tuple[str, ColorPair]
 Letter = str
 Glyph = tuple[Letter, ColorPair]
+
+GreenAt = ("@", Colors.Green)
+BlackAt = ("@", Colors.Black)
+WhiteAt = ("@", Colors.White)

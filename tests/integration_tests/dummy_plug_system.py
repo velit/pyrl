@@ -6,7 +6,6 @@ from collections import deque
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
-from functools import partial
 from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
 from pyrl.engine.types.keys import AnyKey, KeySequence, KeyOrSequence

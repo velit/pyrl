@@ -1,10 +1,10 @@
+from abc import ABC
 from dataclasses import dataclass, field
 
 from pyrl.engine.creature.creature import Creature
 
-
 @dataclass(eq=False)
-class Turner(Creature):
+class Turner(Creature, ABC):
 
     turns: int = field(init=False, repr=False, default=0)
 

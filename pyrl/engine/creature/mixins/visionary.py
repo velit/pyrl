@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC
 from collections import defaultdict
 from dataclasses import field, dataclass
 from typing import TYPE_CHECKING
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from pyrl.engine.types.directions import Coord
 
 @dataclass(eq=False)
-class Visionary(Creature):
+class Visionary(Creature, ABC):
     """Creatures with this mixin class see and remember squares they've seen."""
 
     seen_coords: dict[Level, set[Coord]] = field(init=False, repr=False, default_factory=lambda: defaultdict(set))

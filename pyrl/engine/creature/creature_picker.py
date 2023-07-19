@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import random
-from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Iterable
 
 from pyrl.engine.behaviour.coordinates import resize_range
+from pyrl.engine.creature.basic_creature import CreatureTemplate
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.creature_template import CreatureTemplate
 
 
 @dataclass(init=False, eq=False)
