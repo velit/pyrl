@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Iterable, Callable
 from dataclasses import field, dataclass
 
 from pyrl.engine.creature.item import Item, Slot
-from pyrl.engine.creature.stats import Stats, StatsProvider
+from pyrl.engine.creature.stats import Stats, StatsProvider, Stat
 from pyrl.engine.structures.dice import Dice
 
 
@@ -88,6 +89,10 @@ class Inventory(StatsProvider):
         return tuple(self._bag)
 
     def stats_sources(self) -> Iterable[Stats]:
+        stats = Counter[Stat]()
         for item in self._equipment.values():
             if item:
-                yield item.stats
+                for stat, value in item.stats:
+                    stats[stat] += value
+        if stats:
+            yield stats

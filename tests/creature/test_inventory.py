@@ -38,7 +38,7 @@ def test_creature_inventory() -> None:
 
     assert len(inventory._bag) == 0
     assert state[stats_changed_count] == 5
-    assert len(list(inventory.stats_sources())) == 5
+    assert len(list(inventory.stats_sources())) == 1
 
     # unequip items
     for slot in test_equipment:
