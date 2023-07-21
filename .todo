@@ -390,6 +390,12 @@
             done?
         </comment>
     </note>
+    <note priority="veryhigh" time="1641730948" done="1689974246">
+        Fix Creature picker to work better with the assumption that monsters start at level 1
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1666746558" done="1666819251">
         types.char.Glyph is being used as variables with the names char, rename them to glyph
         <comment>
@@ -398,6 +404,12 @@
     </note>
     <note priority="veryhigh" time="1689672897" done="1689758488">
         Implement automatic test/benchmark for time and space requirements for generating like 10k items and monsters
+        <comment>
+            done
+        </comment>
+    </note>
+    <note priority="veryhigh" time="1689785444" done="1689944376">
+        Fix learner levels to be 0-based, maybe unify experience_level and creature_level
         <comment>
             done
         </comment>
@@ -714,17 +726,8 @@
             not gunna
         </comment>
     </note>
-    <note priority="veryhigh" time="1641730948">
-        Fix Creature picker to work better with the assumption that monsters start at level 1
-    </note>
     <note priority="veryhigh" time="1689758539">
         Add category system for creatures, stuff like Swift, Strong that adds multipliers to various stats
-    </note>
-    <note priority="veryhigh" time="1689785444" done="1689944376">
-        Fix learner levels to be 0-based, maybe unify experience_level and creature_level
-        <comment>
-            done
-        </comment>
     </note>
     <note priority="high" time="1475592380">
         Add item drops and progression through that
@@ -735,8 +738,11 @@
     <note priority="high" time="1618067884">
         Add gunslinger with vests that hold four pistols and the rotation shoots all of them
     </note>
-    <note priority="high" time="1689943494">
+    <note priority="high" time="1689943494" done="1689974266">
         Add abstraction for dataclass init/instance fields? (To reduce visual clutter on using default field params)
+        <comment>
+            cantfix
+        </comment>
     </note>
     <note priority="medium" time="1452611306">
         https://www.reddit.com/r/roguelikedev/comments/406wx0/item_labels/

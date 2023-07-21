@@ -21,8 +21,8 @@ from pyrl.engine.structures.uniq_dict import UniqDict
 from pyrl.engine.types.directions import Direction, Dir, Coord
 from pyrl.engine.types.glyphs import Glyph
 from pyrl.engine.world.world_types import LevelLocation, WorldPoint, LevelKey
-from pyrl.game_data.default_creatures import default_creatures
 from pyrl.game_data.levels.shared_assets import DefaultLocation
+from pyrl.game_data.pyrl_creatures import PyrlCreature
 
 if TYPE_CHECKING:
     from pyrl.engine.world.tile import Tile
@@ -48,7 +48,7 @@ class Level(DimensionsMixin):
     visible_change: Event                = field(init=False, repr=False, default_factory=Event)
 
     def __post_init__(self, custom_creatures: Iterable[Creature], initial_creature_spawns: bool) -> None:
-        self.creature_picker = CreaturePicker(default_creatures, self.area_level)
+        self.creature_picker = CreaturePicker.using_speciation(PyrlCreature.templates(), self.area_level)
 
         for creature in custom_creatures:
             self.spawn_creature(creature)

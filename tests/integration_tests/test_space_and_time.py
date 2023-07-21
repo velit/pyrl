@@ -5,7 +5,7 @@ from pyrl.engine import state_store
 from pyrl.engine.creature.creature_picker import CreaturePicker
 from pyrl.engine.creature.item import Weapon
 from pyrl.engine.structures.dice import Dice
-from pyrl.game_data.default_creatures import default_creatures
+from pyrl.game_data.pyrl_creatures import PyrlCreature
 from pyrl.game_data.pyrl_player import pyrl_player
 
 def test_space_and_time() -> None:
@@ -21,7 +21,7 @@ def test_space_and_time() -> None:
     items_end = time.time()
     item_seconds = items_end - items_start
 
-    creature_picker = CreaturePicker(default_creatures, danger_level=10)
+    creature_picker = CreaturePicker.using_speciation(PyrlCreature.templates(), area_level=20)
 
     creature_start = time.time()
     creatures = [creature_picker.spawn_random_creature() for _ in range(n)]
