@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from abc import ABC
-from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -17,8 +16,7 @@ class Learner(StatsMutator, ABC):
     """Creatures with this mixin class learn new things and gain levels."""
 
     experience:     int        = field(init=False, default=0)
-    levelups:       deque[int] = field(init=False, repr=False, default_factory=lambda: deque(range(2, 101)))
-
+    claimed_level:  int        = field(init=False, default=0)
     kill_xp_unit:   Final[int] = field(init=False, repr=False, default=50)
     level_xp_unit:  Final[int] = field(init=False, repr=False, default=1000)
 
@@ -27,6 +25,7 @@ class Learner(StatsMutator, ABC):
         return self.calc_experience_level(self.experience, self.level_xp_unit)
 
     def gain_kill_xp(self, target: Creature) -> tuple[int, Sequence[int]]:
+        """Returns earned xp normalized by level difference and potential levelups from the gained xp."""
         creature_xp = self.kill_xp_unit * target.creature_level
         levels_above = self.creature_level - target.creature_level
 
@@ -44,11 +43,11 @@ class Learner(StatsMutator, ABC):
     def gain_xp(self, amount: int) -> Sequence[int]:
         self.experience += amount
         levels = []
-        if self.creature_level >= self.levelups[0]:
-            while self.creature_level >= self.levelups[0]:
-                level = self.levelups.popleft()
-                levels.append(level)
-                self.level_up(level)
+        if self.creature_level > self.claimed_level:
+            while self.creature_level > self.claimed_level:
+                self.claimed_level += 1
+                levels.append(self.claimed_level)
+                self.level_up(self.claimed_level)
             self.update_stats()
 
         return levels
@@ -62,12 +61,13 @@ class Learner(StatsMutator, ABC):
         level_units = experience / base_level_xp
         inner_sqrt = 2 * level_units - 1
         if inner_sqrt < 0:
-            return 1
+            return 0
         else:
-            return int(sqrt(inner_sqrt) + 1) + 1
+            return int(sqrt(inner_sqrt) + 1)
 
     @staticmethod
-    def calc_experience_limit(level: int, level_unit_xp: int) -> int:
-        """Return the xp limit for the given level."""
-        level_units = level ** 2 / 2 - level + 1
+    def calc_next_level_limit(level: int, level_unit_xp: int) -> int:
+        """Return the next level xp limit for the given level."""
+        next_level = level + 1
+        level_units = next_level ** 2 / 2 - next_level + 1
         return int(level_units * level_unit_xp)
