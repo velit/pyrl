@@ -4,9 +4,9 @@ from typing import Iterable
 
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.position import Position
-from pyrl.engine.types.directions import Coord
-from pyrl.engine.types.glyphs import ColorPair, Colors, Glyph
-from pyrl.engine.types.keys import Key, AnyKey
+from pyrl.engine.enums.directions import Coord
+from pyrl.engine.enums.glyphs import ColorPair, Colors, Glyph
+from pyrl.engine.enums.keys import Key, AnyKey
 from pyrl.game_data.levels.shared_assets import default_dims
 from pyrl.ui.io_lib.mock import IMPLEMENTATION
 from pyrl.ui.io_lib.protocol.io_window import IoWindow

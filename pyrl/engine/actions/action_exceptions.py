@@ -9,7 +9,5 @@ class ActionException(Exception):
             self.player_message = message
 
 class IllegalMoveException(ActionException): pass
-
 class NoValidTargetException(ActionException): pass
-
 class IllegalContextException(ActionException): pass

@@ -7,8 +7,8 @@ from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import NoValidTargetException
 from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
-from pyrl.engine.creature.inventory import Inventory
-from pyrl.engine.creature.item import Slot
+from pyrl.engine.creature.advanced.inventory import Inventory
+from pyrl.engine.creature.enums.slots import Slot
 from pyrl.ui.views.line import Line
 from pyrl.ui.views.lines_view import lines_view, multi_select_lines_view
 

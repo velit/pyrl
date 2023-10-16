@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from pyrl.engine.world.world import World
-from pyrl.engine.world.world_types import WorldPoint, LevelKey
+from pyrl.engine.world.enums.level_key import LevelKey
+from pyrl.engine.world.enums.world_point import WorldPoint
 from pyrl.game_data.levels import test_level, overworld
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.pyrl_player import pyrl_player

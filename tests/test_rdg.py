@@ -11,7 +11,8 @@ from pyrl.engine.behaviour.dungeon_gen import DungeonGen
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.rectangle import Rectangle
 from pyrl.engine.world.level_gen_params import LevelGenParams
-from pyrl.engine.world.world_types import LevelGen, LevelKey
+from pyrl.engine.world.enums.level_key import LevelKey
+from pyrl.engine.world.enums.level_gen import LevelGen
 from pyrl.game_data.levels.shared_assets import construct_data, DefaultLocation, default_dims
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 from tools import profile_util

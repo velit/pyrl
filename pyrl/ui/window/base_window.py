@@ -8,9 +8,9 @@ from typing import ClassVar
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.helper_mixins import DimensionsMixin
 from pyrl.engine.structures.position import Position
-from pyrl.engine.types.directions import Coord
-from pyrl.engine.types.glyphs import Colors, ColorPair, ColorStr, Glyph
-from pyrl.engine.types.keys import Key, AnyKey, KeyTuple
+from pyrl.engine.enums.directions import Coord
+from pyrl.engine.enums.glyphs import Colors, ColorPair, ColorStr, Glyph
+from pyrl.engine.enums.keys import Key, AnyKey, KeyTuple
 from pyrl.ui.io_lib.protocol.io_window import IoWindow
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 

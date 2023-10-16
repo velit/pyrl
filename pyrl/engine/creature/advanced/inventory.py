@@ -4,10 +4,10 @@ from collections import Counter
 from collections.abc import Iterable, Callable
 from dataclasses import field, dataclass
 
-from pyrl.engine.creature.item import Item, Slot
-from pyrl.engine.creature.stats import Stats, StatsProvider, Stat
+from pyrl.engine.creature.enums.slots import Slot
+from pyrl.engine.world.item import Item
+from pyrl.engine.creature.enums.stats import Stats, StatsProvider, Stat
 from pyrl.engine.structures.dice import Dice
-
 
 @dataclass(eq=False)
 class Inventory(StatsProvider):

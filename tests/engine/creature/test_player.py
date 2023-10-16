@@ -1,9 +1,9 @@
 import logging
 from collections import Counter
 
-from pyrl.engine.creature.player import Player
-from pyrl.engine.creature.skills import Skills, Skill
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.advanced.player import Player
+from pyrl.engine.creature.advanced.skills import Skills, Skill
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.game_data.pyrl_player import pyrl_player
 
 

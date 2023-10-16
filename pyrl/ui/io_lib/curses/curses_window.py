@@ -11,9 +11,9 @@ assert sys.platform != "win32"
 from pyrl.config.debug import Debug
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.position import Position
-from pyrl.engine.types.directions import Coord
-from pyrl.engine.types.glyphs import ColorPair, Colors, Glyph
-from pyrl.engine.types.keys import Key, AnyKey
+from pyrl.engine.enums.directions import Coord
+from pyrl.engine.enums.glyphs import ColorPair, Colors, Glyph
+from pyrl.engine.enums.keys import Key, AnyKey
 from pyrl.ui.io_lib.curses import IMPLEMENTATION, WideChar
 from pyrl.ui.io_lib.curses.curses_dicts import Curses256ColorDict, CursesColorDict
 from pyrl.ui.io_lib.curses.curses_keys import curses_key_map

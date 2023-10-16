@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 from pyrl.config.binds import Binds
-from pyrl.engine.types.glyphs import Colors, ColorPair, ColorStr
+from pyrl.engine.enums.glyphs import Colors, ColorPair, ColorStr
 from pyrl.ui.window.window_system import WindowSystem
 
 def from_seq(display_strings: Iterable[str], color: ColorPair = Colors.Normal) -> list[ColorStr]:

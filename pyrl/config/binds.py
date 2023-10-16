@@ -5,8 +5,8 @@ from collections.abc import MutableMapping, Iterable
 from importlib.resources import files
 from itertools import chain
 
-from pyrl.engine.types.directions import Direction, Dir
-from pyrl.engine.types.keys import AnyKey, Key, KeySequence
+from pyrl.engine.enums.directions import Direction, Dir
+from pyrl.engine.enums.keys import AnyKey, Key, KeySequence
 
 unbound = KeySequence([Key.UNDEFINED] * 4)
 

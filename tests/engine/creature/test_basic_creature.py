@@ -1,9 +1,8 @@
 import logging
 
-from pyrl.engine.creature.basic_creature import BasicCreature
-from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.stats import Stat
-from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.creature.basic.basic_creature import BasicCreature
+from pyrl.engine.creature.enums.stats import Stat
+from pyrl.engine.enums.glyphs import Colors
 
 
 def test_basic_creature() -> None:

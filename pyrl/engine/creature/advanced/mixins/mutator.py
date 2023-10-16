@@ -3,10 +3,11 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.stats import Stats, StatsProvider, Stat, calculate_stats
+from pyrl.engine.creature.enums.stats import Stats, StatsProvider, Stat, calculate_stats
 
 @dataclass(eq=False)
-class StatsMutator(Creature, ABC):
+class Mutator(Creature, ABC):
+    """Creatures with this mixin class and the classes that inherit from this can modify the creature's stats."""
 
     stats:           Stats               = field(init=False, repr=False, default_factory=Counter[Stat])
     stats_providers: list[StatsProvider] = field(init=False, repr=False, default_factory=list)

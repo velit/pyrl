@@ -10,7 +10,7 @@ import pytest
 from pyrl import main
 from pyrl.config.binds import Binds
 from pyrl.engine.game import Game
-from pyrl.engine.types.keys import KeyOrSequence
+from pyrl.engine.enums.keys import KeyOrSequence
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from tests.integration_tests import dummy_plug_system
 from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions

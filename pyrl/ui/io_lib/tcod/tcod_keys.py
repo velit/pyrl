@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from tcod.event import KeySym
 
-from pyrl.engine.types.keys import Key
+from pyrl.engine.enums.keys import Key
 
 key_map: dict[int, str] = {
     KeySym.BACKSPACE: Key.BACKSPACE,

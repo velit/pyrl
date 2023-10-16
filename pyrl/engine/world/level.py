@@ -10,17 +10,19 @@ from pyrl.engine.actions.action import Action
 from pyrl.engine.behaviour.coordinates import bresenham, cross_product, add_vector
 from pyrl.engine.behaviour.pathing import path, distance
 from pyrl.engine.creature.creature_picker import CreaturePicker
-from pyrl.engine.creature.item import Item
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.world.item import Item
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.event import Event
 from pyrl.engine.structures.helper_mixins import DimensionsMixin
 from pyrl.engine.structures.scheduler import Scheduler
 from pyrl.engine.structures.table import Table
 from pyrl.engine.structures.uniq_dict import UniqDict
-from pyrl.engine.types.directions import Direction, Dir, Coord
-from pyrl.engine.types.glyphs import Glyph
-from pyrl.engine.world.world_types import LevelLocation, WorldPoint, LevelKey
+from pyrl.engine.enums.directions import Direction, Dir, Coord
+from pyrl.engine.enums.glyphs import Glyph
+from pyrl.engine.world.enums.level_key import LevelKey
+from pyrl.engine.world.enums.world_point import WorldPoint
+from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.pyrl_creatures import PyrlCreature
 

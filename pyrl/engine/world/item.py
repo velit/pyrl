@@ -1,23 +1,12 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass, field
-from enum import StrEnum
-from typing import Any
+from typing import Any, Iterable
 
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.slots import Slot
+from pyrl.engine.creature.enums.stats import Stat
+from pyrl.engine.enums.glyphs import Glyph, Colors
 from pyrl.engine.structures.dice import Dice
-from pyrl.engine.types.glyphs import Colors, Glyph
-
-ItemStat = tuple[Stat, int]
-ItemStats = tuple[ItemStat, ...]
-
-class Slot(StrEnum):
-    Head       = "Head"
-    Body       = "Body"
-    Right_Hand = "Right Hand"
-    Left_Hand  = "Left Hand"
-    Feet       = "Feet"
 
 @dataclass(eq=False)
 class Item:
@@ -89,3 +78,6 @@ def Armor(name: str,
         stats = {}
     item_stats = ((Stat.DEF, defense), (Stat.ARMOR, armor), *stats.items())
     return Item(name=name, glyph=glyph, stats=item_stats, compatible_slots=tuple(compatible_slots))
+
+ItemStat = tuple[Stat, int]
+ItemStats = tuple[ItemStat, ...]

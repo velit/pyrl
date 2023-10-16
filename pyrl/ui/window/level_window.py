@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from pyrl.engine.behaviour.coordinates import bresenham
-from pyrl.engine.types.directions import Coord
-from pyrl.engine.types.glyphs import Colors, Glyph
+from pyrl.engine.enums.directions import Coord
+from pyrl.engine.enums.glyphs import Colors, Glyph
 from pyrl.ui.window.base_window import BaseWindow
 
 @dataclass(eq=False)

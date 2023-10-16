@@ -1,11 +1,6 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import NamedTuple
-
-class LevelLocation(Enum):
-    """Key for various interesting locations inside Levels. This is the supertype."""
-    pass
 
 class LevelGen(Enum):
     """
@@ -23,14 +18,3 @@ class LevelGen(Enum):
 
     def is_used(self) -> bool:
         return self != LevelGen.NoGeneration
-
-class WorldPoint(NamedTuple):
-    """Describes a specific level and location. Used for marking passage connections."""
-    level_key: LevelKey
-    level_location: LevelLocation
-
-class LevelKey(NamedTuple):
-    """Uniquely identifies a Level.
-    Levels are found in dungeons and the idx identifies which level in that dungeon."""
-    dungeon: str
-    idx: int

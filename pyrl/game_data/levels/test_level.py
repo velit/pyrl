@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from pyrl.engine.creature.basic_creature import BasicCreature
-from pyrl.engine.creature.player import Player
-from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.creature.basic.basic_creature import BasicCreature
+from pyrl.engine.creature.advanced.player import Player
+from pyrl.engine.enums.glyphs import Colors
 from pyrl.engine.world.level_gen_params import LevelGenParams
-from pyrl.engine.world.world_types import LevelGen
+from pyrl.engine.world.enums.level_gen import LevelGen
 from pyrl.game_data.levels.shared_assets import construct_data, default_dims, DefaultLocation, AssetTileDict, \
     AssetLocationDict, AssetCreatureDict
 from pyrl.game_data.pyrl_tiles import PyrlTiles

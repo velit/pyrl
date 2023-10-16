@@ -4,7 +4,7 @@ from collections.abc import Iterable, Callable
 from heapq import heappush, heappop
 
 from pyrl.engine.behaviour.coordinates import chebyshev_distance
-from pyrl.engine.types.directions import Coord
+from pyrl.engine.enums.directions import Coord
 
 NeighborCall = Callable[[Coord], Iterable[tuple[Coord, int]]]
 HeuristicCall = Callable[[Coord, Coord, Coord], float]

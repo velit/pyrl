@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypeVar, Callable, TYPE_CHECKING, Any
 
-from pyrl.engine.types.keys import AnyKey, KeySequence, KeyOrSequence
+from pyrl.engine.enums.keys import AnyKey, KeySequence, KeyOrSequence
 from pyrl.ui.io_lib.protocol.io_window import IoWindow
 
 if TYPE_CHECKING:

@@ -10,7 +10,7 @@ from pyrl.engine.actions.action_exceptions import NoValidTargetException
 from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
-from pyrl.engine.world.world_types import LevelLocation
+from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 
 class DebugAction(CreatureActionsMixin):

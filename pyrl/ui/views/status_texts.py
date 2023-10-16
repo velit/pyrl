@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from pyrl.engine.creature.advanced.mixins.turner import Turner
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.mixins.turner import Turner
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.stats import Stat
 
 if TYPE_CHECKING:
     from pyrl.ui.window.window_system import WindowSystem

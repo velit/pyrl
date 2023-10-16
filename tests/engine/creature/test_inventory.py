@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import dataclasses
-from collections import Counter
-
-from pyrl.engine.creature.inventory import Inventory
-from pyrl.engine.creature.item import Weapon, Armor, Slot
-from pyrl.engine.creature.stats import Stats, Stat
+from pyrl.engine.creature.advanced.inventory import Inventory
+from pyrl.engine.creature.enums.slots import Slot
+from pyrl.engine.world.item import Weapon, Armor
+from pyrl.engine.creature.enums.stats import Stats, Stat
 from pyrl.engine.structures.dice import Dice
 
 def test_creature_inventory() -> None:

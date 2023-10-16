@@ -5,7 +5,7 @@ import sys
 
 assert sys.platform != "win32"
 
-from pyrl.engine.types.keys import Key
+from pyrl.engine.enums.keys import Key
 from pyrl.ui.io_lib.curses import WideChar
 
 curses_key_map: dict[WideChar, str] = {

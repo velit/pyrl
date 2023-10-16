@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from pyrl.engine.types.glyphs import Glyph
+from pyrl.engine.enums.glyphs import Glyph
 
 @dataclass(eq=False, frozen=True)
 class Tile:

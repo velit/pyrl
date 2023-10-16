@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.engine.types.glyphs import Colors
+from pyrl.engine.enums.glyphs import Colors
 from pyrl.engine.world.tile import Tile
 
 class PyrlTiles:

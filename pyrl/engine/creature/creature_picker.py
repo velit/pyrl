@@ -6,24 +6,24 @@ from decimal import Decimal
 from typing import Iterable, Self
 
 from pyrl.engine.behaviour.coordinates import resize_range
-from pyrl.engine.creature.basic_creature import CreatureTemplate
+from pyrl.engine.creature.basic.basic_creature import BasicCreatureTemplate
 from pyrl.engine.creature.creature import Creature
 
 @dataclass(eq=False, frozen=True)
 class CreaturePicker:
-    weighted_creatures: list[tuple[int, CreatureTemplate]]
+    weighted_creatures: list[tuple[int, BasicCreatureTemplate]]
     total_weight: int
 
     @classmethod
-    def using_speciation(cls, creature_templates: Iterable[CreatureTemplate], area_level: int) -> Self:
+    def using_speciation(cls, creature_templates: Iterable[BasicCreatureTemplate], area_level: int) -> Self:
         weighted_creatures = []
         accumulator = 0
-        for creature in creature_templates:
-            weight = cls._picking_weight(area_level, creature)
+        for template in creature_templates:
+            weight = cls._picking_weight(area_level, template)
             if weight == 0:
                 continue
             accumulator += weight
-            weighted_creatures.append((accumulator, creature))
+            weighted_creatures.append((accumulator, template))
         return cls(weighted_creatures, accumulator)
 
     def spawn_random_creature(self) -> Creature:
@@ -33,7 +33,7 @@ class CreaturePicker:
         return next(creature_template.create() for (slot, creature_template) in self.weighted_creatures if index < slot)
 
     @classmethod
-    def _picking_weight(cls, area_level: int, creature_template: CreatureTemplate) -> int:
+    def _picking_weight(cls, area_level: int, creature_template: BasicCreatureTemplate) -> int:
         speciation_multiplier = cls._speciation_mult(area_level - creature_template.creature_level)
         return round(1000 * speciation_multiplier * creature_template.spawn_weight_class)
 

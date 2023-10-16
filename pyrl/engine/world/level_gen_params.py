@@ -7,10 +7,12 @@ from pyrl.engine.creature.creature import Creature
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.table import Table
 from pyrl.engine.structures.uniq_dict import UniqDict
-from pyrl.engine.types.directions import Coord
+from pyrl.engine.enums.directions import Coord
 from pyrl.engine.world.level import Level
 from pyrl.engine.world.tile import Tile
-from pyrl.engine.world.world_types import LevelLocation, LevelGen, LevelKey
+from pyrl.engine.world.enums.level_key import LevelKey
+from pyrl.engine.world.enums.level_gen import LevelGen
+from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 
 @dataclass

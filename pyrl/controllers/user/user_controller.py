@@ -18,11 +18,11 @@ from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
     PickItemsFeedback, DisplacementFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import add_vector, bresenham
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
-from pyrl.engine.types.directions import Direction, Dir
-from pyrl.engine.types.glyphs import Color, Colors
-from pyrl.engine.types.keys import Key, KeyTuple, AnyKey
+from pyrl.engine.enums.directions import Direction, Dir
+from pyrl.engine.enums.glyphs import Color, Colors
+from pyrl.engine.enums.keys import Key, KeyTuple, AnyKey
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.ui.views.help_view import help_view
 from pyrl.ui.views.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view

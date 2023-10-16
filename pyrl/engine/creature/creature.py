@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.behaviour.coordinates import vector_within_distance
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.dice import Dice
-from pyrl.engine.types.directions import Coord
-from pyrl.engine.types.glyphs import Glyph
+from pyrl.engine.enums.directions import Coord
+from pyrl.engine.enums.glyphs import Glyph
 
 if TYPE_CHECKING:
     from pyrl.engine.world.level import Level

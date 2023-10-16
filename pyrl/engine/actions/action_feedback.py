@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.item import Item
-from pyrl.engine.types.directions import Direction, Coord
+from pyrl.engine.world.item import Item
+from pyrl.engine.enums.directions import Direction, Coord
 from pyrl.engine.world.tile import Tile
 
 @dataclass

@@ -5,7 +5,7 @@ import sys
 
 assert sys.platform != "win32"
 
-from pyrl.engine.types.glyphs import Color, ColorPair
+from pyrl.engine.enums.glyphs import Color, ColorPair
 
 class Curses256ColorDict(dict[ColorPair, int]):
 

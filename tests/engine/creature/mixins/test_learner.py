@@ -1,7 +1,7 @@
 from typing import Callable
 
-from pyrl.engine.creature.mixins.learner import Learner
-from pyrl.engine.types.glyphs import Glyph, GreenAt
+from pyrl.engine.creature.advanced.mixins.learner import Learner
+from pyrl.engine.enums.glyphs import Glyph, GreenAt
 
 class ConcreteLearner(Learner):
 
@@ -15,8 +15,8 @@ class ConcreteLearner(Learner):
 
 def test_learner() -> None:
     level_xp_unit = 1000
-    next_level_limit: Callable[[int], int] = lambda lvl: Learner.calc_next_level_limit(lvl, level_xp_unit)
-    xp_level: Callable[[int], int] = lambda xp: Learner.calc_experience_level(xp, level_xp_unit)
+    next_level_limit: Callable[[int], int] = lambda lvl: Learner._calc_next_level_limit(lvl, level_xp_unit)
+    xp_level: Callable[[int], int] = lambda xp: Learner._calc_experience_level(xp, level_xp_unit)
 
     for level in range(100):
         assert level == xp_level(next_level_limit(level)) - 1

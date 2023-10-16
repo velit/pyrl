@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable
 
-from pyrl.engine.creature.stats import StatsProvider, Stats, Stat
+from pyrl.engine.creature.enums.stats import StatsProvider, Stats, Stat
 
 
 class Skill(Enum):

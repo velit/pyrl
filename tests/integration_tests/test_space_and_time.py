@@ -3,7 +3,7 @@ import time
 
 from pyrl.engine import state_store
 from pyrl.engine.creature.creature_picker import CreaturePicker
-from pyrl.engine.creature.item import Weapon
+from pyrl.engine.world.item import Weapon
 from pyrl.engine.structures.dice import Dice
 from pyrl.game_data.pyrl_creatures import PyrlCreature
 from pyrl.game_data.pyrl_player import pyrl_player

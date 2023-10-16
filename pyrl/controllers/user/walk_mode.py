@@ -10,7 +10,7 @@ from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import get_vector, anticlockwise_45, reverse, clockwise_45
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
-from pyrl.engine.types.directions import Direction, Dir
+from pyrl.engine.enums.directions import Direction, Dir
 
 class Type(Enum):
     Wait          = (None, None)

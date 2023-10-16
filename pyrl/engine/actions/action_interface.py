@@ -8,14 +8,14 @@ from pyrl.engine.actions.action_exceptions import IllegalMoveException, NoValidT
 from pyrl.engine.actions.action_feedback import AttackFeedback, ActionFeedback, MoveFeedback, DropItemsFeedback, \
     PickItemsFeedback, DisplacementFeedback, SwapFeedback
 from pyrl.engine.behaviour.coordinates import get_vector, vector_is_direction, add_vector
+from pyrl.engine.creature.advanced.mixins.hoarder import Hoarder
+from pyrl.engine.creature.advanced.mixins.visionary import Visionary
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.item import Item
-from pyrl.engine.creature.mixins.hoarder import Hoarder
-from pyrl.engine.creature.mixins.visionary import Visionary
+from pyrl.engine.world.item import Item
 from pyrl.engine.structures.helper_mixins import GameMixin, CreatureMixin
-from pyrl.engine.types.directions import Direction, Dir, Coord
+from pyrl.engine.enums.directions import Direction, Dir, Coord
 from pyrl.engine.world.tile import Tile
-from pyrl.engine.world.world_types import LevelLocation
+from pyrl.engine.world.enums.level_location import LevelLocation
 
 if TYPE_CHECKING:
     from pyrl.engine.game import Game

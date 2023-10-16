@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from collections import Counter
 
-from pyrl.engine.creature.item import Armor, Weapon, Slot
-from pyrl.engine.creature.player import Player
-from pyrl.engine.creature.skills import Skills, Skill
-from pyrl.engine.creature.stats import Stats, Stat
+from pyrl.engine.creature.enums.slots import Slot
+from pyrl.engine.world.item import Weapon, Armor
+from pyrl.engine.creature.advanced.player import Player
+from pyrl.engine.creature.advanced.skills import Skills, Skill
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.dice import Dice
-from pyrl.engine.types.glyphs import Color, Colors
+from pyrl.engine.enums.glyphs import Colors
 
 def pyrl_player() -> Player:
     skills = Skills(Counter({

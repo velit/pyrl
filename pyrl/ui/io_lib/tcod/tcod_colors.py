@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyrl.engine.types.glyphs import Color
+from pyrl.engine.enums.glyphs import Color
 
 color_map: dict[Color, tuple[int, int, int]] = {
     Color.Red:           (175, 0, 0),

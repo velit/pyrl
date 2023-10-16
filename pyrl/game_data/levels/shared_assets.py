@@ -5,10 +5,10 @@ from pyrl.engine.creature.creature import Creature
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.table import Table
 from pyrl.engine.structures.uniq_dict import UniqDict
-from pyrl.engine.types.directions import Dir, Coord
-from pyrl.engine.types.glyphs import Letter
+from pyrl.engine.enums.directions import Dir, Coord
+from pyrl.engine.enums.glyphs import Letter
 from pyrl.engine.world.tile import Tile
-from pyrl.engine.world.world_types import LevelLocation
+from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 
 default_dims = Dimensions(26, 96)

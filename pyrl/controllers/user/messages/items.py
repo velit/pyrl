@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from pyrl.controllers.user.messages.generic import get_article
-from pyrl.engine.creature.item import Item
+from pyrl.engine.world.item import Item
 
 def item_description(items: Sequence[Item], *, use_verb: bool = False, use_article: bool = True) -> str:
     if len(items) == 1:

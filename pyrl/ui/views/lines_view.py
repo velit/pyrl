@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from typing import TypeVar, Generic, Final
 
 from pyrl.config.binds import Binds
-from pyrl.engine.types.glyphs import ColorPair, ColorStr
-from pyrl.engine.types.keys import AnyKey, KeyTuple
+from pyrl.engine.enums.glyphs import ColorPair, ColorStr
+from pyrl.engine.enums.keys import AnyKey, KeyTuple
 from pyrl.ui.views.line import Line
 from pyrl.ui.window.base_window import BaseWindow
 

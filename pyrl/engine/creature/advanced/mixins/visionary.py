@@ -9,7 +9,7 @@ from pyrl.engine.creature.creature import Creature
 from pyrl.engine.world.level import Level
 
 if TYPE_CHECKING:
-    from pyrl.engine.types.directions import Coord
+    from pyrl.engine.enums.directions import Coord
 
 @dataclass(eq=False)
 class Visionary(Creature, ABC):

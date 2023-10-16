@@ -9,10 +9,10 @@ from typing import Final
 
 from pyrl.engine.behaviour.coordinates import resize_range
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.mixins.stats_mutator import StatsMutator
+from pyrl.engine.creature.advanced.mixins.mutator import Mutator
 
 @dataclass(eq=False)
-class Learner(StatsMutator, ABC):
+class Learner(Mutator, ABC):
     """Creatures with this mixin class learn new things and gain levels."""
 
     experience:     int        = field(init=False, default=0)
@@ -22,7 +22,7 @@ class Learner(StatsMutator, ABC):
 
     @property
     def creature_level(self) -> int:
-        return self.calc_experience_level(self.experience, self.level_xp_unit)
+        return self._calc_experience_level(self.experience, self.level_xp_unit)
 
     def gain_kill_xp(self, target: Creature) -> tuple[int, Sequence[int]]:
         """Returns earned xp normalized by level difference and potential levelups from the gained xp."""
@@ -57,7 +57,7 @@ class Learner(StatsMutator, ABC):
         pass
 
     @staticmethod
-    def calc_experience_level(experience: int, base_level_xp: int) -> int:
+    def _calc_experience_level(experience: int, base_level_xp: int) -> int:
         level_units = experience / base_level_xp
         inner_sqrt = 2 * level_units - 1
         if inner_sqrt < 0:
@@ -66,7 +66,7 @@ class Learner(StatsMutator, ABC):
             return int(sqrt(inner_sqrt) + 1)
 
     @staticmethod
-    def calc_next_level_limit(level: int, level_unit_xp: int) -> int:
+    def _calc_next_level_limit(level: int, level_unit_xp: int) -> int:
         """Return the next level xp limit for the given level."""
         next_level = level + 1
         level_units = next_level ** 2 / 2 - next_level + 1

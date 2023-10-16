@@ -3,7 +3,7 @@ from __future__ import annotations
 from random import randint
 
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.dice import Dice
 from pyrl.engine.world.tile import Tile
 

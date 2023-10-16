@@ -4,7 +4,7 @@ import math
 from decimal import Decimal
 from typing import TypeVar, Type, Iterable, TypeGuard
 
-from pyrl.engine.types.directions import Direction, Dir, Coord
+from pyrl.engine.enums.directions import Direction, Dir, Coord
 
 N = TypeVar('N', int, float, Decimal)
 

@@ -7,9 +7,9 @@ from pyrl.engine.actions.action_feedback import ActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import resize_vector_to_len, add_vector, get_vector
 from pyrl.engine.creature.creature import Creature
-from pyrl.engine.creature.stats import Stat
+from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
-from pyrl.engine.types.directions import Dir, Coord
+from pyrl.engine.enums.directions import Dir, Coord
 
 AiState = dict[Creature, tuple[Coord | None, Coord | None]]
 

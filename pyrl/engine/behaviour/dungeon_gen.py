@@ -11,9 +11,10 @@ from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.helper_mixins import DimensionsMixin
 from pyrl.engine.structures.rectangle import Rectangle
 from pyrl.engine.structures.table import Table
-from pyrl.engine.types.directions import Dir, Direction, Coord
+from pyrl.engine.enums.directions import Dir, Direction, Coord
 from pyrl.engine.world.tile import Tile
-from pyrl.engine.world.world_types import LevelLocation, LevelGen
+from pyrl.engine.world.enums.level_gen import LevelGen
+from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.game_data.pyrl_tiles import PyrlTiles
 

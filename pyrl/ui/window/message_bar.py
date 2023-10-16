@@ -8,7 +8,7 @@ from textwrap import TextWrapper
 from typing import Any
 
 from pyrl.config.binds import Binds
-from pyrl.engine.types.glyphs import Colors, ColorPair
+from pyrl.engine.enums.glyphs import Colors, ColorPair
 from pyrl.ui.io_lib import mock
 from pyrl.ui.window.base_window import BaseWindow
 
