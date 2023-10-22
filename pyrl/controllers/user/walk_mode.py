@@ -12,16 +12,16 @@ from pyrl.engine.behaviour.coordinates import get_vector, anticlockwise_45, reve
 from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.engine.enums.directions import Direction, Dir
 
-class Type(Enum):
-    Wait          = (None, None)
-    Corridor      = (False, False)
-    Left          = (True, False)
-    Right         = (False, True)
-    Open          = (True, True)
+class WalkType(Enum):
+    Wait     = (None, None)
+    Corridor = (False, False)
+    Left     = (True, False)
+    Right    = (False, True)
+    Open     = (True, True)
 
 class WalkModeState(NamedTuple):
     direction: Direction
-    walk_type: Type
+    walk_type: WalkType
     next_walk_time: float
     show_msg_time: float
 
@@ -90,10 +90,10 @@ class WalkMode(CreatureActionsMixin):
 
         return next_direction
 
-    def _calculate_next_direction(self, old_direction: Direction, walk_type: Type) -> Direction | None:
-        if walk_type == Type.Wait:
+    def _calculate_next_direction(self, old_direction: Direction, walk_type: WalkType) -> Direction | None:
+        if walk_type == WalkType.Wait:
             return old_direction
-        elif walk_type == Type.Corridor:
+        elif walk_type == WalkType.Corridor:
             forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(old_direction)
             if len(forward_dirs) == 1:
                 new_direction = forward_dirs.pop()
@@ -133,9 +133,9 @@ class WalkMode(CreatureActionsMixin):
         up_left    = self._passable(Dir.clockwise(direction, 7))
         return forward, up_left, up_right, left, right, down_left, down_right
 
-    def _get_initial_walk_type(self, direction: Direction) -> Type | None:
+    def _get_initial_walk_type(self, direction: Direction) -> WalkType | None:
         if direction == Dir.Stay:
-            return Type.Wait
+            return WalkType.Wait
 
         walk_type = self._get_type_from_sides(direction)
         forward, up_left, up_right, left, right, down_left, down_right = \
@@ -146,10 +146,10 @@ class WalkMode(CreatureActionsMixin):
                 or not forward and right and down_right):
             return None
         if not forward:
-            walk_type = Type.Corridor
+            walk_type = WalkType.Corridor
         return walk_type
 
-    def _get_type_from_sides(self, direction: Direction) -> Type:
+    def _get_type_from_sides(self, direction: Direction) -> WalkType:
         if direction in Dir.Orthogonals:
             turns = 2
         elif direction in Dir.Diagonals:
@@ -158,7 +158,7 @@ class WalkMode(CreatureActionsMixin):
             raise Exception(f"Not a valid {direction=} for side viewing")
         left = self._passable(Dir.counter_clockwise(direction, turns))
         right = self._passable(Dir.clockwise(direction, turns))
-        return Type((left, right))
+        return WalkType((left, right))
 
     def _any_creatures_visible(self) -> int:
         return len(self.actions.get_coords_of_creatures_in_vision())

@@ -13,12 +13,8 @@ from pyrl.config.debug import Debug
 from pyrl.engine import state_store
 from pyrl.engine.game import Game
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
+from pyrl.ui.window.window_system import WindowSystem
 from tools import profile_util
-
-def run() -> None:
-    options = get_commandline_options()
-    with init_cursor_lib(options.output) as io_wrapper:
-        create_game(options, io_wrapper).game_loop()
 
 def get_commandline_options(args: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="pyrl; Python Roguelike")
@@ -48,31 +44,20 @@ def get_commandline_options(args: Sequence[str] | None = None) -> argparse.Names
 
     return parser.parse_args(args)
 
-def init_cursor_lib(output: str) -> IoWrapper:
-    if output == "terminal":
-        from pyrl.ui.io_lib.curses.curses_wrapper import CursesWrapper
-        return CursesWrapper()
-        # if sys.platform != "win32":
-        # else:
-        #     print("Terminal mode is not supported on Windows", file=sys.stderr)
-        #     sys.exit(1)
-    elif output == "sdl":
-        from pyrl.ui.io_lib.tcod.tcod_wrapper import TcodWrapper
-        return TcodWrapper()
-    elif output == "test":
-        from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper
-        return MockWrapper()
-    else:
-        assert False, f"Unknown output parameter '{output}'"
-
-def create_game(options: argparse.Namespace, cursor_lib: IoWrapper) -> Game:
+def main() -> None:
+    options = get_commandline_options()
     init_files_and_folders()
     init_logger_system(options.output)
+    if options.load and Config.save_game_warning:
+        load_warning()
+    with init_cursor_lib(options.output) as io_wrapper:
+        init_game(options, WindowSystem(io_wrapper)).game_loop()
 
+def init_game(options: argparse.Namespace, window_system: WindowSystem) -> Game:
     if options.load:
-        game = load_game(options.load, cursor_lib)
+        game = load_game(options.load, window_system)
     else:
-        game = Game(options.game, cursor_lib)
+        game = Game(options.game, window_system)
 
     if options.profile:
         profiler = Profile()
@@ -84,6 +69,17 @@ def create_game(options: argparse.Namespace, cursor_lib: IoWrapper) -> Game:
 
         atexit.register(write_profile)
 
+    return game
+
+def load_game(game_name: str, io: WindowSystem) -> Game:
+    try:
+        game = state_store.load(game_name)
+    except FileNotFoundError:
+        print(f"Save file '{game_name}' not found.", file=sys.stderr)
+        sys.exit(1)
+    assert isinstance(game, Game), f"Loaded data isn't a savegame. Found an object of type {type(game)}"
+    game.init_non_serialized_state(io)
+    game.redraw()
     return game
 
 def init_files_and_folders() -> None:
@@ -98,13 +94,37 @@ def init_logger_system(output: str) -> None:
         logging.basicConfig(filename=Debug.log_file, level=Debug.log_level)
         logging.debug("Starting new session")
 
-def load_game(game_name: str, cursor_lib: IoWrapper) -> Game:
+def init_cursor_lib(output: str) -> IoWrapper:
+    if output == "terminal":
+        from pyrl.ui.io_lib.curses.curses_wrapper import CursesWrapper
+        return CursesWrapper()
+    elif output == "sdl":
+        from pyrl.ui.io_lib.tcod.tcod_wrapper import TcodWrapper
+        return TcodWrapper()
+    elif output == "test":
+        from pyrl.ui.io_lib.mock.mock_wrapper import MockWrapper
+        return MockWrapper()
+    else:
+        assert False, f"Unknown output parameter '{output}'"
+
+def load_warning() -> None:
+    warning = """
+WARNING APPROACHING
+
+************************************************************************************
+*                                                                                  *
+* The savegame functionality of this game is implemented using pickle.             *
+* https://docs.python.org/3/library/pickle.html                                    *
+* Pickle is vulnerable to arbitrary code execution during unpickling.              *
+* Only use savegames from sources you trust.                                       *
+* This warning can be disabled by setting Save_Game_Warning = false in config.toml *
+*                                                                                  *
+************************************************************************************
+
+Input "abort" or press ctrl-c to abort. Input anything else to continue: """
     try:
-        game = state_store.load(game_name)
-    except FileNotFoundError:
-        print(f"Save file '{game_name}' not found.", file=sys.stderr)
-        sys.exit(1)
-    assert isinstance(game, Game), f"Loaded data isn't a savegame. Found an object of type {type(game)}"
-    game.__post_init__(cursor_lib)
-    game.redraw()
-    return game
+        result = input(warning)
+    except KeyboardInterrupt:
+        sys.exit(0)
+    if result == "abort":
+        sys.exit(0)

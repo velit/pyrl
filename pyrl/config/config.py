@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
+
+from importlib.resources import files
 
 
 class Config:
@@ -15,3 +18,9 @@ class Config:
     default_game_name = "pyrl"
     clearly_show_vision = False
     save_folder = Path("save_data")
+    save_game_warning = True
+
+with files("pyrl").joinpath("config.toml").open("rb") as config_file:
+    config = tomllib.load(config_file)
+    if "save_game_warning" in config:
+        Config.save_game_warning = config["save_game_warning"]

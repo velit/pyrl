@@ -408,6 +408,12 @@
             done
         </comment>
     </note>
+    <note priority="veryhigh" time="1689758539" done="1697490899">
+        Add category system for creatures, stuff like Swift, Strong that adds multipliers to various stats
+        <comment>
+            done
+        </comment>
+    </note>
     <note priority="veryhigh" time="1689785444" done="1689944376">
         Fix learner levels to be 0-based, maybe unify experience_level and creature_level
         <comment>
@@ -732,12 +738,6 @@
             not gunna
         </comment>
     </note>
-    <note priority="veryhigh" time="1689758539" done="1697490899">
-        Add category system for creatures, stuff like Swift, Strong that adds multipliers to various stats
-        <comment>
-            done
-        </comment>
-    </note>
     <note priority="high" time="1475592380">
         Add item drops and progression through that
     </note>
@@ -756,8 +756,11 @@
     <note priority="medium" time="1461374954">
         Add a pronoun system for items and game world objects
     </note>
-    <note priority="medium" time="1462173383">
+    <note priority="medium" time="1462173383" done="1698017114">
         Add system for figuring out if savegame is external (wasn't produced by this machine) to warn about danger/mark external load.
+        <comment>
+            Done via just adding a generic warning
+        </comment>
     </note>
     <note priority="medium" time="1462289109">
         Add color support for messages

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Sequence
-from dataclasses import field, InitVar, dataclass
+from dataclasses import field, dataclass
 from typing import NoReturn, Any
 
 from pyrl.config.binds import Binds
@@ -18,36 +18,35 @@ from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.combat import calc_melee_attack
 from pyrl.engine.behaviour.field_of_vision import ShadowCast
 from pyrl.engine.creature.advanced.mixins.visionary import Visionary
-from pyrl.engine.creature.creature import Creature
 from pyrl.engine.creature.advanced.player import Player
+from pyrl.engine.creature.creature import Creature
 from pyrl.engine.creature.enums.stats import Stat
 from pyrl.engine.enums.glyphs import Colors
+from pyrl.engine.world.enums.world_point import WorldPoint
 from pyrl.engine.world.level import Level
 from pyrl.engine.world.tile import Tile
 from pyrl.engine.world.world import World
-from pyrl.engine.world.enums.world_point import WorldPoint
 from pyrl.game_data.pyrl_world import pyrl_world
-from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
 from pyrl.ui.views.status_texts import register_status_texts
 from pyrl.ui.window.window_system import WindowSystem
-
 
 @dataclass
 class Game:
     game_name:        str
-    cursor_lib:       InitVar[IoWrapper] = field(repr=False)
+    io:               WindowSystem       = field(init=True, repr=False)
 
     ai_state:         AiState            = field(init=False, repr=False, default_factory=dict)
     world:            World              = field(init=False, repr=False, default_factory=pyrl_world)
 
-    io:               WindowSystem       = field(init=False, repr=False)
     action_interface: ActionInterface    = field(init=False, repr=False)
     ai_controller:    AIController       = field(init=False, repr=False)
     user_controller:  UserController     = field(init=False, repr=False)
 
-    def __post_init__(self, cursor_lib: IoWrapper) -> None:
-        """Initialize non-serialised state. Used when loading the game."""
-        self.io = WindowSystem(cursor_lib)
+    def __post_init__(self) -> None:
+        self.init_non_serialized_state(self.io)
+
+    def init_non_serialized_state(self, io: WindowSystem) -> None:
+        self.io = io
         self.action_interface = ActionInterface(self)
         self.ai_controller = AIController(self.ai_state, self.action_interface)
         self.user_controller = UserController(self.action_interface)

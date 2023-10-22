@@ -12,6 +12,7 @@ from pyrl.config.binds import Binds
 from pyrl.engine.game import Game
 from pyrl.engine.enums.keys import KeyOrSequence
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
+from pyrl.ui.window.window_system import WindowSystem
 from tests.integration_tests import dummy_plug_system
 from tests.integration_tests.dummy_plug_system import DummySpeed, DummyMode, DummyPlugSystem, DummyOptions
 
@@ -55,13 +56,13 @@ def dummy_system(integr_config: IntegrConfig) -> Iterable[DummyPlugSystem]:
         yield dummy_plug
 
 @pytest.fixture
-def io_wrapper(integr_config: IntegrConfig) -> Iterable[IoWrapper]:
+def window_system(integr_config: IntegrConfig) -> Iterable[WindowSystem]:
     with integr_config.io_wrapper_type() as io_wrapper:
-        yield io_wrapper
+        yield WindowSystem(io_wrapper)
 
 @pytest.fixture
-def game(io_wrapper: IoWrapper, dummy_system: DummyPlugSystem, integr_config: IntegrConfig) -> Iterable[Game]:
-    game = main.create_game(main.get_commandline_options(args=("-g", "test")), io_wrapper)
+def game(window_system: WindowSystem, dummy_system: DummyPlugSystem, integr_config: IntegrConfig) -> Iterable[Game]:
+    game = main.init_game(main.get_commandline_options(args=("-g", "test")), window_system)
     if platform.system() == "Darwin" and game.io.wrapper.implementation != "mock" and integr_config.continue_after_test:
         old_mode = dummy_system.options.mode
         dummy_system.options.mode = DummyMode.Disabled
@@ -80,17 +81,17 @@ def game(io_wrapper: IoWrapper, dummy_system: DummyPlugSystem, integr_config: In
         dummy_system.options.mode = DummyMode.Hybrid
         game.io.get_key()
 
-def load_game(io_wrapper: IoWrapper) -> Game:
-    return main.create_game(main.get_commandline_options(args=("-l", "test")), io_wrapper)
+def load_game(window_system: WindowSystem) -> Game:
+    return main.init_game(main.get_commandline_options(args=("-l", "test")), window_system)
 
-def test_save_and_load_game(game: Game, io_wrapper: IoWrapper, dummy_system: DummyPlugSystem) -> None:
+def test_save_and_load_game(game: Game, window_system: WindowSystem, dummy_system: DummyPlugSystem) -> None:
 
     input_seq = [Binds.Descend] * 4 + [Binds.Save]
     game = dummy_system.add_input_and_run(input_seq, game)
     assert game.player.turns == 5
     assert game.player.level.level_key.idx == 3
 
-    game = load_game(io_wrapper)
+    game = load_game(window_system)
     input_seq = [Binds.Descend] * 4
     game = dummy_system.add_input_and_run(input_seq, game)
     assert game.player.turns == 9

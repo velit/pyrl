@@ -63,20 +63,19 @@ Equipment_View_Backpack = ["v"]
 
 [BackpackView]
 Backpack_Drop_Items     = ["Tab"]
-Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i",
-                           "j", "k", "l", "m", "n", "o", "p", "q",
-                           "r", "s", "t", "u", "v", "w", "x", "y"]
+Backpack_Select_Keys    = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+                           "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y"]
 
 [Directions]
-SouthWest               = ["1", "m",      "Numpad 1", "End"]
-South                   = ["2", ",",      "Numpad 2", "Down"]
-SouthEast               = ["3", ".",      "Numpad 3", "Page Down"]
-West                    = ["4", "j",      "Numpad 4", "Left"]
-East                    = ["6", "l",      "Numpad 6", "Right"]
-NorthWest               = ["7", "u",      "Numpad 7", "Home"]
-North                   = ["8", "i",      "Numpad 8", "Up"]
-NorthEast               = ["9", "o",      "Numpad 9", "Page Up"]
-Stay                    = ["5", "k",      "Numpad 5"]
+SouthWest               = ["1", "m", "Numpad 1", "End"]
+South                   = ["2", ",", "Numpad 2", "Down"]
+SouthEast               = ["3", ".", "Numpad 3", "Page Down"]
+West                    = ["4", "j", "Numpad 4", "Left"]
+East                    = ["6", "l", "Numpad 6", "Right"]
+NorthWest               = ["7", "u", "Numpad 7", "Home"]
+North                   = ["8", "i", "Numpad 8", "Up"]
+NorthEast               = ["9", "o", "Numpad 9", "Page Up"]
+Stay                    = ["5", "k", "Numpad 5"]
 
 # Initiate walk mode instantly to some direction.
 [InstantWalk]
