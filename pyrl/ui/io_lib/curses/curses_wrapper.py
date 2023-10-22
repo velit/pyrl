@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import curses
-import sys
 from typing import Any
-
-assert sys.platform != "win32"
 
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.ui.io_lib.curses import IMPLEMENTATION

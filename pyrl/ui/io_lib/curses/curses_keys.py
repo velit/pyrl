@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import curses.ascii
-import sys
-
-assert sys.platform != "win32"
 
 from pyrl.engine.enums.keys import Key
 from pyrl.ui.io_lib.curses import WideChar

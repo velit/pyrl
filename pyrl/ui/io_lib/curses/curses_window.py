@@ -6,8 +6,6 @@ import logging
 import sys
 from typing import Iterable, TYPE_CHECKING, ClassVar
 
-assert sys.platform != "win32"
-
 from pyrl.config.debug import Debug
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.position import Position

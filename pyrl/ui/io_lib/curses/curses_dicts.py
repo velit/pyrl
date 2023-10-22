@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import curses
-import sys
-
-assert sys.platform != "win32"
 
 from pyrl.engine.enums.glyphs import Color, ColorPair
 
