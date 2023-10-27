@@ -18,6 +18,7 @@ class Config:
     default_game_name = "pyrl"
     clearly_show_vision = False
     save_folder = Path("save_data")
+    secret_path = save_folder / ".do_not_share_this_file"
     save_game_warning = True
 
 with files("pyrl").joinpath("config.toml").open("rb") as config_file:

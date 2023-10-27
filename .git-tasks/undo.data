@@ -19,3 +19,7 @@ new [description:"Add a pronoun system for items and game world objects" entry:"
 time 1698178757
 new [description:"Add hmac-signed savegames so that it's possible to show a warning on imported savegames" entry:"1698178757" modified:"1698178757" priority:"H" status:"pending" uuid:"fbafab38-de17-40e6-a26b-71de86d46343"]
 ---
+time 1698424748
+old [description:"Add hmac-signed savegames so that it's possible to show a warning on imported savegames" entry:"1698178757" modified:"1698178757" priority:"H" status:"pending" uuid:"fbafab38-de17-40e6-a26b-71de86d46343"]
+new [description:"Add hmac-signed savegames so that it's possible to show a warning on imported savegames" end:"1698424748" entry:"1698178757" modified:"1698424748" priority:"H" status:"completed" uuid:"fbafab38-de17-40e6-a26b-71de86d46343"]
+---

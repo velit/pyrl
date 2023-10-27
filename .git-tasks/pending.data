@@ -4,4 +4,3 @@
 [description:"https:\/\/www.reddit.com\/r\/roguelikedev\/comments\/406wx0\/item_labels\/" entry:"1698156797" modified:"1698156797" priority:"M" status:"pending" uuid:"2842e9fc-faaf-4cdf-89ec-1e0fdd62b75a"]
 [description:"Update game_actions to provide tools for user_controller.look" entry:"1698156803" modified:"1698156803" priority:"M" status:"pending" uuid:"20425721-1350-4b0d-82af-8b17b2a708f3"]
 [description:"Add a pronoun system for items and game world objects" entry:"1698156809" modified:"1698156809" priority:"M" status:"pending" uuid:"f214de5f-e5f3-4391-a1bb-5d5aa8779ace"]
-[description:"Add hmac-signed savegames so that it's possible to show a warning on imported savegames" entry:"1698178757" modified:"1698178757" priority:"H" status:"pending" uuid:"fbafab38-de17-40e6-a26b-71de86d46343"]

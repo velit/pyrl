@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import bz2
+import hashlib
+import hmac
 import pickle
+import secrets
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -9,11 +13,7 @@ from pyrl.config.config import Config
 
 _SAVE_FILETYPE = ".save"
 
-def load(save_name: str) -> Any:
-    save_path = Path(Config.save_folder, save_name + _SAVE_FILETYPE)
-    with open(save_path, "rb") as f:
-        state_string = f.read()
-    return pickle.loads(bz2.decompress(state_string))
+DIGEST_SIZE = 64
 
 def save(obj: Any, save_name: str) -> str:
     Path(Config.save_folder).mkdir(parents=True, exist_ok=True)
@@ -26,7 +26,38 @@ def save(obj: Any, save_name: str) -> str:
 def pickle_data(obj: Any) -> tuple[bytes, bytes]:
     state = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
     compressed_state = bz2.compress(state, Config.save_compression_level)
-    return state, compressed_state
+    digest = create_digest(compressed_state)
+    assert len(digest) == DIGEST_SIZE, \
+        f"The dev's assumption that blake2 digest would always be {DIGEST_SIZE} bytes long is incorrect"
+    return state, digest + compressed_state
+
+def load(save_name: str, unsafe: bool = False) -> Any:
+    save_path = Path(Config.save_folder, save_name + _SAVE_FILETYPE)
+    with open(save_path, "rb") as f:
+        return unpickle_data(f.read(), unsafe)
+
+def unpickle_data(data: bytes, unsafe: bool = False) -> Any:
+    digest, compressed_state = data[:DIGEST_SIZE], data[DIGEST_SIZE:]
+    expected_digest = create_digest(compressed_state)
+    if not unsafe and not secrets.compare_digest(digest, expected_digest):
+        raise ValueError("Wrong save file signature. Either hardware has changed or save files were moved.")
+    return pickle.loads(bz2.decompress(compressed_state))
+
+def create_digest(data: bytes) -> bytes:
+    return hmac.digest(secret(), data, hashlib.blake2b)
+
+def secret() -> bytes:
+    return machine_secret() + unique_secret()
+
+def machine_secret() -> bytes:
+    return str(uuid.getnode()).encode()
+
+def unique_secret() -> bytes:
+    if not Config.secret_path.exists():
+        with Config.secret_path.open("wb") as f:
+            f.write(secrets.token_bytes(64))
+    with Config.secret_path.open("rb") as f:
+        return f.read()
 
 def compression_msg(state: bytes, compressed: bytes) -> str:
     raw_size = sizeof_fmt(len(state))

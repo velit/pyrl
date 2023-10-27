@@ -5,3 +5,4 @@
 {"description":"Update game_actions to provide tools for user_controller.look","entry":"20231024T141323Z","modified":"20231024T141323Z","priority":"M","status":"pending","uuid":"20425721-1350-4b0d-82af-8b17b2a708f3"}
 {"description":"Add a pronoun system for items and game world objects","entry":"20231024T141329Z","modified":"20231024T141329Z","priority":"M","status":"pending","uuid":"f214de5f-e5f3-4391-a1bb-5d5aa8779ace"}
 {"description":"Add hmac-signed savegames so that it's possible to show a warning on imported savegames","entry":"20231024T201917Z","modified":"20231024T201917Z","priority":"H","status":"pending","uuid":"fbafab38-de17-40e6-a26b-71de86d46343"}
+{"description":"Add hmac-signed savegames so that it's possible to show a warning on imported savegames","end":"20231027T163908Z","entry":"20231024T201917Z","modified":"20231027T163908Z","priority":"H","status":"completed","uuid":"fbafab38-de17-40e6-a26b-71de86d46343"}

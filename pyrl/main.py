@@ -4,15 +4,18 @@ import argparse
 import atexit
 import logging
 import os
+import secrets
 import sys
 from cProfile import Profile
 from collections.abc import Sequence
 
+from pyrl.config.binds import Binds
 from pyrl.config.config import Config
 from pyrl.config.debug import Debug
 from pyrl.engine import state_store
 from pyrl.engine.game import Game
 from pyrl.ui.io_lib.protocol.io_wrapper import IoWrapper
+from pyrl.ui.views.line import from_multiline_str
 from pyrl.ui.window.window_system import WindowSystem
 from tools import profile_util
 
@@ -48,8 +51,6 @@ def main() -> None:
     options = get_commandline_options()
     init_files_and_folders()
     init_logger_system(options.output)
-    if options.load and Config.save_game_warning:
-        load_warning()
     with init_cursor_lib(options.output) as io_wrapper:
         init_game(options, WindowSystem(io_wrapper)).game_loop()
 
@@ -77,14 +78,16 @@ def load_game(game_name: str, io: WindowSystem) -> Game:
     except FileNotFoundError:
         print(f"Save file '{game_name}' not found.", file=sys.stderr)
         sys.exit(1)
+    except ValueError:
+        show_load_warning(io)
+        game = state_store.load(game_name, unsafe=True)
     assert isinstance(game, Game), f"Loaded data isn't a savegame. Found an object of type {type(game)}"
     game.init_non_serialized_state(io)
     game.redraw()
     return game
 
 def init_files_and_folders() -> None:
-    if not os.path.exists(Config.save_folder):
-        os.makedirs(Config.save_folder)
+    Config.save_folder.mkdir(parents=True, exist_ok=True)
 
 def init_logger_system(output: str) -> None:
     if output == "sdl":
@@ -107,24 +110,26 @@ def init_cursor_lib(output: str) -> IoWrapper:
     else:
         assert False, f"Unknown output parameter '{output}'"
 
-def load_warning() -> None:
-    warning = """
-WARNING APPROACHING
+def show_load_warning(io: WindowSystem) -> None:
+    raw_warning = f"""
+                                     WARNING APPROACHING
 
-************************************************************************************
-*                                                                                  *
-* The savegame functionality of this game is implemented using pickle.             *
-* https://docs.python.org/3/library/pickle.html                                    *
-* Pickle is vulnerable to arbitrary code execution during unpickling.              *
-* Only use savegames from sources you trust.                                       *
-* This warning can be disabled by setting Save_Game_Warning = false in config.toml *
-*                                                                                  *
-************************************************************************************
+ ********************************************************************************************** 
+ *                                                                                            * 
+ *               The save functionality of this game is implemented using pickle.             * 
+ *                       https://docs.python.org/3/library/pickle.html                        * 
+ *                      Pickle is vulnerable to arbitrary code execution.                     * 
+ *                                                                                            * 
+ *                         ONLY USE SAVE FILES FROM SOURCES YOU TRUST!                        * 
+ *                                                                                            * 
+ *        This warning is shown because an attempt is made to track the origin of saves.      * 
+ *            The detection isn't perfect and this warning can be shown erroneously.          * 
+ *       This warning can be disabled by setting Save_Game_Warning = false in config.toml.    * 
+ *                                                                                            * 
+ ********************************************************************************************** 
 
-Input "abort" or press ctrl-c to abort. Input anything else to continue: """
-    try:
-        result = input(warning)
-    except KeyboardInterrupt:
-        sys.exit(0)
-    if result == "abort":
+                   Press [{Binds.Yes}] to continue, anything else to abort:"""
+
+    io.whole_window.draw_lines(from_multiline_str(raw_warning))
+    if io.whole_window.get_key(refresh=True) not in Binds.Yes:
         sys.exit(0)
