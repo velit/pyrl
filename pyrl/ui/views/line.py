@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TypeVar, Generic, Iterable
+from typing import Iterable
 
 from pyrl.engine.enums.glyphs import ColorPair, Colors, ColorStr
 
-T = TypeVar('T', covariant=True)
 @dataclass(order=True, frozen=True)
-class Line(Generic[T]):
+class Line[T]:
     """line_view Line"""
     display: str
     return_value: T

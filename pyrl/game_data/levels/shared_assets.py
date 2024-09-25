@@ -64,7 +64,7 @@ def _construct_data(dimensions: Dimensions, table_data: str, tiles_lookup: Asset
                     locations_lookup: AssetLocationDict, creatures_lookup: AssetCreatureDict) \
                         -> tuple[Table[Tile], UniqDict[Coord, LevelLocation], list[Creature]]:
     locations: UniqDict[Coord, LevelLocation] = UniqDict()
-    creatures = []
+    creatures: list[Creature] = []
     tile_list: list[Tile] = []
     for index, letter in enumerate(table_data):
         coord = dimensions.get_coord(index)

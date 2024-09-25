@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from pyrl.engine.creature.advanced.mixins.learner import Learner
 from pyrl.engine.enums.glyphs import Glyph, GreenAt

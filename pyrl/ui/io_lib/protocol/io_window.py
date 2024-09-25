@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import Protocol, Iterable, ClassVar
+from collections.abc import Iterable
+from typing import Protocol, ClassVar
 
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.position import Position

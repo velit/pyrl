@@ -7,10 +7,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 @pytest.fixture
 def live(request: pytest.FixtureRequest) -> bool:
-    return request.config.getoption("--live")
+    return request.config.getoption("--live")  # pyright: ignore [reportReturnType]
 
 @pytest.fixture
 def delay(request: pytest.FixtureRequest) -> float:
-    return float(request.config.getoption("--delay"))
+    return float(request.config.getoption("--delay"))  # pyright: ignore [reportArgumentType]
 
 

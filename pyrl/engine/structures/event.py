@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Any
+from typing import Any
 
 @dataclass(eq=False)
 class Event:

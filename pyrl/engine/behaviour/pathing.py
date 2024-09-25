@@ -19,8 +19,8 @@ def distance(coord_a: Coord, coord_b: Coord, default_movement_cost: int, diagona
 def _a_star(start: Coord, goal: Coord, neighbors: NeighborCall, heuristic: HeuristicCall) -> dict[Coord, Coord]:
     start, goal = goal, start
     came_from: dict[Coord, Coord] = {}
-    closedset = set()
-    openmember = set()
+    closedset: set[tuple[int, int]] = set()
+    openmember: set[tuple[int, int]] = set()
     openmember.add(start)
 
     cheap = {start: 0}  # Current cheapest cost to coord

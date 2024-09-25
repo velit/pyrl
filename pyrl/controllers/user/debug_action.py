@@ -13,6 +13,7 @@ from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.engine.world.enums.level_location import LevelLocation
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 
+# pyright: reportUnusedVariable=false
 class DebugAction(CreatureActionsMixin):
 
     def __init__(self, actions: ActionInterface) -> None:

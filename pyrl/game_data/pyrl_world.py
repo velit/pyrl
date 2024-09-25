@@ -13,7 +13,7 @@ def pyrl_world() -> World:
     start = LevelKey("dungeon", 1)
     world.add_level(start.dungeon, test_level.get_level(world.player))
 
-    for x in range(99 - 1):
+    for _ in range(99 - 1):
         world.add_level(start.dungeon)
 
     world.add_level(overworld.name, overworld.get_level())

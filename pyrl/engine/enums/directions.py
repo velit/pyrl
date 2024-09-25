@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Literal, Final
 
-Coord = tuple[int, int]
-DirectionUnit = Literal[-1, 0, 1]
-Direction     = tuple[DirectionUnit, DirectionUnit]
-Directions    = tuple[Direction, ...]
+type Coord         = tuple[int, int]
+type DirectionUnit = Literal[-1, 0, 1]
+type Direction     = tuple[DirectionUnit, DirectionUnit]
+type Directions    = tuple[Direction, ...]
 
 class Dir:
     OrthogonalMoveMult: Final[float] = 1.0

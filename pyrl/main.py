@@ -3,8 +3,6 @@ from __future__ import annotations
 import argparse
 import atexit
 import logging
-import os
-import secrets
 import sys
 from cProfile import Profile
 from collections.abc import Sequence
@@ -124,6 +122,7 @@ def show_load_warning(io: WindowSystem) -> None:
  *                                                                                            * 
  *        This warning is shown because an attempt is made to track the origin of saves.      * 
  *            The detection isn't perfect and this warning can be shown erroneously.          * 
+ *                        For example in the case of a hardware change.                       *
  *       This warning can be disabled by setting Save_Game_Warning = false in config.toml.    * 
  *                                                                                            * 
  ********************************************************************************************** 

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
 
 from pyrl.engine.creature.enums.slots import Slot
 from pyrl.engine.creature.enums.stats import Stat

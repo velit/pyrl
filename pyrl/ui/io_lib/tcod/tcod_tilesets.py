@@ -4,7 +4,7 @@ from pathlib import Path
 import tcod.tileset
 from tcod.tileset import CHARMAP_CP437, CHARMAP_TCOD, Tileset
 
-tileset_params = dict((
+tileset_params: dict[str, tuple[int, int, list[int]]] = dict((
     ("arial10x10.png",                  (32, 8,  CHARMAP_TCOD)),
     ("arial12x12.png",                  (32, 8,  CHARMAP_TCOD)),
     ("arial8x8.png",                    (32, 8,  CHARMAP_TCOD)),

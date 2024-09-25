@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from textwrap import TextWrapper
 from typing import Any
@@ -39,7 +39,6 @@ class MessageBar(BaseWindow):
         logging.debug(f"io.msg: {obj}")
 
     def queue_msg(self, *args: Any, color: ColorPair = Colors.Normal) -> None:
-        output: Callable[[str], Any]
         for obj in args:
             if self.io_win.implementation == mock.IMPLEMENTATION:
                 self.debug_msg(str(obj))
@@ -49,14 +48,14 @@ class MessageBar(BaseWindow):
     def add_lines_to_history(self, lines: Iterable[tuple[str, ColorPair]]) -> None:
         for msg, color in lines:
             if self.history:
-                lastitem, lastcolor = self.history[-1]
+                last_item = self.history[-1][0]
 
-                if msg == lastitem:
+                if msg == last_item:
                     self.history[-1] = (f"{msg} (x2)", color)
                     continue
 
-                if msg == lastitem[:len(msg)]:
-                    result = re.match(r" \(x(\d+)\)", lastitem[len(msg):])
+                if msg == last_item[:len(msg)]:
+                    result = re.match(r" \(x(\d+)\)", last_item[len(msg):])
                     if result:
                         repeat_number = int(result.group(1)) + 1
                         self.history[-1] = (f"{msg} (x{repeat_number})", color)

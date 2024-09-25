@@ -1,19 +1,14 @@
 pyrl
 ====
 
-![Image](resources/screenshot.png?raw=true)
+![Image](resources/screenshot.png)
 
 The dots are floor tiles, the # dungeon walls and < and > entrances to other
 levels. The @ is the player character and the brown walls and bold dots are in
 line of sight of the player.
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>
-<br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Python Roguelike</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit" property="cc:attributionName" rel="cc:attributionURL">Veli Tapani Kiiskinen</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
-<br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/velit/pyrl" rel="dct:source">https://github.com/velit/pyrl</a>.
-<br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit/pyrl" rel="cc:morePermissions">https://github.com/velit/pyrl</a>.
-
 Installing pyrl
-===============
+---------------
 
 Release packages might be available at some point if the project attains enough
 gameplay to warrant it. If you wish to try pyrl out before that happens then
@@ -21,7 +16,7 @@ you need to download/clone the working directory of this repository and satisfy
 some requirements in the following section.
 
 Requirements
-============
+------------
 
 ### SDL version, all platforms (pyrl.py)
 
@@ -36,13 +31,12 @@ Requirements
 * Most any terminal emulator (xterm, gnome-terminal, Konsole, putty etc.)
 
 Ncurses specific topics
-=======================
+-----------------------
 
 Information in this paragraph is only relevant when using the terminal version
 of the game, ie. when using 'terminal_pyrl.sh'.
 
-More colors
------------
+### More colors
 
 pyrl.py supports 256 colors for more variety. To use this feature set your TERM
 entry to xterm-256color (or other, see below). Some terminals allow to do this
@@ -52,15 +46,15 @@ the following
 
     export TERM=xterm-256color
 
-ncurses-term
-------------
+### ncurses-term
+
 
 ncurses-term is a package that adds more termcap entries which allows for more
 compatibility for many terminals. If the package is installed your machine you
 can instead use one of the following entries for your TERM for better
 compatibility for your particular terminal
 
-### Some terminals and their corresponding TERM values
+#### Some terminals and their corresponding TERM values
 
 <table>
     <tr>
@@ -133,3 +127,12 @@ variable ESCDELAY a value of your choosing in milliseconds. To set the value do
 the following in the command line or .bashrc (or equivalent)
 
     export ESCDELAY=25
+
+License
+-------
+
+<br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Python Roguelike</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit" property="cc:attributionName" rel="cc:attributionURL">Veli Tapani Kiiskinen</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+<br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/velit/pyrl" rel="dct:source">https://github.com/velit/pyrl</a>.
+<br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="https://github.com/velit/pyrl" rel="cc:morePermissions">https://github.com/velit/pyrl</a>.
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a>

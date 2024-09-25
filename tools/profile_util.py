@@ -3,7 +3,6 @@ import sys
 from pstats import Stats
 
 from pyrl.config.config import Config
-from pyrl.config.debug import Debug
 
 def write_results_log(profiler: cProfile.Profile, filename: str) -> None:
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence, Iterable
 from dataclasses import dataclass, field
-from typing import TypeVar, Generic, Final
+from typing import Final
 
 from pyrl.config.binds import Binds
 from pyrl.engine.enums.glyphs import ColorPair, ColorStr
@@ -17,19 +17,18 @@ def build_lines(iterable: Iterable[str]) -> tuple[Line[int], ...]:
 def build_color_lines(iterable: Iterable[tuple[str, ColorPair]]) -> tuple[Line[int], ...]:
     return tuple(Line(value, i, color) for i, (value, color) in enumerate(iterable))
 
-T = TypeVar('T')
-def lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
-               return_keys: KeyTuple = Binds.Cancel, header: str = "",
-               footer: str | None = None) -> tuple[AnyKey, T | None]:
+def lines_view[T](window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
+                  return_keys: KeyTuple = Binds.Cancel, header: str = "",
+                  footer: str | None = None) -> tuple[AnyKey, T | None]:
     return LinesView(window, lines, select_keys, return_keys, header, footer).single()
 
-def multi_select_lines_view(window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
-                            return_keys: KeyTuple = Binds.Cancel, header: str = "",
-                            footer: str | None = None) -> tuple[AnyKey, Sequence[T]]:
+def multi_select_lines_view[T](window: BaseWindow, lines: Sequence[Line[T]], select_keys: KeyTuple = (),
+                               return_keys: KeyTuple = Binds.Cancel, header: str = "",
+                               footer: str | None = None) -> tuple[AnyKey, Sequence[T]]:
     return LinesView(window, lines, select_keys, return_keys, header, footer).multi()
 
 @dataclass(eq=False)
-class LinesView(Generic[T]):
+class LinesView[T]:
     """
     Render a Lines based view with given parameters.
 
@@ -160,10 +159,10 @@ class LinesView(Generic[T]):
     def _print_view(self, header: str, footer: str,
                     main_view_pos: int = 2, header_pos: int = 0, footer_pos: int = -1) -> None:
         self.window.clear()
-        if header is not None:
+        if header:
             self.window.draw_banner(header, y_offset=header_pos)
         self.window.draw_lines(self._get_print_lines(), y_offset=main_view_pos)
-        if footer is not None:
+        if footer:
             self.window.draw_banner(footer, y_offset=footer_pos)
 
     def _handle_scrolling(self, key: AnyKey) -> None:

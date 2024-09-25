@@ -3,10 +3,10 @@ from __future__ import annotations
 import logging
 import time
 from collections import deque
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TypeVar, Callable, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any
 
 from pyrl.engine.enums.keys import AnyKey, KeySequence, KeyOrSequence
 from pyrl.ui.io_lib.protocol.io_window import IoWindow
@@ -83,11 +83,9 @@ def get(options: DummyOptions | None = None) -> DummyPlugSystem:
         _rei.change_options(options)
     return _rei
 
-IoWindowSubclass = TypeVar('IoWindowSubclass', bound=IoWindow)
-GetKeyMethod = Callable[[IoWindowSubclass], AnyKey]
-def handle_dummy_input(get_key: GetKeyMethod[IoWindowSubclass]) -> GetKeyMethod[IoWindowSubclass]:
+def handle_dummy_input[T: IoWindow](get_key: Callable[[T], AnyKey]) -> Callable[[T], AnyKey]:
 
-    def get_key_handle_dummy_input(self: IoWindowSubclass) -> AnyKey:
+    def get_key_handle_dummy_input(self: T) -> AnyKey:
         """Get a key and handle dummy input if any exist"""
         dps = get()
         bound_get_key = get_key.__get__(self, self.__class__)

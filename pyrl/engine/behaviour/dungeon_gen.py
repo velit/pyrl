@@ -28,14 +28,12 @@ Rock = PyrlTiles.Rock
 class DungeonGen(DimensionsMixin):
 
     def __init__(self, level_params: LevelGenParams) -> None:
-        if level_params.tiles is not None:
-            self.tiles = level_params.tiles
-            self.dimensions = self.tiles.dimensions
-        elif level_params.dimensions is not None:
+        if level_params.tiles is None:
             self.dimensions = level_params.dimensions
             self.tiles = Table(self.dimensions, fillvalue=Rock)
         else:
-            raise ValueError(f"Can't generate tiles to {level_params=} which has neither dimensions nor tiles set")
+            self.tiles = level_params.tiles
+            self.dimensions = self.tiles.dimensions
 
         self.generation_type = level_params.generation_type
         self.locations = level_params.locations

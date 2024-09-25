@@ -94,7 +94,7 @@ class WalkMode(CreatureActionsMixin):
         if walk_type == WalkType.Wait:
             return old_direction
         elif walk_type == WalkType.Corridor:
-            forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(old_direction)
+            forward_dirs, orthogonal_dirs, ignored_dirs = self._get_corridor_candidate_dirs(old_direction)  # pyright: ignore [reportUnusedVariable]
             if len(forward_dirs) == 1:
                 new_direction = forward_dirs.pop()
                 return new_direction

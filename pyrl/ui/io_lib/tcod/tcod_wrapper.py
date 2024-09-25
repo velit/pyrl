@@ -18,6 +18,7 @@ from pyrl.ui.io_lib.tcod.tcod_tilesets import get_tileset_by_index, get_bdf_inde
 from pyrl.ui.io_lib.tcod.tcod_window import TcodWindow
 from pyrl.ui.window.window_system import WindowSystem
 
+# pyright: reportUnknownVariableType=false, reportUnknownMemberType=false
 @dataclass
 class TcodWrapper(IoWrapper, DimensionsMixin):
     """Wrapper for the chronicles of doryen roguelike library (SDL)."""

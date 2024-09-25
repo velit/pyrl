@@ -1,12 +1,8 @@
 from __future__ import annotations
 
 from collections import UserDict
-from typing import TypeVar
 
-K = TypeVar("K")
-V = TypeVar("V")
-
-class UniqDict(UserDict[K, V]):
+class UniqDict[K, V](UserDict[K, V]):
     """One to one mapping. A dict which guarantees uniqueness for values in addition to keys."""
     def __setitem__(self, key: K, value: V) -> None:
         if value in self.values():

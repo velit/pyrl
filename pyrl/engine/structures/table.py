@@ -4,16 +4,14 @@ from collections.abc import Iterable
 from dataclasses import dataclass, InitVar, field
 from itertools import zip_longest
 from random import randrange
-from typing import TypeVar, Generic, Iterator
+from typing import Iterator, Any
 
+from pyrl.engine.enums.directions import Coord
 from pyrl.engine.structures.dimensions import Dimensions
 from pyrl.engine.structures.helper_mixins import DimensionsMixin
-from pyrl.engine.enums.directions import Coord
-
-T = TypeVar('T')
 
 @dataclass
-class Table(Generic[T], DimensionsMixin):
+class Table[T](DimensionsMixin):
     """
     Mutable non-dynamic array with two-dimensional get- and setitem methods.
 
@@ -54,9 +52,9 @@ class Table(Generic[T], DimensionsMixin):
     def __iter__(self) -> Iterator[T]:
         return iter(self._impl)
 
-    def __eq__(self, o: object) -> bool:
+    def __eq__(self, o: Any) -> bool:
         if isinstance(o, Table):
-            return self.dimensions == o.dimensions and self._impl == o._impl
+            return self.dimensions == o.dimensions and self._impl == o._impl  # pyright: ignore [reportUnknownMemberType]
         return False
 
     def get_coord(self, index: int) -> Coord:
@@ -78,7 +76,7 @@ class Table(Generic[T], DimensionsMixin):
             yield self.get_coord(i), item
 
     def coord_iter(self) -> Iterable[Coord]:
-        for i, item in enumerate(self):
+        for i, _ in enumerate(self):
             yield self.get_coord(i)
 
     def random_coord(self) -> Coord:

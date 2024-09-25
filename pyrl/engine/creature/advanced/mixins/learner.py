@@ -42,7 +42,7 @@ class Learner(Mutator, ABC):
 
     def gain_xp(self, amount: int) -> Sequence[int]:
         self.experience += amount
-        levels = []
+        levels: list[int] = []
         if self.creature_level > self.claimed_level:
             while self.creature_level > self.claimed_level:
                 self.claimed_level += 1

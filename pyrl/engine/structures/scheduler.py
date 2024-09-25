@@ -2,13 +2,9 @@ from __future__ import annotations
 
 import heapq
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar
-
-T = TypeVar('T')
-Entry = tuple[int, int, T]
 
 @dataclass(eq=False)
-class Scheduler(Generic[T]):
+class Scheduler[T]:
     """Priority queue based scheduler. Behaves in LIFO fashion with equal time values."""
 
     priority_queue: list[tuple[int, int, T]] = field(default_factory=list, repr=False)
@@ -24,7 +20,7 @@ class Scheduler(Generic[T]):
     def pop(self) -> tuple[T, int]:
         """Pops the next item and its time delta."""
         self._clean_queue_front()
-        item_time, count, item = heapq.heappop(self.priority_queue)
+        item_time, _, item = heapq.heappop(self.priority_queue)
         time_delta = item_time - self.ticks
         self.ticks = item_time
         return item, time_delta

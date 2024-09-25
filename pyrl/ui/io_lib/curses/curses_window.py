@@ -4,14 +4,15 @@ import curses
 import curses.ascii
 import logging
 import sys
-from typing import Iterable, TYPE_CHECKING, ClassVar
+from collections.abc import Iterable
+from typing import ClassVar
 
 from pyrl.config.debug import Debug
-from pyrl.engine.structures.dimensions import Dimensions
-from pyrl.engine.structures.position import Position
 from pyrl.engine.enums.directions import Coord
 from pyrl.engine.enums.glyphs import ColorPair, Colors, Glyph
 from pyrl.engine.enums.keys import Key, AnyKey
+from pyrl.engine.structures.dimensions import Dimensions
+from pyrl.engine.structures.position import Position
 from pyrl.ui.io_lib.curses import IMPLEMENTATION, WideChar
 from pyrl.ui.io_lib.curses.curses_dicts import Curses256ColorDict, CursesColorDict
 from pyrl.ui.io_lib.curses.curses_keys import curses_key_map
@@ -19,19 +20,16 @@ from pyrl.ui.io_lib.protocol.io_window import IoWindow
 from pyrl.ui.window.window_system import WindowSystem
 from tests.integration_tests.dummy_plug_system import handle_dummy_input
 
-if TYPE_CHECKING:
-    from _curses import _CursesWindow
-
 class CursesWindow(IoWindow):
 
     implementation: ClassVar[str] = IMPLEMENTATION
     color_map: ClassVar[dict[ColorPair, int]]
     key_map: ClassVar[dict[WideChar, str]] = curses_key_map
 
-    win: _CursesWindow
+    win: curses.window
     root_win: CursesWindow
 
-    def __init__(self, curses_window: _CursesWindow, root_window: CursesWindow | None = None) -> None:
+    def __init__(self, curses_window: curses.window, root_window: CursesWindow | None = None) -> None:
         self.win = curses_window
         if root_window is None:
             self.root_win = self

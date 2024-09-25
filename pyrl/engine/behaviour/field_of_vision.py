@@ -21,7 +21,7 @@ class ShadowCast:
     def get_light_set(cls, visible: IsVisible, coord: Coord, sight: int,
                       max_rows: int, max_cols: int) -> set[Coord]:
         y, x = coord
-        light_set = set()
+        light_set: set[Coord] = set()
         light_set.add(coord)
         for octant in range(8):
             cls._shadow_cast(light_set, visible, y, x, 1, 1.0, 0.0, sight, max_rows, max_cols,
@@ -67,7 +67,7 @@ class ShadowCast:
                                 new_start = r_slope
                             else:
                                 blocked = False
-                                start = new_start
+                                start = new_start  # pyright: ignore [reportPossiblyUnboundVariable]
                         else:
                             if not visible((map_y, map_x)) and j < radius:
                                 # This is a blocking square, start a child scan:

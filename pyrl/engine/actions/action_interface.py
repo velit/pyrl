@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Callable
 from dataclasses import dataclass, field
-from typing import NoReturn, Iterable, TYPE_CHECKING, ParamSpec, Callable, Concatenate
+from typing import NoReturn, TYPE_CHECKING, ParamSpec, Concatenate
 
 from pyrl.engine.actions.action import Action
 from pyrl.engine.actions.action_exceptions import IllegalMoveException, NoValidTargetException

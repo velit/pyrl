@@ -2,24 +2,21 @@ from __future__ import annotations
 
 import math
 from decimal import Decimal
-from typing import TypeVar, Type, Iterable, TypeGuard
+from typing import Iterable, TypeGuard
 
-from pyrl.engine.enums.directions import Direction, Dir, Coord
+from pyrl.engine.enums.directions import Direction, Dir, Coord, DirectionUnit
 
-N = TypeVar('N', int, float, Decimal)
-
-def resize_range(number: N, old_range: range, new_range: range = range(2)) -> N:
+def resize_range[N: (int, float, Decimal)](number: N, old_range: range, new_range: range = range(2)) -> N:
     """Resize given number from the old_range to the new_range.
 
     If the input number is a float or decimal then the return value will also be and might include fractions
     For example resize_range(1.0, range(3)) == 0.5 because 1 is in the middle of range(3)"""
-    n_t: Type[N] = type(number)
+    t = type(number)
     assert number in old_range, f"Value '{number}' is not inside {old_range}"
     assert len(old_range) > 1, f"Number {old_range.start} is not a range"
-    old_min, old_max = n_t(old_range.start), n_t(old_range.stop - 1)
-    new_min, new_max = n_t(new_range.start), n_t(new_range.stop - 1)
-    return n_t((((n_t(number) - n_t(old_min)) * (n_t(new_max) - n_t(new_min)))
-               / (n_t(old_max) - n_t(old_min))) + n_t(new_min))
+    old_min, old_max = t(old_range.start), t(old_range.stop - 1)
+    new_min, new_max = t(new_range.start), t(new_range.stop - 1)
+    return t((((t(number) - t(old_min)) * (t(new_max) - t(new_min))) / (t(old_max) - t(old_min))) + t(new_min))
 
 def bresenham(coord_a: Coord, coord_b: Coord) -> Iterable[Coord]:
     (ay, ax), (by, bx) = coord_a, coord_b
@@ -40,7 +37,7 @@ def bresenham(coord_a: Coord, coord_b: Coord) -> Iterable[Coord]:
             err = err + dx
             ay = ay + sy
 
-def bresenham_old(coord_a: Coord, coord_b: Coord, includelast: bool = True) -> Iterable[Coord]:
+def bresenham_old(coord_a: Coord, coord_b: Coord, include_last: bool = True) -> Iterable[Coord]:
     (ay, ax), (by, bx) = coord_a, coord_b
     steep = abs(bx - ax) > abs(by - ay)
     if steep:
@@ -51,7 +48,7 @@ def bresenham_old(coord_a: Coord, coord_b: Coord, includelast: bool = True) -> I
     error = deltay // 2
     x = ax
     xstep = 1 if ax < bx else -1
-    y_range = range(ay, by + includelast) if ay < by else range(by, ay + includelast)[::-1]
+    y_range = range(ay, by + include_last) if ay < by else range(by, ay + include_last)[::-1]
     for y in y_range:
         yield (x, y) if steep else (y, x)
         error -= deltax
@@ -101,14 +98,13 @@ def add_vector(vector_a: Coord, vector_b: Coord) -> Coord:
 def scalar_mult(scalar: int, vector: Coord) -> Coord:
     return scalar * vector[0], scalar * vector[1]
 
-Vector = TypeVar('Vector', Coord, Direction)
-def reverse(vector: Vector) -> Vector:
+def reverse[I: (int, DirectionUnit)](vector: tuple[I, I]) -> tuple[I, I]:
     return -vector[0], -vector[1]
 
-def clockwise_90(vector: Vector) -> Vector:
+def clockwise_90[I: (int, DirectionUnit)](vector: tuple[I, I]) -> tuple[I, I]:
     return vector[1], -vector[0]
 
-def anticlockwise_90(vector: Vector) -> Vector:
+def anticlockwise_90[I: (int, DirectionUnit)](vector: tuple[I, I]) -> tuple[I, I]:
     return -vector[1], vector[0]
 
 def clockwise_45(direction: Direction) -> Direction:

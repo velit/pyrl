@@ -1,0 +1,54 @@
+[project]
+name = "tappi-pyrl"
+version = "0.1.0"
+dependencies = [
+    "tcod",
+    "windows-curses  ; sys_platform == 'win32'",
+]
+requires-python = ">= 3.12"
+authors = [
+    { name = "Tapani Kiiskinen", email = "tapani.kiiskinen@gmail.com" },
+]
+maintainers = [
+    { name = "Tapani Kiiskinen", email = "tapani.kiiskinen@gmail.com" },
+]
+description = "Python Roguelike; essentially just an engine don't expect much gameplay."
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+keywords = ["pyrl", "roguelike", "game", "tappi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console :: Curses",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Games/Entertainment",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pyright",
+]
+
+[project.urls]
+Repository = "https://github.com/velit/pyrl"
+
+[project.scripts]
+pyrl = "pyrl.main:main"
+
+[project.gui-scripts]
+pyrl = "pyrl.main:main"
+
+[tool.pyright]
+typeCheckingMode = "strict"
+include = ["pyrl", "tests", "tools"]
+exclude = []
+ignore = []
+
+reportPrivateUsage = false
+
+pythonVersion = "3.12"
+
+executionEnvironments = [
+]

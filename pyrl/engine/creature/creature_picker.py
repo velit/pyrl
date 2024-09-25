@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import random
+from collections.abc import Iterable
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Iterable, Self
+from typing import Self
 
 from pyrl.engine.behaviour.coordinates import resize_range
 from pyrl.engine.creature.basic.basic_creature import BasicCreatureTemplate
@@ -16,7 +17,7 @@ class CreaturePicker:
 
     @classmethod
     def using_speciation(cls, creature_templates: Iterable[BasicCreatureTemplate], area_level: int) -> Self:
-        weighted_creatures = []
+        weighted_creatures: list[tuple[int, BasicCreatureTemplate]] = []
         accumulator = 0
         for template in creature_templates:
             weight = cls._picking_weight(area_level, template)

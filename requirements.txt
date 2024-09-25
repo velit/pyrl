@@ -1,4 +1,0 @@
-tcod
-pytest
-mypy
-windows-curses  ; sys_platform == 'win32'

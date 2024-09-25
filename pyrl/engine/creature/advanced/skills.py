@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable
 
 from pyrl.engine.creature.enums.stats import StatsProvider, Stats, Stat
 

@@ -19,10 +19,10 @@ from pyrl.engine.actions.action_feedback import ActionFeedback, NoActionFeedback
 from pyrl.engine.actions.action_interface import ActionInterface
 from pyrl.engine.behaviour.coordinates import add_vector, bresenham
 from pyrl.engine.creature.enums.stats import Stat
-from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.engine.enums.directions import Direction, Dir
 from pyrl.engine.enums.glyphs import Color, Colors
 from pyrl.engine.enums.keys import Key, KeyTuple, AnyKey
+from pyrl.engine.structures.helper_mixins import CreatureActionsMixin
 from pyrl.game_data.levels.shared_assets import DefaultLocation
 from pyrl.ui.views.help_view import help_view
 from pyrl.ui.views.inventory_views import equipment_view, backpack_view, pickup_items_view, drop_items_view
@@ -114,8 +114,7 @@ class UserController(CreatureActionsMixin):
 
     def process_feedback(self, feedback: ActionFeedback) -> None:
         match feedback:
-
-            case DisplacementFeedback(action, coord, items):
+            case DisplacementFeedback(_, _, items):
                 if self.actions.get_passage():
                     self.io.msg(f"There is {article(self.actions.get_tile().name)} here.")
                 if items:
@@ -145,6 +144,7 @@ class UserController(CreatureActionsMixin):
                 if levelups:
                     self.io.msg(f"Congratulations! you've gained enough experience to attain level {levelups[-1]}!",
                                 color=Colors.Yellow)
+            case _: pass
 
     def _get_and_execute_action(self) -> ActionFeedback:
         if self.walk_mode.active:
@@ -176,7 +176,7 @@ class UserController(CreatureActionsMixin):
                 self.io.draw_line(coord, self.coord, ("*", Colors.Yellow))
                 self.io.msg(f"LoS: {self.actions.level.check_los(self.coord, coord)}")
             if coord != self.coord:
-                symbol, (foreground, background) = self.actions.level.visible_glyph(coord)
+                symbol, (foreground, _) = self.actions.level.visible_glyph(coord)
                 glyph = symbol, (foreground, Color.Green)
                 self.io.draw_glyph(glyph, coord)
                 self.io.draw_glyph(self.actions.level.visible_glyph(self.coord), self.coord, reverse=True)
